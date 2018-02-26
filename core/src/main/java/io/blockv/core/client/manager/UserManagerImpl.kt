@@ -6,11 +6,20 @@ import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Observable
 import io.blockv.core.internal.net.rest.request.LoginRequest
+import io.blockv.core.internal.net.rest.request.OauthLoginRequest
 
 /**
  * Created by LordCheddar on 2018/02/22.
  */
 class UserManagerImpl(var api: UserApi) : UserManager {
+
+  override fun loginOauth(provider: String, token: String): Observable<User?> = object : Observable<User?>() {
+    override fun getResult(): User? = api
+      .oauthLogin(OauthLoginRequest(
+        provider,
+        token)).payload
+  }
+
 
   private fun login(tokenType: String, token: String, auth: String): Observable<User?> = object : Observable<User?>() {
     override fun getResult(): User? = api

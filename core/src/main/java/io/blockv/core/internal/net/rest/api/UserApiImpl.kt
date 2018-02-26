@@ -7,6 +7,7 @@ import io.blockv.android.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.internal.net.rest.request.LoginRequest
+import io.blockv.core.internal.net.rest.request.OauthLoginRequest
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -16,7 +17,17 @@ import org.json.JSONObject
 class UserApiImpl(val client: Client,
                   val jsonModule: JsonModule) : UserApi {
 
-  override fun register(request: RegisterRequest): BaseResponse<User?> {
+  override fun oauthLogin(request: OauthLoginRequest): BaseResponse<User?> {
+    val response: JSONObject = client.post("users", request.toJson())
+    val payload: JSONObject = response.optJSONObject("payload")
+    return BaseResponse(
+      response.optString("status"),
+      response.optInt("error"),
+      response.optString("message"),
+      jsonModule.userDeserilizer.deserialize(payload))
+  }
+
+  override fun register(request: CreateUserRequest): BaseResponse<User?> {
     val response: JSONObject = client.post("users", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(

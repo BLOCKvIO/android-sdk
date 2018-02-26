@@ -13,6 +13,8 @@ interface UserManager {
 
   fun loginPhoneNumber(phoneNumber: String, password: String): Observable<User?>
 
+  fun loginOauth(provider: String, token: String): Observable<User?>
+
   fun sendOtpPhoneNumber(phone: String): Observable<Void?>
 
   fun sendOtpEmail(email: String): Observable<Void?>

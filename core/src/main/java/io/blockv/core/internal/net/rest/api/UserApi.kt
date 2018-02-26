@@ -5,6 +5,7 @@ import io.blockv.android.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.internal.net.rest.request.LoginRequest
+import io.blockv.core.internal.net.rest.request.OauthLoginRequest
 import org.json.JSONObject
 
 /**
@@ -12,9 +13,11 @@ import org.json.JSONObject
  */
 interface UserApi {
 
-  fun register(request: RegisterRequest): BaseResponse<User?>
+  fun register(request: CreateUserRequest): BaseResponse<User?>
 
   fun login(request: LoginRequest): BaseResponse<User?>
+
+  fun oauthLogin(request: OauthLoginRequest): BaseResponse<User?>
 
   fun getCurrentUser(): BaseResponse<User?>
 
