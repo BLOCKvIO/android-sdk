@@ -45,6 +45,11 @@ interface UserManager {
                      var password: String?,
                      var language: String?,
                      var tokens: List<Token>?)
+  {
+    open class Token(val type:String,val value:String)
+
+    class OauthToken(type:String,value:String,val auth:String):Token(type,value)
+  }
 
   class UserUpdate(var firstName: String?,
                    var lastName: String?,
@@ -52,4 +57,6 @@ interface UserManager {
                    var avatarUri: String?,
                    var password: String?,
                    var language: String?)
+
+
 }

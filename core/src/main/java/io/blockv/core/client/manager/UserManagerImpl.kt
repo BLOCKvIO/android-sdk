@@ -10,6 +10,8 @@ import io.blockv.core.internal.net.rest.request.OauthLoginRequest
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Observable
+import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * Created by LordCheddar on 2018/02/22.
@@ -59,14 +61,26 @@ class UserManagerImpl(var api: UserApi) : UserManager {
   override fun sendVerificationEmail(email: String): Observable<Void?> = sendVerification("email", email)
 
   override fun register(registration: UserManager.Registration): Observable<User?> = object : Observable<User?>() {
-    override fun getResult(): User? = api.register(CreateUserRequest(
-      registration.firstName,
-      registration.lastName,
-      registration.birthday,
-      registration.avatarUri,
-      registration.password,
-      registration.language,
-      registration.tokens)).payload
+    override fun getResult(): User? {
+
+      val tokens = JSONArray()
+      registration.tokens?.forEach {
+        val data = JSONObject()
+        data.put("token_type", it.type)
+        data.put("token", it.value)
+        if (it is UserManager.Registration.OauthToken) {
+          data.put("auth_data", JSONObject().put("auth_data", it.auth))
+        }
+      }
+      return api.register(CreateUserRequest(
+        registration.firstName,
+        registration.lastName,
+        registration.birthday,
+        registration.avatarUri,
+        registration.password,
+        registration.language,
+        tokens)).payload
+    }
   }
 
   private fun verify(type: String, token: String, code: String): Observable<Void?> = object : Observable<Void?>() {

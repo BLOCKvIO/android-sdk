@@ -1,7 +1,6 @@
 package io.blockv.core.client.builder
 
 import io.blockv.core.client.manager.UserManager
-import io.blockv.core.model.Token
 import java.util.*
 
 /**
@@ -16,7 +15,7 @@ class RegistrationBuilder {
   internal var avatar: String? = null
   internal var password: String? = null
   internal var language: String? = null
-  internal var tokens: MutableList<Token> = ArrayList()
+  internal var tokens: MutableList<UserManager.Registration.Token> = ArrayList()
 
   fun setFirstName(firstName: String): RegistrationBuilder {
     this.firstName = firstName
@@ -43,8 +42,21 @@ class RegistrationBuilder {
     return this
   }
 
-  fun addToken(token: Token): RegistrationBuilder {
+  fun addToken(token: UserManager.Registration.Token): RegistrationBuilder {
     tokens.add(token)
+    return this
+  }
+
+  fun addEmail(email: String): RegistrationBuilder {
+    tokens.add(UserManager.Registration.Token("email", email))
+    return this
+  }
+  fun addPhoneNumber(phoneNumber: String): RegistrationBuilder {
+    tokens.add(UserManager.Registration.Token("phone_number", phoneNumber))
+    return this
+  }
+  fun addOauth(provider:String,token:String,auth:String): RegistrationBuilder {
+    tokens.add(UserManager.Registration.OauthToken(provider,token,auth))
     return this
   }
 

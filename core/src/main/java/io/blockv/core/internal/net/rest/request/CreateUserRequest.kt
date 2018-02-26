@@ -27,7 +27,7 @@ class CreateUserRequest {
   var avatarUri: String? = null
   var password: String? = null
   var language: String? = null
-  var tokens: List<Token>? = ArrayList()
+  var tokens: JSONArray? = null
 
   constructor(firstName: String?,
               lastName: String?,
@@ -35,7 +35,7 @@ class CreateUserRequest {
               avatarUri: String?,
               password: String?,
               language: String?,
-              tokens: List<Token>?) {
+              tokens: JSONArray?) {
     this.firstName = firstName
     this.lastName = lastName
     this.birthday = birthday
@@ -54,17 +54,8 @@ class CreateUserRequest {
     if (avatarUri != null) json.put("avatar_uri", avatarUri)
     if (password != null) json.put("password", password)
     if (language != null) json.put("language", language)
-    if (tokens != null) {
-      val tokenArray: List<Token> = tokens as List<Token>
-      val jsonArray: JSONArray = JSONArray(tokenArray.size)
-      for (token: Token in tokenArray) {
-        val data: JSONObject = JSONObject()
-        data.put("token_type", token.tokenType)
-        if (token.token != null) data.put("token", token.token)
-        jsonArray.put(data)
-      }
+    if (tokens != null) json.put("tokens", tokens)
 
-    }
 
     return json
   }
