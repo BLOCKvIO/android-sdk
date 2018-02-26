@@ -2,9 +2,9 @@ package io.blockv.core.internal.net.rest.api
 
 import io.blockv.android.core.internal.net.rest.Client
 import io.blockv.core.internal.json.JsonModule
-import io.blockv.android.core.internal.net.rest.request.GeoRequest
 import io.blockv.core.internal.net.rest.request.InventoryRequest
-import io.blockv.android.core.internal.net.rest.response.BaseResponse
+import io.blockv.core.internal.net.rest.response.BaseResponse
+import io.blockv.core.internal.net.rest.request.GeoRequest
 import io.blockv.core.model.Action
 import io.blockv.core.model.Inventory
 import org.json.JSONObject

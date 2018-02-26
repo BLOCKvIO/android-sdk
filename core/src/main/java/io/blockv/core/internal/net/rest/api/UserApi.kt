@@ -1,7 +1,7 @@
 package io.blockv.core.internal.net.rest.api
 
 import io.blockv.android.core.internal.net.rest.request.*
-import io.blockv.android.core.internal.net.rest.response.BaseResponse
+import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.internal.net.rest.request.LoginRequest

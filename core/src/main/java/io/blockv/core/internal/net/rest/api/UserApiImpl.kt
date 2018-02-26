@@ -3,7 +3,7 @@ package io.blockv.core.internal.net.rest.api
 import io.blockv.android.core.internal.net.rest.Client
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.android.core.internal.net.rest.request.*
-import io.blockv.android.core.internal.net.rest.response.BaseResponse
+import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.internal.net.rest.request.LoginRequest
@@ -108,7 +108,7 @@ class UserApiImpl(val client: Client,
     val payload: JSONArray = response.optJSONArray("payload")
     val list: ArrayList<Token> = ArrayList()
 
-    var count: Int = 0
+    var count = 0
     while (count < payload.length()) {
       val token: Token? = jsonModule.tokenDeserilizer.deserialize(payload.getJSONObject(count))
       if (token != null) {
