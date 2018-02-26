@@ -1,12 +1,15 @@
 package io.blockv.core.client.manager
 
+import io.blockv.android.core.internal.net.rest.request.CreateUserRequest
+import io.blockv.android.core.internal.net.rest.request.ResetTokenRequest
+import io.blockv.android.core.internal.net.rest.request.UpdateUserRequest
+import io.blockv.android.core.internal.net.rest.request.VerifyTokenRequest
 import io.blockv.core.internal.net.rest.api.UserApi
-import io.blockv.android.core.internal.net.rest.request.*
+import io.blockv.core.internal.net.rest.request.LoginRequest
+import io.blockv.core.internal.net.rest.request.OauthLoginRequest
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Observable
-import io.blockv.core.internal.net.rest.request.LoginRequest
-import io.blockv.core.internal.net.rest.request.OauthLoginRequest
 
 /**
  * Created by LordCheddar on 2018/02/22.
@@ -33,17 +36,20 @@ class UserManagerImpl(var api: UserApi) : UserManager {
 
   override fun loginPhoneNumber(phoneNumber: String, password: String): Observable<User?> = login("phone_number", phoneNumber, password)
 
-  override fun sendOtpPhoneNumber(phone: String): Observable<Void?> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  private fun sendOtp(type: String, token: String): Observable<Void?> = object : Observable<Void?>() {
+    override fun getResult(): Void? {
+      api.resetToken(ResetTokenRequest(type, token))
+      return null
+    }
   }
 
-  override fun sendOtpEmail(email: String): Observable<Void?> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun sendOtpPhoneNumber(phone: String): Observable<Void?> = sendVerification("phone_number", phone)
+
+  override fun sendOtpEmail(email: String): Observable<Void?> = sendVerification("email", email)
 
   private fun sendVerification(type: String, token: String): Observable<Void?> = object : Observable<Void?>() {
     override fun getResult(): Void? {
-      api.resetToken(ResetTokenRequest(type, token))
+      api.resetVerificationToken(ResetTokenRequest(type, token))
       return null
     }
   }

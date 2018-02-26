@@ -9,7 +9,7 @@ class ResetTokenRequest(var tokenType: String, var token: String) {
 
   fun toJson():JSONObject
   {
-    val out: JSONObject = JSONObject()
+    val out = JSONObject()
     out.put("token", token)
     out.put("token_type", tokenType)
     return out

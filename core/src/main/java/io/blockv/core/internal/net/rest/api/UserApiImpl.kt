@@ -71,9 +71,20 @@ class UserApiImpl(val client: Client,
       jsonModule.userDeserilizer.deserialize(payload))
   }
 
-  override fun resetToken(request: ResetTokenRequest): BaseResponse<Token?> {
+  override fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token?> {
 
     val response: JSONObject = client.post("users/reset_token_verification", request.toJson())
+    val payload: JSONObject = response.optJSONObject("payload")
+    return BaseResponse(
+      response.optString("status"),
+      response.optInt("error"),
+      response.optString("message"),
+      jsonModule.tokenDeserilizer.deserialize(payload))
+  }
+
+  override fun resetToken(request: ResetTokenRequest): BaseResponse<Token?> {
+
+    val response: JSONObject = client.post("users/reset_token", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),

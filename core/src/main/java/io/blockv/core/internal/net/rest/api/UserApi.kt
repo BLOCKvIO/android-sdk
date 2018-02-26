@@ -23,6 +23,8 @@ interface UserApi {
 
   fun updateCurrentUser(request: UpdateUserRequest): BaseResponse<User?>
 
+  fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token?>
+
   fun resetToken(request: ResetTokenRequest): BaseResponse<Token?>
 
   fun verifyToken(request: VerifyTokenRequest): BaseResponse<Token?>
