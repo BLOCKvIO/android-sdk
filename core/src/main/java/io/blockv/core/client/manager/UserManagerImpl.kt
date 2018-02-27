@@ -45,9 +45,9 @@ class UserManagerImpl(var api: UserApi) : UserManager {
     }
   }
 
-  override fun sendOtpPhoneNumber(phone: String): Observable<Void?> = sendVerification("phone_number", phone)
+  override fun sendOtpPhoneNumber(phone: String): Observable<Void?> = sendOtp("phone_number", phone)
 
-  override fun sendOtpEmail(email: String): Observable<Void?> = sendVerification("email", email)
+  override fun sendOtpEmail(email: String): Observable<Void?> = sendOtp("email", email)
 
   private fun sendVerification(type: String, token: String): Observable<Void?> = object : Observable<Void?>() {
     override fun getResult(): Void? {

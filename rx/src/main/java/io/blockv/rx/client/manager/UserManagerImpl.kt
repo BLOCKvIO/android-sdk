@@ -14,6 +14,8 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * Created by LordCheddar on 2018/02/25.
@@ -29,25 +31,19 @@ class UserManagerImpl(var api: UserApi) : UserManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun loginEmail(email: String, password: String): Single<User?> {
-    return login("email", email, password)
-  }
+  override fun loginEmail(email: String, password: String): Single<User?> = login("email", email, password)
 
-  override fun loginPhoneNumber(phoneNumber: String, password: String): Single<User?> {
-    return login("phone_number", phoneNumber, password)
-  }
+  override fun loginPhoneNumber(phoneNumber: String, password: String): Single<User?> =
+    login("phone_number", phoneNumber, password)
 
-  private fun sendOtp(type: String, token: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  private fun sendOtp(type: String, token: String): Completable =
+    Completable.fromCallable { api.resetToken(ResetTokenRequest(type, token)) }
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
 
-  override fun sendOtpPhoneNumber(phone: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun sendOtpPhoneNumber(phone: String): Completable = sendOtp("phone_number", phone)
 
-  override fun sendOtpEmail(email: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun sendOtpEmail(email: String): Completable = sendOtp("email", email)
 
   private fun sendVerification(type: String, token: String): Completable = Completable.fromCallable {
     api.resetToken(ResetTokenRequest(type, token))
@@ -61,6 +57,15 @@ class UserManagerImpl(var api: UserApi) : UserManager {
 
   override fun register(registration: io.blockv.core.client.manager.UserManager.Registration): Single<User?> =
     Single.fromCallable {
+      val tokens = JSONArray()
+      registration.tokens?.forEach {
+        val data = JSONObject()
+        data.put("token_type", it.type)
+        data.put("token", it.value)
+        if (it is io.blockv.core.client.manager.UserManager.Registration.OauthToken) {
+          data.put("auth_data", JSONObject().put("auth_data", it.auth))
+        }
+      }
       api.register(CreateUserRequest(
         registration.firstName,
         registration.lastName,
@@ -68,7 +73,7 @@ class UserManagerImpl(var api: UserApi) : UserManager {
         registration.avatarUri,
         registration.password,
         registration.language,
-        registration.tokens)).payload
+        tokens)).payload
     }
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
