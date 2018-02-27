@@ -3,4 +3,6 @@ package io.blockv.core.model
 /**
  * Created by LordCheddar on 2018/02/25.
  */
-class Inventory(val vatoms:List<Vatom>, val faces:List<Face>, val actions:List<Action>)
+class Inventory(val vatoms: List<Vatom>, val faces: List<Face>, val actions: List<Action>) {
+  constructor() : this(ArrayList<Vatom>(), ArrayList<Face>(), ArrayList<Action>())
+}

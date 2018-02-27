@@ -2,11 +2,12 @@ package io.blockv.core.internal.net.rest.api
 
 import io.blockv.android.core.internal.net.rest.Client
 import io.blockv.core.internal.json.JsonModule
+import io.blockv.core.internal.net.rest.request.GeoRequest
 import io.blockv.core.internal.net.rest.request.InventoryRequest
 import io.blockv.core.internal.net.rest.response.BaseResponse
-import io.blockv.core.internal.net.rest.request.GeoRequest
 import io.blockv.core.model.Action
 import io.blockv.core.model.Inventory
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -15,26 +16,69 @@ import org.json.JSONObject
 class VatomApiImpl(val client: Client,
                    val jsonModule: JsonModule) : VatomApi {
 
-
-  override fun getCurrentUserInventory(request: InventoryRequest): BaseResponse<Inventory?> {
-    val response: JSONObject = client.post("v1/currentuser/inventory", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
+  override fun discover(request: JSONObject): BaseResponse<JSONObject?> {
+    val response: JSONObject = client.post("v1/currentuser/vatom/discover", request)
+    val payload: JSONObject? = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.inventoryDeserilizer.deserialize(payload))
+      payload)
+  }
+
+
+  override fun getCurrentUserInventory(request: InventoryRequest): BaseResponse<Inventory?> {
+    val response: JSONObject = client.post("v1/currentuser/inventory", request.toJson())
+    val payload: JSONObject? = response.optJSONObject("payload")
+
+    return BaseResponse(
+      response.optString("status"),
+      response.optInt("error"),
+      response.optString("message"),
+      (if (payload != null) jsonModule.inventoryDeserilizer.deserialize(payload) else null) ?: Inventory()
+    )
   }
 
   override fun getVatomActions(template: String?): BaseResponse<List<Action>> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    val response: JSONObject = client.get("v1/currentuser/actions/" + template)
+    val payload: JSONArray? = response.optJSONArray("payload")
+    val list: ArrayList<Action> = ArrayList()
+    if (payload != null) {
+      var count = 0
+      while (count < payload.length()) {
+        val action: Action? = jsonModule.actionDeserilizer.deserialize(payload.getJSONObject(count))
+        if (action != null) {
+          list.add(action)
+        }
+        count++
+      }
+    }
+    return BaseResponse(
+      response.optString("status"),
+      response.optInt("error"),
+      response.optString("message"),
+      list)
   }
 
-  override fun preformAction(request: JSONObject): BaseResponse<Void?> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  override fun preformAction(request: JSONObject): BaseResponse<JSONObject?> {
+    val response: JSONObject = client.post("v1/currentuser/inventory", request)
+    val payload: JSONObject? = response.optJSONObject("payload")
+    return BaseResponse(
+      response.optString("status"),
+      response.optInt("error"),
+      response.optString("message"),
+      payload)
   }
 
-  override fun geoDiscover(request: GeoRequest): BaseResponse<Inventory?> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  override fun geoDiscover(request: JSONObject): BaseResponse<Inventory?> {
+    val response: JSONObject = client.post("v1/currentuser/geodiscover", request)
+    val payload: JSONObject? = response.optJSONObject("payload")
+
+    return BaseResponse(
+      response.optString("status"),
+      response.optInt("error"),
+      response.optString("message"),
+      (if (payload != null) jsonModule.inventoryDeserilizer.deserialize(payload) else null) ?: Inventory()
+    )
   }
 }

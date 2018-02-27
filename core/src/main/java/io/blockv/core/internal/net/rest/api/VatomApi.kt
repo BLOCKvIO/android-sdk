@@ -16,9 +16,12 @@ interface VatomApi {
 
   fun getVatomActions(template:String?): BaseResponse<List<Action>>
 
-  fun preformAction(request: JSONObject): BaseResponse<Void?>
+  fun preformAction(request: JSONObject): BaseResponse<JSONObject?>
 
-  fun geoDiscover(request: GeoRequest): BaseResponse<Inventory?>
+  fun geoDiscover(request: JSONObject): BaseResponse<Inventory?>
+
+  fun discover(request: JSONObject): BaseResponse<JSONObject?>
+
 
 
 }
