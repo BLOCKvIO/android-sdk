@@ -11,11 +11,11 @@ import java.util.HashMap
  */
 interface VatomManager {
 
-  fun getVatom(id:String): Observable<Vatom>
+  fun getVatoms(ids:List<String>): Observable<Inventory>
 
-  fun getInventory(id:String): Observable<Inventory>
+  fun getInventory(id:String?,pageToken:String?,pageAmount:Int?): Observable<Inventory>
 
-  fun geoDiscover(latitude:Double,longitude:Double,radius:Double): Observable<Inventory>
+  fun geoDiscover(latitude:Double,longitude:Double,radius:Int,limit:Int): Observable<Inventory>
 
   fun getVatomActions(template:String): Observable<List<io.blockv.core.model.Action>>
 

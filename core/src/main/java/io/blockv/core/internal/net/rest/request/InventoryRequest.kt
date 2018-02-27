@@ -8,9 +8,9 @@ import org.json.JSONObject
 class InventoryRequest(val parentId: String, val pageToken: String?, val pageAmount: Int) {
 
   fun toJson(): JSONObject {
-    val out: JSONObject = JSONObject()
+    val out = JSONObject()
     out.put("id", parentId)
-    out.put("page_token", pageToken)
+    out.put("page_token", pageToken ?: "")
     out.put("page_amount", pageAmount)
     return out
   }

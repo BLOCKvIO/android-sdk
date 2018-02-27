@@ -13,7 +13,8 @@ class InventoryDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
 
   override fun deserialize(data: JSONObject): Inventory? {
     try {
-      val inventory: JSONArray? = data.optJSONArray("inventory")
+      val inventory: JSONArray? = if (data.has("inventory")) data.optJSONArray("inventory") else data.optJSONArray("objects") //so it can work with get current user vatom payload
+
       val faces: JSONArray? = data.optJSONArray("faces")
       val actions: JSONArray? = data.optJSONArray("actions")
 
