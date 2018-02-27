@@ -18,7 +18,7 @@ class UserApiImpl(val client: Client,
                   val jsonModule: JsonModule) : UserApi {
 
   override fun oauthLogin(request: OauthLoginRequest): BaseResponse<User?> {
-    val response: JSONObject = client.post("users", request.toJson())
+    val response: JSONObject = client.post("v1/user/login", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
@@ -28,7 +28,7 @@ class UserApiImpl(val client: Client,
   }
 
   override fun register(request: CreateUserRequest): BaseResponse<User?> {
-    val response: JSONObject = client.post("users", request.toJson())
+    val response: JSONObject = client.post("v1/users", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
@@ -38,7 +38,7 @@ class UserApiImpl(val client: Client,
   }
 
   override fun login(request: LoginRequest): BaseResponse<User?> {
-    val response: JSONObject = client.post("users/login", request.toJson())
+    val response: JSONObject = client.post("v1/user/login", request.toJson())
 
     val payload: JSONObject = response.optJSONObject("payload")
     val user: JSONObject = payload.optJSONObject("user")
@@ -51,7 +51,7 @@ class UserApiImpl(val client: Client,
   }
 
   override fun getCurrentUser(): BaseResponse<User?> {
-    val response: JSONObject = client.get("user")
+    val response: JSONObject = client.get("v1/user")
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
@@ -62,7 +62,7 @@ class UserApiImpl(val client: Client,
   }
 
   override fun updateCurrentUser(request: UpdateUserRequest): BaseResponse<User?> {
-    val response: JSONObject = client.patch("user", request.toJson())
+    val response: JSONObject = client.patch("v1/user", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
@@ -73,7 +73,7 @@ class UserApiImpl(val client: Client,
 
   override fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token?> {
 
-    val response: JSONObject = client.post("users/reset_token_verification", request.toJson())
+    val response: JSONObject = client.post("v1/users/reset_token_verification", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
@@ -84,7 +84,7 @@ class UserApiImpl(val client: Client,
 
   override fun resetToken(request: ResetTokenRequest): BaseResponse<Token?> {
 
-    val response: JSONObject = client.post("users/reset_token", request.toJson())
+    val response: JSONObject = client.post("v1/users/reset_token", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
@@ -94,7 +94,7 @@ class UserApiImpl(val client: Client,
   }
 
   override fun verifyToken(request: VerifyTokenRequest): BaseResponse<Token?> {
-    val response: JSONObject = client.post("users/verify_token", request.toJson())
+    val response: JSONObject = client.post("v1/users/verify_token", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
@@ -104,7 +104,7 @@ class UserApiImpl(val client: Client,
   }
 
   override fun getUserTokens(): BaseResponse<List<Token>> {
-    val response: JSONObject = client.get("user/tokens")
+    val response: JSONObject = client.get("v1/user/tokens")
     val payload: JSONArray = response.optJSONArray("payload")
     val list: ArrayList<Token> = ArrayList()
 
@@ -125,7 +125,7 @@ class UserApiImpl(val client: Client,
   }
 
   override fun logout(): BaseResponse<JSONObject> {
-    val response: JSONObject = client.post("user/logout", null)
+    val response: JSONObject = client.post("v1/user/logout", null)
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
