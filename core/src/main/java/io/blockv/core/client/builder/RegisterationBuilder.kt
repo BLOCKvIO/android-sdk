@@ -9,13 +9,13 @@ import java.util.*
 
 class RegistrationBuilder {
 
-  internal var firstName: String? = null
-  internal var lastName: String? = null
-  internal var birthday: String? = null
-  internal var avatar: String? = null
-  internal var password: String? = null
-  internal var language: String? = null
-  internal var tokens: MutableList<UserManager.Registration.Token> = ArrayList()
+  private var firstName: String? = null
+  private var lastName: String? = null
+  private var birthday: String? = null
+  private var avatar: String? = null
+  private var password: String? = null
+  private var language: String? = null
+  private var tokens: MutableList<UserManager.Registration.Token> = ArrayList()
 
   fun setFirstName(firstName: String): RegistrationBuilder {
     this.firstName = firstName

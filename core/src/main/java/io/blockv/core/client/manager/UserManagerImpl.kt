@@ -18,6 +18,7 @@ import org.json.JSONObject
  */
 class UserManagerImpl(var api: UserApi) : UserManager {
 
+
   override fun loginOauth(provider: String, token: String): Observable<User?> = object : Observable<User?>() {
     override fun getResult(): User? = api
       .oauthLogin(OauthLoginRequest(
@@ -26,7 +27,7 @@ class UserManagerImpl(var api: UserApi) : UserManager {
   }
 
 
-  private fun login(tokenType: String, token: String, auth: String): Observable<User?> = object : Observable<User?>() {
+  private fun login(token: String, tokenType: String, auth: String): Observable<User?> = object : Observable<User?>() {
     override fun getResult(): User? = api
       .login(LoginRequest(
         tokenType,
@@ -34,31 +35,25 @@ class UserManagerImpl(var api: UserApi) : UserManager {
         auth)).payload
   }
 
-  override fun loginEmail(email: String, password: String): Observable<User?> = login("email", email, password)
+  override fun login(token: String, tokenType: UserManager.TokenType, password: String): Observable<User?> = login(token, tokenType.name.toLowerCase(), password)
 
-  override fun loginPhoneNumber(phoneNumber: String, password: String): Observable<User?> = login("phone_number", phoneNumber, password)
-
-  private fun sendOtp(type: String, token: String): Observable<Void?> = object : Observable<Void?>() {
+  private fun sendLoginOtp(token: String, type: String): Observable<Void?> = object : Observable<Void?>() {
     override fun getResult(): Void? {
       api.resetToken(ResetTokenRequest(type, token))
       return null
     }
   }
 
-  override fun sendOtpPhoneNumber(phone: String): Observable<Void?> = sendOtp("phone_number", phone)
+  override fun sendLoginOtp(token: String, tokenType: UserManager.TokenType): Observable<Void?> = sendLoginOtp(token, tokenType.name.toLowerCase())
 
-  override fun sendOtpEmail(email: String): Observable<Void?> = sendOtp("email", email)
-
-  private fun sendVerification(type: String, token: String): Observable<Void?> = object : Observable<Void?>() {
+  private fun sendVerificationCode(token: String, type: String): Observable<Void?> = object : Observable<Void?>() {
     override fun getResult(): Void? {
       api.resetVerificationToken(ResetTokenRequest(type, token))
       return null
     }
   }
 
-  override fun sendVerificationPhoneNumber(phoneNumber: String): Observable<Void?> = sendVerification("phone_number", phoneNumber)
-
-  override fun sendVerificationEmail(email: String): Observable<Void?> = sendVerification("email", email)
+  override fun sendVerificationCode(token: String, tokenType: UserManager.TokenType): Observable<Void?> = sendVerificationCode(token, tokenType.name.toLowerCase())
 
   override fun register(registration: UserManager.Registration): Observable<User?> = object : Observable<User?>() {
     override fun getResult(): User? {
@@ -83,16 +78,14 @@ class UserManagerImpl(var api: UserApi) : UserManager {
     }
   }
 
-  private fun verify(type: String, token: String, code: String): Observable<Void?> = object : Observable<Void?>() {
+  private fun verifyToken(token: String, type: String, code: String): Observable<Void?> = object : Observable<Void?>() {
     override fun getResult(): Void? {
       api.verifyToken(VerifyTokenRequest(type, token, code))
       return null
     }
   }
 
-  override fun verifyPhoneNumber(phone: String, code: String): Observable<Void?> = verify("phone_number", phone, code)
-
-  override fun verifyEmail(email: String, code: String): Observable<Void?> = verify("email", email, code)
+  override fun verifyToken(token: String, tokenType: UserManager.TokenType, code: String): Observable<Void?> = verifyToken(token, tokenType.name.toLowerCase(), code)
 
   override fun logout(): Observable<Void?> = object : Observable<Void?>() {
     override fun getResult(): Void? {

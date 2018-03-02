@@ -8,12 +8,12 @@ import io.blockv.core.client.manager.UserManager
 
 class UpdateUserBuilder {
 
-  internal var firstName: String? = null
-  internal var lastName: String? = null
-  internal var birthday: String? = null
-  internal var avatar: String? = null
-  internal var password: String? = null
-  internal var language: String? = null
+  private var firstName: String? = null
+  private var lastName: String? = null
+  private var birthday: String? = null
+  private var avatar: String? = null
+  private var password: String? = null
+  private var language: String? = null
 
   fun setFirstName(firstName: String): UpdateUserBuilder {
     this.firstName = firstName
