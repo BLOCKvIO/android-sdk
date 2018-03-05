@@ -1,12 +1,14 @@
-package io.blockv.android.core.internal.net.rest
+package io.blockv.core.internal.net.rest
 
 
 import android.util.Log
+import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.net.rest.exception.BlockvException
 import io.blockv.core.internal.net.rest.exception.ErrorMapper
-import io.blockv.android.core.internal.repository.Preferences
+import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Environment
 import io.blockv.core.model.Error
+import io.blockv.core.model.Jwt
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -20,20 +22,22 @@ import java.util.concurrent.Semaphore
  * Created by LordCheddar on 2018/02/22.
  */
 class HttpClient(val preferences: Preferences,
-                 val errorMapper: ErrorMapper) : Client {
+                 val errorMapper: ErrorMapper,
+                 val jsonModule: JsonModule) : Client {
 
   var readTimeout: Int? = null
   var connectTimeout: Int? = null
   var environment: Environment? = preferences.environment
 
 
-  @Volatile internal var accessToken: String = ""
-  internal val lock: Semaphore = Semaphore(1)
+  @Volatile private var accessToken: Jwt? = null
+  private val lock: Semaphore = Semaphore(1)
 
   constructor(preferences: Preferences,
               errorMapper: ErrorMapper,
+              jsonModule: JsonModule,
               readTimeout: Int?,
-              connectTimeout: Int?) : this(preferences, errorMapper) {
+              connectTimeout: Int?) : this(preferences, errorMapper, jsonModule) {
     this.readTimeout = readTimeout
     this.connectTimeout = connectTimeout
   }
@@ -61,8 +65,8 @@ class HttpClient(val preferences: Preferences,
       connection.connectTimeout = connectTimeout as Int
     }
     try {
-      if(authentication!=null) {
-        connection.setRequestProperty("Authorization", "Bearer "+authentication)
+      if (authentication != null) {
+        connection.setRequestProperty("Authorization", "Bearer " + authentication)
       }
       connection.setRequestProperty("X-Vatomic-App-Id", environment!!.appId)
       connection.setRequestProperty("Content-Type", "application/json")
@@ -81,7 +85,7 @@ class HttpClient(val preferences: Preferences,
 
       val responseCode: Int = connection.responseCode
 
-      Log.e("httpclient",""+responseCode)
+      Log.e("httpclient", "" + responseCode)
       val input: DataInputStream
       if (responseCode == 200) {
         input = DataInputStream(connection.inputStream)
@@ -116,24 +120,25 @@ class HttpClient(val preferences: Preferences,
         try {
           val pay: JSONObject = response.getJSONObject("payload")
           if (pay.has("refresh_token")) {
-            preferences.refreshToken = pay.getString("refresh_token")
-            Log.e("httpCLient",preferences.refreshToken )
+
+            preferences.refreshToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("refresh_token"))
+
           }
           if (pay.has("access_token")) {
-            accessToken = pay.getString("access_token")
-            Log.e("httpCLient",accessToken )
+            accessToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("access_token"))
+
           }
 
         } catch (e: Exception) {
-          Log.e("httpCLient",e.toString())
+          Log.e("httpCLient", e.toString())
         }
         return response
       } else {
         val exception: BlockvException = errorMapper.map(responseCode, response)
-        Log.e("httpCLient",exception.toString())
+        Log.e("httpCLient", exception.toString())
         if (exception.error == Error.TOKEN_EXPIRED && retry == 0) {
           connection.disconnect()
-          return http(refreshToken(), method, endpoint, payload, 1)
+          return http(refreshToken()?.token ?: "", method, endpoint, payload, 1)
         }
         throw exception
 
@@ -147,7 +152,9 @@ class HttpClient(val preferences: Preferences,
   }
 
   override fun http(method: String, endpoint: String, payload: JSONObject?): JSONObject {
-    return http(getToken(), method, endpoint, payload, 0)
+    val jwt: Jwt? = getToken()
+
+    return http(if (jwt != null) jwt.type + ":" + jwt.token else "", method, endpoint, payload, 0)
 
   }
 
@@ -171,28 +178,32 @@ class HttpClient(val preferences: Preferences,
     return http("PATCH", endpoint, payload)
   }
 
-  internal fun refreshToken(): String {
+  private fun refreshToken(): Jwt? {
     try {
 
       if (lock.availablePermits() > 0) {
         lock.acquire()
-        Log.e("httpclient","refrshing token")
-        val response: JSONObject = http(preferences.refreshToken, "POST", "access_token", null, 0)
-        accessToken = response.optString("access_token")
+        Log.e("httpclient", "refrshing token")
+        val jwt: Jwt? = preferences.refreshToken;
+        if (jwt != null) {
+          val response: JSONObject = http(jwt.type + ":" + jwt.token, "POST", "access_token", null, 0)
+          accessToken = jsonModule.jwtDeserilizer.deserialize(response.optJSONObject("access_token"))
+        } else
+          accessToken = null
 
-        Log.e("httpclient",""+accessToken)
+        Log.e("httpclient", "" + accessToken)
       } else {
         lock.acquire()
       }
     } catch (e: Exception) {
-      Log.e("httpclient",""+e)
+      Log.e("httpclient", "" + e)
     } finally {
       lock.release()
     }
     return accessToken
   }
 
-  @Synchronized internal fun getToken(): String {
+  @Synchronized private fun getToken(): Jwt? {
     try {
       lock.acquire()
       return accessToken

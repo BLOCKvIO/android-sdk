@@ -1,4 +1,4 @@
-package io.blockv.android.core.internal.net.rest
+package io.blockv.core.internal.net.rest
 
 import org.json.JSONObject
 

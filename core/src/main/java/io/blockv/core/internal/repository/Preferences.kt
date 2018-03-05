@@ -1,10 +1,11 @@
-package io.blockv.android.core.internal.repository
+package io.blockv.core.internal.repository
 
 import android.content.Context
 import android.content.SharedPreferences
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.model.AssetProvider
 import io.blockv.core.model.Environment
+import io.blockv.core.model.Jwt
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -42,9 +43,15 @@ class Preferences(context: Context,
       }
     }
 
-  var refreshToken: String
-    get() = getString(Key.REFRESH_TOKEN)
-    set(token) = set(Key.REFRESH_TOKEN, token)
+  var refreshToken: Jwt?
+    get() {
+      val token: String? = getString(Key.REFRESH_TOKEN)
+      if (token != null) {
+        return jsonModule.jwtDeserilizer.deserialize(JSONObject(token))
+      }
+      return null
+    }
+    set(token) = set(Key.REFRESH_TOKEN, jsonModule.jwtSerializer.serialize(token).toString())
 
   var assetProviders: List<AssetProvider>
     get() {

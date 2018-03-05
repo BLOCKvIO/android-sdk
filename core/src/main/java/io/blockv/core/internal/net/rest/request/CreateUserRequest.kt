@@ -1,4 +1,4 @@
-package io.blockv.android.core.internal.net.rest.request
+package io.blockv.core.internal.net.rest.request
 
 import io.blockv.core.model.Token
 import org.json.JSONArray

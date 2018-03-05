@@ -1,8 +1,8 @@
-package io.blockv.android.core.internal.net
+package io.blockv.core.internal.net
 
-import io.blockv.android.core.internal.net.rest.Client
-import io.blockv.android.core.internal.net.rest.HttpClient
-import io.blockv.android.core.internal.repository.Preferences
+import io.blockv.core.internal.net.rest.Client
+import io.blockv.core.internal.net.rest.HttpClient
+import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.net.rest.api.UserApi
 import io.blockv.core.internal.net.rest.api.UserApiImpl
@@ -18,6 +18,7 @@ class NetModule(val preferences: Preferences, val jsonModule: JsonModule) {
   val client: Client = HttpClient(
     preferences,
     DefaultErrorMapper(),
+    jsonModule,
     50000,
     60000)
 

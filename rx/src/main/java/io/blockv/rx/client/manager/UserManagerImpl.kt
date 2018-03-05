@@ -1,10 +1,10 @@
 package io.blockv.rx.client.manager
 
 
-import io.blockv.android.core.internal.net.rest.request.CreateUserRequest
-import io.blockv.android.core.internal.net.rest.request.ResetTokenRequest
-import io.blockv.android.core.internal.net.rest.request.UpdateUserRequest
-import io.blockv.android.core.internal.net.rest.request.VerifyTokenRequest
+import io.blockv.core.internal.net.rest.request.CreateUserRequest
+import io.blockv.core.internal.net.rest.request.ResetTokenRequest
+import io.blockv.core.internal.net.rest.request.UpdateUserRequest
+import io.blockv.core.internal.net.rest.request.VerifyTokenRequest
 import io.blockv.core.client.manager.UserManager.UserUpdate
 import io.blockv.core.internal.net.rest.api.UserApi
 import io.blockv.core.internal.net.rest.request.LoginRequest

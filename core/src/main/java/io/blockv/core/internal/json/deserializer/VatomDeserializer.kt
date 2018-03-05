@@ -1,6 +1,5 @@
 package io.blockv.core.internal.json.deserializer
 
-import io.blockv.android.core.model.*
 import io.blockv.core.model.*
 import org.json.JSONObject
 
