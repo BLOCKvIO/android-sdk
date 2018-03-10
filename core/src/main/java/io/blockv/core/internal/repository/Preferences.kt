@@ -20,7 +20,7 @@ class Preferences(context: Context,
     ASSET_PROVIDER
   }
 
-  private val preferences: SharedPreferences = context.getSharedPreferences("com.blockv.core.prefs", Context.MODE_PRIVATE)
+  private val preferences: SharedPreferences = context.getSharedPreferences("io.blockv.core.prefs", Context.MODE_PRIVATE)
 
   private val context: Context = context.applicationContext
 

@@ -9,7 +9,8 @@ import io.blockv.core.util.Disposable
  */
 abstract class Observable<out T> {
 
-  internal abstract fun getResult(): T
+  @Throws(Exception::class)
+  abstract fun getResult(): T?
 
   fun subscribe(): Disposable {
     return this.subscribe(null)
@@ -22,20 +23,22 @@ abstract class Observable<out T> {
 
     val asynk: AsyncTask<Void, Void, Any> = object : AsyncTask<Void, Void, Any>() {
 
-      override fun doInBackground(vararg params: Void?): Any {
+      override fun doInBackground(vararg params: Void?): Any? {
         try {
-          return getResult() as Any
+          val result = getResult() ?: return null
+          return result as Any
         } catch (e: Exception) {
           return e
         }
       }
 
-      override fun onPostExecute(result: Any) {
+      override fun onPostExecute(result: Any?) {
         super.onPostExecute(result)
-        if (result is Exception) {
-          error?.onError(result)
-        } else
-          success?.onSuccess(result as T)
+        when (result) {
+          null -> success?.onSuccess(null)
+          is Exception -> error?.onError(result)
+          else -> success?.onSuccess(result as T)
+        }
       }
 
     }
@@ -56,7 +59,7 @@ abstract class Observable<out T> {
   }
 
   interface OnSuccess<in T> {
-    fun onSuccess(response: T)
+    fun onSuccess(response: T?)
   }
 
   interface OnError {

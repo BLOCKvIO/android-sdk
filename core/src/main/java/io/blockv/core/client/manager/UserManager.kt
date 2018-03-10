@@ -1,5 +1,6 @@
 package io.blockv.core.client.manager
 
+import android.graphics.Bitmap
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Observable
@@ -27,7 +28,7 @@ interface UserManager {
    * @param password the user's password.
    * @return new Observable<User> instance
    */
-  fun login(token: String,tokenType:TokenType, password: String): Observable<User?>
+  fun login(token: String, tokenType: TokenType, password: String): Observable<User?>
 
   /**
    * Logs a user into the Blockv platform. Accepts an OAuth token.
@@ -39,6 +40,14 @@ interface UserManager {
   fun loginOauth(provider: String, oauthToken: String): Observable<User?>
 
   /**
+   * Logs a user into the Blockv platform. Accepts a guest id
+   *
+   * @param guestId the user's guest id.
+   * @return new Observable<User> instance
+   */
+  fun loginGuest(guestId: String): Observable<User?>
+
+  /**
    * Verifies ownership of a token by submitting the verification code to the Blockv platform.
    *
    * @param token the user's phone(E.164) or email
@@ -46,7 +55,7 @@ interface UserManager {
    * @param code the verification code send to the user's token (phone or email).
    * @return new Observable<User> instance
    */
-  fun verifyToken(token: String,tokenType:TokenType, code: String): Observable<Void?>
+  fun verifyUserToken(token: String, tokenType: TokenType, code: String): Observable<Void?>
 
   /**
    * Sends a One-Time-Pin (OTP) to the user's token (phone or email).
@@ -57,7 +66,7 @@ interface UserManager {
    * @param tokenType the type of the token (phone or email)
    * @return new Observable<Void> instance
    */
-  fun sendLoginOtp(token: String,tokenType:TokenType): Observable<Void?>
+  fun resetToken(token: String, tokenType: TokenType): Observable<Void?>
 
   /**
    * Sends a verification code to the user's token (phone or email).
@@ -68,7 +77,7 @@ interface UserManager {
    * @param tokenType the type of the token (phone or email)
    * @return new Observable<Void> instance
    */
-  fun sendVerificationCode(token: String,tokenType:TokenType): Observable<Void?>
+  fun resendVerification(token: String, tokenType: TokenType): Observable<Void?>
 
   /**
    * Fetches the current user's profile information from the Blockv platform.
@@ -97,8 +106,10 @@ interface UserManager {
   fun logout(): Observable<Void?>
 
 
-  enum class TokenType
-  {
+  fun uploadAvatar(avatar: Bitmap): Observable<Void?>
+
+
+  enum class TokenType {
     EMAIL,
     PHONE_NUMBER
   }
@@ -109,11 +120,11 @@ interface UserManager {
                      var avatarUri: String?,
                      var password: String?,
                      var language: String?,
-                     var tokens: List<Token>?)
-  {
-    open class Token(val type:String,val value:String)
+                     var tokens: List<Token>?) {
+    open class Token(val type: String, val value: String)
 
-    class OauthToken(type:String,value:String,val auth:String):Token(type,value)
+    class OauthToken(type: String, value: String, val auth: String) : Token(type, value)
+
   }
 
   class UserUpdate(var firstName: String?,

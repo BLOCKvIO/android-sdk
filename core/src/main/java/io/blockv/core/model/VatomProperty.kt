@@ -54,7 +54,7 @@ class VatomProperty {
 
   var transferedBy: String? = null
 
-  var resources: List<VatomResource>? = null
+  var resources: List<Resource>? = null
 
   var childPolicy: List<ChildPolicy>? = null
 

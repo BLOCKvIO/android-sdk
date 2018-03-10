@@ -1,11 +1,11 @@
 package io.blockv.core.model
 
-class VatomResource(var name: String,
-                    var type: String,
-                    var url: String) {
+class Resource(var name: String,
+               var type: String,
+               var url: String) {
 
   override fun toString(): String {
-    return "VatomResource{" +
+    return "Resource{" +
       "name='" + name + '\'' +
       ", type='" + type + '\'' +
       ", url='" + url + '\'' +
@@ -14,7 +14,7 @@ class VatomResource(var name: String,
 
   override fun equals(o: Any?): Boolean {
     if (this === o) return true
-    if (o !is VatomResource) return false
+    if (o !is Resource) return false
     val resource = o
     if (name != resource.name) return false
     if (type != resource.type) return false

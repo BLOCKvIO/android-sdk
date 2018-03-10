@@ -4,8 +4,6 @@ import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
-import io.blockv.core.internal.net.rest.request.LoginRequest
-import io.blockv.core.internal.net.rest.request.OauthLoginRequest
 import org.json.JSONObject
 
 /**
@@ -17,6 +15,8 @@ interface UserApi {
 
   fun login(request: LoginRequest): BaseResponse<User?>
 
+  fun loginGuest(request: GuestLoginRequest): BaseResponse<User?>
+
   fun oauthLogin(request: OauthLoginRequest): BaseResponse<User?>
 
   fun getCurrentUser(): BaseResponse<User?>
@@ -25,12 +25,14 @@ interface UserApi {
 
   fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token?>
 
-  fun resetToken(request: ResetTokenRequest): BaseResponse<Token?>
+  fun resetToken(request: ResetTokenRequest): BaseResponse<Void?>
 
-  fun verifyToken(request: VerifyTokenRequest): BaseResponse<Token?>
+  fun verifyToken(request: VerifyTokenRequest): BaseResponse<Void?>
 
   fun getUserTokens(): BaseResponse<List<Token>>
 
   fun logout(): BaseResponse<JSONObject>
+
+  fun uploadAvatar(request: UploadAvatarRequest): BaseResponse<Void?>
 
 }

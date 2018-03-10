@@ -1,12 +1,9 @@
 package io.blockv.core.client
 
 import android.content.Context
+import io.blockv.core.client.manager.*
 import io.blockv.core.internal.net.NetModule
 import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.client.manager.UserManager
-import io.blockv.core.client.manager.UserManagerImpl
-import io.blockv.core.client.manager.VatomManager
-import io.blockv.core.client.manager.VatomManagerImpl
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.json.deserializer.*
 import io.blockv.core.internal.json.serializer.AssetProviderSerializer
@@ -51,7 +48,7 @@ class Blockv {
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
     this.netModule = NetModule(preferences, jsonModule)
-    this.userManager = UserManagerImpl(netModule.userApi)
+    this.userManager = UserManagerImpl(netModule.userApi,ResourceManagerImpl(preferences))
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
   }
   constructor(context: Context, environment: Environment) {
@@ -76,7 +73,7 @@ class Blockv {
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
     this.netModule = NetModule(preferences, jsonModule)
-    this.userManager = UserManagerImpl(netModule.userApi)
+    this.userManager = UserManagerImpl(netModule.userApi,ResourceManagerImpl(preferences))
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
   }
 

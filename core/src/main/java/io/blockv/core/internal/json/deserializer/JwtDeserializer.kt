@@ -8,6 +8,8 @@ class JwtDeserializer : Deserializer<Jwt> {
       val token: String = data.getString("token")
       val tokenType: String = data.getString("token_type")
       val expiresIn: Int = data.getInt("expires_in")
+
+      android.util.Log.e("JwtDeserializer",""+token+" "+tokenType+" "+expiresIn);
       return Jwt(
         token,
         tokenType,

@@ -1,5 +1,6 @@
 package io.blockv.core.internal.net.rest.request
 
+import android.util.Log
 import io.blockv.core.model.Token
 import org.json.JSONArray
 import org.json.JSONObject
@@ -54,8 +55,7 @@ class CreateUserRequest {
     if (avatarUri != null) json.put("avatar_uri", avatarUri)
     if (password != null) json.put("password", password)
     if (language != null) json.put("language", language)
-    if (tokens != null) json.put("tokens", tokens)
-
+    if (tokens != null) json.put("user_tokens", tokens)
 
     return json
   }

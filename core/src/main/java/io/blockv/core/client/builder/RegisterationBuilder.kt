@@ -1,5 +1,6 @@
 package io.blockv.core.client.builder
 
+import android.text.TextUtils
 import io.blockv.core.client.manager.UserManager
 import java.util.*
 
@@ -17,28 +18,31 @@ class RegistrationBuilder {
   private var language: String? = null
   private var tokens: MutableList<UserManager.Registration.Token> = ArrayList()
 
-  fun setFirstName(firstName: String): RegistrationBuilder {
-    this.firstName = firstName
+  fun setFirstName(firstName: String?): RegistrationBuilder {
+    if (firstName != null) {
+      this.firstName = firstName
+    }
     return this
   }
 
-  fun setLastName(lastName: String): RegistrationBuilder {
-    this.lastName = lastName
+  fun setLastName(lastName: String?): RegistrationBuilder {
+    if (lastName != null) {
+      this.lastName = lastName
+    }
     return this
   }
 
-  fun setBirthday(birthday: String): RegistrationBuilder {
-    this.birthday = birthday
+  fun setBirthday(birthday: String?): RegistrationBuilder {
+    if (birthday != null) {
+      this.birthday = birthday
+    }
     return this
   }
 
-  fun setAvatarUri(avatar: String): RegistrationBuilder {
-    this.avatar = avatar
-    return this
-  }
-
-  fun setPassword(password: String): RegistrationBuilder {
-    this.password = password
+  fun setPassword(password: String?): RegistrationBuilder {
+    if (password != null) {
+      this.password = password
+    }
     return this
   }
 
@@ -47,21 +51,35 @@ class RegistrationBuilder {
     return this
   }
 
-  fun addEmail(email: String): RegistrationBuilder {
-    tokens.add(UserManager.Registration.Token("email", email))
-    return this
-  }
-  fun addPhoneNumber(phoneNumber: String): RegistrationBuilder {
-    tokens.add(UserManager.Registration.Token("phone_number", phoneNumber))
-    return this
-  }
-  fun addOauth(provider:String,token:String,auth:String): RegistrationBuilder {
-    tokens.add(UserManager.Registration.OauthToken(provider,token,auth))
+  fun addEmail(email: String?): RegistrationBuilder {
+    if (email != null && email.isNotEmpty()) {
+      tokens.add(UserManager.Registration.Token("email", email))
+    }
     return this
   }
 
-  fun setLanguage(language: String): RegistrationBuilder {
-    this.language = language
+  fun addPhoneNumber(phoneNumber: String?): RegistrationBuilder {
+    if (phoneNumber != null && phoneNumber.isNotEmpty()) {
+      tokens.add(UserManager.Registration.Token("phone_number", phoneNumber))
+    }
+    return this
+  }
+
+  fun addOauth(provider: String?, token: String?, auth: String?): RegistrationBuilder {
+
+    if (provider != null
+      && token != null
+      && auth != null) {
+
+      tokens.add(UserManager.Registration.OauthToken(provider, token, auth))
+    }
+    return this
+  }
+
+  fun setLanguage(language: String?): RegistrationBuilder {
+    if (language != null) {
+      this.language = language
+    }
     return this
   }
 

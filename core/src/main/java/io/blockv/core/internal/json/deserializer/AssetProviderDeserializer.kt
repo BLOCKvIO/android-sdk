@@ -14,7 +14,7 @@ class AssetProviderDeserialzier : Deserializer<AssetProvider> {
       for (key: String in descriptorObject.keys()) {
         descriptor.put(key, descriptorObject.getString(key))
       }
-      return AssetProvider(data.getString("name"), data.getString("type"), descriptor)
+      return AssetProvider(data.getString("name"),data.getString("uri"), data.getString("type"), descriptor)
     } catch (e: Exception) {
       android.util.Log.w("AssetProvDeserializer", e.message)
     }

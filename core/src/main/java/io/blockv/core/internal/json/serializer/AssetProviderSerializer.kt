@@ -9,9 +9,11 @@ import org.json.JSONObject
 class AssetProviderSerializer : Serializer<AssetProvider?> {
   override fun serialize(data: AssetProvider?): JSONObject {
     val out: JSONObject = JSONObject()
-    if(data!=null) {
+    if (data != null) {
       out.put("name", data.name)
       out.put("type", data.type)
+      out.put("uri", data.uri)
+
       val descriptor: JSONObject = JSONObject()
       for (key: String in data.descriptor.keys) {
         descriptor.put(key, data.descriptor.getValue(key))

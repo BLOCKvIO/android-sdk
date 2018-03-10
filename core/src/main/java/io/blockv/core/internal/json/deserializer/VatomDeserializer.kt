@@ -95,11 +95,11 @@ class VatomDeserializer : Deserializer<Vatom> {
           value.optBoolean("valid_through", false)))
 
       val resourceArray = prop.optJSONArray("resources")
-      val resources: ArrayList<VatomResource> = ArrayList(resourceArray.length())
+      val resources: ArrayList<Resource> = ArrayList(resourceArray.length())
       (0..resourceArray.length())
         .map { resourceArray.optJSONObject(it) }
         .mapTo(resources) {
-          VatomResource(
+          Resource(
             it.optString("name")
             , it.optString("v1::ResourceType"),
             it.optJSONObject("value").optString("value")

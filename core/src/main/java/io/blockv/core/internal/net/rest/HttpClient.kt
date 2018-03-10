@@ -10,11 +10,10 @@ import io.blockv.core.model.Environment
 import io.blockv.core.model.Error
 import io.blockv.core.model.Jwt
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
-import java.io.DataOutputStream
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLConnection
 import java.util.concurrent.Semaphore
 
 
@@ -66,7 +65,7 @@ class HttpClient(val preferences: Preferences,
     }
     try {
       if (authentication != null) {
-        connection.setRequestProperty("Authorization", "Bearer " + authentication)
+        connection.setRequestProperty("Authorization", authentication)
       }
       connection.setRequestProperty("X-Vatomic-App-Id", environment!!.appId)
       connection.setRequestProperty("Content-Type", "application/json")
@@ -154,7 +153,7 @@ class HttpClient(val preferences: Preferences,
   override fun http(method: String, endpoint: String, payload: JSONObject?): JSONObject {
     val jwt: Jwt? = getToken()
 
-    return http(if (jwt != null) jwt.type + ":" + jwt.token else "", method, endpoint, payload, 0)
+    return http(if (jwt != null) jwt.type + " " + jwt.token else "", method, endpoint, payload, 0)
 
   }
 
@@ -178,6 +177,123 @@ class HttpClient(val preferences: Preferences,
     return http("PATCH", endpoint, payload)
   }
 
+  override fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray): JSONObject {
+    return multipart(endpoint, fieldName, fileName, type, payload,0)
+  }
+
+  override fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray, retry: Int): JSONObject {
+    if (environment == null) {
+      environment = preferences.environment
+      if (environment == null) {
+        throw NullPointerException("Environment is null")
+      }
+    }
+    val url = URL(environment!!.rest + endpoint)
+    val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+
+    if (readTimeout != null) {
+      connection.readTimeout = readTimeout as Int
+    }
+
+    if (connectTimeout != null) {
+      connection.connectTimeout = connectTimeout as Int
+    }
+
+    val jwt: Jwt? = getToken()
+
+    try {
+      if (jwt != null) {
+        connection.setRequestProperty("Authorization", jwt.type + " " + jwt.token)
+      }
+      val boundary = "14737809831466499882746641449"
+      connection.setRequestProperty("X-Vatomic-App-Id", environment!!.appId)
+      connection.useCaches = false
+      connection.doInput = true
+      connection.doOutput = true
+      connection.requestMethod = "POST";
+      connection.setRequestProperty("Connection", "Keep-Alive")
+      connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary)
+      connection.setRequestProperty(fieldName, fieldName)
+
+      val output = connection.outputStream;
+      val dos = DataOutputStream(output)
+
+      dos.writeBytes("--" + boundary + "\r\n");
+      dos.writeBytes("Content-Disposition: form-data; name=\"" + fieldName + "\";filename=" + fieldName + "\r\n")
+      dos.writeBytes("\r\n")
+      dos.writeBytes("Content-Transfer-Encoding: binary"+"\r\n")
+      dos.writeBytes("\r\n")
+      dos.writeBytes("Content-Type: application/octet-stream\r\n")
+      dos.writeBytes("\r\n")
+      dos.write(payload)
+      dos.writeBytes("\r\n")
+      dos.writeBytes("--" + boundary + "--" + "\r\n")
+      dos.flush()
+      dos.close()
+
+      val responseCode: Int = connection.responseCode
+
+      val input: DataInputStream
+      if (responseCode == 200) {
+        input = DataInputStream(connection.inputStream)
+      } else {
+        input = DataInputStream(connection.errorStream)
+      }
+      val buffer = ByteArrayOutputStream()
+
+      var read: Int
+      val data = ByteArray(16384)
+
+      do {
+        read = input.read(data, 0, data.size)
+        if (read != -1) {
+          buffer.write(data, 0, read)
+        }
+      } while (read != -1)
+
+      buffer.flush()
+      var response = JSONObject()
+
+      try {
+        response = JSONObject(String(buffer.toByteArray()))
+      } catch (exception: Exception) {
+        Log.e("HttpClient", exception.toString())
+      }
+      if (responseCode == 200) {
+
+        try {
+          val pay: JSONObject = response.getJSONObject("payload")
+          if (pay.has("refresh_token")) {
+            preferences.refreshToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("refresh_token"))
+
+          }
+          if (pay.has("access_token")) {
+            accessToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("access_token"))
+
+          }
+
+        } catch (e: Exception) {
+          Log.e("httpCLient", e.toString())
+        }
+        return response
+      } else {
+        val exception: BlockvException = errorMapper.map(responseCode, response)
+        Log.e("httpCLient", exception.toString())
+        if (exception.error == Error.TOKEN_EXPIRED && retry == 0) {
+          connection.disconnect()
+          return multipart(endpoint, fieldName, fileName, type, payload, 1)
+        }
+        throw exception
+
+      }
+
+    } finally {
+      connection.disconnect()
+    }
+
+  }
+
+
   private fun refreshToken(): Jwt? {
     try {
 
@@ -186,7 +302,7 @@ class HttpClient(val preferences: Preferences,
         Log.e("httpclient", "refrshing token")
         val jwt: Jwt? = preferences.refreshToken;
         if (jwt != null) {
-          val response: JSONObject = http(jwt.type + ":" + jwt.token, "POST", "access_token", null, 0)
+          val response: JSONObject = http(jwt.type + ":" + jwt.token, "POST", "v1/access_token", null, 0)
           accessToken = jsonModule.jwtDeserilizer.deserialize(response.optJSONObject("access_token"))
         } else
           accessToken = null
