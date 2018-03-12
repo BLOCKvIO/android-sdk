@@ -1,31 +1,46 @@
 package io.blockv.core.client.manager
 
 import io.blockv.core.internal.net.rest.api.VatomApi
-import io.blockv.core.internal.net.rest.request.GeoRequest
 import io.blockv.core.internal.net.rest.request.InventoryRequest
 import io.blockv.core.internal.net.rest.request.PerformActionRequest
 import io.blockv.core.internal.net.rest.request.VatomRequest
 import io.blockv.core.model.Action
-import io.blockv.core.model.Inventory
+import io.blockv.core.model.Group
 import io.blockv.core.util.Observable
 import org.json.JSONObject
 
-/**
- * Created by LordCheddar on 2018/02/26.
- */
-class VatomManagerImpl(val api: VatomApi) : VatomManager {
+class VatomManagerImpl(val api: VatomApi,
+                       val resourceManager: ResourceManager) : VatomManager {
 
-  override fun getVatoms(ids: List<String>): Observable<Inventory> = object : Observable<Inventory>() {
-    override fun getResult(): Inventory = api.getCurrentUserVatom(VatomRequest(ids)).payload ?: Inventory()
+  override fun getVatoms(vararg ids: String): Observable<Group> = object : Observable<Group>() {
+    override fun getResult(): Group {
+      val group = api.getUserVatom(VatomRequest(ids.toList())).payload ?: Group(ArrayList(),ArrayList(),ArrayList())
+      group.vatoms.forEach {
+        it.property.resources?.forEach {
+          it.url = resourceManager.encodeUrl(it.url) ?: it.url
+        }
+      }
+      return group
+    }
   }
 
-  override fun getInventory(id: String?, pageToken: String?, pageAmount: Int?): Observable<Inventory> = object : Observable<Inventory>() {
-    override fun getResult(): Inventory =
-      api.getCurrentUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id), pageToken ?: "", pageAmount ?: 1000)).payload ?: Inventory()
-  }
+  override fun getInventory(id: String?): Observable<Group> = object : Observable<Group>() {
+    override fun getResult(): Group {
+      val group = api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
 
-  override fun geoDiscover(latitude: Double, longitude: Double, radius: Int, limit: Int): Observable<Inventory> = object : Observable<Inventory>() {
-    override fun getResult(): Inventory = api.geoDiscover(GeoRequest(latitude, longitude, radius, limit)).payload ?: Inventory()
+
+      if(group!=null) {
+
+        group.vatoms.forEach {
+          it.property.resources.forEach {
+            it.url = resourceManager.encodeUrl(it.url) ?: it.url
+          }
+        }
+        return group
+      }
+
+      return Group(ArrayList(),ArrayList(),ArrayList())
+    }
   }
 
   override fun getVatomActions(template: String): Observable<List<Action>> = object : Observable<List<Action>>() {
@@ -44,23 +59,15 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
   override fun acquireVatom(id: String): Observable<Void?> = preformAction(VatomManager.Action.ACQUIRE, id, null)
 
-  override fun acquirePubVatom(id: String): Observable<Void?> = preformAction(VatomManager.Action.ACQUIRE_PUB_VARIATION, id, null)
 
-  override fun transferVatomByEmail(id: String, email: String): Observable<Void?> {
+  override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Observable<Void?> {
     val payload = JSONObject()
-    payload.put("new.owner.email", email)
-    return preformAction(VatomManager.Action.TRANSFER, id, payload)
-  }
+    when (tokenType) {
+      VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
+      VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
+      VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
+    }
 
-  override fun transferVatomByPhoneNumber(id: String, phoneNumber: String): Observable<Void?> {
-    val payload = JSONObject()
-    payload.put("new.owner.phone_number", phoneNumber)
-    return preformAction(VatomManager.Action.TRANSFER, id, payload)
-  }
-
-  override fun transferVatomById(id: String, userId: String): Observable<Void?> {
-    val payload = JSONObject()
-    payload.put("new.owner.id", userId)
     return preformAction(VatomManager.Action.TRANSFER, id, payload)
   }
 

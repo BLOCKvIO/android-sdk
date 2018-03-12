@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import io.blockv.core.internal.net.rest.api.UserApi
 import io.blockv.core.internal.net.rest.request.*
+import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Observable
@@ -11,10 +12,18 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
+
 /**
  * Created by LordCheddar on 2018/02/22.
  */
-class UserManagerImpl(var api: UserApi, var resourceManager: ResourceManager) : UserManager {
+class UserManagerImpl(var api: UserApi,
+                      var preferences: Preferences,
+                      val resourceManager: ResourceManager) : UserManager {
+
+  override fun isLoggedIn(): Boolean {
+    val token = preferences.refreshToken
+    return token!=null && !token.hasExpired()
+  }
 
   override fun uploadAvatar(avatar: Bitmap): Observable<Void?> = object : Observable<Void?>() {
     override fun getResult(): Void? {
@@ -105,6 +114,7 @@ class UserManagerImpl(var api: UserApi, var resourceManager: ResourceManager) : 
 
   override fun logout(): Observable<Void?> = object : Observable<Void?>() {
     override fun getResult(): Void? {
+      preferences.refreshToken = null
       api.logout()
       return null
     }

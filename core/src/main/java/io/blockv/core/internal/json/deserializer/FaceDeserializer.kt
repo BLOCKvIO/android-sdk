@@ -10,8 +10,8 @@ class FaceDeserializer : Deserializer<Face> {
     try {
       val meta: JSONObject = data.getJSONObject("meta")
       val properties: JSONObject = data.getJSONObject("properties")
-      val id: String? = data.getString("id")
-      val template: String? = data.getString("template")
+      val id: String = data.getString("id")
+      val template: String = data.getString("template")
       val createdBy: String? = meta.optString("created_by")
       val whenCreated: String? = meta.getString("when_created")
       val whenModified: String? = meta.optString("when_modified", whenCreated)
@@ -32,13 +32,8 @@ class FaceDeserializer : Deserializer<Face> {
         whenModified,
         FaceProperty(
           displayUrl,
-          constraints.optBoolean("bluetooth_le"),
-          constraints.optBoolean("contact_list"),
-          constraints.optBoolean("gps"),
-          constraints.optBoolean("three_d"),
           constraints.optString("view_mode"),
           constraints.optString("platform"),
-          constraints.optString("quality"),
           resources
         ))
     } catch (e: Exception) {

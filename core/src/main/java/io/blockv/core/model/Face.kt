@@ -1,7 +1,7 @@
 package io.blockv.core.model
 
 class Face(var id: String?,
-           var template: String?,
+           var templateId: String?,
            var createdBy: String?,
            var whenCreated: String?,
            var whenModified: String?,
@@ -11,7 +11,7 @@ class Face(var id: String?,
   override fun toString(): String {
     return "Face{" +
       "id='" + id + '\'' +
-      ", template='" + template + '\'' +
+      ", templateId='" + templateId + '\'' +
       ", createdBy='" + createdBy + '\'' +
       ", whenCreated='" + whenCreated + '\'' +
       ", whenModified='" + whenModified + '\'' +

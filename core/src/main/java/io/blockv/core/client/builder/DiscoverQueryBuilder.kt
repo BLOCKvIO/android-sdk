@@ -9,7 +9,8 @@ class DiscoverQueryBuilder {
     OWNER,
     TEMPLATE,
     TEMPLATE_VARIATION,
-    PUBLISHER
+    ACQUIRABLE,
+    PARENT_ID
   }
 
   enum class Filter {
@@ -28,11 +29,10 @@ class DiscoverQueryBuilder {
     DROPPED,
     ACQUIRABLE,
     AUTHOR,
-    CATEGORY,
-
-
-
+    CATEGORY
   }
+
+
 
   fun setScope(key: String, value: String): DiscoverQueryBuilder {
     return this

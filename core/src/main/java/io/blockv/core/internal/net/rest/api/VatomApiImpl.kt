@@ -1,14 +1,13 @@
 package io.blockv.core.internal.net.rest.api
 
-import io.blockv.core.internal.net.rest.Client
 import io.blockv.core.internal.json.JsonModule
-import io.blockv.core.internal.net.rest.request.GeoRequest
+import io.blockv.core.internal.net.rest.Client
 import io.blockv.core.internal.net.rest.request.InventoryRequest
 import io.blockv.core.internal.net.rest.request.PerformActionRequest
 import io.blockv.core.internal.net.rest.request.VatomRequest
 import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Action
-import io.blockv.core.model.Inventory
+import io.blockv.core.model.Group
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -18,8 +17,8 @@ import org.json.JSONObject
 class VatomApiImpl(val client: Client,
                    val jsonModule: JsonModule) : VatomApi {
 
-  override fun getCurrentUserVatom(request: VatomRequest): BaseResponse<Inventory?> {
-    val response: JSONObject = client.post("v1/currentuser/vatom/get", request.toJson())
+  override fun getUserVatom(request: VatomRequest): BaseResponse<Group?> {
+    val response: JSONObject = client.post("v1/user/vatom/get", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
 
 
@@ -27,12 +26,12 @@ class VatomApiImpl(val client: Client,
       response.optString("status"),
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.inventoryDeserilizer.deserialize(payload) else null) ?: Inventory()
+      (if (payload != null) jsonModule.groupDeserilizer.deserialize(payload) else null) ?: Group(ArrayList(), ArrayList(), ArrayList())
     )
   }
 
   override fun discover(request: JSONObject): BaseResponse<JSONObject?> {
-    val response: JSONObject = client.post("v1/currentuser/vatom/discover", request)
+    val response: JSONObject = client.post("v1/vatom/discover", request)
     val payload: JSONObject? = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
@@ -42,20 +41,20 @@ class VatomApiImpl(val client: Client,
   }
 
 
-  override fun getCurrentUserInventory(request: InventoryRequest): BaseResponse<Inventory?> {
-    val response: JSONObject = client.post("v1/currentuser/inventory", request.toJson())
+  override fun getUserInventory(request: InventoryRequest): BaseResponse<Group?> {
+    val response: JSONObject = client.post("/v1/user/vatom/inventory", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
 
     return BaseResponse(
       response.optString("status"),
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.inventoryDeserilizer.deserialize(payload) else null) ?: Inventory()
-    )
+      if (payload != null) jsonModule.groupDeserilizer.deserialize(payload) else null)
+
   }
 
   override fun getVatomActions(template: String?): BaseResponse<List<Action>> {
-    val response: JSONObject = client.get("v1/currentuser/actions/" + template)
+    val response: JSONObject = client.get("v1/user/actions/" + template)
     val payload: JSONArray? = response.optJSONArray("payload")
     val list: ArrayList<Action> = ArrayList()
     if (payload != null) {
@@ -76,24 +75,12 @@ class VatomApiImpl(val client: Client,
   }
 
   override fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?> {
-    val response: JSONObject = client.post("api/v1/currentuser/action/"+request.action, request.toJson())
+    val response: JSONObject = client.post("v1/user/vatom/action/" + request.action, request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
     return BaseResponse(
       response.optString("status"),
       response.optInt("error"),
       response.optString("message"),
       payload)
-  }
-
-  override fun geoDiscover(request: GeoRequest): BaseResponse<Inventory?> {
-    val response: JSONObject = client.post("v1/currentuser/geodiscover", request.toJson())
-    val payload: JSONObject? = response.optJSONObject("payload")
-
-    return BaseResponse(
-      response.optString("status"),
-      response.optInt("error"),
-      response.optString("message"),
-      (if (payload != null) jsonModule.inventoryDeserilizer.deserialize(payload) else null) ?: Inventory()
-    )
   }
 }

@@ -2,13 +2,13 @@ package io.blockv.core.client
 
 import android.content.Context
 import io.blockv.core.client.manager.*
-import io.blockv.core.internal.net.NetModule
-import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.json.deserializer.*
 import io.blockv.core.internal.json.serializer.AssetProviderSerializer
 import io.blockv.core.internal.json.serializer.EnviromentSerializer
 import io.blockv.core.internal.json.serializer.JwtSerializer
+import io.blockv.core.internal.net.NetModule
+import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Action
 import io.blockv.core.model.Environment
 import io.blockv.core.model.Face
@@ -19,17 +19,18 @@ import io.blockv.core.model.Vatom
  */
 class Blockv {
 
-  val appId:String
-  private val preferences:Preferences
+  val appId: String
+  private val preferences: Preferences
   private val netModule: NetModule
-  private val jsonModule:JsonModule
-  val userManager:UserManager
-  val vatomManager:VatomManager
+  private val jsonModule: JsonModule
+  val userManager: UserManager
+  val vatomManager: VatomManager
 
   constructor(context: Context, appId: String) {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
     val faceDeserilizer: Deserializer<Face?> = FaceDeserializer()
     val actionDeserilizer: Deserializer<Action?> = ActionDeserializer()
+
     this.jsonModule = JsonModule(
       UserDeserializer(),
       TokenDeserializer(),
@@ -47,10 +48,18 @@ class Blockv {
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
-    this.netModule = NetModule(preferences, jsonModule)
-    this.userManager = UserManagerImpl(netModule.userApi,ResourceManagerImpl(preferences))
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi)
+    val resourceManager = ResourceManagerImpl(preferences)
+    this.netModule = NetModule(
+      preferences,
+      jsonModule)
+    this.userManager = UserManagerImpl(
+      netModule.userApi,
+      preferences,
+      resourceManager
+    )
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)
   }
+
   constructor(context: Context, environment: Environment) {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
     val faceDeserilizer: Deserializer<Face?> = FaceDeserializer()
@@ -72,16 +81,19 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
+    val resourceManager = ResourceManagerImpl(preferences)
     this.netModule = NetModule(preferences, jsonModule)
-    this.userManager = UserManagerImpl(netModule.userApi,ResourceManagerImpl(preferences))
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi)
+    this.userManager = UserManagerImpl(
+      netModule.userApi,
+      preferences,
+      resourceManager)
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)
   }
-
 
 
   constructor(appId: String,
               preferences: Preferences,
-              jsonModule:JsonModule,
+              jsonModule: JsonModule,
               netModule: NetModule,
               userManager: UserManager,
               vatomManager: VatomManager) {

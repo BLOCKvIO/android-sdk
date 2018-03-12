@@ -108,6 +108,8 @@ interface UserManager {
 
   fun uploadAvatar(avatar: Bitmap): Observable<Void?>
 
+  fun isLoggedIn():Boolean
+
 
   enum class TokenType {
     EMAIL,

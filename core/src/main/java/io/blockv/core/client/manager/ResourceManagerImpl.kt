@@ -1,6 +1,7 @@
 package io.blockv.core.client.manager
 
 import android.net.Uri
+import android.util.Log
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.AssetProvider
 
@@ -14,8 +15,11 @@ class ResourceManagerImpl(private val preferences: Preferences) : ResourceManage
 
   override fun encodeUrl(url: String?): String? {
     if (url != null) {
+      Log.e("resourceManager",""+preferences.assetProviders.size)
       assetProviders?.forEach {
+        Log.e("resourceManager",""+it)
         if (url.startsWith(it.uri)) {
+
           val descriptor: Map<String, String?> = it.descriptor
           val original = Uri.parse(url)
           val out = Uri.parse(url).buildUpon().clearQuery()
@@ -28,7 +32,9 @@ class ResourceManagerImpl(private val preferences: Preferences) : ResourceManage
               out.appendQueryParameter(param, original.getQueryParameter(param))
             }
           }
-          return out.build().toString()
+          val str = out.build().toString()
+          Log.e("ResourceMnger",str)
+          return str
 
         }
       }

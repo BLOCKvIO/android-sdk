@@ -7,22 +7,22 @@ class VatomDeserializer : Deserializer<Vatom> {
   override fun deserialize(data: JSONObject): Vatom? {
 
     try {
-      val prop: JSONObject = data.getJSONObject("vAtomic::v1::vAtom::vAtomType")
-      val id: String? = data.getString("id")
+      val prop: JSONObject = data.getJSONObject("vAtom::vAtomType")
+      val id: String = data.getString("id")
       val private: JSONObject? = data.optJSONObject("private")
-      val whenCreated: String? = data.getString("when_created")
-      val whenModified: String? = data.getString("when_modified")
+      val whenCreated: String = data.getString("when_created")
+      val whenModified: String = data.getString("when_modified")
       val properties: VatomProperty = VatomProperty()
       properties.author = prop.optString("author")
       properties.category = prop.optString("category")
       properties.clonedFrom = prop.optString("cloned_from")
-      properties.acquireable = prop.optBoolean("acquireable")
+      properties.isAcquireable = prop.optBoolean("acquireable")
       properties.cloningScore = prop.optDouble("cloning_score").toFloat()
       properties.description = prop.optString("description")
-      properties.dropped = prop.optBoolean("dropped")
-      properties.inContract = prop.optBoolean("in_contract")
+      properties.isDropped = prop.optBoolean("dropped")
+      properties.isInContract = prop.optBoolean("in_contract")
       properties.inContractWith = prop.optString("in_contract_with")
-      properties.inReaction = prop.optBoolean("in_reaction")
+      properties.isInReaction = prop.optBoolean("in_reaction")
       properties.notifyMsg = prop.optString("notify_msg")
       properties.numDirectClones = prop.optInt("num_direct_clones")
       properties.owner = prop.getString("owner")
@@ -31,37 +31,39 @@ class VatomDeserializer : Deserializer<Vatom> {
       properties.reactedBy = prop.optString("reacted_by")
       properties.reactionExpires = prop.optString("reaction_expires")
       properties.rootType = prop.optString("root_type")
-      properties.template = prop.getString("template")
-      properties.templateVariation = prop.getString("template_variation")
+      properties.templateId = prop.getString("template")
+      properties.templateVariationId = prop.getString("template_variation")
       properties.title = prop.optString("title")
-      properties.tradeable = prop.optBoolean("tradeable")
-      properties.transferable = prop.optBoolean("transferable")
+      properties.isTradeable = prop.optBoolean("tradeable")
+      properties.isTransferable = prop.optBoolean("transferable")
       properties.transferedBy = prop.optString("transfered_by")
+      properties.isRedeemable = prop.optBoolean("redeemable")
 
-      val policyArray = prop.optJSONArray("child_policy")
-      val childPolicy: ArrayList<ChildPolicy> = ArrayList()
-      (0..policyArray.length())
-        .mapTo(childPolicy) {
-          val policy =policyArray.optJSONObject(it)
-          val creation = policy.optJSONObject("creation_policy")
-          ChildPolicy(
-            policy.optInt("count"),
-            policy.optString("template_variation"),
-            CreationPolicy(
-              creation.optString("auto_create"),
-              creation.optInt("auto_create_count"),
-              creation.optBoolean("auto_create_count_random"),
-              creation.optBoolean("enforce_policy_count_max"),
-              creation.optBoolean("enforce_policy_count_min"),
-              creation.optInt("policy_count_max"),
-              creation.optInt("policy_count_min")
+      if (prop.has("child_policy")) {
+        val policyArray = prop.optJSONArray("child_policy")
+        val childPolicy: ArrayList<ChildPolicy> = ArrayList()
+        (0..policyArray.length())
+          .mapTo(childPolicy) {
+            val policy = policyArray.optJSONObject(it)
+            val creation = policy.optJSONObject("creation_policy")
+            ChildPolicy(
+              policy.optInt("count"),
+              policy.optString("template_variation"),
+              CreationPolicy(
+                creation.optString("auto_create"),
+                creation.optInt("auto_create_count"),
+                creation.optBoolean("auto_create_count_random"),
+                creation.optBoolean("enforce_policy_count_max"),
+                creation.optBoolean("enforce_policy_count_min"),
+                creation.optInt("policy_count_max"),
+                creation.optInt("policy_count_min")
+              )
             )
-          )
-        }
-        .filter { android.text.TextUtils.isEmpty(it.templateVariation) }
+          }
+          .filter { android.text.TextUtils.isEmpty(it.templateVariation) }
 
-      properties.childPolicy = childPolicy
-
+        properties.childPolicy = childPolicy
+      }
       val visibility: JSONObject = prop.optJSONObject("visibility")
       properties.visibility = VatomVisibility(visibility.optString("type"), visibility.optString("value", "*"))
 
@@ -80,31 +82,34 @@ class VatomDeserializer : Deserializer<Vatom> {
         geoPos.optString("\$reql_type\$", "GEOMETRY"),
         coordinates)
 
-      val commerce: JSONObject = prop.optJSONObject("MyCommerce")
-      val pricing = commerce.optJSONObject("pricing")
-      val value = pricing.optJSONObject("value")
+      if (prop.has("commerce")) {
+        val commerce: JSONObject = prop.optJSONObject("commerce")
+        val pricing = commerce.optJSONObject("pricing")
+        val value = pricing.optJSONObject("value")
 
-      properties.commerce = Commerce(
-        commerce.optBoolean("redeemable"),
-        Pricing(
-          pricing.optString("v1::PricingType", "Fixed"),
-          value.optString("currency"),
-          value.optString("price"),
-          value.optString("valid_from", "*"),
-          value.optString("valid_through", "*"),
-          value.optBoolean("valid_through", false)))
-
+        properties.commerce = Commerce(
+          Pricing(
+            pricing.optString("pricingType", "Fixed"),
+            value.optString("currency"),
+            value.optString("price"),
+            value.optString("valid_from", "*"),
+            value.optString("valid_through", "*"),
+            value.optBoolean("vat_included", false)))
+      }
       val resourceArray = prop.optJSONArray("resources")
-      val resources: ArrayList<Resource> = ArrayList(resourceArray.length())
-      (0..resourceArray.length())
-        .map { resourceArray.optJSONObject(it) }
-        .mapTo(resources) {
-          Resource(
-            it.optString("name")
-            , it.optString("v1::ResourceType"),
-            it.optJSONObject("value").optString("value")
-          )
+      val resources: ArrayList<Resource> = ArrayList()
+      (0 until resourceArray.length())
+        .forEach {
+          val resource = resourceArray.optJSONObject(it)
+          if (resource != null) {
+            resources.add(Resource(
+              resource.optString("name"),
+              resource.optString("resourceType"),
+              resource.optJSONObject("value").optString("value")
+            ))
+          }
         }
+      properties.resources = resources
 
       return Vatom(
         id,
@@ -113,7 +118,7 @@ class VatomDeserializer : Deserializer<Vatom> {
         properties,
         private)
     } catch (e: Exception) {
-      android.util.Log.w("VatomDeserializer", e.message)
+      android.util.Log.e("VatomDeserializer", e.message)
     }
     return null
   }

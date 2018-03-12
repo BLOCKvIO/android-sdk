@@ -1,3 +1,3 @@
 package io.blockv.core.model
 
-class Action(val template:String,val action:String)
+class Action(val templateId:String,val name:String)

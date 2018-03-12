@@ -11,7 +11,7 @@ class VatomRequest(val ids: List<String>) {
   fun toJson(): JSONObject {
     val out = JSONObject()
     val idArray = JSONArray()
-    (0..ids.size).forEach {
+    (0 until ids.size).forEach {
       idArray.put(ids[it])
     }
     out.put("ids", idArray)

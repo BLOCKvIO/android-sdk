@@ -6,20 +6,19 @@ import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.net.rest.exception.BlockvException
 import io.blockv.core.internal.net.rest.exception.ErrorMapper
 import io.blockv.core.internal.repository.Preferences
+import io.blockv.core.model.AssetProvider
 import io.blockv.core.model.Environment
 import io.blockv.core.model.Error
 import io.blockv.core.model.Jwt
 import org.json.JSONObject
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLConnection
 import java.util.concurrent.Semaphore
 
 
-/**
- * Created by LordCheddar on 2018/02/22.
- */
 class HttpClient(val preferences: Preferences,
                  val errorMapper: ErrorMapper,
                  val jsonModule: JsonModule) : Client {
@@ -127,6 +126,17 @@ class HttpClient(val preferences: Preferences,
             accessToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("access_token"))
 
           }
+          if (pay.has("asset_provider")) {
+            val assetProviders = pay.getJSONArray("asset_provider")
+            val assetProviderArray = ArrayList<AssetProvider>()
+            (0 until assetProviders.length()).forEach {
+              val assetProvider = jsonModule.assetProviderDeserializer.deserialize(assetProviders.getJSONObject(it))
+              if (assetProvider != null) {
+                assetProviderArray.add(assetProvider)
+              }
+            }
+            preferences.assetProviders = assetProviderArray
+          }
 
         } catch (e: Exception) {
           Log.e("httpCLient", e.toString())
@@ -137,7 +147,9 @@ class HttpClient(val preferences: Preferences,
         Log.e("httpCLient", exception.toString())
         if (exception.error == Error.TOKEN_EXPIRED && retry == 0) {
           connection.disconnect()
-          return http(refreshToken()?.token ?: "", method, endpoint, payload, 1)
+          val token = refreshToken()
+
+          return http(if (token != null) token.type + " " + token.token else "", method, endpoint, payload, 1)
         }
         throw exception
 
@@ -178,7 +190,7 @@ class HttpClient(val preferences: Preferences,
   }
 
   override fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray): JSONObject {
-    return multipart(endpoint, fieldName, fileName, type, payload,0)
+    return multipart(endpoint, fieldName, fileName, type, payload, 0)
   }
 
   override fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray, retry: Int): JSONObject {
@@ -221,7 +233,7 @@ class HttpClient(val preferences: Preferences,
       dos.writeBytes("--" + boundary + "\r\n");
       dos.writeBytes("Content-Disposition: form-data; name=\"" + fieldName + "\";filename=" + fieldName + "\r\n")
       dos.writeBytes("\r\n")
-      dos.writeBytes("Content-Transfer-Encoding: binary"+"\r\n")
+      dos.writeBytes("Content-Transfer-Encoding: binary" + "\r\n")
       dos.writeBytes("\r\n")
       dos.writeBytes("Content-Type: application/octet-stream\r\n")
       dos.writeBytes("\r\n")
@@ -302,8 +314,10 @@ class HttpClient(val preferences: Preferences,
         Log.e("httpclient", "refrshing token")
         val jwt: Jwt? = preferences.refreshToken;
         if (jwt != null) {
-          val response: JSONObject = http(jwt.type + ":" + jwt.token, "POST", "v1/access_token", null, 0)
-          accessToken = jsonModule.jwtDeserilizer.deserialize(response.optJSONObject("access_token"))
+          val response: JSONObject = http(jwt.type + " " + jwt.token, "POST", "v1/access_token", null, 0)
+          if (response.has("payload")) {
+            accessToken = jsonModule.jwtDeserilizer.deserialize(response.getJSONObject("payload").optJSONObject("access_token"))
+          }
         } else
           accessToken = null
 

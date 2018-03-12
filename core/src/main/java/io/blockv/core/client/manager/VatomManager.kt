@@ -1,53 +1,94 @@
 package io.blockv.core.client.manager
 
-import io.blockv.core.model.Inventory
-import io.blockv.core.model.Vatom
+import io.blockv.core.model.Group
 import io.blockv.core.util.Observable
 import org.json.JSONObject
-import java.util.HashMap
+import java.util.*
 
 /**
- * Created by LordCheddar on 2018/02/25.
+ *  This interface contains the available Blockv vatom functions
  */
 interface VatomManager {
 
-  fun getVatoms(ids:List<String>): Observable<Inventory>
+  /**
+   * Fetches vatoms by id
+   *
+   * @param ids is a list of vatom id's in the current users inventory
+   * @return new Observable<Group> instance
+   */
+  fun getVatoms(vararg ids: String): Observable<Group>
 
-  fun getInventory(id:String?,pageToken:String?,pageAmount:Int?): Observable<Inventory>
+  /**
+   * Fetches the current users inventory
+   *
+   * @param id is the id of the inventory you want to fetch
+   * @return new Observable<Group> instance
+   */
+  fun getInventory(id: String?): Observable<Group>
 
-  fun geoDiscover(latitude:Double,longitude:Double,radius:Int,limit:Int): Observable<Inventory>
+  /**
+   * Fetches List of actions
+   * @param templateId is which the actions are associated to
+   * @return new Observable<List<io.blockv.core.model.Action>> instance
+   */
+  fun getVatomActions(templateId: String): Observable<List<io.blockv.core.model.Action>>
 
-  fun getVatomActions(template:String): Observable<List<io.blockv.core.model.Action>>
+  /**
+   * Performs an action
+   * @param action is the action's name
+   * @param payload contains the data required to do the action
+   */
+  fun preformAction(action: String, id: String, payload: JSONObject?): Observable<Void?>
 
-  fun preformAction(action:String,id:String,payload: JSONObject?): Observable<Void?>
+  /**
+   * Performs an action
+   * @param action is the action type
+   * @param payload contains the data required to do the action
+   */
+  fun preformAction(action: Action, id: String, payload: JSONObject?): Observable<Void?>
 
-  fun preformAction(action: Action, id:String, payload: JSONObject?): Observable<Void?>
+  /**
+   * Attempts to acquire a vatom
+   *
+   * @param id is the vatom's id
+   */
+  fun acquireVatom(id: String): Observable<Void?>
 
-  fun acquireVatom(id:String): Observable<Void?>
+  /**
+   * Attempts to transfer a vatom to a user
+   *
+   * @param id is the vatom's id
+   * @param tokenType is the type of the user's token
+   * @param token is the user's token matching the provided type
+   */
+  fun transferVatom(id: String, tokenType: TokenType, token: String): Observable<Void?>
 
-  fun acquirePubVatom(id:String): Observable<Void?>
+  /**
+   * Attempts to drop a vatom on the map
+   *
+   * @param id is the vatom's id
+   * @param latitude
+   * @param longitude
+   */
+  fun dropVatom(id: String, latitude: Double, longitude: Double): Observable<Void?>
 
-  fun transferVatomByEmail(id:String,email:String): Observable<Void?>
+  /**
+   * Attempts to pick up a vatom from the map
+   *
+   * @param id is the vatom's id
+   */
+  fun pickupVatom(id: String): Observable<Void?>
 
-  fun transferVatomByPhoneNumber(id:String,phoneNumber:String): Observable<Void?>
-
-  fun transferVatomById(id:String,userId:String): Observable<Void?>
-
-  fun dropVatom(id:String,latitude:Double,longitude:Double): Observable<Void?>
-
-  fun pickupVatom(id:String): Observable<Void?>
-
+  enum class TokenType {
+    EMAIL,
+    PHONE_NUMBER,
+    ID
+  }
 
   enum class Action {
 
     ACQUIRE {
       override fun action(): String = "Acquire"
-    },
-    ACQUIRE_PUB_VARIATION {
-      override fun action(): String = "AcquirePubVariation"
-    },
-    CLONE {
-      override fun action(): String = "Clone"
     },
     TRANSFER {
       override fun action(): String = "Transfer"
@@ -57,12 +98,6 @@ interface VatomManager {
     },
     PICKUP {
       override fun action(): String = "Pickup"
-    },
-    REDEEM {
-      override fun action(): String = "Redeem"
-    },
-    DISCOVER {
-      override fun action(): String = "Discover"
     };
 
     abstract fun action(): String

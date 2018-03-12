@@ -2,9 +2,9 @@ package io.blockv.core.model
 
 class VatomProperty {
 
-  var commerce:Commerce? = null
+  var commerce: Commerce? = null
 
-  var acquireable: Boolean? = false
+  var isAcquireable: Boolean? = false
 
   var author: String? = null
 
@@ -16,15 +16,15 @@ class VatomProperty {
 
   var description: String? = null
 
-  var dropped: Boolean? = false
+  var isDropped: Boolean? = false
 
   var geoPos: GeoPosition? = null
 
-  var inContract: Boolean? = false
+  var isInContract: Boolean? = false
 
   var inContractWith: String? = null
 
-  var inReaction: Boolean? = false
+  var isInReaction: Boolean? = false
 
   var notifyMsg: String? = null
 
@@ -44,38 +44,57 @@ class VatomProperty {
 
   var tags: List<String>? = null
 
-  var template: String? = null
+  var templateId: String? = null
 
-  var templateVariation: String? = null
+  var templateVariationId: String? = null
 
   var title: String? = null
 
-  var transferable: Boolean? = false
+  var isTransferable: Boolean? = false
 
   var transferedBy: String? = null
 
-  var resources: List<Resource>? = null
+  var isRedeemable: Boolean = false
+
+
+  var resources: List<Resource> = ArrayList()
+    set(value) {
+      field = value
+      _resources.clear()
+      field.forEach { _resources.put(it.name, it) }
+    }
+
+  private val _resources: HashMap<String, Resource> = HashMap<String, Resource>()
 
   var childPolicy: List<ChildPolicy>? = null
 
   var visibility: VatomVisibility? = null
 
-  var tradeable:Boolean? = null
+  var isTradeable: Boolean? = null
+
+
+  fun getResource(name: String): Resource? {
+    val resources = _resources
+    if (name != null) {
+      return resources[name]
+    }
+    return null
+  }
 
   override fun toString(): String {
     return "VatomProperty{" +
       commerce +
-      ", acquireable=" + acquireable +
+      ", acquireable=" + isAcquireable +
       ", author='" + author + '\'' +
       ", category='" + category + '\'' +
       ", clonedFrom='" + clonedFrom + '\'' +
       ", cloningScore=" + cloningScore +
       ", description='" + description + '\'' +
-      ", dropped=" + dropped +
+      ", dropped=" + isDropped +
       ", geoPos=" + geoPos +
-      ", inContract=" + inContract +
+      ", inContract=" + isInContract +
       ", inContractWith='" + inContractWith + '\'' +
-      ", inReaction=" + inReaction +
+      ", inReaction=" + isInReaction +
       ", notifyMsg='" + notifyMsg + '\'' +
       ", numDirectClones=" + numDirectClones +
       ", owner='" + owner + '\'' +
@@ -85,15 +104,17 @@ class VatomProperty {
       ", reactionExpires='" + reactionExpires + '\'' +
       ", rootType='" + rootType + '\'' +
       ", tags=" + tags +
-      ", template='" + template + '\'' +
-      ", templateVariation='" + templateVariation + '\'' +
+      ", templateId='" + templateId + '\'' +
+      ", templateVariationId='" + templateVariationId + '\'' +
       ", title='" + title + '\'' +
-      ", transferable=" + transferable +
+      ", transferable=" + isTransferable +
       ", transferedBy='" + transferedBy + '\'' +
       ", resources=" + resources +
       ", childPolicy=" + childPolicy +
       ", visibility=" + visibility +
       '}'
   }
+
+
 }
 

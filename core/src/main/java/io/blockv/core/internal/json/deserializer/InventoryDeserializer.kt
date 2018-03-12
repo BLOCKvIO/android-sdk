@@ -2,18 +2,18 @@ package io.blockv.core.internal.json.deserializer
 
 import io.blockv.core.model.Action
 import io.blockv.core.model.Face
-import io.blockv.core.model.Inventory
+import io.blockv.core.model.Group
 import io.blockv.core.model.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
 
 class InventoryDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
                             val faceDeserializer: Deserializer<Face?>,
-                            val actionDeserializer: Deserializer<Action?>) : Deserializer<Inventory> {
+                            val actionDeserializer: Deserializer<Action?>) : Deserializer<Group> {
 
-  override fun deserialize(data: JSONObject): Inventory? {
+  override fun deserialize(data: JSONObject): Group? {
     try {
-      val inventory: JSONArray? = if (data.has("inventory")) data.optJSONArray("inventory") else data.optJSONArray("objects") //so it can work with get current user vatom payload
+      val inventory: JSONArray? = data.optJSONArray("vatoms")
 
       val faces: JSONArray? = data.optJSONArray("faces")
       val actions: JSONArray? = data.optJSONArray("actions")
@@ -23,7 +23,7 @@ class InventoryDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
       val actionsArray: ArrayList<Action> = ArrayList()
 
       if (inventory != null) {
-        (0..inventory.length())
+        (0 until inventory.length())
           .forEach {
             val vatom: Vatom? = vatomDeserializer.deserialize(inventory.optJSONObject(it))
             if (vatom != null) {
@@ -32,7 +32,7 @@ class InventoryDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
           }
       }
       if (faces != null) {
-        (0..faces.length())
+        (0 until faces.length())
           .forEach {
             val face: Face? = faceDeserializer.deserialize(faces.optJSONObject(it))
             if (face != null) {
@@ -41,7 +41,7 @@ class InventoryDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
           }
       }
       if (actions != null) {
-        (0..actions.length())
+        (0 until actions.length())
           .forEach {
             val action: Action? = actionDeserializer.deserialize(actions.optJSONObject(it))
             if (action != null) {
@@ -49,9 +49,9 @@ class InventoryDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
             }
           }
       }
-      return Inventory(inventoryArray, facesArray, actionsArray)
+      return Group(inventoryArray, facesArray, actionsArray)
     } catch (e: Exception) {
-      android.util.Log.w("InventoryDeserializer", e.message)
+      android.util.Log.e("InventoryDeserializer", e.message)
     }
     return null
   }
