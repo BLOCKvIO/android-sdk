@@ -91,7 +91,7 @@ class Preferences(context: Context,
     return preferences.getInt(key.name, value)
   }
 
-  internal fun getString(key: Key): String {
+  internal fun getString(key: Key): String? {
     return preferences.getString(key.name, null)
   }
 

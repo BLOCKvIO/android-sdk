@@ -67,10 +67,15 @@ class VatomDeserializer : Deserializer<Vatom> {
       val visibility: JSONObject = prop.optJSONObject("visibility")
       properties.visibility = VatomVisibility(visibility.optString("type"), visibility.optString("value", "*"))
 
-      val tagArray: org.json.JSONArray = prop.optJSONArray("tags")
-      val tags: ArrayList<String> = ArrayList(tagArray.length())
-      (0..tagArray.length()).mapTo(tags) { tagArray.optString(it) }
-      properties.tags = tags
+      val tagArray: org.json.JSONArray? = prop.optJSONArray("tags")
+      if(tagArray!=null) {
+        val tags: ArrayList<String> = ArrayList(tagArray.length())
+        (0..tagArray.length()).mapTo(tags) { tagArray.optString(it) }
+        properties.tags = tags
+      }
+      else
+        properties.tags = ArrayList()
+
 
       val geoPos = prop.optJSONObject("geo_pos")
       val coordArray: org.json.JSONArray = geoPos.optJSONArray("coordinates")

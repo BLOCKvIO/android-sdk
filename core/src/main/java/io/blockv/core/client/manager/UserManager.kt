@@ -105,7 +105,11 @@ interface UserManager {
    */
   fun logout(): Observable<Void?>
 
-
+  /**
+   * Upload Bitmap to server to be used as the user's avatar
+   *
+   * @return new Observable<Void> instance
+   */
   fun uploadAvatar(avatar: Bitmap): Observable<Void?>
 
   fun isLoggedIn():Boolean

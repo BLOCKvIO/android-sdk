@@ -11,12 +11,14 @@ import io.blockv.core.model.Environment
 import io.blockv.core.model.Error
 import io.blockv.core.model.Jwt
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
-import java.io.DataOutputStream
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLConnection
 import java.util.concurrent.Semaphore
+import java.net.URLConnection.guessContentTypeFromName
+
+
 
 
 class HttpClient(val preferences: Preferences,
@@ -104,40 +106,39 @@ class HttpClient(val preferences: Preferences,
 
       buffer.flush()
 
-      var response: JSONObject = JSONObject()
+      var response = JSONObject()
 
       try {
-
         response = JSONObject(String(buffer.toByteArray()))
-        //response = response.optJSONObject("payload")
       } catch (exception: Exception) {
         Log.e("HttpClient", exception.toString())
       }
       if (responseCode == 200) {
 
         try {
-          val pay: JSONObject = response.getJSONObject("payload")
-          if (pay.has("refresh_token")) {
+          if(response.has("payload")&&(response.get("payload") is JSONObject)) {
+            val pay: JSONObject = response.getJSONObject("payload")
+            if (pay.has("refresh_token")) {
 
-            preferences.refreshToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("refresh_token"))
+              preferences.refreshToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("refresh_token"))
 
-          }
-          if (pay.has("access_token")) {
-            accessToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("access_token"))
-
-          }
-          if (pay.has("asset_provider")) {
-            val assetProviders = pay.getJSONArray("asset_provider")
-            val assetProviderArray = ArrayList<AssetProvider>()
-            (0 until assetProviders.length()).forEach {
-              val assetProvider = jsonModule.assetProviderDeserializer.deserialize(assetProviders.getJSONObject(it))
-              if (assetProvider != null) {
-                assetProviderArray.add(assetProvider)
-              }
             }
-            preferences.assetProviders = assetProviderArray
-          }
+            if (pay.has("access_token")) {
+              accessToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("access_token"))
 
+            }
+            if (pay.has("asset_provider")) {
+              val assetProviders = pay.getJSONArray("asset_provider")
+              val assetProviderArray = ArrayList<AssetProvider>()
+              (0 until assetProviders.length()).forEach {
+                val assetProvider = jsonModule.assetProviderDeserializer.deserialize(assetProviders.getJSONObject(it))
+                if (assetProvider != null) {
+                  assetProviderArray.add(assetProvider)
+                }
+              }
+              preferences.assetProviders = assetProviderArray
+            }
+          }
         } catch (e: Exception) {
           Log.e("httpCLient", e.toString())
         }
@@ -217,31 +218,48 @@ class HttpClient(val preferences: Preferences,
       if (jwt != null) {
         connection.setRequestProperty("Authorization", jwt.type + " " + jwt.token)
       }
-      val boundary = "14737809831466499882746641449"
-      connection.setRequestProperty("X-Vatomic-App-Id", environment!!.appId)
+      val boundary = "1234567890"
+
+      // These strings are sent in the request body. They provide information about the file being uploaded
+      val contentDisposition = "Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + fileName + "\""
+      val contentType = "Content-Type: application/octet-stream"
+
+        connection.setRequestProperty("X-Vatomic-App-Id", environment!!.appId)
       connection.useCaches = false
       connection.doInput = true
       connection.doOutput = true
-      connection.requestMethod = "POST";
-      connection.setRequestProperty("Connection", "Keep-Alive")
+      connection.requestMethod = "POST"
       connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary)
       connection.setRequestProperty(fieldName, fieldName)
 
-      val output = connection.outputStream;
-      val dos = DataOutputStream(output)
+      val output = connection.outputStream
 
-      dos.writeBytes("--" + boundary + "\r\n");
-      dos.writeBytes("Content-Disposition: form-data; name=\"" + fieldName + "\";filename=" + fieldName + "\r\n")
-      dos.writeBytes("\r\n")
-      dos.writeBytes("Content-Transfer-Encoding: binary" + "\r\n")
-      dos.writeBytes("\r\n")
-      dos.writeBytes("Content-Type: application/octet-stream\r\n")
-      dos.writeBytes("\r\n")
-      dos.write(payload)
-      dos.writeBytes("\r\n")
-      dos.writeBytes("--" + boundary + "--" + "\r\n")
-      dos.flush()
-      dos.close()
+      val writer = PrintWriter(OutputStreamWriter(output, "UTF-8"), true)
+      writer
+        .append("--" + boundary)
+        .append("\r\n")
+        .append("Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + fieldName + "\"")
+        .append("\r\n")
+        .append("Content-Type: " + URLConnection.guessContentTypeFromName(fileName))
+        .append("\r\n")
+        .append("Content-Transfer-Encoding: binary")
+        .append("\r\n")
+        .append("\r\n")
+        .flush()
+
+      output
+        .write(payload)
+      output.flush()
+
+      writer
+        .append("\r\n")
+        .flush()
+        writer
+          .append("\r\n")
+          .flush()
+      writer.append("--" + boundary + "--")
+        .append("\r\n")
+      writer.close()
 
       val responseCode: Int = connection.responseCode
 

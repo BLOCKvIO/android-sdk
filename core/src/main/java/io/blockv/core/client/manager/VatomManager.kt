@@ -11,7 +11,7 @@ import java.util.*
 interface VatomManager {
 
   /**
-   * Fetches vatoms by id
+   * Fetches vAtoms by id
    *
    * @param ids is a list of vatom id's in the current users inventory
    * @return new Observable<Group> instance
