@@ -68,7 +68,7 @@ class HttpClient(val preferences: Preferences,
       if (authentication != null) {
         connection.setRequestProperty("Authorization", authentication)
       }
-      connection.setRequestProperty("X-Vatomic-App-Id", environment!!.appId)
+      connection.setRequestProperty("App-Id", environment!!.appId)
       connection.setRequestProperty("Content-Type", "application/json")
       connection.requestMethod = method
       connection.useCaches = false
