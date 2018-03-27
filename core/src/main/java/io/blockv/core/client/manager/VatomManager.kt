@@ -79,6 +79,9 @@ interface VatomManager {
    */
   fun pickupVatom(id: String): Observable<Void?>
 
+
+  fun discover(query: JSONObject): Observable<Group>
+
   enum class TokenType {
     EMAIL,
     PHONE_NUMBER,

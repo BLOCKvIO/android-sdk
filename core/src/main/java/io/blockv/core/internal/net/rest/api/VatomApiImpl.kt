@@ -7,6 +7,7 @@ import io.blockv.core.internal.net.rest.request.PerformActionRequest
 import io.blockv.core.internal.net.rest.request.VatomRequest
 import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Action
+import io.blockv.core.model.DiscoverGroup
 import io.blockv.core.model.Group
 import org.json.JSONArray
 import org.json.JSONObject
@@ -30,14 +31,15 @@ class VatomApiImpl(val client: Client,
     )
   }
 
-  override fun discover(request: JSONObject): BaseResponse<JSONObject?> {
+  override fun discover(request: JSONObject): BaseResponse<DiscoverGroup?> {
     val response: JSONObject = client.post("v1/vatom/discover", request)
     val payload: JSONObject? = response.optJSONObject("payload")
+
     return BaseResponse(
       response.optString("status"),
       response.optInt("error"),
       response.optString("message"),
-      payload)
+      if (payload != null) jsonModule.discoverDeserilizer.deserialize(payload) else null)
   }
 
 

@@ -16,7 +16,9 @@ class JsonModule(
   val environmentSerializer: Serializer<Environment?>,
   val groupDeserilizer: Deserializer<Group?>,
   val jwtDeserilizer: Deserializer<Jwt?>,
-  val jwtSerializer: Serializer<Jwt?>
+  val jwtSerializer: Serializer<Jwt?>,
+  val discoverDeserilizer: Deserializer<DiscoverGroup?>
+
 
 
 )

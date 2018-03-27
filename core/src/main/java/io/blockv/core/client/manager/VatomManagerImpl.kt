@@ -12,9 +12,21 @@ import org.json.JSONObject
 class VatomManagerImpl(val api: VatomApi,
                        val resourceManager: ResourceManager) : VatomManager {
 
+  override fun discover(query: JSONObject): Observable<Group> = object : Observable<Group>() {
+    override fun getResult(): Group {
+      val group = api.discover(query).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
+      group.vatoms.forEach {
+        it.property.resources?.forEach {
+          it.url = resourceManager.encodeUrl(it.url) ?: it.url
+        }
+      }
+      return group
+    }
+  }
+
   override fun getVatoms(vararg ids: String): Observable<Group> = object : Observable<Group>() {
     override fun getResult(): Group {
-      val group = api.getUserVatom(VatomRequest(ids.toList())).payload ?: Group(ArrayList(),ArrayList(),ArrayList())
+      val group = api.getUserVatom(VatomRequest(ids.toList())).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
       group.vatoms.forEach {
         it.property.resources?.forEach {
           it.url = resourceManager.encodeUrl(it.url) ?: it.url
@@ -29,7 +41,7 @@ class VatomManagerImpl(val api: VatomApi,
       val group = api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
 
 
-      if(group!=null) {
+      if (group != null) {
 
         group.vatoms.forEach {
           it.property.resources.forEach {
@@ -39,7 +51,7 @@ class VatomManagerImpl(val api: VatomApi,
         return group
       }
 
-      return Group(ArrayList(),ArrayList(),ArrayList())
+      return Group(ArrayList(), ArrayList(), ArrayList())
     }
   }
 

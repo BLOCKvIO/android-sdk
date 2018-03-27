@@ -5,6 +5,7 @@ import io.blockv.core.internal.net.rest.request.PerformActionRequest
 import io.blockv.core.internal.net.rest.request.VatomRequest
 import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Action
+import io.blockv.core.model.DiscoverGroup
 import io.blockv.core.model.Group
 import org.json.JSONObject
 
@@ -21,7 +22,7 @@ interface VatomApi {
 
   fun preformAction(request:PerformActionRequest): BaseResponse<JSONObject?>
 
-  fun discover(request: JSONObject): BaseResponse<JSONObject?>
+  fun discover(request: JSONObject): BaseResponse<DiscoverGroup?>
 
 
 }

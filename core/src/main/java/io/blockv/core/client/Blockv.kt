@@ -43,7 +43,8 @@ class Blockv {
       EnviromentSerializer(),
       InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       JwtDeserializer(),
-      JwtSerializer()
+      JwtSerializer(),
+      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer)
     )
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
@@ -76,7 +77,8 @@ class Blockv {
       EnviromentSerializer(),
       InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       JwtDeserializer(),
-      JwtSerializer()
+      JwtSerializer(),
+      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer)
     )
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
