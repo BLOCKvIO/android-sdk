@@ -34,11 +34,11 @@ class DiscoverQueryBuilder {
 
   enum class FilterOperation(val operator: String) {
     EQUAL("Eq"),
-    GREATERTHAN("Gt"),
-    GREATEROREQUAL("Ge"),
-    LESSTHAN("Lt"),
-    LESSOREQUAL("Le"),
-    NOTEQUAL("Ne"),
+    GREATER_THAN("Gt"),
+    GREATER_OR_EQUAL("Ge"),
+    LESS_THAN("Lt"),
+    LESS_OR_EQUAL("Le"),
+    NOT_EQUAL("Ne"),
     MATCH("Match")
   }
 
