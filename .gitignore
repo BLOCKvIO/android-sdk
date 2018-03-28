@@ -8,6 +8,7 @@
 /captures
 SDKNotes.md
 encodings.xml
+gradle-app.setting
 
 # Built application files
 *.apk
@@ -52,6 +53,10 @@ captures/
 
 # Keystore files
 *.jks
+*.keystore
+
+# Gradle Signing
+signing.properties
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
@@ -63,3 +68,16 @@ google-services.json
 freeline.py
 freeline/
 freeline_project_description.json
+
+# [Maven] ========================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+
+
+
+

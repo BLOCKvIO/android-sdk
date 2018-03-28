@@ -3,7 +3,7 @@ package io.blockv.core.client.manager
 import android.graphics.Bitmap
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
-import io.blockv.core.util.Observable
+import io.blockv.core.util.Callable
 
 /**
  *  This interface contains the available Blockv user functions
@@ -15,9 +15,9 @@ interface UserManager {
    * Registers a user on the Blockv platform.
    *
    * @param registration contains properties of the user. Only the properties to be registered should be set.
-   * @return new Observable<User> instance
+   * @return new Callable<User> instance
    */
-  fun register(registration: Registration): Observable<User?>
+  fun register(registration: Registration): Callable<User?>
 
 
   /**
@@ -26,26 +26,26 @@ interface UserManager {
    * @param token the user's phone(E.164) or email
    * @param tokenType the type of the token (phone or email)
    * @param password the user's password.
-   * @return new Observable<User> instance
+   * @return new Callable<User> instance
    */
-  fun login(token: String, tokenType: TokenType, password: String): Observable<User?>
+  fun login(token: String, tokenType: TokenType, password: String): Callable<User?>
 
   /**
    * Logs a user into the Blockv platform. Accepts an OAuth token.
    *
    * @param provider the OAuth provider, e.g. Facebook.
    * @param oauthToken the OAuth token issued by the OAuth provider.
-   * @return new Observable<User> instance
+   * @return new Callable<User> instance
    */
-  fun loginOauth(provider: String, oauthToken: String): Observable<User?>
+  fun loginOauth(provider: String, oauthToken: String): Callable<User?>
 
   /**
    * Logs a user into the Blockv platform. Accepts a guest id
    *
    * @param guestId the user's guest id.
-   * @return new Observable<User> instance
+   * @return new Callable<User> instance
    */
-  fun loginGuest(guestId: String): Observable<User?>
+  fun loginGuest(guestId: String): Callable<User?>
 
   /**
    * Verifies ownership of a token by submitting the verification code to the Blockv platform.
@@ -53,9 +53,9 @@ interface UserManager {
    * @param token the user's phone(E.164) or email
    * @param tokenType the type of the token (phone or email)
    * @param code the verification code send to the user's token (phone or email).
-   * @return new Observable<User> instance
+   * @return new Callable<User> instance
    */
-  fun verifyUserToken(token: String, tokenType: TokenType, code: String): Observable<Void?>
+  fun verifyUserToken(token: String, tokenType: TokenType, code: String): Callable<Void?>
 
   /**
    * Sends a One-Time-Pin (OTP) to the user's token (phone or email).
@@ -64,9 +64,9 @@ interface UserManager {
    *
    * @param token the user's phone(E.164) or email
    * @param tokenType the type of the token (phone or email)
-   * @return new Observable<Void> instance
+   * @return new Callable<Void> instance
    */
-  fun resetToken(token: String, tokenType: TokenType): Observable<Void?>
+  fun resetToken(token: String, tokenType: TokenType): Callable<Void?>
 
   /**
    * Sends a verification code to the user's token (phone or email).
@@ -75,42 +75,42 @@ interface UserManager {
    *
    * @param token the user's phone(E.164) or email
    * @param tokenType the type of the token (phone or email)
-   * @return new Observable<Void> instance
+   * @return new Callable<Void> instance
    */
-  fun resendVerification(token: String, tokenType: TokenType): Observable<Void?>
+  fun resendVerification(token: String, tokenType: TokenType): Callable<Void?>
 
   /**
    * Fetches the current user's profile information from the Blockv platform.
    *
-   * @return new Observable<User> instance
+   * @return new Callable<User> instance
    */
-  fun getCurrentUser(): Observable<User?>
+  fun getCurrentUser(): Callable<User?>
 
   /**
    * Updates the current user's profile on the Blockv platform.
    *
    * @param update holds the properties of the user, e.g. their first name. Only the properties to be updated should be set.
-   * @return new Observable<User> instance
+   * @return new Callable<User> instance
    */
-  fun updateCurrentUser(update: UserUpdate): Observable<User?>
+  fun updateCurrentUser(update: UserUpdate): Callable<User?>
 
-  fun getCurrentUserTokens(): Observable<List<Token>>
+  fun getCurrentUserTokens(): Callable<List<Token>>
 
   /**
    * Log out the current user.
    *
    * The current user will not longer be authorized to perform user scoped requests on the Blockv platfrom.
    *
-   * @return new Observable<Void> instance
+   * @return new Callable<Void> instance
    */
-  fun logout(): Observable<Void?>
+  fun logout(): Callable<Void?>
 
   /**
    * Upload Bitmap to server to be used as the user's avatar
    *
-   * @return new Observable<Void> instance
+   * @return new Callable<Void> instance
    */
-  fun uploadAvatar(avatar: Bitmap): Observable<Void?>
+  fun uploadAvatar(avatar: Bitmap): Callable<Void?>
 
   fun isLoggedIn():Boolean
 

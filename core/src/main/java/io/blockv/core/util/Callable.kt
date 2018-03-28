@@ -1,25 +1,24 @@
 package io.blockv.core.util
 
 import android.os.AsyncTask
-import io.blockv.core.util.Disposable
 
 
 /**
  * Created by LordCheddar on 2018/02/21.
  */
-abstract class Observable<out T> {
+abstract class Callable<out T> {
 
   @Throws(Exception::class)
   abstract fun getResult(): T?
 
-  fun subscribe(): Disposable {
-    return this.subscribe(null)
+  fun call(): Cancellable {
+    return this.call(null)
   }
-  fun subscribe(success: OnSuccess<T>?): Disposable {
-    return this.subscribe(success, null)
+  fun call(success: OnSuccess<T>?): Cancellable {
+    return this.call(success, null)
   }
 
-  fun subscribe(success: OnSuccess<T>?, error: OnError?): Disposable {
+  fun call(success: OnSuccess<T>?, error: OnError?): Cancellable {
 
     val asynk: AsyncTask<Void, Void, Any> = object : AsyncTask<Void, Void, Any>() {
 
@@ -45,12 +44,18 @@ abstract class Observable<out T> {
 
     asynk.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-    return object : Disposable {
-      override fun isDisposed(): Boolean {
-        return asynk.isCancelled or (asynk.status == AsyncTask.Status.FINISHED)
+    return object : Cancellable {
+
+      override fun isComplete(): Boolean
+      {
+        return asynk.status == AsyncTask.Status.FINISHED
       }
 
-      override fun dispose() {
+      override fun isCanceled(): Boolean {
+        return asynk.isCancelled
+      }
+
+      override fun cancel() {
         asynk.cancel(true)
       }
 
@@ -65,23 +70,5 @@ abstract class Observable<out T> {
   interface OnError {
     fun onError(response: Throwable)
   }
-
-  /*fun toCompletable(): Completable {
-    val callable = this
-    return object : Completable() {
-      override fun subscribe(complete: OnComplete, error: OnError): Disposable {
-        callable.subscribe(object : OnSuccess<T> {
-          override fun onSuccess(response: T) {
-            complete.onComplete()
-          }
-        }, object : Observable.OnError {
-          override fun onError(response: Throwable) {
-            error.onError(response)
-          }
-        })
-      }
-    }
-  }*/
-
 
 }

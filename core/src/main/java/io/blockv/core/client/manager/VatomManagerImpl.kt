@@ -6,13 +6,13 @@ import io.blockv.core.internal.net.rest.request.PerformActionRequest
 import io.blockv.core.internal.net.rest.request.VatomRequest
 import io.blockv.core.model.Action
 import io.blockv.core.model.Group
-import io.blockv.core.util.Observable
+import io.blockv.core.util.Callable
 import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi,
                        val resourceManager: ResourceManager) : VatomManager {
 
-  override fun discover(query: JSONObject): Observable<Group> = object : Observable<Group>() {
+  override fun discover(query: JSONObject): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
       val group = api.discover(query).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
       group.vatoms.forEach {
@@ -24,7 +24,7 @@ class VatomManagerImpl(val api: VatomApi,
     }
   }
 
-  override fun getVatoms(vararg ids: String): Observable<Group> = object : Observable<Group>() {
+  override fun getVatoms(vararg ids: String): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
       val group = api.getUserVatom(VatomRequest(ids.toList())).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
       group.vatoms.forEach {
@@ -36,7 +36,7 @@ class VatomManagerImpl(val api: VatomApi,
     }
   }
 
-  override fun getInventory(id: String?): Observable<Group> = object : Observable<Group>() {
+  override fun getInventory(id: String?): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
       val group = api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
 
@@ -55,24 +55,24 @@ class VatomManagerImpl(val api: VatomApi,
     }
   }
 
-  override fun getVatomActions(template: String): Observable<List<Action>> = object : Observable<List<Action>>() {
+  override fun getVatomActions(template: String): Callable<List<Action>> = object : Callable<List<Action>>() {
     override fun getResult(): List<Action> = api.getVatomActions(template).payload
   }
 
-  override fun preformAction(action: String, id: String, payload: JSONObject?): Observable<Void?> = object : Observable<Void?>() {
+  override fun preformAction(action: String, id: String, payload: JSONObject?): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.preformAction(PerformActionRequest(action, id, payload))
       return null
     }
   }
 
-  override fun preformAction(action: VatomManager.Action, id: String, payload: JSONObject?): Observable<Void?> =
+  override fun preformAction(action: VatomManager.Action, id: String, payload: JSONObject?): Callable<Void?> =
     preformAction(action.action(), id, payload)
 
-  override fun acquireVatom(id: String): Observable<Void?> = preformAction(VatomManager.Action.ACQUIRE, id, null)
+  override fun acquireVatom(id: String): Callable<Void?> = preformAction(VatomManager.Action.ACQUIRE, id, null)
 
 
-  override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Observable<Void?> {
+  override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Callable<Void?> {
     val payload = JSONObject()
     when (tokenType) {
       VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
@@ -83,7 +83,7 @@ class VatomManagerImpl(val api: VatomApi,
     return preformAction(VatomManager.Action.TRANSFER, id, payload)
   }
 
-  override fun dropVatom(id: String, latitude: Double, longitude: Double): Observable<Void?> {
+  override fun dropVatom(id: String, latitude: Double, longitude: Double): Callable<Void?> {
     val payload = JSONObject()
     payload.put("geo.pos", JSONObject()
       .put("Lat", latitude)
@@ -91,5 +91,5 @@ class VatomManagerImpl(val api: VatomApi,
     return preformAction(VatomManager.Action.DROP, id, payload)
   }
 
-  override fun pickupVatom(id: String): Observable<Void?> = preformAction(VatomManager.Action.PICKUP, id, null)
+  override fun pickupVatom(id: String): Callable<Void?> = preformAction(VatomManager.Action.PICKUP, id, null)
 }

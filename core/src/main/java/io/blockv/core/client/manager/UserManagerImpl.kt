@@ -7,7 +7,7 @@ import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
-import io.blockv.core.util.Observable
+import io.blockv.core.util.Callable
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -25,7 +25,7 @@ class UserManagerImpl(var api: UserApi,
     return token!=null && !token.hasExpired()
   }
 
-  override fun uploadAvatar(avatar: Bitmap): Observable<Void?> = object : Observable<Void?>() {
+  override fun uploadAvatar(avatar: Bitmap): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       val stream = ByteArrayOutputStream()
       avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
@@ -33,13 +33,13 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  override fun loginGuest(guestId: String): Observable<User?> = object : Observable<User?>() {
+  override fun loginGuest(guestId: String): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? = api
       .loginGuest(GuestLoginRequest(
         guestId)).payload
   }
 
-  override fun loginOauth(provider: String, token: String): Observable<User?> = object : Observable<User?>() {
+  override fun loginOauth(provider: String, token: String): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? = api
       .oauthLogin(OauthLoginRequest(
         provider,
@@ -47,7 +47,7 @@ class UserManagerImpl(var api: UserApi,
   }
 
 
-  private fun login(token: String, tokenType: String, auth: String): Observable<User?> = object : Observable<User?>() {
+  private fun login(token: String, tokenType: String, auth: String): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? = api
       .login(LoginRequest(
         tokenType,
@@ -55,9 +55,9 @@ class UserManagerImpl(var api: UserApi,
         auth)).payload
   }
 
-  override fun login(token: String, tokenType: UserManager.TokenType, password: String): Observable<User?> = login(token, tokenType.name.toLowerCase(), password)
+  override fun login(token: String, tokenType: UserManager.TokenType, password: String): Callable<User?> = login(token, tokenType.name.toLowerCase(), password)
 
-  private fun resetToken(token: String, type: String): Observable<Void?> = object : Observable<Void?>() {
+  private fun resetToken(token: String, type: String): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
 
       api.resetToken(ResetTokenRequest(type, token)).payload
@@ -67,18 +67,18 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  override fun resetToken(token: String, tokenType: UserManager.TokenType): Observable<Void?> = resetToken(token, tokenType.name.toLowerCase())
+  override fun resetToken(token: String, tokenType: UserManager.TokenType): Callable<Void?> = resetToken(token, tokenType.name.toLowerCase())
 
-  private fun resendVerification(token: String, type: String): Observable<Void?> = object : Observable<Void?>() {
+  private fun resendVerification(token: String, type: String): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.resetVerificationToken(ResetTokenRequest(type, token))
       return null
     }
   }
 
-  override fun resendVerification(token: String, tokenType: UserManager.TokenType): Observable<Void?> = resendVerification(token, tokenType.name.toLowerCase())
+  override fun resendVerification(token: String, tokenType: UserManager.TokenType): Callable<Void?> = resendVerification(token, tokenType.name.toLowerCase())
 
-  override fun register(registration: UserManager.Registration): Observable<User?> = object : Observable<User?>() {
+  override fun register(registration: UserManager.Registration): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? {
 
       val tokens = JSONArray()
@@ -103,16 +103,16 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  private fun verifyUserToken(token: String, type: String, code: String): Observable<Void?> = object : Observable<Void?>() {
+  private fun verifyUserToken(token: String, type: String, code: String): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.verifyToken(VerifyTokenRequest(type, token, code))
       return null
     }
   }
 
-  override fun verifyUserToken(token: String, tokenType: UserManager.TokenType, code: String): Observable<Void?> = verifyUserToken(token, tokenType.name.toLowerCase(), code)
+  override fun verifyUserToken(token: String, tokenType: UserManager.TokenType, code: String): Callable<Void?> = verifyUserToken(token, tokenType.name.toLowerCase(), code)
 
-  override fun logout(): Observable<Void?> = object : Observable<Void?>() {
+  override fun logout(): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       preferences.refreshToken = null
       api.logout()
@@ -120,7 +120,7 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  override fun getCurrentUser(): Observable<User?> = object : Observable<User?>() {
+  override fun getCurrentUser(): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? {
       val user: User? = api.getCurrentUser().payload
       if (user?.avatarUri != null) {
@@ -131,11 +131,11 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  override fun getCurrentUserTokens(): Observable<List<Token>> = object : Observable<List<Token>>() {
+  override fun getCurrentUserTokens(): Callable<List<Token>> = object : Callable<List<Token>>() {
     override fun getResult(): List<Token> = api.getUserTokens().payload
   }
 
-  override fun updateCurrentUser(update: UserManager.UserUpdate): Observable<User?> = object : Observable<User?>() {
+  override fun updateCurrentUser(update: UserManager.UserUpdate): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? = api.updateCurrentUser(UpdateUserRequest(
       update.firstName,
       update.lastName,
