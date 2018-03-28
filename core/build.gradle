@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
 
 android {
   compileSdkVersion 27
@@ -33,4 +35,38 @@ dependencies {
 }
 repositories {
   mavenCentral()
+}
+
+def libraryGroupId = 'io.blockv.sdk'
+def libraryArtifactId = 'core'
+def libraryVersion = '0.5.1'
+
+publishing {
+  publications {
+    aar(MavenPublication) {
+      groupId libraryGroupId
+      version libraryVersion
+      artifactId libraryArtifactId
+
+      artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+    }
+  }
+}
+
+artifactory {
+  contextUrl = 'https://maven.blockv.io/artifactory'
+  publish {
+    repository {
+      repoKey = 'BLOCKv'
+      username = artifactory_username
+      password = artifactory_password
+    }
+    defaults {
+      publications('aar')
+      publishArtifacts = true
+
+      properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
+      publishPom = true
+    }
+  }
 }
