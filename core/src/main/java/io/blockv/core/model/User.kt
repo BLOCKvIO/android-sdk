@@ -39,6 +39,8 @@ class User {
     this.language = language
   }
 
+  constructor()
+
 
   override fun toString(): String {
     return "User{" +

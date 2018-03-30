@@ -10,68 +10,94 @@
  */
 package io.blockv.rx.client.manager
 
+import io.blockv.core.client.manager.ResourceManager
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.InventoryRequest
+import io.blockv.core.internal.net.rest.request.PerformActionRequest
 import io.blockv.core.internal.net.rest.request.VatomRequest
 import io.blockv.core.model.Action
-import io.blockv.core.model.Inventory
+import io.blockv.core.model.Group
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 
-class VatomManagerImpl(val api: VatomApi) : VatomManager {
-  override fun getVatoms(ids: List<String>): Single<Inventory> =
-    Single.fromCallable { api.getCurrentUserVatom(VatomRequest(ids)).payload ?: Inventory() }
+class VatomManagerImpl(val api: VatomApi,
+                       val resourceManager: ResourceManager) : VatomManager {
+  override fun getVatoms(vararg ids: String): Single<Group> = Single.fromCallable {
+    val group = api.getUserVatom(VatomRequest(ids.toList())).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
+    group.vatoms.forEach {
+      it.property.resources?.forEach {
+        it.url = resourceManager.encodeUrl(it.url) ?: it.url
+      }
+    }
+    group
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getInventory(id: String?, pageToken: String?, pageAmount: Int?): Single<Inventory> =
-    Single.fromCallable {
-      api.getCurrentUserInventory(InventoryRequest(
-        (if (id == null || id.isEmpty()) "." else id),
-        pageToken ?: "",
-        pageAmount ?: 1000)).payload ?: Inventory()
+  override fun getInventory(id: String?): Single<Group> = Single.fromCallable {
+    val group = api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
+    group?.vatoms?.forEach {
+      it.property.resources.forEach {
+        it.url = resourceManager.encodeUrl(it.url) ?: it.url
+      }
+    }
+    group ?: Group(ArrayList(), ArrayList(), ArrayList())
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getVatomActions(templateId: String): Single<List<Action>> = Single.fromCallable {
+    api.getVatomActions(templateId).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun preformAction(action: String, id: String, payload: JSONObject?): Completable = Completable.fromCallable {
+    api.preformAction(PerformActionRequest(action, id, payload))
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun preformAction(action: io.blockv.core.client.manager.VatomManager.Action, id: String, payload: JSONObject?): Completable = preformAction(action.action(), id, payload)
+
+  override fun acquireVatom(id: String): Completable = preformAction(io.blockv.core.client.manager.VatomManager.Action.ACQUIRE, id, null)
+
+  override fun transferVatom(id: String, tokenType: io.blockv.core.client.manager.VatomManager.TokenType, token: String): Completable {
+    val payload = JSONObject()
+    when (tokenType) {
+      io.blockv.core.client.manager.VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
+      io.blockv.core.client.manager.VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
+      io.blockv.core.client.manager.VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
     }
 
-  override fun geoDiscover(latitude: Double, longitude: Double, radius: Int, limit: Int): Single<Inventory> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    return preformAction(io.blockv.core.client.manager.VatomManager.Action.TRANSFER, id, payload)
   }
 
-  override fun getVatomActions(template: String): Single<List<Action>> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun preformAction(action: String, id: String, payload: JSONObject?): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun preformAction(action: io.blockv.core.client.manager.VatomManager.Action, id: String, payload: JSONObject?): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun acquireVatom(id: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun acquirePubVatom(id: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun transferVatomByEmail(id: String, email: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun transferVatomByPhoneNumber(id: String, phoneNumber: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun transferVatomById(id: String, userId: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
 
   override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    val payload = JSONObject()
+    payload.put("geo.pos", JSONObject()
+      .put("Lat", latitude)
+      .put("Lon", longitude))
+    return preformAction(io.blockv.core.client.manager.VatomManager.Action.DROP, id, payload)
   }
 
-  override fun pickupVatom(id: String): Completable {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+  override fun pickupVatom(id: String): Completable = preformAction(io.blockv.core.client.manager.VatomManager.Action.PICKUP, id, null)
+
+  override fun discover(query: JSONObject): Single<Group> = Single.fromCallable {
+    val group = api.discover(query).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
+    group.vatoms.forEach {
+      it.property.resources?.forEach {
+        it.url = resourceManager.encodeUrl(it.url) ?: it.url
+      }
+    }
+    group
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
 }
