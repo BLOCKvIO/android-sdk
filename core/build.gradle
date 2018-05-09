@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
@@ -25,13 +24,12 @@ android {
 }
 
 dependencies {
-  compile fileTree(dir: 'libs', include: ['*.jar'])
-  androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
     exclude group: 'com.android.support', module: 'support-annotations'
   })
-  compile 'com.android.support:appcompat-v7:27.+'
-  testCompile 'junit:junit:4.12'
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  implementation 'com.android.support:appcompat-v7:27.+'
+  testImplementation 'junit:junit:4.12'
 }
 repositories {
   mavenCentral()
@@ -58,8 +56,8 @@ artifactory {
   publish {
     repository {
       repoKey = 'BLOCKv'
-      username = artifactory_username
-      password = artifactory_password
+      username = blockv_artifactory_username
+      password = blockv_artifactory_password
     }
     defaults {
       publications('aar')
