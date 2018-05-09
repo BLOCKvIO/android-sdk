@@ -12,6 +12,7 @@
 package io.blockv.core.client.manager
 
 import android.graphics.Bitmap
+import io.blockv.core.model.Jwt
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Callable
@@ -123,8 +124,9 @@ interface UserManager {
    */
   fun uploadAvatar(avatar: Bitmap): Callable<Void?>
 
-  fun isLoggedIn():Boolean
+  fun isLoggedIn(): Boolean
 
+  fun getAccessToken(): Callable<Jwt?>
 
   enum class TokenType {
     EMAIL,

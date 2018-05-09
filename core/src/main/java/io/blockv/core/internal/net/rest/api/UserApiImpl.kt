@@ -15,6 +15,7 @@ import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.net.rest.Client
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.net.rest.response.BaseResponse
+import io.blockv.core.model.Jwt
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import org.json.JSONArray
@@ -22,6 +23,7 @@ import org.json.JSONObject
 
 class UserApiImpl(val client: Client,
                   val jsonModule: JsonModule) : UserApi {
+
   override fun uploadAvatar(request: UploadAvatarRequest): BaseResponse<Void?> {
     val response: JSONObject = client.multipart(
       "v1/user/avatar",

@@ -18,6 +18,7 @@ import io.blockv.core.internal.json.serializer.AssetProviderSerializer
 import io.blockv.core.internal.json.serializer.EnviromentSerializer
 import io.blockv.core.internal.json.serializer.JwtSerializer
 import io.blockv.core.internal.net.NetModule
+import io.blockv.core.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Action
 import io.blockv.core.model.Environment
@@ -57,11 +58,14 @@ class Blockv {
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
     val resourceManager = ResourceManagerImpl(preferences)
+    val auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
+      auth,
       preferences,
       jsonModule)
     this.userManager = UserManagerImpl(
       netModule.userApi,
+      auth,
       preferences,
       resourceManager
     )
@@ -91,9 +95,11 @@ class Blockv {
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
     val resourceManager = ResourceManagerImpl(preferences)
-    this.netModule = NetModule(preferences, jsonModule)
+    val auth = AuthenticatorImpl(this.preferences, jsonModule)
+    this.netModule = NetModule(auth, preferences, jsonModule)
     this.userManager = UserManagerImpl(
       netModule.userApi,
+      auth,
       preferences,
       resourceManager)
     this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)

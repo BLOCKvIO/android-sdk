@@ -18,14 +18,17 @@ import io.blockv.core.internal.net.rest.api.UserApi
 import io.blockv.core.internal.net.rest.api.UserApiImpl
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.api.VatomApiImpl
+import io.blockv.core.internal.net.rest.auth.Authenticator
 import io.blockv.core.internal.net.rest.exception.DefaultErrorMapper
 
-class NetModule(val preferences: Preferences, val jsonModule: JsonModule) {
+
+class NetModule(val authenticator: Authenticator, val preferences: Preferences, val jsonModule: JsonModule) {
 
   val client: Client = HttpClient(
     preferences,
     DefaultErrorMapper(),
     jsonModule,
+    authenticator,
     50000,
     60000)
 

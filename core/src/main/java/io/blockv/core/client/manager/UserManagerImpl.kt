@@ -13,8 +13,10 @@ package io.blockv.core.client.manager
 import android.graphics.Bitmap
 import android.util.Log
 import io.blockv.core.internal.net.rest.api.UserApi
+import io.blockv.core.internal.net.rest.auth.Authenticator
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.repository.Preferences
+import io.blockv.core.model.Jwt
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Callable
@@ -23,19 +25,26 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
 class UserManagerImpl(var api: UserApi,
+                      var authenticator: Authenticator,
                       var preferences: Preferences,
                       val resourceManager: ResourceManager) : UserManager {
 
+  override fun getAccessToken(): Callable<Jwt?> = object : Callable<Jwt?>() {
+    override fun getResult(): Jwt? {
+      return authenticator.refreshToken()
+    }
+  }
+
   override fun isLoggedIn(): Boolean {
     val token = preferences.refreshToken
-    return token!=null && !token.hasExpired()
+    return token != null && !token.hasExpired()
   }
 
   override fun uploadAvatar(avatar: Bitmap): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       val stream = ByteArrayOutputStream()
       avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
-      return api.uploadAvatar(UploadAvatarRequest("avatar","avatar.png","image/png",stream.toByteArray())).payload
+      return api.uploadAvatar(UploadAvatarRequest("avatar", "avatar.png", "image/png", stream.toByteArray())).payload
     }
   }
 
@@ -68,7 +77,7 @@ class UserManagerImpl(var api: UserApi,
 
       api.resetToken(ResetTokenRequest(type, token)).payload
 
-      Log.e("reset", "reset succes")
+      Log.e("reset", "reset success")
       return null
     }
   }
