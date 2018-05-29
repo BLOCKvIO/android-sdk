@@ -86,11 +86,11 @@ class HttpClient(val preferences: Preferences,
         if (response.has("payload") && (response.get("payload") is JSONObject)) {
           val pay: JSONObject = response.getJSONObject("payload")
           if (pay.has("refresh_token")) {
-            preferences.refreshToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("refresh_token"))
+            preferences.refreshToken = jsonModule.jctDeserializer.deserialize(pay.getJSONObject("refresh_token"))
           }
 
           if (pay.has("access_token")) {
-            authenticator.setToken(jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("access_token")))
+            authenticator.setToken(jsonModule.jctDeserializer.deserialize(pay.getJSONObject("access_token")))
 
           }
           if (pay.has("asset_provider")) {
@@ -177,10 +177,6 @@ class HttpClient(val preferences: Preferences,
       }
       val boundary = "1234567890"
 
-      // These strings are sent in the request body. They provide information about the file being uploaded
-      val contentDisposition = "Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + fileName + "\""
-      val contentType = "Content-Type: application/octet-stream"
-
       connection.setRequestProperty("X-Vatomic-App-Id", environment!!.appId)
       connection.useCaches = false
       connection.doInput = true
@@ -251,11 +247,11 @@ class HttpClient(val preferences: Preferences,
         try {
           val pay: JSONObject = response.getJSONObject("payload")
           if (pay.has("refresh_token")) {
-            preferences.refreshToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("refresh_token"))
+            preferences.refreshToken = jsonModule.jctDeserializer.deserialize(pay.getJSONObject("refresh_token"))
 
           }
           if (pay.has("access_token")) {
-            authenticator.setToken(jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("access_token")))
+            authenticator.setToken(jsonModule.jctDeserializer.deserialize(pay.getJSONObject("access_token")))
           }
 
         } catch (e: Exception) {

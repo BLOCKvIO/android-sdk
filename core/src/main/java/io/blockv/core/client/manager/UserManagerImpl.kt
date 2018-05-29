@@ -17,6 +17,7 @@ import io.blockv.core.internal.net.rest.auth.Authenticator
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Jwt
+import io.blockv.core.model.PublicUser
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Callable
@@ -26,8 +27,41 @@ import java.io.ByteArrayOutputStream
 
 class UserManagerImpl(var api: UserApi,
                       var authenticator: Authenticator,
-                      var preferences: Preferences,
-                      val resourceManager: ResourceManager) : UserManager {
+                      var preferences: Preferences) : UserManager {
+
+  override fun addUserToken(token: String, tokenType: UserManager.TokenType, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
+    override fun getResult(): Void? {
+      api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload
+      return null
+    }
+  }
+
+  override fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
+    override fun getResult(): Void? {
+      api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault)).payload
+      return null
+    }
+  }
+
+  override fun setDefaultUserToken(tokenId: String): Callable<Void?> = object : Callable<Void?>() {
+    override fun getResult(): Void? {
+      api.setDefaultUserToken(tokenId).payload
+      return null
+    }
+  }
+
+  override fun deleteUserToken(tokenId: String): Callable<Void?> = object : Callable<Void?>() {
+    override fun getResult(): Void? {
+      api.deleteUserToken(tokenId).payload
+      return null
+    }
+  }
+
+  override fun getPublicUser(userId: String): Callable<PublicUser?> = object : Callable<PublicUser?>() {
+    override fun getResult(): PublicUser? = api
+      .getPublicUser(userId).payload
+  }
+
 
   override fun getAccessToken(): Callable<Jwt?> = object : Callable<Jwt?>() {
     override fun getResult(): Jwt? {
@@ -54,11 +88,11 @@ class UserManagerImpl(var api: UserApi,
         guestId)).payload
   }
 
-  override fun loginOauth(provider: String, token: String): Callable<User?> = object : Callable<User?>() {
+  override fun loginOauth(provider: String, oauthToken: String): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? = api
       .oauthLogin(OauthLoginRequest(
         provider,
-        token)).payload
+        oauthToken)).payload
   }
 
 
@@ -137,12 +171,7 @@ class UserManagerImpl(var api: UserApi,
 
   override fun getCurrentUser(): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? {
-      val user: User? = api.getCurrentUser().payload
-      if (user?.avatarUri != null) {
-        user.avatarUri = resourceManager.encodeUrl(user.avatarUri)
-      }
-
-      return user
+      return api.getCurrentUser().payload
     }
   }
 

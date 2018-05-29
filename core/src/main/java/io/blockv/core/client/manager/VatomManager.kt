@@ -10,6 +10,7 @@
  */
 package io.blockv.core.client.manager
 
+import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
 import org.json.JSONObject
@@ -36,6 +37,12 @@ interface VatomManager {
    */
   fun getInventory(id: String?): Callable<Group>
 
+  fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, limit: Int, filter: GeoFilter): Callable<Group>
+
+  fun geoDiscoverGroup(left: Double, bottom: Double, right: Double, top: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
+
+  fun updateVatom(payload: JSONObject): Callable<Void?>
+
   /**
    * Fetches List of actions
    * @param templateId is which the actions are associated to
@@ -48,21 +55,21 @@ interface VatomManager {
    * @param action is the action's name
    * @param payload contains the data required to do the action
    */
-  fun preformAction(action: String, id: String, payload: JSONObject?): Callable<Void?>
+  fun preformAction(action: String, id: String, payload: JSONObject?): Callable<JSONObject?>
 
   /**
    * Performs an action
    * @param action is the action type
    * @param payload contains the data required to do the action
    */
-  fun preformAction(action: Action, id: String, payload: JSONObject?): Callable<Void?>
+  fun preformAction(action: Action, id: String, payload: JSONObject?): Callable<JSONObject?>
 
   /**
    * Attempts to acquire a vatom
    *
    * @param id is the vatom's id
    */
-  fun acquireVatom(id: String): Callable<Void?>
+  fun acquireVatom(id: String): Callable<JSONObject?>
 
   /**
    * Attempts to transfer a vatom to a user
@@ -71,7 +78,7 @@ interface VatomManager {
    * @param tokenType is the type of the user's token
    * @param token is the user's token matching the provided type
    */
-  fun transferVatom(id: String, tokenType: TokenType, token: String): Callable<Void?>
+  fun transferVatom(id: String, tokenType: TokenType, token: String): Callable<JSONObject?>
 
   /**
    * Attempts to drop a vatom on the map
@@ -80,14 +87,14 @@ interface VatomManager {
    * @param latitude
    * @param longitude
    */
-  fun dropVatom(id: String, latitude: Double, longitude: Double): Callable<Void?>
+  fun dropVatom(id: String, latitude: Double, longitude: Double): Callable<JSONObject?>
 
   /**
    * Attempts to pick up a vatom from the map
    *
    * @param id is the vatom's id
    */
-  fun pickupVatom(id: String): Callable<Void?>
+  fun pickupVatom(id: String): Callable<JSONObject?>
 
 
   fun discover(query: JSONObject): Callable<Group>
@@ -96,6 +103,12 @@ interface VatomManager {
     EMAIL,
     PHONE_NUMBER,
     ID
+  }
+
+  enum class GeoFilter {
+    ALL,
+    VATOMS,
+    AVATARS
   }
 
   enum class Action {

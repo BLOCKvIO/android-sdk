@@ -18,6 +18,7 @@ import io.blockv.core.internal.json.serializer.AssetProviderSerializer
 import io.blockv.core.internal.json.serializer.EnviromentSerializer
 import io.blockv.core.internal.json.serializer.JwtSerializer
 import io.blockv.core.internal.net.NetModule
+import io.blockv.core.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Action
 import io.blockv.core.model.Environment
@@ -51,13 +52,17 @@ class Blockv {
       InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer)
+      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      PublicUserDeserializer(),
+      GeoGroupDeserializer()
     )
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
     val resourceManager = ResourceManagerImpl(preferences)
+    val authenticator = AuthenticatorImpl(preferences,jsonModule)
     this.netModule = NetModule(
+      authenticator,
       preferences,
       jsonModule)
     this.userManager = UserManagerImpl(
@@ -85,13 +90,16 @@ class Blockv {
       InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer)
+      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      PublicUserDeserializer(),
+      GeoGroupDeserializer()
     )
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
     val resourceManager = ResourceManagerImpl(preferences)
-    this.netModule = NetModule(preferences, jsonModule)
+    val authenticator = AuthenticatorImpl(preferences,jsonModule)
+    this.netModule = NetModule(authenticator,preferences, jsonModule)
     this.userManager = UserManagerImpl(
       netModule.userApi,
       preferences,

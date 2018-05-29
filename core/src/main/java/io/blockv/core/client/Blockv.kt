@@ -29,10 +29,11 @@ class Blockv {
 
   val appId: String
   private val preferences: Preferences
-  private val netModule: NetModule
+  val netModule: NetModule
   private val jsonModule: JsonModule
   val userManager: UserManager
   val vatomManager: VatomManager
+  val resourceManager: ResourceManager
 
   constructor(context: Context, appId: String) {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
@@ -52,12 +53,14 @@ class Blockv {
       InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer)
+      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      PublicUserDeserializer(),
+      GeoGroupDeserializer()
     )
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
-    val resourceManager = ResourceManagerImpl(preferences)
+    this.resourceManager = ResourceManagerImpl(preferences)
     val auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
       auth,
@@ -66,8 +69,7 @@ class Blockv {
     this.userManager = UserManagerImpl(
       netModule.userApi,
       auth,
-      preferences,
-      resourceManager
+      preferences
     )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)
   }
@@ -89,19 +91,20 @@ class Blockv {
       InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer)
+      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      PublicUserDeserializer(),
+      GeoGroupDeserializer()
     )
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    val resourceManager = ResourceManagerImpl(preferences)
+    this.resourceManager = ResourceManagerImpl(preferences)
     val auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     this.userManager = UserManagerImpl(
       netModule.userApi,
       auth,
-      preferences,
-      resourceManager)
+      preferences)
     this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)
   }
 
@@ -111,7 +114,8 @@ class Blockv {
               jsonModule: JsonModule,
               netModule: NetModule,
               userManager: UserManager,
-              vatomManager: VatomManager) {
+              vatomManager: VatomManager,
+              resourceManager: ResourceManager) {
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
@@ -119,7 +123,7 @@ class Blockv {
     this.netModule = netModule
     this.userManager = userManager
     this.vatomManager = vatomManager
-
+    this.resourceManager = resourceManager
   }
 
 }

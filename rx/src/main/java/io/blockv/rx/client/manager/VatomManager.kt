@@ -10,8 +10,11 @@
  */
 package io.blockv.rx.client.manager
 
+import io.blockv.core.client.manager.VatomManager
 import io.blockv.core.model.Action
+import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
+import io.blockv.core.util.Callable
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.json.JSONObject
@@ -37,6 +40,12 @@ interface VatomManager {
    */
   fun getInventory(id: String?): Single<Group>
 
+  fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, limit: Int, filter: VatomManager.GeoFilter): Single<Group>
+
+  fun geoDiscoverGroup(left: Double, bottom: Double, right: Double, top: Double, precision: Int, filter: VatomManager.GeoFilter): Single<List<GeoGroup>>
+
+  fun updateVatom(payload: JSONObject): Completable
+
   /**
    * Fetches List of actions
    * @param templateId is which the actions are associated to
@@ -49,14 +58,14 @@ interface VatomManager {
    * @param action is the action's name
    * @param payload contains the data required to do the action
    */
-  fun preformAction(action: String, id: String, payload: JSONObject?): Completable
+  fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject>
 
   /**
    * Performs an action
    * @param action is the action type
    * @param payload contains the data required to do the action
    */
-  fun preformAction(action: io.blockv.core.client.manager.VatomManager.Action, id: String, payload: JSONObject?): Completable
+  fun preformAction(action: io.blockv.core.client.manager.VatomManager.Action, id: String, payload: JSONObject?): Single<JSONObject>
 
   /**
    * Attempts to acquire a vatom

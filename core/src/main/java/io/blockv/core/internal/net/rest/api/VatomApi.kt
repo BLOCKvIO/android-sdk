@@ -10,12 +10,11 @@
  */
 package io.blockv.core.internal.net.rest.api
 
-import io.blockv.core.internal.net.rest.request.InventoryRequest
-import io.blockv.core.internal.net.rest.request.PerformActionRequest
-import io.blockv.core.internal.net.rest.request.VatomRequest
+import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Action
 import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import org.json.JSONObject
 
@@ -27,9 +26,14 @@ interface VatomApi {
 
   fun getVatomActions(template: String?): BaseResponse<List<Action>>
 
-  fun preformAction(request:PerformActionRequest): BaseResponse<JSONObject?>
+  fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?>
 
   fun discover(request: JSONObject): BaseResponse<DiscoverGroup?>
 
+  fun geoDiscover(request: GeoRequest): BaseResponse<Group?>
 
+  fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>?>
+
+  fun updateVatom(request: JSONObject): BaseResponse<Void?>
 }
+

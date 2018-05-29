@@ -14,7 +14,7 @@ class VatomProperty {
 
   var commerce: Commerce? = null
 
-  var isAcquireable: Boolean? = false
+  var isAcquireable: Boolean = false
 
   var author: String? = null
 
@@ -26,15 +26,15 @@ class VatomProperty {
 
   var description: String? = null
 
-  var isDropped: Boolean? = false
+  var isDropped: Boolean = false
 
   var geoPos: GeoPosition? = null
 
-  var isInContract: Boolean? = false
+  var isInContract: Boolean = false
 
   var inContractWith: String? = null
 
-  var isInReaction: Boolean? = false
+  var isInReaction: Boolean = false
 
   var notifyMsg: String? = null
 
@@ -54,13 +54,13 @@ class VatomProperty {
 
   var tags: List<String>? = null
 
-  var templateId: String? = null
+  var templateId: String = ""
 
-  var templateVariationId: String? = null
+  var templateVariationId: String = ""
 
   var title: String? = null
 
-  var isTransferable: Boolean? = false
+  var isTransferable: Boolean = false
 
   var transferedBy: String? = null
 
@@ -85,10 +85,7 @@ class VatomProperty {
 
   fun getResource(name: String): Resource? {
     val resources = _resources
-    if (name != null) {
-      return resources[name]
-    }
-    return null
+    return resources[name]
   }
 
   override fun toString(): String {

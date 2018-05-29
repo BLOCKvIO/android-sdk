@@ -25,7 +25,7 @@ class FaceDeserializer : Deserializer<Face> {
       val createdBy: String? = meta.optString("created_by")
       val whenCreated: String? = meta.getString("when_created")
       val whenModified: String? = meta.optString("when_modified", whenCreated)
-      val displayUrl: String? = properties.getString("display_url")
+      val displayUrl: String = properties.getString("display_url")
       val constraints: JSONObject = properties.optJSONObject("constraints")
       val resourceArray = properties.optJSONArray("resources")
       val resources: ArrayList<String> = ArrayList(resourceArray.length())

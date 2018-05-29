@@ -10,23 +10,20 @@
  */
 package io.blockv.core.internal.json.deserializer
 
-import io.blockv.core.model.Token
 
-class TokenDeserializer : Deserializer<Token> {
-  override fun deserialize(data: org.json.JSONObject): Token? {
+import android.util.Log
+import io.blockv.core.model.GeoGroup
+
+class GeoGroupDeserializer : Deserializer<GeoGroup?> {
+
+  override fun deserialize(data: org.json.JSONObject): GeoGroup? {
     try {
-      val properties: org.json.JSONObject = data.getJSONObject("properties")
-      val token: String = properties.getString("token")
-      val tokenType: String = properties.getString("token_type")
-      val confirmed: Boolean = data.optBoolean("confirmed", false)
-      val primary: Boolean = properties.optBoolean("is_default",false)
-      return Token(
-        tokenType,
-        token,
-        confirmed,
-        primary)
+      val lon: Double = data.optDouble("lon")
+      val lat: Double = data.optDouble("lat")
+      val count: Int = data.optInt("count")
+      return GeoGroup(lon, lat, count)
     } catch (e: Exception) {
-      android.util.Log.w("TokenDeserializer", e.message)
+      Log.e("deserilizer", e.toString())
     }
     return null
   }

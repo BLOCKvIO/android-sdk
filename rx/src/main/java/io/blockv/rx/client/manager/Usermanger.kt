@@ -12,6 +12,7 @@ package io.blockv.rx.client.manager
 
 import android.graphics.Bitmap
 import io.blockv.core.client.manager.UserManager.*
+import io.blockv.core.model.PublicUser
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.reactivex.Completable
@@ -108,6 +109,16 @@ interface UserManager {
 
   fun getCurrentUserTokens(): Single<List<Token>>
 
+  fun addUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Completable
+
+  fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Completable
+
+  fun setDefaultUserToken(tokenId: String): Completable
+
+  fun deleteUserToken(tokenId: String): Completable
+
+  fun getPublicUser(userId: String): Single<PublicUser>
+
   /**
    * Log out the current user.
    *
@@ -124,7 +135,10 @@ interface UserManager {
    */
   fun uploadAvatar(avatar: Bitmap): Completable
 
-  fun isLoggedIn():Boolean
+  fun isLoggedIn(): Boolean
 
-
+  companion object {
+    val NULL_USER = User()
+    val NULL_PUBLIC_USER = PublicUser()
+  }
 }

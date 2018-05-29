@@ -14,7 +14,7 @@ package io.blockv.core.client.builder
 import org.json.JSONArray
 import org.json.JSONObject
 
-class DiscoverQueryBuilder {
+open class DiscoverQueryBuilder {
 
   enum class Scope(val value: String) {
     OWNER("vAtom::vAtomType.owner"),

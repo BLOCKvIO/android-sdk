@@ -51,7 +51,7 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
             if (response.has("payload") && (response.get("payload") is JSONObject)) {
               val pay: JSONObject = response.getJSONObject("payload")
               if (pay.has("access_token")) {
-                accessToken = jsonModule.jwtDeserilizer.deserialize(pay.getJSONObject("access_token"))
+                accessToken = jsonModule.jctDeserializer.deserialize(pay.getJSONObject("access_token"))
 
               }
             }
@@ -82,7 +82,7 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
     return accessToken
   }
 
-  override fun setToken(token: Jwt) {
+  override fun setToken(token: Jwt?) {
     accessToken = token
   }
 }

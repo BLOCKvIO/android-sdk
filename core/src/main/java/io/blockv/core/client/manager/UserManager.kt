@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 
 import android.graphics.Bitmap
 import io.blockv.core.model.Jwt
+import io.blockv.core.model.PublicUser
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Callable
@@ -107,6 +108,16 @@ interface UserManager {
   fun updateCurrentUser(update: UserUpdate): Callable<User?>
 
   fun getCurrentUserTokens(): Callable<List<Token>>
+
+  fun addUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Callable<Void?>
+
+  fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?>
+
+  fun setDefaultUserToken(tokenId: String): Callable<Void?>
+
+  fun deleteUserToken(tokenId: String): Callable<Void?>
+
+  fun getPublicUser(userId: String): Callable<PublicUser?>
 
   /**
    * Log out the current user.

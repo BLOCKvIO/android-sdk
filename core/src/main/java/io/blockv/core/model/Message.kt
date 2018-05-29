@@ -1,3 +1,5 @@
+package io.blockv.core.model
+
 /**
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
@@ -8,8 +10,14 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.net.rest.response
-
-class BaseResponse<T>(val error:Int?,
-                      val message:String?,
-                      val payload:T)
+class Message(val id:Long,
+              val userId:String,
+              val triggeredBy:String,
+              val whenCreated:String,
+              val whenModified:String,
+              val action:String,
+              val message:String,
+              val vatomIds:List<String>,
+              val templateVariations:List<String>,
+              val geoPosition: List<Double>,
+              val resources:List<Resource>)

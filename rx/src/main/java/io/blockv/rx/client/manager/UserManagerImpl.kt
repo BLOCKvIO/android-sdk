@@ -16,8 +16,11 @@ import io.blockv.core.client.manager.UserManager.UserUpdate
 import io.blockv.core.internal.net.rest.api.UserApi
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.repository.Preferences
+import io.blockv.core.model.PublicUser
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
+import io.blockv.rx.client.manager.UserManager.Companion.NULL_PUBLIC_USER
+import io.blockv.rx.client.manager.UserManager.Companion.NULL_USER
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -29,9 +32,42 @@ import java.io.ByteArrayOutputStream
 class UserManagerImpl(val api: UserApi,
                       val preferences: Preferences,
                       val resourceManager: ResourceManager) : UserManager {
-  companion object {
-    val NULL_USER = User()
+
+  override fun addUserToken(token: String, tokenType: io.blockv.core.client.manager.UserManager.TokenType, isDefault: Boolean): Completable = Completable.fromCallable {
+    api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault))
+
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Completable = Completable.fromCallable {
+    api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault))
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun setDefaultUserToken(tokenId: String): Completable = Completable.fromCallable {
+    api.setDefaultUserToken(tokenId)
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+
+  override fun deleteUserToken(tokenId: String): Completable = Completable.fromCallable {
+    api.deleteUserToken(tokenId)
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+
+  override fun getPublicUser(userId: String): Single<PublicUser> = Single.fromCallable {
+    api.getPublicUser(userId).payload?: NULL_PUBLIC_USER
+  }
+  .subscribeOn(Schedulers.io())
+  .observeOn(AndroidSchedulers.mainThread())
+
+
+
 
   override fun register(registration: io.blockv.core.client.manager.UserManager.Registration): Single<User> = Single.fromCallable {
     val tokens = JSONArray()
@@ -151,7 +187,7 @@ class UserManagerImpl(val api: UserApi,
 
   override fun isLoggedIn(): Boolean {
     val token = preferences.refreshToken
-    return token!=null && !token.hasExpired()
+    return token != null && !token.hasExpired()
   }
 
 

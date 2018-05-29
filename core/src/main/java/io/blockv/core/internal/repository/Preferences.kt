@@ -57,7 +57,7 @@ class Preferences(context: Context,
     get() {
       val token: String? = getString(Key.REFRESH_TOKEN)
       if (token != null) {
-        return jsonModule.jwtDeserilizer.deserialize(JSONObject(token))
+        return jsonModule.jctDeserializer.deserialize(JSONObject(token))
       }
       return null
     }

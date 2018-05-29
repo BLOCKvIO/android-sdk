@@ -8,8 +8,18 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.net.rest.response
+package io.blockv.core.internal.net.rest.request
 
-class BaseResponse<T>(val error:Int?,
-                      val message:String?,
-                      val payload:T)
+import org.json.JSONObject
+
+class CreateOauthTokenRequest(var tokenType: String, var token: String, var code: String, var isPrimary: Boolean) {
+
+  fun toJson(): JSONObject {
+    val out: JSONObject = JSONObject()
+    out.put("token", token)
+    out.put("token_type", tokenType)
+    out.put("is_primary", isPrimary)
+    out.put("auth_data", JSONObject().put("code", code))
+    return out
+  }
+}

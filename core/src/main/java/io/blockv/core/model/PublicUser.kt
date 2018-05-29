@@ -10,24 +10,32 @@
  */
 package io.blockv.core.model
 
-class Face(var id: String,
-           var templateId: String,
-           var createdBy: String?,
-           var whenCreated: String?,
-           var whenModified: String?,
-           var property: FaceProperty) {
+open class PublicUser {
+
+  var id: String? = null
+  var firstName: String? = null
+  var lastName: String? = null
+  var avatarUri: String? = null
+  val name: String
+    get() = ((this.firstName ?: "") + " " + (this.lastName ?: "")).trim()
+
+  constructor()
+
+  constructor(id: String?, firstName: String?, lastName: String?, avatarUri: String?) {
+    this.id = id
+    this.firstName = firstName
+    this.lastName = lastName
+    this.avatarUri = avatarUri
+  }
 
 
   override fun toString(): String {
-    return "Face{" +
+    return "User{" +
       "id='" + id + '\'' +
-      ", templateId='" + templateId + '\'' +
-      ", createdBy='" + createdBy + '\'' +
-      ", whenCreated='" + whenCreated + '\'' +
-      ", whenModified='" + whenModified + '\'' +
-      "," + property+ '\'' +
-    "}"
+      ", firstName='" + firstName + '\'' +
+      ", lastName='" + lastName + '\'' +
+      ", avatarUrl='" + avatarUri + '\'' +
+      '}'
   }
-
 
 }

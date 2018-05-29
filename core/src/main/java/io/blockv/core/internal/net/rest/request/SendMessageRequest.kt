@@ -1,3 +1,7 @@
+package io.blockv.core.internal.net.rest.request
+
+import org.json.JSONObject
+
 /**
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
@@ -8,8 +12,11 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.net.rest.response
-
-class BaseResponse<T>(val error:Int?,
-                      val message:String?,
-                      val payload:T)
+class SendMessageRequest(val userId: String, val message: String) {
+  fun toJson(): JSONObject {
+    val out: JSONObject = JSONObject()
+    out.put("id", userId)
+    out.put("message", message)
+    return out
+  }
+}

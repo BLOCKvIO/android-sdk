@@ -10,23 +10,26 @@
  */
 package io.blockv.core.internal.json.deserializer
 
-import io.blockv.core.model.Token
 
-class TokenDeserializer : Deserializer<Token> {
-  override fun deserialize(data: org.json.JSONObject): Token? {
+import android.util.Log
+import io.blockv.core.model.PublicUser
+
+class PublicUserDeserializer : Deserializer<PublicUser?> {
+
+  override fun deserialize(data: org.json.JSONObject): PublicUser? {
     try {
       val properties: org.json.JSONObject = data.getJSONObject("properties")
-      val token: String = properties.getString("token")
-      val tokenType: String = properties.getString("token_type")
-      val confirmed: Boolean = data.optBoolean("confirmed", false)
-      val primary: Boolean = properties.optBoolean("is_default",false)
-      return Token(
-        tokenType,
-        token,
-        confirmed,
-        primary)
+      val id: String? = data.getString("id")
+      val firstName: String? = properties.optString("first_name")
+      val lastName: String? = properties.optString("last_name")
+      val avatarUri: String? = properties.optString("avatar_uri")
+      return PublicUser(
+        id,
+        firstName,
+        lastName,
+        avatarUri)
     } catch (e: Exception) {
-      android.util.Log.w("TokenDeserializer", e.message)
+      Log.e("deserilizer", e.toString())
     }
     return null
   }

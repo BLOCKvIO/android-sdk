@@ -10,7 +10,7 @@
  */
 package io.blockv.core.model
 
-class Environment(val rest: String,
+open class Environment(val rest: String,
                   val appId: String) {
   companion object {
     val DEFAULT_SERVER = "https://api.blockv.io/"

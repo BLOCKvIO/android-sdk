@@ -20,6 +20,9 @@ class User {
   var avatarUri: String? = null
   var birthday: String? = null
   var language: String? = null
+  val name: String
+    get() = ((this.firstName ?: "") + " " + (this.lastName ?: "")).trim()
+
 
   constructor(id: String?,
               whenCreated: String?,
