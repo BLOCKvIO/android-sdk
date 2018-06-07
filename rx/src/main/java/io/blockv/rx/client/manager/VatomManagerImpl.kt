@@ -115,11 +115,6 @@ class VatomManagerImpl(val api: VatomApi,
 
   override fun discover(query: JSONObject): Single<Group> = Single.fromCallable {
     val group = api.discover(query).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
-    group.vatoms.forEach {
-      it.property.resources?.forEach {
-        it.url = resourceManager.encodeUrl(it.url) ?: it.url
-      }
-    }
     group
   }
     .subscribeOn(Schedulers.io())
