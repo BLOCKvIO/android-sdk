@@ -28,25 +28,27 @@ enum class Error {
   MALFORMED_REQUEST_BODY,
   INVALID_DATA_VALIDATION,
   VATOM_NOT_FOUND,
-  AVATAR_UPLOAD_FAILED;
+  AVATAR_UPLOAD_FAILED,
+  USER_REFRESH_TOKEN_EXPIRED;
 
   companion object {
 
-    private val MAP: MutableMap<Int, Error> = HashMap<Int,Error>()
+    private val MAP: MutableMap<Int, Error> = HashMap<Int, Error>()
 
     init {
       MAP.put(401, TOKEN_EXPIRED)
       MAP.put(516, INVALID_PAYLOAD)//empty string as token value
       MAP.put(521, TOKEN_UNAVAILABLE)
       MAP.put(527, INVALID_DATE_FORMAT)
-      MAP.put(1004,MALFORMED_REQUEST_BODY)
-      MAP.put(1041,INVALID_DATA_VALIDATION)
-      MAP.put(1701,VATOM_NOT_FOUND)
+      MAP.put(1004, MALFORMED_REQUEST_BODY)
+      MAP.put(1041, INVALID_DATA_VALIDATION)
+      MAP.put(1701, VATOM_NOT_FOUND)
       MAP.put(2030, INVALID_USER)
       MAP.put(2031, AUTHENTICATION_FAILED)
       MAP.put(2032, AUTHENTICATION_FAILED)
       MAP.put(2034, INVALID_USER)//user with token does not exist
       MAP.put(2037, AVATAR_UPLOAD_FAILED)
+      MAP.put(2049, USER_REFRESH_TOKEN_EXPIRED)
       MAP.put(2552, UNABLE_TO_RETRIEVE_TOKEN)
       MAP.put(2563, TOKEN_ALREADY_CONFIRMED)
       MAP.put(2564, INVALID_VERIFICATION_CODE)
