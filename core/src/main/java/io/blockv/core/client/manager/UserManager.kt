@@ -111,6 +111,7 @@ interface UserManager {
 
   fun addUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Callable<Void?>
 
+  ///needs testing,remove if doesnt work
   fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?>
 
   fun setDefaultUserToken(tokenId: String): Callable<Void?>
