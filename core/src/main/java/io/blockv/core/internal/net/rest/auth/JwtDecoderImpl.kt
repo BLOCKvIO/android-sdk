@@ -11,13 +11,12 @@ class JwtDecoderImpl : JwtDecoder {
   override fun decode(jwt: Jwt): DecodedJwt {
     val parts: List<String> = jwt.token.split(".")
     try {
-
       if (parts.size == 3) {
         val data = JSONObject(String(Base64.decode(parts[1].toByteArray(), Base64.DEFAULT)))
-        return DecodedJwt(jwt, data.getString("user_id"), Date(data.getLong("exp")))
+        return DecodedJwt(jwt, data.getString("user_id"), Date(data.getLong("exp")*1000))
       }
     } catch (exception: Exception) {
-      Log.e("JwtDecoder",exception.message);
+      Log.e("JwtDecoder",exception.message)
     }
     throw InvalidTokenException()
   }
