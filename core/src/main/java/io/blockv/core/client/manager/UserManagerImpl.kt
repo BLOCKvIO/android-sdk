@@ -14,6 +14,8 @@ import android.graphics.Bitmap
 import android.util.Log
 import io.blockv.core.internal.net.rest.api.UserApi
 import io.blockv.core.internal.net.rest.auth.Authenticator
+import io.blockv.core.internal.net.rest.auth.JwtDecoder
+import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Jwt
@@ -27,7 +29,8 @@ import java.io.ByteArrayOutputStream
 
 class UserManagerImpl(var api: UserApi,
                       var authenticator: Authenticator,
-                      var preferences: Preferences) : UserManager {
+                      var preferences: Preferences,
+                      var jwtDecoder: JwtDecoder) : UserManager {
 
   override fun addUserToken(token: String, tokenType: UserManager.TokenType, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
@@ -71,7 +74,16 @@ class UserManagerImpl(var api: UserApi,
 
   override fun isLoggedIn(): Boolean {
     val token = preferences.refreshToken
-    return token != null && !token.hasExpired()
+    if (token != null) {
+      try {
+        val expired = jwtDecoder.decode(token).checkIsExpired()
+        Log.i("UserManager", "token has expired $expired")
+        return !expired
+      } catch (exception: JwtDecoderImpl.InvalidTokenException) {
+        Log.i("UserManager", exception.message)
+      }
+    }
+    return false
   }
 
   override fun uploadAvatar(avatar: Bitmap): Callable<Void?> = object : Callable<Void?>() {
@@ -164,6 +176,7 @@ class UserManagerImpl(var api: UserApi,
   override fun logout(): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       preferences.refreshToken = null
+      //remove asset providers
       api.logout()
       return null
     }

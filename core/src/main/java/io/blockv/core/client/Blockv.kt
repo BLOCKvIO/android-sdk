@@ -19,6 +19,7 @@ import io.blockv.core.internal.json.serializer.EnviromentSerializer
 import io.blockv.core.internal.json.serializer.JwtSerializer
 import io.blockv.core.internal.net.NetModule
 import io.blockv.core.internal.net.rest.auth.AuthenticatorImpl
+import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Action
 import io.blockv.core.model.Environment
@@ -69,7 +70,8 @@ class Blockv {
     this.userManager = UserManagerImpl(
       netModule.userApi,
       auth,
-      preferences
+      preferences,
+      JwtDecoderImpl()
     )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)
   }
@@ -104,7 +106,8 @@ class Blockv {
     this.userManager = UserManagerImpl(
       netModule.userApi,
       auth,
-      preferences)
+      preferences,
+      JwtDecoderImpl())
     this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)
   }
 

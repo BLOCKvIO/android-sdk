@@ -11,9 +11,12 @@
 package io.blockv.rx.client.manager
 
 import android.graphics.Bitmap
+import android.util.Log
 import io.blockv.core.client.manager.ResourceManager
 import io.blockv.core.client.manager.UserManager.UserUpdate
 import io.blockv.core.internal.net.rest.api.UserApi
+import io.blockv.core.internal.net.rest.auth.JwtDecoder
+import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.PublicUser
@@ -31,7 +34,8 @@ import java.io.ByteArrayOutputStream
 
 class UserManagerImpl(val api: UserApi,
                       val preferences: Preferences,
-                      val resourceManager: ResourceManager) : UserManager {
+                      val resourceManager: ResourceManager,
+                      val jwtDecoder:JwtDecoder) : UserManager {
 
   override fun addUserToken(token: String, tokenType: io.blockv.core.client.manager.UserManager.TokenType, isDefault: Boolean): Completable = Completable.fromCallable {
     api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault))
@@ -187,7 +191,16 @@ class UserManagerImpl(val api: UserApi,
 
   override fun isLoggedIn(): Boolean {
     val token = preferences.refreshToken
-    return token != null && !token.hasExpired()
+    if (token != null) {
+      try {
+        val expired = jwtDecoder.decode(token).checkIsExpired()
+        Log.i("UserManager", "token has expired $expired")
+        return !expired
+      } catch (exception: JwtDecoderImpl.InvalidTokenException) {
+        Log.i("UserManager", exception.message)
+      }
+    }
+    return false
   }
 
 
