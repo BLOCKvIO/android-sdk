@@ -19,8 +19,6 @@ class JwtSerializer : Serializer<Jwt?> {
     if (data != null) {
       out.put("token", data.token)
       out.put("token_type", data.type)
-      out.put("expires_in", data.expiresIn)
-      out.put("expires", data.expires)
     }
     return out
   }
