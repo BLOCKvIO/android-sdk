@@ -29,6 +29,7 @@ interface UserManager {
    *
    * @param registration contains properties of the user. Only the properties to be registered should be set.
    * @return new Callable<User> instance
+   * @see Registration
    */
   fun register(registration: Registration): Callable<User?>
 
@@ -107,8 +108,22 @@ interface UserManager {
    */
   fun updateCurrentUser(update: UserUpdate): Callable<User?>
 
+  /**
+   * Fetches a list of the current user's tokens
+   *
+   * @return new Callable<List<Token>>
+   * @see Token
+   */
   fun getCurrentUserTokens(): Callable<List<Token>>
 
+  /**
+   * Adds a new access token to the current user's account
+   *
+   * @param token the user's phone(E.164) or email
+   * @param tokenType the type of the token (phone or email)
+   * @param isDefault
+   * @return new Callable<Void?>
+   */
   fun addUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Callable<Void?>
 
   fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?>
@@ -117,6 +132,13 @@ interface UserManager {
 
   fun deleteUserToken(tokenId: String): Callable<Void?>
 
+  /**
+   * Fetches the specified user's public information
+   *
+   * @param userId is the unique identifier of the user
+   * @return new Callable<PublicUser?>
+   * @see PublicUser
+   */
   fun getPublicUser(userId: String): Callable<PublicUser?>
 
   /**
