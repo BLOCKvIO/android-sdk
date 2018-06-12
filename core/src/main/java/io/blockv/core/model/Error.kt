@@ -35,7 +35,6 @@ enum class Error {
     private val MAP: MutableMap<Int, Error> = HashMap<Int,Error>()
 
     init {
-      MAP.put(401, TOKEN_EXPIRED)
       MAP.put(516, INVALID_PAYLOAD)//empty string as token value
       MAP.put(521, TOKEN_UNAVAILABLE)
       MAP.put(527, INVALID_DATE_FORMAT)
