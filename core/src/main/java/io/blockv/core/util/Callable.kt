@@ -20,49 +20,34 @@ abstract class Callable<out T> {
   fun call(): Cancellable {
     return this.call(null)
   }
+
   fun call(success: OnSuccess<T>?): Cancellable {
     return this.call(success, null)
   }
 
   fun call(success: OnSuccess<T>?, error: OnError?): Cancellable {
 
-    val asynk: AsyncTask<Void, Void, Any> = object : AsyncTask<Void, Void, Any>() {
-
-      override fun doInBackground(vararg params: Void?): Any? {
-        try {
-          val result = getResult() ?: return null
-          return result as Any
-        } catch (e: Exception) {
-          return e
-        }
+    val result: OnResult<T> = object : OnResult<T> {
+      override fun onResult(): T? {
+        return getResult()
       }
-
-      override fun onPostExecute(result: Any?) {
-        super.onPostExecute(result)
-        when (result) {
-          null -> success?.onSuccess(null)
-          is Exception -> error?.onError(result)
-          else -> success?.onSuccess(result as T)
-        }
-      }
-
     }
+    val async: AsyncTask<Void, Void, Any> = CallableTask(result, success, error)
 
-    asynk.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
     return object : Cancellable {
 
-      override fun isComplete(): Boolean
-      {
-        return asynk.status == AsyncTask.Status.FINISHED
+      override fun isComplete(): Boolean {
+        return async.status == AsyncTask.Status.FINISHED
       }
 
       override fun isCanceled(): Boolean {
-        return asynk.isCancelled
+        return async.isCancelled
       }
 
       override fun cancel() {
-        asynk.cancel(true)
+        async.cancel(true)
       }
 
     }
@@ -77,4 +62,31 @@ abstract class Callable<out T> {
     fun onError(response: Throwable)
   }
 
+  interface OnResult<out T> {
+    fun onResult(): T?
+  }
+
+  class CallableTask<T>(private val onResult: OnResult<T>,
+                        private val success: OnSuccess<T>?,
+                        private val error: OnError?) : AsyncTask<Void, Void, Any>() {
+
+    override fun doInBackground(vararg params: Void?): Any? {
+      try {
+        val result = onResult.onResult() ?: return null
+        return result as Any
+      } catch (e: Exception) {
+        return e
+      }
+    }
+
+    override fun onPostExecute(result: Any?) {
+      super.onPostExecute(result)
+      when (result) {
+        null -> success?.onSuccess(null)
+        is Exception -> error?.onError(result)
+        else -> success?.onSuccess(result as T)
+      }
+    }
+
+  }
 }
