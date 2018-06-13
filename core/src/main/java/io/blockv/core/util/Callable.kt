@@ -10,9 +10,38 @@
  */
 package io.blockv.core.util
 
-import android.os.AsyncTask
+import android.os.Handler
+import android.os.Looper
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 abstract class Callable<out T> {
+
+  companion object {
+    private val cores = Runtime.getRuntime().availableProcessors()
+    val ioPool: ThreadPoolExecutor = ThreadPoolExecutor(10, 100, Long.MAX_VALUE, TimeUnit.NANOSECONDS, LinkedBlockingQueue())
+    val compPool: ThreadPoolExecutor = ThreadPoolExecutor(cores * 2, cores * 4, 60L, TimeUnit.SECONDS, LinkedBlockingQueue())
+  }
+
+  enum class Scheduler {
+    IO,
+    COMP,
+    MAIN
+  }
+
+  var executionScheduler: Scheduler = Scheduler.IO
+  var responseScheduler: Scheduler = Scheduler.MAIN
+
+  fun runOn(scheduler: Scheduler): Callable<T> {
+    this.executionScheduler = scheduler
+    return this
+  }
+
+  fun returnOn(responseScheduler: Scheduler): Callable<T> {
+    this.responseScheduler = responseScheduler
+    return this
+  }
 
   @Throws(Exception::class)
   abstract fun getResult(): T?
@@ -20,52 +49,107 @@ abstract class Callable<out T> {
   fun call(): Cancellable {
     return this.call(null)
   }
+
   fun call(success: OnSuccess<T>?): Cancellable {
     return this.call(success, null)
   }
 
   fun call(success: OnSuccess<T>?, error: OnError?): Cancellable {
 
-    val asynk: AsyncTask<Void, Void, Any> = object : AsyncTask<Void, Void, Any>() {
-
-      override fun doInBackground(vararg params: Void?): Any? {
+    val runnable: Runnable = object : Runnable() {
+      override fun run() {
         try {
-          val result = getResult() ?: return null
-          return result as Any
+          val result = getResult()
+          this.completed = true
+          if (success != null && !canceled) {
+            when (responseScheduler) {
+              Scheduler.IO -> {
+                ioPool.execute({ success.onSuccess(result) })
+              }
+              Scheduler.COMP -> {
+                compPool.execute({ success.onSuccess(result) })
+              }
+              Scheduler.MAIN -> {
+                Handler(Looper.getMainLooper()).post({ success.onSuccess(result) })
+              }
+            }
+          }
         } catch (e: Exception) {
-          return e
+          this.completed = true
+          if (error != null && !canceled) {
+            when (responseScheduler) {
+              Scheduler.IO -> {
+                ioPool.execute({ error.onError(e) })
+              }
+              Scheduler.COMP -> {
+                compPool.execute({ error.onError(e) })
+              }
+              Scheduler.MAIN -> {
+                Handler(Looper.getMainLooper()).post({ error.onError(e) })
+              }
+            }
+
+          } else
+            throw e
         }
       }
+    }
 
-      override fun onPostExecute(result: Any?) {
-        super.onPostExecute(result)
-        when (result) {
-          null -> success?.onSuccess(null)
-          is Exception -> error?.onError(result)
-          else -> success?.onSuccess(result as T)
+    when (executionScheduler) {
+      Scheduler.IO -> {
+        ioPool.execute(runnable)
+        return object : Cancellable(runnable) {
+          override fun cancel() {
+            runnable.canceled = true
+            ioPool.remove(runnable)
+          }
+        }
+      }
+      Scheduler.COMP -> {
+        compPool.execute(runnable)
+        return object : Cancellable(runnable) {
+          override fun cancel() {
+            runnable.canceled = true
+            compPool.remove(runnable)
+          }
+        }
+      }
+      Scheduler.MAIN -> {
+        val handler = Handler(Looper.getMainLooper())
+        handler.post(runnable)
+        return object : Cancellable(runnable) {
+          override fun cancel() {
+            runnable.canceled = true
+            handler.removeCallbacks(runnable)
+          }
         }
       }
 
     }
 
-    asynk.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+  }
 
-    return object : Cancellable {
-
-      override fun isComplete(): Boolean
-      {
-        return asynk.status == AsyncTask.Status.FINISHED
-      }
-
-      override fun isCanceled(): Boolean {
-        return asynk.isCancelled
-      }
-
-      override fun cancel() {
-        asynk.cancel(true)
-      }
-
+  abstract class Cancellable(private val runnable: Runnable) : io.blockv.core.util.Cancellable {
+    override fun isComplete(): Boolean {
+      return runnable.isComplete
     }
+
+    override fun isCanceled(): Boolean {
+      return runnable.isCanceled
+    }
+  }
+
+  abstract class Runnable : java.lang.Runnable {
+    internal var completed: Boolean = false
+    internal var canceled: Boolean = false
+    val isComplete: Boolean
+      get() {
+        return completed
+      }
+    val isCanceled: Boolean
+      get() {
+        return canceled
+      }
 
   }
 
