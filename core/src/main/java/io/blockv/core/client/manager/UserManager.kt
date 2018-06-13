@@ -105,6 +105,7 @@ interface UserManager {
    *
    * @param update holds the properties of the user, e.g. their first name. Only the properties to be updated should be set.
    * @return new Callable<User> instance
+   * @see UserUpdate
    */
   fun updateCurrentUser(update: UserUpdate): Callable<User?>
 
@@ -117,20 +118,42 @@ interface UserManager {
   fun getCurrentUserTokens(): Callable<List<Token>>
 
   /**
-   * Adds a new access token to the current user's account
+   * Adds a user token to the current user
    *
-   * @param token the user's phone(E.164) or email
+   * @param token the user's token to be linked to the current user
    * @param tokenType the type of the token (phone or email)
-   * @param isDefault
+   * @param isDefault determines whether the token is the primary token on this account.
    * @return new Callable<Void?>
    */
-  fun addUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Callable<Void?>
+  fun addCurrentUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Callable<Void?>
 
+  /**
+   * Adds a oAuth user token to the current user
+   *
+   *
+   */
   fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?>
 
-  fun setDefaultUserToken(tokenId: String): Callable<Void?>
+  /**
+   * Updates the specified token to be the current user's default token on the BLOCKv Platform.
+   *
+   * Backend description:
+   * Boolean to indicate if this token is the primary token. The primary token is used when no other
+   * token is explicitly selected, for example to send messages. This will automatically set the
+   * is_primary flag of an existing token to false , because only one token can be the primary token.
+   *
+   * @param tokenId is the unique identifier of the token to be deleted
+   * @return new Callable<Void?>
+   */
+  fun setCurrentUserDefaultToken(tokenId: String): Callable<Void?>
 
-  fun deleteUserToken(tokenId: String): Callable<Void?>
+  /**
+   * Removes the token from the current user's token list on the BLOCKv Platform.
+   *
+   * @param tokenId is the unique identifier of the token
+   * @return new Callable<Void?>
+   */
+  fun deleteCurrentUserToken(tokenId: String): Callable<Void?>
 
   /**
    * Fetches the specified user's public information
@@ -157,8 +180,21 @@ interface UserManager {
    */
   fun uploadAvatar(avatar: Bitmap): Callable<Void?>
 
+  /**
+   * Determines whether a user is logged in.
+   *
+   * @return Boolean `true` if logged in. `false` otherwise.
+   */
   fun isLoggedIn(): Boolean
 
+  /**
+   * Retrieves and refreshes the SDKs access token
+   *
+   * This function should only be called if you have a well defined reason for obtaining an access token.
+   *
+   * @return new Callable<Jwt?>
+   * @see Jwt
+   */
   fun getAccessToken(): Callable<Jwt?>
 
   enum class TokenType {
