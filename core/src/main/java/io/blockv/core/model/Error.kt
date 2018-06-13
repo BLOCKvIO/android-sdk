@@ -14,44 +14,55 @@ import java.util.*
 
 enum class Error {
 
-  AUTHENTICATION_FAILED,
-  TOKEN_EXPIRED,
-  INVALID_TOKEN,
-  INVALID_PAYLOAD,
-  INVALID_DATE_FORMAT,
-  TOKEN_UNAVAILABLE,
-  INVALID_USER,
-  TOKEN_ALREADY_CONFIRMED,
-  INVALID_VERIFICATION_CODE,
-  INVALID_PHONE_NUMBER,
-  UNABLE_TO_RETRIEVE_TOKEN,
-  MALFORMED_REQUEST_BODY,
-  INVALID_DATA_VALIDATION,
-  VATOM_NOT_FOUND,
-  AVATAR_UPLOAD_FAILED,
-  USER_REFRESH_TOKEN_INVALID;
+  UNKNOWN_APP_ID,// App Id is unacceptable.
+  INTERNAL_SERVER_ISSUE,// Server encountered an error processing the request.
+  INVALID_PAYLOAD,// Request paylaod is invalid.
+  TOKEN_UNAVAILABLE,// User token (phone, email) is already taken.
+  INVALID_DATE_FORMAT,// Date format is invalid (e.g. invalid birthday in update user call).
+  MALFORMED_REQUEST_BODY,// Invalid request payload on an action.
+  VATOM_NOT_FOUND,// vAtom is unrecognized by the platform.
+  UNKNOWN_USER_TOKEN,// User token (phone, email, id) is unrecognized by the platfrom.
+  AUTHENTICATION_FAILED,// Login phone/email wrong. password
+  AVATAR_UPLOAD_FAILED, // Uploading the avatar data. failed.
+  USER_REFRESH_TOKEN_INVALID,// Refresh token is not on the whitelist, or the token has expired.
+  AUTHENTICATION_LIMITED,// Too many login requests.
+  UNABLE_TO_RETRIEVE_TOKEN,//???
+  UNKNOWN_TOKEN_ID,// Token id does not map to a token.
+  CANNOT_DELETE_PRIMARY_TOKEN,// Primary token cannot be deleted.
+  TOKEN_ALREADY_CONFIRMED,// Attempting to verfiy an already verified token.
+  INVALID_VERIFICATION_CODE,// Invalid verification code used when attempting to verify an account.
+  UNKNOWN_TOKEN_TYPE,// Unrecognized token type (only `phone` and `email` are currently accepted).
+  INVALID_EMAIL_ADDRESS,// Invalid email address.
+  INVALID_PHONE_NUMBER,// Invalid phone number.
+  USER_ACCESS_TOKEN_INVALID;
 
   companion object {
 
     private val MAP: MutableMap<Int, Error> = HashMap<Int, Error>()
 
     init {
-      MAP.put(516, INVALID_PAYLOAD)//empty string as token value
-      MAP.put(521, TOKEN_UNAVAILABLE)
-      MAP.put(527, INVALID_DATE_FORMAT)
-      MAP.put(1004, MALFORMED_REQUEST_BODY)
-      MAP.put(1041, INVALID_DATA_VALIDATION)
-      MAP.put(1701, VATOM_NOT_FOUND)
-      MAP.put(2030, INVALID_USER)
-      MAP.put(2031, AUTHENTICATION_FAILED)
-      MAP.put(2032, AUTHENTICATION_FAILED)
-      MAP.put(2034, INVALID_USER)//user with token does not exist
-      MAP.put(2037, AVATAR_UPLOAD_FAILED)
-      MAP.put(2049, USER_REFRESH_TOKEN_INVALID)
-      MAP.put(2552, UNABLE_TO_RETRIEVE_TOKEN)
-      MAP.put(2563, TOKEN_ALREADY_CONFIRMED)
-      MAP.put(2564, INVALID_VERIFICATION_CODE)
-      MAP.put(2569, INVALID_PHONE_NUMBER)
+      MAP[2] = UNKNOWN_APP_ID
+      MAP[11] = INTERNAL_SERVER_ISSUE
+      MAP[17] = UNKNOWN_APP_ID
+      MAP[516] = INVALID_PAYLOAD
+      MAP[517] = INVALID_PAYLOAD
+      MAP[521] = TOKEN_UNAVAILABLE
+      MAP[527] = INVALID_DATE_FORMAT
+      MAP[1004] = MALFORMED_REQUEST_BODY
+      MAP[1701] = VATOM_NOT_FOUND
+      MAP[2030] = UNKNOWN_USER_TOKEN
+      MAP[2032] = AUTHENTICATION_FAILED
+      MAP[2037] = AVATAR_UPLOAD_FAILED
+      MAP[2049] = USER_REFRESH_TOKEN_INVALID
+      MAP[2051] = AUTHENTICATION_LIMITED
+      MAP[2552] = UNABLE_TO_RETRIEVE_TOKEN
+      MAP[2553] = UNKNOWN_TOKEN_ID
+      MAP[2562] = CANNOT_DELETE_PRIMARY_TOKEN
+      MAP[2566] = TOKEN_ALREADY_CONFIRMED
+      MAP[2567] = INVALID_VERIFICATION_CODE
+      MAP[2569] = UNKNOWN_TOKEN_TYPE
+      MAP[2571] = INVALID_EMAIL_ADDRESS
+      MAP[2572] = INVALID_PHONE_NUMBER
 
     }
 
