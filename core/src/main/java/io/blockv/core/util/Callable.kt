@@ -33,12 +33,14 @@ abstract class Callable<out T> {
   var executionScheduler: Scheduler = Scheduler.IO
   var responseScheduler: Scheduler = Scheduler.MAIN
 
-  fun runOn(scheduler: Scheduler) {
+  fun runOn(scheduler: Scheduler): Callable<T> {
     this.executionScheduler = scheduler
+    return this
   }
 
-  fun returnOn(responseScheduler: Scheduler) {
+  fun returnOn(responseScheduler: Scheduler): Callable<T> {
     this.responseScheduler = responseScheduler
+    return this
   }
 
   @Throws(Exception::class)
