@@ -19,7 +19,6 @@ import io.blockv.core.model.Jwt
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.util.*
 
 class Preferences(context: Context,
                   private val jsonModule: JsonModule) {
@@ -31,8 +30,6 @@ class Preferences(context: Context,
   }
 
   private val preferences: SharedPreferences = context.getSharedPreferences("io.blockv.core.prefs", Context.MODE_PRIVATE)
-
-  private val context: Context = context.applicationContext
 
   var environment: Environment?
     get() {
@@ -93,43 +90,43 @@ class Preferences(context: Context,
       set(Key.ASSET_PROVIDER, array.toString())
     }
 
-  internal fun getInt(key: Key): Int {
+  fun getInt(key: Key): Int {
     return preferences.getInt(key.name, 0)
   }
 
-  internal fun getInt(key: Key, value: Int): Int {
+  fun getInt(key: Key, value: Int): Int {
     return preferences.getInt(key.name, value)
   }
 
-  internal fun getString(key: Key): String? {
+  fun getString(key: Key): String? {
     return preferences.getString(key.name, null)
   }
 
-  internal fun getString(key: Key, value: String?): String? {
+  fun getString(key: Key, value: String?): String? {
     return preferences.getString(key.name, value)
   }
 
-  internal operator fun set(key: Key, value: Boolean) {
+  fun set(key: Key, value: Boolean) {
     preferences.edit().putBoolean(key.name, value).apply()
   }
 
-  internal operator fun set(key: Key, value: String) {
+  fun set(key: Key, value: String) {
     preferences.edit().putString(key.name, value).apply()
   }
 
-  internal operator fun set(key: Key, value: Float) {
+  fun set(key: Key, value: Float) {
     preferences.edit().putFloat(key.name, value).apply()
   }
 
-  internal operator fun set(key: Key, value: Int) {
+  fun set(key: Key, value: Int) {
     preferences.edit().putInt(key.name, value).apply()
   }
 
-  internal operator fun set(key: Key, value: Long) {
+  fun set(key: Key, value: Long) {
     preferences.edit().putLong(key.name, value).apply()
   }
 
-  internal operator fun set(key: Key, value: Set<String>) {
+  fun set(key: Key, value: Set<String>) {
     preferences.edit().putStringSet(key.name, value).apply()
   }
 
