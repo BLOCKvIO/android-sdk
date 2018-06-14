@@ -158,10 +158,13 @@ interface UserManager {
   fun deleteCurrentUserToken(tokenId: String): Completable
 
   /**
-   * Fetches the specified user's public information
+   * Fetches the publicly available attributes of any user given their user id.
+   *
+   * Since users are given control over which attributes they make public, you should make
+   * provision for receiving all, some, or none of their public attributes.
    *
    * @param userId is the unique identifier of the user
-   * @return new Callable<PublicUser?>
+   * @return new Single<PublicUser>
    * @see PublicUser
    */
   fun getPublicUser(userId: String): Single<PublicUser>
