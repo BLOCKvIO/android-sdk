@@ -27,6 +27,7 @@ interface VatomManager {
    *
    * @param ids is a list of vatom id's in the current users inventory
    * @return new Callable<Group> instance
+   * @see Group
    */
   fun getVatoms(vararg ids: String): Callable<Group>
 
@@ -35,11 +36,38 @@ interface VatomManager {
    *
    * @param id is the id of the inventory you want to fetch
    * @return new Callable<Group> instance
+   * @see Group
    */
   fun getInventory(id: String?): Callable<Group>
 
+  /**
+   * Fetches the dropped vAtoms in the specified area
+   *
+   * @param left
+   * @param bottom
+   * @param right
+   * @param top
+   * @param limit
+   * @param filter
+   * @return new Callable<Group> instance
+   * @see GeoFilter
+   * @see Group
+   */
   fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, limit: Int, filter: GeoFilter): Callable<Group>
 
+  /**
+   * Fetches the count of vAtoms dropped in specified area
+   *
+   * @param left
+   * @param bottom
+   * @param right
+   * @param top
+   * @param precision
+   * @param filter
+   * @return new Callable<List<GeoGroup> instance
+   * @see GeoFilter
+   * @see GeoGroup
+   */
   fun geoDiscoverGroup(left: Double, bottom: Double, right: Double, top: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
 
   /**
@@ -51,26 +79,31 @@ interface VatomManager {
   fun updateVatom(payload: JSONObject): Callable<Void?>
 
   /**
-   * Fetches List of actions
+   * Fetches all the actions configured for a template.
    *
-   * @param templateId is which the actions are associated to
-   * @return new Callable<List<io.blockv.core.model.Action>> instance
+   * @param templateId is the unique identified of the template.
+   * @return new Callable<List<Action>> instance
+   * @see io.blockv.core.model.Action
    */
   fun getVatomActions(templateId: String): Callable<List<io.blockv.core.model.Action>>
 
   /**
-   * Performs an action
+   * Performs an action on the BLOCKv Platform.
    *
-   * @param action is the action's name
+   * @param action is the name of the action to perform, e.g. "Drop".
+   * @param id is the id of the vAtom to preform the action on
    * @param payload contains the data required to do the action
+   * @return new Callable<JSONObject>
    */
   fun preformAction(action: String, id: String, payload: JSONObject?): Callable<JSONObject?>
 
   /**
-   * Performs an action
+   * Performs an action on the BLOCKv Platform.
    *
-   * @param action is the action type
+   * @param action is the action to perform
+   * @param id is the id of the vAtom to preform the action on
    * @param payload contains the data required to do the action
+   * @return new Callable<JSONObject>
    */
   fun preformAction(action: Action, id: String, payload: JSONObject?): Callable<JSONObject?>
 
@@ -81,6 +114,7 @@ interface VatomManager {
    * ID. This call is useful is such circumstances.
    *
    * @param id is the identifier of the vAtom to acquire
+   * @return new Callable<JSONObject>
    */
   fun acquireVatom(id: String): Callable<JSONObject?>
 
@@ -90,6 +124,7 @@ interface VatomManager {
    * @param id is the vatom's id
    * @param tokenType is the type of the user's token
    * @param token is the user's token matching the provided type
+   * @return new Callable<JSONObject>
    */
   fun transferVatom(id: String, tokenType: TokenType, token: String): Callable<JSONObject?>
 
@@ -99,6 +134,7 @@ interface VatomManager {
    * @param id is the vatom's id
    * @param latitude
    * @param longitude
+   * @return new Callable<JSONObject>
    */
   fun dropVatom(id: String, latitude: Double, longitude: Double): Callable<JSONObject?>
 
@@ -106,6 +142,7 @@ interface VatomManager {
    * Attempts to pick up a vatom from the map
    *
    * @param id is the vatom's id
+   * @return new Callable<JSONObject>
    */
   fun pickupVatom(id: String): Callable<JSONObject?>
 
@@ -113,6 +150,7 @@ interface VatomManager {
    * Searches for vAtoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query
+   * @return new Callable<Group>
    * @see DiscoverQueryBuilder
    */
   fun discover(query: JSONObject): Callable<Group>
