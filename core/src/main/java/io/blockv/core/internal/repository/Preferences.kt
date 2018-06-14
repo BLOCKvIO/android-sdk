@@ -10,6 +10,7 @@
  */
 package io.blockv.core.internal.repository
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import io.blockv.core.internal.json.JsonModule
@@ -130,9 +131,9 @@ class Preferences(context: Context,
     preferences.edit().putStringSet(key.name, value).apply()
   }
 
+  @SuppressLint("ApplySharedPref")
   fun clear() {
-
-    preferences.edit().clear().commit()
+    preferences.edit().clear().commit()//prefs are expected be cleared directly when function is called, called before sdk reset
   }
 
 
