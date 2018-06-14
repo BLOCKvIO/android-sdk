@@ -10,10 +10,5 @@
  */
 package io.blockv.core.model
 
-import java.util.*
 
-class Jwt(val token: String, val type: String, val expiresIn: Int, val expires: Int) {
-
-  fun hasExpired(): Boolean = (Date().time / 1000).toInt() > expires
-}
-
+class Jwt(val token: String, val type: String)

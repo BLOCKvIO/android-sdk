@@ -1,7 +1,7 @@
-Blockv SDK
+BLOCKv SDK for Android
 ======================
 
-The Android SDK makes integration with the BlockV platform easy. It handles a number of operations on your behalf, including:
+This is the official BLOCKv SDK. It allows you to easily integrate your own apps into the BLOCKv Platform. It handles a number of operations on your behalf, including:
 
 - Wrapping API endpoints,
 - Parsing JSON to native Java models, and
@@ -9,15 +9,15 @@ The Android SDK makes integration with the BlockV platform easy. It handles a nu
 
 ### Requirements
 
-- Android Api 19+
+- Android API 19+
 - Kotlin
 
-The Blockv sdk is dependant on kotlin, if your version of Android Studio < 3.0 you will need to install it. Go to File | Settings | Plugins | Install JetBrains plugin… and then search for and install Kotlin. If you are looking at the "Welcome to Android Studio" screen, choose Configure | Plugins | Install JetBrains plugin… You'll need to restart the IDE after this completes.
+The BLOCKv SDK is dependant on Kotlin, if your version of Android Studio < 3.0 you will need to install it. Go to File | Settings | Plugins | Install JetBrains plugin… and then search for and install Kotlin. If you are looking at the "Welcome to Android Studio" screen, choose Configure | Plugins | Install JetBrains plugin… You'll need to restart the IDE after this completes.
 
 
 ### Install and configure the SDK
 
-First add the Blockv maven repository to the root-level `build.gradle` file.
+First, add the BLOCKv maven repository to the root-level `build.gradle` file:
 
 ```java
 allprojects {
@@ -31,7 +31,7 @@ allprojects {
 }
 ```
 
-Next add the following dependencies to your module Gradle file (usually the `app/build.gradle`).
+Next, add the following dependencies to your module Gradle file (usually the `app/build.gradle`):
 
 ```java
 dependencies {
@@ -42,15 +42,15 @@ dependencies {
 }
 ```
 
-To access Blockv SDK in your application code, import the class.
+To access the BLOCKv SDK in your application code, import the class:
 
 ```java
 import io.blockv.core.Blockv
 ```
 
-### Configure your BlockV integration
+### Configure your BLOCKv integration
 
-Next create an instance of the Blockv sdk, you will require an App Id. See [FAQ](https://developer-dev.blockv.io/docs/faq)
+To configure your integration, create an instance of the BLOCKv SDK.
 
 ```java
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,4 +60,8 @@ Next create an instance of the Blockv sdk, you will require an App Id. See [FAQ]
     }
 ```
 
-Note: We recommend you use [Dagger 2](https://github.com/google/dagger) or any similar library for your singleton management of the Blockv sdk
+> At this point you will need an App Id. See [FAQ](https://developer-dev.blockv.io/docs/faq)
+
+### Recommendations
+
+We recommend you use [Dagger 2](https://github.com/google/dagger), or a similar library, for singleton management for the BLOCKv SDK.
