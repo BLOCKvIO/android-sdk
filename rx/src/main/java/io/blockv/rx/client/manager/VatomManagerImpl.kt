@@ -88,7 +88,7 @@ class VatomManagerImpl(val api: VatomApi,
 
   override fun preformAction(action: io.blockv.core.client.manager.VatomManager.Action, id: String, payload: JSONObject?): Single<JSONObject> = preformAction(action.action(), id, payload)
 
-  override fun acquireVatom(id: String): Completable = preformAction(io.blockv.core.client.manager.VatomManager.Action.ACQUIRE, id, null).toCompletable()
+  override fun acquireVatom(id: String): Single<JSONObject> = preformAction(io.blockv.core.client.manager.VatomManager.Action.ACQUIRE, id, null)
 
   override fun transferVatom(id: String, tokenType: io.blockv.core.client.manager.VatomManager.TokenType, token: String): Completable {
     val payload = JSONObject()
