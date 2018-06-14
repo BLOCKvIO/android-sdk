@@ -136,7 +136,7 @@ interface UserManager {
    * @param isDefault determines whether the token is the primary token on this account.
    * @return new Callable<Void?>
    */
-  fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?>
+  fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?>
 
   /**
    * Updates the specified token to be the current user's default token on the BLOCKv Platform.

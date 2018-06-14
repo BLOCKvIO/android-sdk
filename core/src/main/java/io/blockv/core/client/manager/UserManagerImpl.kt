@@ -32,28 +32,28 @@ class UserManagerImpl(var api: UserApi,
                       var preferences: Preferences,
                       var jwtDecoder: JwtDecoder) : UserManager {
 
-  override fun addUserToken(token: String, tokenType: UserManager.TokenType, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
+  override fun addCurrentUserToken(token: String, tokenType: UserManager.TokenType, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload
       return null
     }
   }
 
-  override fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
+  override fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault)).payload
       return null
     }
   }
 
-  override fun setDefaultUserToken(tokenId: String): Callable<Void?> = object : Callable<Void?>() {
+  override fun setCurrentUserDefaultToken(tokenId: String): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.setDefaultUserToken(tokenId).payload
       return null
     }
   }
 
-  override fun deleteUserToken(tokenId: String): Callable<Void?> = object : Callable<Void?>() {
+  override fun deleteCurrentUserToken(tokenId: String): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.deleteUserToken(tokenId).payload
       return null
