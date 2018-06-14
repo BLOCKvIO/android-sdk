@@ -107,16 +107,63 @@ interface UserManager {
    */
   fun updateCurrentUser(update: UserUpdate): Single<User>
 
+  /**
+   * Fetches a list of the current user's tokens
+   *
+   * @return new Single<List<Token>> instance
+   * @see Token
+   */
   fun getCurrentUserTokens(): Single<List<Token>>
 
-  fun addUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Completable
+  /**
+   * Adds a user token to the current user
+   *
+   * @param token the user's token to be linked to the current user
+   * @param tokenType the type of the token (phone or email)
+   * @param isDefault determines whether the token is the primary token on this account.
+   * @return new Completable instance
+   */
+  fun addCurrentUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Completable
 
-  fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Completable
+  /**
+   * Adds a oAuth user token to the current user
+   *
+   * @param token is the users id from the oAuth provider
+   * @param tokenType is the oAuth provider (e.g facebook)
+   * @param code is the auth oauth token from the provider
+   * @param isDefault determines whether the token is the primary token on this account.
+   * @return new Completable instance
+   */
+  fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Completable
 
-  fun setDefaultUserToken(tokenId: String): Completable
+  /**
+   * Updates the specified token to be the current user's default token on the BLOCKv Platform.
+   *
+   * Backend description:
+   * Boolean to indicate if this token is the primary token. The primary token is used when no other
+   * token is explicitly selected, for example to send messages. This will automatically set the
+   * is_primary flag of an existing token to false , because only one token can be the primary token.
+   *
+   * @param tokenId is the unique identifier of the token to be deleted
+   * @return new Completable instance
+   */
+  fun setCurrentUserDefaultToken(tokenId: String): Completable
 
-  fun deleteUserToken(tokenId: String): Completable
+  /**
+   * Removes the token from the current user's token list on the BLOCKv Platform.
+   *
+   * @param tokenId is the unique identifier of the token
+   * @return new Completable instance
+   */
+  fun deleteCurrentUserToken(tokenId: String): Completable
 
+  /**
+   * Fetches the specified user's public information
+   *
+   * @param userId is the unique identifier of the user
+   * @return new Callable<PublicUser?>
+   * @see PublicUser
+   */
   fun getPublicUser(userId: String): Single<PublicUser>
 
   /**
@@ -135,6 +182,11 @@ interface UserManager {
    */
   fun uploadAvatar(avatar: Bitmap): Completable
 
+  /**
+   * Determines whether a user is logged in.
+   *
+   * @return Boolean `true` if logged in. `false` otherwise.
+   */
   fun isLoggedIn(): Boolean
 
   companion object {
