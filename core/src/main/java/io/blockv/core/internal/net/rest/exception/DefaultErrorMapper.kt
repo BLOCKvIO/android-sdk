@@ -27,7 +27,7 @@ class DefaultErrorMapper : ErrorMapper {
       error = if ((httpCode == 401 && errorCode == 0)
         && payload.has("exp") && payload.getString("exp").equals("token expired", true)
         || (payload.has("message") && payload.getString("message").equals("Unauthorized", true))) {
-        Error.TOKEN_EXPIRED
+        Error.USER_ACCESS_TOKEN_INVALID
       } else
         Error.from(errorCode)
       BlockvException(httpCode, message, errorCode, error)

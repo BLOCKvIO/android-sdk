@@ -112,7 +112,7 @@ class HttpClient(val preferences: Preferences,
     } else {
       val exception: BlockvException = errorMapper.map(requestResponse.first, requestResponse.second)
       Log.e("httpCLient", exception.toString())
-      if (exception.error == Error.TOKEN_EXPIRED && retry == 0) {
+      if (exception.error == Error.USER_ACCESS_TOKEN_INVALID && retry == 0) {
         authenticator.refreshToken()
         return http( method, endpoint, payload, 1)
       }
@@ -261,7 +261,7 @@ class HttpClient(val preferences: Preferences,
       } else {
         val exception: BlockvException = errorMapper.map(responseCode, response)
         Log.e("httpCLient", exception.toString())
-        if (exception.error == Error.TOKEN_EXPIRED && retry == 0) {
+        if (exception.error == Error.USER_ACCESS_TOKEN_INVALID && retry == 0) {
           connection.disconnect()
           return multipart(endpoint, fieldName, fileName, type, payload, 1)
         }
