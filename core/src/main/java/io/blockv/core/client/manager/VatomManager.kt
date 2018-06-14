@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
+import io.blockv.core.client.builder.DiscoverQueryBuilder
 import org.json.JSONObject
 import java.util.*
 
@@ -41,10 +42,17 @@ interface VatomManager {
 
   fun geoDiscoverGroup(left: Double, bottom: Double, right: Double, top: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
 
+  /**
+   * Updates the vAtom's properties
+   *
+   * @param payload contains the properties to update
+   * @return new Callable<Void?> instance
+   */
   fun updateVatom(payload: JSONObject): Callable<Void?>
 
   /**
    * Fetches List of actions
+   *
    * @param templateId is which the actions are associated to
    * @return new Callable<List<io.blockv.core.model.Action>> instance
    */
@@ -52,6 +60,7 @@ interface VatomManager {
 
   /**
    * Performs an action
+   *
    * @param action is the action's name
    * @param payload contains the data required to do the action
    */
@@ -59,15 +68,19 @@ interface VatomManager {
 
   /**
    * Performs an action
+   *
    * @param action is the action type
    * @param payload contains the data required to do the action
    */
   fun preformAction(action: Action, id: String, payload: JSONObject?): Callable<JSONObject?>
 
   /**
-   * Attempts to acquire a vatom
+   * Performs an acquire action on a vAtom.
    *
-   * @param id is the vatom's id
+   * Often, only a vAtom's ID is known, e.g. scanning a QR code with an embeded vAtom
+   * ID. This call is useful is such circumstances.
+   *
+   * @param id is the identifier of the vAtom to acquire
    */
   fun acquireVatom(id: String): Callable<JSONObject?>
 
@@ -96,7 +109,12 @@ interface VatomManager {
    */
   fun pickupVatom(id: String): Callable<JSONObject?>
 
-
+  /**
+   * Searches for vAtoms on the BLOCKv Platform.
+   *
+   * @param query is a JSONObject containing the discover query
+   * @see DiscoverQueryBuilder
+   */
   fun discover(query: JSONObject): Callable<Group>
 
   enum class TokenType {

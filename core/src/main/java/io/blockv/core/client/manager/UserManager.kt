@@ -130,7 +130,11 @@ interface UserManager {
   /**
    * Adds a oAuth user token to the current user
    *
-   *
+   * @param token is the users id from the oAuth provider
+   * @param tokenType is the oAuth provider (e.g facebook)
+   * @param code is the auth oauth token from the provider
+   * @param isDefault determines whether the token is the primary token on this account.
+   * @return new Callable<Void?>
    */
   fun addUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?>
 
