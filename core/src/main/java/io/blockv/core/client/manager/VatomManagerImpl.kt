@@ -20,9 +20,9 @@ import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi,
                        val resourceManager: ResourceManager) : VatomManager {
-  override fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, limit: Int, filter: VatomManager.GeoFilter): Callable<Group> = object : Callable<Group>() {
+  override fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, filter: VatomManager.GeoFilter): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
-      return api.geoDiscover(GeoRequest(left, bottom, right, top, limit, filter.name.toLowerCase())).payload
+      return api.geoDiscover(GeoRequest(left, bottom, right, top, 10000, filter.name.toLowerCase())).payload
         ?: Group(ArrayList(), ArrayList(), ArrayList())
     }
   }
@@ -56,7 +56,7 @@ class VatomManagerImpl(val api: VatomApi,
   override fun getInventory(id: String?): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
       val group = api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
-      return group?:Group(ArrayList(), ArrayList(), ArrayList())
+      return group ?: Group(ArrayList(), ArrayList(), ArrayList())
     }
   }
 

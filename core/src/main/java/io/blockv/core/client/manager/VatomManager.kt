@@ -47,13 +47,12 @@ interface VatomManager {
    * @param bottom
    * @param right
    * @param top
-   * @param limit
    * @param filter
    * @return new Callable<Group> instance.
    * @see GeoFilter
    * @see Group
    */
-  fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, limit: Int, filter: GeoFilter): Callable<Group>
+  fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, filter: GeoFilter): Callable<Group>
 
   /**
    * Fetches the count of vAtoms dropped in specified area.
