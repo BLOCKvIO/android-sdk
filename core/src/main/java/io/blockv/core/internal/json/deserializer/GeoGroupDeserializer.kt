@@ -18,10 +18,11 @@ class GeoGroupDeserializer : Deserializer<GeoGroup?> {
 
   override fun deserialize(data: org.json.JSONObject): GeoGroup? {
     try {
+      val geoHash: String = data.optString("key","")
       val lon: Double = data.optDouble("lon")
       val lat: Double = data.optDouble("lat")
       val count: Int = data.optInt("count")
-      return GeoGroup(lon, lat, count)
+      return GeoGroup(geoHash, lon, lat, count)
     } catch (e: Exception) {
       Log.e("deserilizer", e.toString())
     }
