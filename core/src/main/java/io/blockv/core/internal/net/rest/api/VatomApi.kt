@@ -20,19 +20,19 @@ import org.json.JSONObject
 
 interface VatomApi {
 
-  fun getUserVatom(request: VatomRequest): BaseResponse<Group?>
+  fun getUserVatom(request: VatomRequest): BaseResponse<Group>
 
-  fun getUserInventory(request: InventoryRequest): BaseResponse<Group?>
+  fun getUserInventory(request: InventoryRequest): BaseResponse<Group>
 
   fun getVatomActions(template: String?): BaseResponse<List<Action>>
 
   fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?>
 
-  fun discover(request: JSONObject): BaseResponse<DiscoverGroup?>
+  fun discover(request: JSONObject): BaseResponse<DiscoverGroup>
 
-  fun geoDiscover(request: GeoRequest): BaseResponse<Group?>
+  fun geoDiscover(request: GeoRequest): BaseResponse<Group>
 
-  fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>?>
+  fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>>
 
   fun updateVatom(request: JSONObject): BaseResponse<Void?>
 }

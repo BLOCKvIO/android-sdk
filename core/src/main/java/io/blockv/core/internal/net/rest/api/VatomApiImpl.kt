@@ -32,7 +32,7 @@ class VatomApiImpl(val client: Client,
       null)
   }
 
-  override fun geoDiscover(request: GeoRequest): BaseResponse<Group?> {
+  override fun geoDiscover(request: GeoRequest): BaseResponse<Group> {
     val response: JSONObject = client.post("v1/vatom/geodiscover", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
 
@@ -44,10 +44,10 @@ class VatomApiImpl(val client: Client,
     )
   }
 
-  override fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>?> {
+  override fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>> {
     val response: JSONObject = client.post("v1/vatom/geodiscovergroups", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
-    var group: JSONArray = payload?.optJSONArray("groups") ?: JSONArray()
+    val group: JSONArray = payload?.optJSONArray("groups") ?: JSONArray()
     val list: ArrayList<GeoGroup> = ArrayList()
     if (payload != null) {
       var count = 0
@@ -65,7 +65,7 @@ class VatomApiImpl(val client: Client,
       list)
   }
 
-  override fun getUserVatom(request: VatomRequest): BaseResponse<Group?> {
+  override fun getUserVatom(request: VatomRequest): BaseResponse<Group> {
     val response: JSONObject = client.post("v1/user/vatom/get", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
 
@@ -78,30 +78,32 @@ class VatomApiImpl(val client: Client,
     )
   }
 
-  override fun discover(request: JSONObject): BaseResponse<DiscoverGroup?> {
+  override fun discover(request: JSONObject): BaseResponse<DiscoverGroup> {
     val response: JSONObject = client.post("v1/vatom/discover", request)
     val payload: JSONObject? = response.optJSONObject("payload")
 
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      if (payload != null) jsonModule.discoverDeserializer.deserialize(payload) else null)
+      (if (payload != null) jsonModule.discoverDeserializer.deserialize(payload) else null)
+        ?: DiscoverGroup(0, ArrayList(), ArrayList(), ArrayList()))
   }
 
 
-  override fun getUserInventory(request: InventoryRequest): BaseResponse<Group?> {
+  override fun getUserInventory(request: InventoryRequest): BaseResponse<Group> {
     val response: JSONObject = client.post("/v1/user/vatom/inventory", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
 
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      if (payload != null) jsonModule.groupDeserializer.deserialize(payload) else null)
+      (if (payload != null) jsonModule.groupDeserializer.deserialize(payload) else null)
+        ?: Group(ArrayList(), ArrayList(), ArrayList()))
 
   }
 
   override fun getVatomActions(template: String?): BaseResponse<List<Action>> {
-    val response: JSONObject = client.get("v1/user/actions/" + template)
+    val response: JSONObject = client.get("v1/user/actions/$template")
     val payload: JSONArray? = response.optJSONArray("payload")
     val list: ArrayList<Action> = ArrayList()
     if (payload != null) {

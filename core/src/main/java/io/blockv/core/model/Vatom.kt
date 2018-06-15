@@ -28,10 +28,10 @@ class Vatom(val id: String,
       "}"
   }
 
-  override fun equals(o: Any?): Boolean {
-    if (this === o) return true
-    if (o !is Vatom) return false
-    return id == o.id
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is Vatom) return false
+    return id == other.id
   }
 
   override fun hashCode(): Int {

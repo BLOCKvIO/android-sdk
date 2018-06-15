@@ -72,7 +72,7 @@ class Blockv {
       resourceManager,
       JwtDecoderImpl()
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi)
   }
 
   constructor(context: Context, environment: Environment) {
@@ -107,7 +107,7 @@ class Blockv {
       preferences,
       resourceManager,
       JwtDecoderImpl())
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi, resourceManager)
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi)
   }
 
 

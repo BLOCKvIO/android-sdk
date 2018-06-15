@@ -10,7 +10,6 @@
  */
 package io.blockv.rx.client.manager
 
-import io.blockv.core.client.manager.ResourceManager
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.model.Action
@@ -22,16 +21,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 
-class VatomManagerImpl(val api: VatomApi,
-                       val resourceManager: ResourceManager) : VatomManager {
+class VatomManagerImpl(val api: VatomApi) : VatomManager {
   override fun geoDiscover(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, filter: io.blockv.core.client.manager.VatomManager.GeoFilter): Single<Group> = Single.fromCallable {
-    val group = api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat,10000, filter.name.toLowerCase())).payload
-    group?.vatoms?.forEach {
-      it.property.resources.forEach {
-        it.url = resourceManager.encodeUrl(it.url) ?: it.url
-      }
-    }
-    group ?: Group(ArrayList(), ArrayList(), ArrayList())
+    api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, 10000, filter.name.toLowerCase())).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -50,25 +42,13 @@ class VatomManagerImpl(val api: VatomApi,
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun getVatoms(vararg ids: String): Single<Group> = Single.fromCallable {
-    val group = api.getUserVatom(VatomRequest(ids.toList())).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
-    group.vatoms.forEach {
-      it.property.resources?.forEach {
-        it.url = resourceManager.encodeUrl(it.url) ?: it.url
-      }
-    }
-    group
+    api.getUserVatom(VatomRequest(ids.toList())).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun getInventory(id: String?): Single<Group> = Single.fromCallable {
-    val group = api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
-    group?.vatoms?.forEach {
-      it.property.resources.forEach {
-        it.url = resourceManager.encodeUrl(it.url) ?: it.url
-      }
-    }
-    group ?: Group(ArrayList(), ArrayList(), ArrayList())
+    api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -81,7 +61,7 @@ class VatomManagerImpl(val api: VatomApi,
 
   override fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject> = Single.fromCallable {
     val response = api.preformAction(PerformActionRequest(action, id, payload))
-    response.payload?:JSONObject()
+    response.payload ?: JSONObject()
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())

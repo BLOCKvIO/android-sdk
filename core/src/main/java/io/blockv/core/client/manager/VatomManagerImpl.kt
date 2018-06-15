@@ -18,8 +18,7 @@ import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
 import org.json.JSONObject
 
-class VatomManagerImpl(val api: VatomApi,
-                       val resourceManager: ResourceManager) : VatomManager {
+class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
   override fun geoDiscover(bottomLeftLon: Double,
                            bottomLeftLat: Double,
@@ -29,14 +28,12 @@ class VatomManagerImpl(val api: VatomApi,
   object : Callable<Group>() {
     override fun getResult(): Group {
       return api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, 10000, filter.name.toLowerCase())).payload
-        ?: Group(ArrayList(), ArrayList(), ArrayList())
     }
   }
 
   override fun geoDiscoverGroup(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, precision: Int, filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = object : Callable<List<GeoGroup>>() {
     override fun getResult(): List<GeoGroup> {
       return api.geoGroupDiscover(GeoGroupRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, precision, filter.name.toLowerCase())).payload
-        ?: ArrayList()
     }
   }
 
@@ -49,20 +46,19 @@ class VatomManagerImpl(val api: VatomApi,
 
   override fun discover(query: JSONObject): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
-      return api.discover(query).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
+      return api.discover(query).payload
     }
   }
 
   override fun getVatoms(vararg ids: String): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
-      return api.getUserVatom(VatomRequest(ids.toList())).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
+      return api.getUserVatom(VatomRequest(ids.toList())).payload
     }
   }
 
   override fun getInventory(id: String?): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
-      val group = api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
-      return group ?: Group(ArrayList(), ArrayList(), ArrayList())
+      return api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
     }
   }
 
