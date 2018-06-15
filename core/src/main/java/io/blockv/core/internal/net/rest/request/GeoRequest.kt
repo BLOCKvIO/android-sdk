@@ -16,12 +16,10 @@ class GeoRequest(val bottomLeftLon: Double,
                  val bottomLeftLat: Double,
                  val topRightLon: Double,
                  val topRightLat: Double,
-                 val limit: Int,
                  val filter: String) {
 
   fun toJson(): JSONObject {
     val out = JSONObject()
-    out.put("limit", limit)
     out.put("filter", filter)
     out.put("bottom_left", JSONObject().put("lat", bottomLeftLat).put("lon", bottomLeftLon))
     out.put("top_right", JSONObject().put("lat", topRightLat).put("lon", topRightLon))

@@ -28,7 +28,7 @@ class VatomManagerImpl(val api: VatomApi,
                            filter: VatomManager.GeoFilter): Callable<Group> =
   object : Callable<Group>() {
     override fun getResult(): Group {
-      return api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, 10000, filter.name.toLowerCase())).payload
+      return api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, filter.name.toLowerCase())).payload
         ?: Group(ArrayList(), ArrayList(), ArrayList())
     }
   }

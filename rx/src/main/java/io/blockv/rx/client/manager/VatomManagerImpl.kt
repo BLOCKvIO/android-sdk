@@ -25,7 +25,7 @@ import org.json.JSONObject
 class VatomManagerImpl(val api: VatomApi,
                        val resourceManager: ResourceManager) : VatomManager {
   override fun geoDiscover(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, filter: io.blockv.core.client.manager.VatomManager.GeoFilter): Single<Group> = Single.fromCallable {
-    val group = api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat,10000, filter.name.toLowerCase())).payload
+    val group = api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat,filter.name.toLowerCase())).payload
     group?.vatoms?.forEach {
       it.property.resources.forEach {
         it.url = resourceManager.encodeUrl(it.url) ?: it.url
