@@ -85,8 +85,8 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
   override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {
     val payload = JSONObject()
     payload.put("geo.pos", JSONObject()
-      .put("Lat", latitude)
-      .put("Lon", longitude))
+      .put("lat", latitude)
+      .put("lon", longitude))
     return preformAction(io.blockv.core.client.manager.VatomManager.Action.DROP, id, payload).toCompletable()
   }
 
