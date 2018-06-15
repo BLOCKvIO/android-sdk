@@ -20,16 +20,22 @@ import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi,
                        val resourceManager: ResourceManager) : VatomManager {
-  override fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, filter: VatomManager.GeoFilter): Callable<Group> = object : Callable<Group>() {
+
+  override fun geoDiscover(bottomLeftLon: Double,
+                           bottomLeftLat: Double,
+                           topRightLon: Double,
+                           topRightLat: Double,
+                           filter: VatomManager.GeoFilter): Callable<Group> =
+  object : Callable<Group>() {
     override fun getResult(): Group {
-      return api.geoDiscover(GeoRequest(left, bottom, right, top, 10000, filter.name.toLowerCase())).payload
+      return api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, 10000, filter.name.toLowerCase())).payload
         ?: Group(ArrayList(), ArrayList(), ArrayList())
     }
   }
 
-  override fun geoDiscoverGroup(left: Double, bottom: Double, right: Double, top: Double, precision: Int, filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = object : Callable<List<GeoGroup>>() {
+  override fun geoDiscoverGroup(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, precision: Int, filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = object : Callable<List<GeoGroup>>() {
     override fun getResult(): List<GeoGroup> {
-      return api.geoGroupDiscover(GeoGroupRequest(left, bottom, right, top, precision, filter.name.toLowerCase())).payload
+      return api.geoGroupDiscover(GeoGroupRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, precision, filter.name.toLowerCase())).payload
         ?: ArrayList()
     }
   }

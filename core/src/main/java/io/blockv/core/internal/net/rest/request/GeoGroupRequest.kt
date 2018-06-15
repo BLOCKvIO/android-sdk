@@ -12,10 +12,10 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class GeoGroupRequest(val left: Double,
-                      val bottom: Double,
-                      val right: Double,
-                      val top: Double,
+class GeoGroupRequest(val bottomLeftLon: Double,
+                      val bottomLeftLat: Double,
+                      val topRightLon: Double,
+                      val topRightLat: Double,
                       val precision: Int,
                       val filter: String) {
 
@@ -23,8 +23,8 @@ class GeoGroupRequest(val left: Double,
     val out = JSONObject()
     out.put("precision", precision)
     out.put("filter", filter)
-    out.put("bottom_left", JSONObject().put("lat", left).put("lon", bottom))
-    out.put("top_right", JSONObject().put("lat", right).put("lon", top))
+    out.put("bottom_left", JSONObject().put("lat", bottomLeftLat).put("lon", bottomLeftLon))
+    out.put("top_right", JSONObject().put("lat", topRightLat).put("lon", topRightLon))
     return out
   }
 
