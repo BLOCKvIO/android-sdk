@@ -24,8 +24,8 @@ import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi,
                        val resourceManager: ResourceManager) : VatomManager {
-  override fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, limit: Int, filter: io.blockv.core.client.manager.VatomManager.GeoFilter): Single<Group> = Single.fromCallable {
-    val group = api.geoDiscover(GeoRequest(left, bottom, right, top, limit, filter.name.toLowerCase())).payload
+  override fun geoDiscover(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, filter: io.blockv.core.client.manager.VatomManager.GeoFilter): Single<Group> = Single.fromCallable {
+    val group = api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat,10000, filter.name.toLowerCase())).payload
     group?.vatoms?.forEach {
       it.property.resources.forEach {
         it.url = resourceManager.encodeUrl(it.url) ?: it.url
@@ -36,8 +36,8 @@ class VatomManagerImpl(val api: VatomApi,
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun geoDiscoverGroup(left: Double, bottom: Double, right: Double, top: Double, precision: Int, filter: io.blockv.core.client.manager.VatomManager.GeoFilter): Single<List<GeoGroup>> = Single.fromCallable {
-    val group = api.geoGroupDiscover(GeoGroupRequest(left, bottom, right, top, precision, filter.name.toLowerCase())).payload
+  override fun geoDiscoverGroup(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, precision: Int, filter: io.blockv.core.client.manager.VatomManager.GeoFilter): Single<List<GeoGroup>> = Single.fromCallable {
+    val group = api.geoGroupDiscover(GeoGroupRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, precision, filter.name.toLowerCase())).payload
     group ?: ArrayList()
   }
     .subscribeOn(Schedulers.io())
