@@ -44,13 +44,17 @@ interface VatomManager {
   fun getInventory(id: String?): Single<Group>
 
   /**
-   * Fetches the dropped vAtoms in the specified area.
+   * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
+   * dropped by the vAtom owners).
    *
-   * @param bottomLeftLon
-   * @param bottomLeftLat
-   * @param topRightLon
-   * @param topRightLat
-   * @param filter
+   * You must supply two coordinates (bottom-left and top-right) which from a rectangle.
+   * This rectangle defines  the geo search region.
+   *
+   * @param bottomLeftLat is the bottom left latitude coordinate.
+   * @param bottomLeftLon is the bottom left longitude coordinate.
+   * @param topRightLat is the top right latitude coordinate.
+   * @param topRightLon is the top right longitude coordinate.
+   * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
    * @return new Single<Group> instance.
    * @see GeoFilter
    * @see Group
@@ -60,12 +64,14 @@ interface VatomManager {
   /**
    * Fetches the count of vAtoms dropped in specified area.
    *
-   * @param bottomLeftLon
-   * @param bottomLeftLat
-   * @param topRightLon
-   * @param topRightLat
-   * @param precision
-   * @param filter
+   * @param bottomLeftLat is the bottom left latitude coordinate.
+   * @param bottomLeftLon is the bottom left longitude coordinate.
+   * @param topRightLat is the top right latitude coordinate.
+   * @param topRightLon is the top right longitude coordinate.
+   * @param precision controls the density of the group distribution. Defaults to 3.
+   *                  Lower values return fewer groups (with a higher vatom count) — less dense.
+   *                  Higher values return more groups (with a lower vatom count) - more dense.
+   * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
    * @return new Single<List<GeoGroup> instance.
    * @see GeoFilter
    * @see GeoGroup
