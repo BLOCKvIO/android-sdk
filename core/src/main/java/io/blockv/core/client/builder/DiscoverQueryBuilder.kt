@@ -55,6 +55,10 @@ open class DiscoverQueryBuilder {
     OR("Or")
   }
 
+  enum class ResultType(val result: String) {
+    PAYLOAD("*"),
+    COUNT("count")
+  }
 
   private val json: JSONObject = JSONObject()
 
@@ -92,5 +96,21 @@ open class DiscoverQueryBuilder {
     return this
   }
 
-  fun build(): JSONObject = json
+  fun setReturn(type: ResultType) {
+    json.put("return",
+      JSONObject()
+        .put("type", type.result)
+        .put("fields", JSONArray()))
+  }
+
+  fun build(): JSONObject {
+    if (!json.has("return")) {
+      json.put("return",
+        JSONObject()
+          .put("type", ResultType.PAYLOAD)
+          .put("fields", JSONArray()))
+    }
+
+    return json
+  }
 }
