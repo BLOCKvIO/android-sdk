@@ -10,10 +10,10 @@
  */
 package io.blockv.core.client.manager
 
+import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
-import io.blockv.core.client.builder.DiscoverQueryBuilder
 import org.json.JSONObject
 import java.util.*
 
@@ -47,24 +47,24 @@ interface VatomManager {
    * You must supply two coordinates (bottom-left and top-right) which from a rectangle.
    * This rectangle defines  the geo search region.
    *
-   * @param bottomLeftLon is the bottom left longitude coordinate.
    * @param bottomLeftLat is the bottom left latitude coordinate.
-   * @param topRightLon is the top right longitude coordinate.
+   * @param bottomLeftLon is the bottom left longitude coordinate.
    * @param topRightLat is the top right latitude coordinate.
+   * @param topRightLon is the top right longitude coordinate.
    * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
    * @return new Callable<Group> instance.
    * @see GeoFilter
    * @see Group
    */
-  fun geoDiscover(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, filter: GeoFilter): Callable<Group>
+  fun geoDiscover(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, filter: GeoFilter): Callable<Group>
 
   /**
    * Fetches the count of vAtoms dropped in specified area.
    *
-   * @param bottomLeftLon is the bottom left longitude coordinate.
    * @param bottomLeftLat is the bottom left latitude coordinate.
-   * @param topRightLon is the top right longitude coordinate.
+   * @param bottomLeftLon is the bottom left longitude coordinate.
    * @param topRightLat is the top right latitude coordinate.
+   * @param topRightLon is the top right longitude coordinate.
    * @param precision controls the density of the group distribution. Defaults to 3.
    *                  Lower values return fewer groups (with a higher vatom count) — less dense.
    *                  Higher values return more groups (with a lower vatom count) - more dense.
@@ -73,7 +73,7 @@ interface VatomManager {
    * @see GeoFilter
    * @see GeoGroup
    */
-  fun geoDiscoverGroup(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
+  fun geoDiscoverGroup(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
 
   /**
    * Updates the vAtom's properties.
