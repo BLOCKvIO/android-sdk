@@ -14,6 +14,7 @@ import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.client.manager.VatomManager
 import io.blockv.core.client.manager.VatomManager.GeoFilter
 import io.blockv.core.model.Action
+import io.blockv.core.model.DiscoverGroup
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.reactivex.Completable
@@ -154,10 +155,10 @@ interface VatomManager {
    * Searches for vAtoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query.
-   * @return new Single<Group>.
+   * @return new Single<DiscoverGroup>.
    * @see DiscoverQueryBuilder
-   * @see Group
+   * @see DiscoverGroup
    */
-  fun discover(query: JSONObject): Single<Group>
+  fun discover(query: JSONObject): Single<DiscoverGroup>
 
 }

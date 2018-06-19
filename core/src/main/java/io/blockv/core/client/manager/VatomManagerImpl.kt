@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.model.Action
+import io.blockv.core.model.DiscoverGroup
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
@@ -41,9 +42,9 @@ class VatomManagerImpl(val api: VatomApi,
     }
   }
 
-  override fun discover(query: JSONObject): Callable<Group> = object : Callable<Group>() {
-    override fun getResult(): Group {
-      return api.discover(query).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
+  override fun discover(query: JSONObject): Callable<DiscoverGroup> = object : Callable<DiscoverGroup>() {
+    override fun getResult(): DiscoverGroup {
+      return api.discover(query).payload ?: DiscoverGroup(0,ArrayList(), ArrayList(), ArrayList())
     }
   }
 

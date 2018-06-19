@@ -14,6 +14,7 @@ import io.blockv.core.client.manager.ResourceManager
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.model.Action
+import io.blockv.core.model.DiscoverGroup
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.reactivex.Completable
@@ -81,7 +82,7 @@ class VatomManagerImpl(val api: VatomApi,
 
   override fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject> = Single.fromCallable {
     val response = api.preformAction(PerformActionRequest(action, id, payload))
-    response.payload?:JSONObject()
+    response.payload ?: JSONObject()
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -113,8 +114,8 @@ class VatomManagerImpl(val api: VatomApi,
 
   override fun pickupVatom(id: String): Completable = preformAction(io.blockv.core.client.manager.VatomManager.Action.PICKUP, id, null).toCompletable()
 
-  override fun discover(query: JSONObject): Single<Group> = Single.fromCallable {
-    val group = api.discover(query).payload ?: Group(ArrayList(), ArrayList(), ArrayList())
+  override fun discover(query: JSONObject): Single<DiscoverGroup> = Single.fromCallable {
+    val group = api.discover(query).payload ?: DiscoverGroup(0, ArrayList(), ArrayList(), ArrayList())
     group
   }
     .subscribeOn(Schedulers.io())
