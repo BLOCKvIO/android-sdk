@@ -59,7 +59,7 @@ interface VatomManager {
    * @see GeoFilter
    * @see Group
    */
-  fun geoDiscover(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, filter: VatomManager.GeoFilter): Single<Group>
+  fun geoDiscover(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, filter: VatomManager.GeoFilter): Single<Group>
 
   /**
    * Fetches the count of vAtoms dropped in specified area.
@@ -76,7 +76,7 @@ interface VatomManager {
    * @see GeoFilter
    * @see GeoGroup
    */
-  fun geoDiscoverGroup(bottomLeftLon: Double, bottomLeftLat: Double, topRightLon: Double, topRightLat: Double, precision: Int, filter: VatomManager.GeoFilter): Single<List<GeoGroup>>
+  fun geoDiscoverGroup(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, precision: Int, filter: VatomManager.GeoFilter): Single<List<GeoGroup>>
 
   /**
    * Updates the vAtom's properties.
