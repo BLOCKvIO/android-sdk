@@ -55,22 +55,21 @@ open class DiscoverQueryBuilder {
     OR("Or")
   }
 
-  companion object {
-    val CURRENT_USER: String = "\$currentuser"
-  }
 
   private val json: JSONObject = JSONObject()
 
-  fun setScope(scope: Scope, value: String) {
-    json.put("scope", JSONObject().put("key", scope.value).put("value", value));
+  fun setScope(scope: Scope, value: String): DiscoverQueryBuilder {
+    json.put("scope", JSONObject().put("key", scope.value).put("value", value))
+    return this
   }
 
-  fun addFilter(field: Field, filterOperation: FilterOperation, value: String, combineOperation: CombineOperation) {
+  fun addFilter(field: Field, filterOperation: FilterOperation, value: String, combineOperation: CombineOperation): DiscoverQueryBuilder {
 
     this.addFilter(field.value, filterOperation.operator, value, combineOperation.operator)
+    return this
   }
 
-  fun addFilter(field: String, filterOperation: String, value: String, combineOperation: String) {
+  fun addFilter(field: String, filterOperation: String, value: String, combineOperation: String): DiscoverQueryBuilder {
 
     if (!json.has("filters")) {
       json.put("filters", JSONArray())
@@ -89,6 +88,8 @@ open class DiscoverQueryBuilder {
       .put("filter_op", filterOperation)
       .put("value", value)
       .put("bool_op", combineOperation))
+
+    return this
   }
 
   fun build(): JSONObject = json
