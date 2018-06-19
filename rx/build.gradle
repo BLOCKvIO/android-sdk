@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
 android {
@@ -42,31 +41,30 @@ def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'rx'
 def libraryVersion = '0.5.3'
 
+//Add this back in when repo is open source
+//
+//task sourceJar(type: Jar) {
+//  from android.sourceSets.main.java.srcDirs
+//  classifier "sources"
+//}
+
 publishing {
   publications {
-    aar(MavenPublication) {
+    rx(MavenPublication) {
       groupId libraryGroupId
-      version libraryVersion
       artifactId libraryArtifactId
-
+      version libraryVersion
+      //artifact(sourceJar)
       artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
     }
   }
-}
-
-artifactory {
-  contextUrl = 'https://maven.blockv.io/artifactory'
-  publish {
-    repository {
-      repoKey = 'BLOCKv-debug'
-      username = blockv_artifactory_username
-      password = blockv_artifactory_password
-    }
-    defaults {
-      publications('aar')
-      publishArtifacts = true
-      properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
-      publishPom = true
+  repositories {
+    maven {
+      url "https://maven.blockv.io/artifactory/Blockv-Debug/"
+      credentials {
+        username = "${blockv_artifactory_username}"
+        password = "${blockv_artifactory_password}"
+      }
     }
   }
 }
