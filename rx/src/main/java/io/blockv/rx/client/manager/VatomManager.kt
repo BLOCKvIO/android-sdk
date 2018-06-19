@@ -76,7 +76,7 @@ interface VatomManager {
    * @see GeoFilter
    * @see GeoGroup
    */
-  fun geoDiscoverGroup(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, precision: Int, filter: VatomManager.GeoFilter): Single<List<GeoGroup>>
+  fun geoDiscoverGroups(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, precision: Int, filter: VatomManager.GeoFilter): Single<List<GeoGroup>>
 
   /**
    * Updates the vAtom's properties.

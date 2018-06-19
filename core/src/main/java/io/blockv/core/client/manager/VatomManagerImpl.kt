@@ -33,7 +33,7 @@ class VatomManagerImpl(val api: VatomApi,
       }
     }
 
-  override fun geoDiscoverGroup(bottomLeftLat: Double,
+  override fun geoDiscoverGroups(bottomLeftLat: Double,
                                 bottomLeftLon: Double,
                                 topRightLat: Double,
                                 topRightLon: Double,
