@@ -48,7 +48,7 @@ interface VatomManager {
    * dropped by the vAtom owners).
    *
    * You must supply two coordinates (bottom-left and top-right) which from a rectangle.
-   * This rectangle defines  the geo search region.
+   * This rectangle defines the geo search region.
    *
    * @param bottomLeftLat is the bottom left latitude coordinate.
    * @param bottomLeftLon is the bottom left longitude coordinate.
