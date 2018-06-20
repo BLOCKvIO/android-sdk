@@ -20,16 +20,28 @@ import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi,
                        val resourceManager: ResourceManager) : VatomManager {
-  override fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, limit: Int, filter: VatomManager.GeoFilter): Callable<Group> = object : Callable<Group>() {
-    override fun getResult(): Group {
-      return api.geoDiscover(GeoRequest(left, bottom, right, top, limit, filter.name.toLowerCase())).payload
-        ?: Group(ArrayList(), ArrayList(), ArrayList())
-    }
-  }
 
-  override fun geoDiscoverGroup(left: Double, bottom: Double, right: Double, top: Double, precision: Int, filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = object : Callable<List<GeoGroup>>() {
+  override fun geoDiscover(bottomLeftLat: Double,
+                           bottomLeftLon: Double,
+                           topRightLat: Double,
+                           topRightLon: Double,
+                           filter: VatomManager.GeoFilter): Callable<Group> =
+    object : Callable<Group>() {
+      override fun getResult(): Group {
+        return api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, filter.name.toLowerCase())).payload
+          ?: Group(ArrayList(), ArrayList(), ArrayList())
+      }
+    }
+
+  override fun geoDiscoverGroups(bottomLeftLat: Double,
+                                 bottomLeftLon: Double,
+                                 topRightLat: Double,
+                                 topRightLon: Double,
+                                 precision: Int,
+                                 filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = object : Callable<List<GeoGroup>>() {
     override fun getResult(): List<GeoGroup> {
-      return api.geoGroupDiscover(GeoGroupRequest(left, bottom, right, top, precision, filter.name.toLowerCase())).payload
+      assert(precision in 1..12) { "Precision required to be in the range  1 - 12" }
+      return api.geoGroupDiscover(GeoGroupRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, precision, filter.name.toLowerCase())).payload
         ?: ArrayList()
     }
   }
@@ -56,7 +68,7 @@ class VatomManagerImpl(val api: VatomApi,
   override fun getInventory(id: String?): Callable<Group> = object : Callable<Group>() {
     override fun getResult(): Group {
       val group = api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
-      return group?:Group(ArrayList(), ArrayList(), ArrayList())
+      return group ?: Group(ArrayList(), ArrayList(), ArrayList())
     }
   }
 
