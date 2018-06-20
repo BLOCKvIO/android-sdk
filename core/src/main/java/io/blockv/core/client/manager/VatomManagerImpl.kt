@@ -34,12 +34,13 @@ class VatomManagerImpl(val api: VatomApi,
     }
 
   override fun geoDiscoverGroups(bottomLeftLat: Double,
-                                bottomLeftLon: Double,
-                                topRightLat: Double,
-                                topRightLon: Double,
-                                precision: Int,
-                                filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = object : Callable<List<GeoGroup>>() {
+                                 bottomLeftLon: Double,
+                                 topRightLat: Double,
+                                 topRightLon: Double,
+                                 precision: Int,
+                                 filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = object : Callable<List<GeoGroup>>() {
     override fun getResult(): List<GeoGroup> {
+      assert(precision in 1..12) { "Precision required to be in the range  1 - 12" }
       return api.geoGroupDiscover(GeoGroupRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, precision, filter.name.toLowerCase())).payload
         ?: ArrayList()
     }
