@@ -72,31 +72,38 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     override fun getResult(): List<Action> = api.getVatomActions(templateId).payload
   }
 
-  override fun preformAction(action: String, id: String, payload: JSONObject?): Callable<JSONObject?> = object : Callable<JSONObject?>() {
+  override fun preformAction(action: String,
+                             id: String,
+                             payload: JSONObject?): Callable<JSONObject?> = object : Callable<JSONObject?>() {
     override fun getResult(): JSONObject? {
       val response = api.preformAction(PerformActionRequest(action, id, payload))
       return response.payload ?: JSONObject()
     }
   }
 
-  override fun preformAction(action: VatomManager.Action, id: String, payload: JSONObject?): Callable<JSONObject?> =
+  override fun preformAction(action: VatomManager.Action,
+                             id: String,
+                             payload: JSONObject?): Callable<JSONObject?> =
     preformAction(action.action(), id, payload)
 
   override fun acquireVatom(id: String): Callable<JSONObject?> = preformAction(VatomManager.Action.ACQUIRE, id, null)
 
 
-  override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Callable<JSONObject?> {
+  override fun transferVatom(id: String,
+                             tokenType: VatomManager.TokenType,
+                             token: String): Callable<JSONObject?> {
     val payload = JSONObject()
     when (tokenType) {
       VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
       VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
       VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
     }
-
     return preformAction(VatomManager.Action.TRANSFER, id, payload)
   }
 
-  override fun dropVatom(id: String, latitude: Double, longitude: Double): Callable<JSONObject?> {
+  override fun dropVatom(id: String,
+                         latitude: Double,
+                         longitude: Double): Callable<JSONObject?> {
     val payload = JSONObject()
     payload.put("geo.pos", JSONObject()
       .put("lat", latitude)

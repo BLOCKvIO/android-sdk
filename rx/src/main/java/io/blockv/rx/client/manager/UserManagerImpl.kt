@@ -13,7 +13,7 @@ package io.blockv.rx.client.manager
 import android.graphics.Bitmap
 import android.util.Log
 import io.blockv.core.client.manager.ResourceManager
-import io.blockv.core.client.manager.UserManager.UserUpdate
+import io.blockv.core.client.manager.UserManager.*
 import io.blockv.core.internal.net.rest.api.UserApi
 import io.blockv.core.internal.net.rest.auth.JwtDecoder
 import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
@@ -35,16 +35,19 @@ import java.io.ByteArrayOutputStream
 class UserManagerImpl(val api: UserApi,
                       val preferences: Preferences,
                       val resourceManager: ResourceManager,
-                      val jwtDecoder:JwtDecoder) : UserManager {
+                      val jwtDecoder: JwtDecoder) : UserManager {
 
-  override fun addCurrentUserToken(token: String, tokenType: io.blockv.core.client.manager.UserManager.TokenType, isDefault: Boolean): Completable = Completable.fromCallable {
+  override fun addCurrentUserToken(token: String,
+                                   tokenType: TokenType,
+                                   isDefault: Boolean): Completable = Completable.fromCallable {
     api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault))
-
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Completable = Completable.fromCallable {
+  override fun addCurrentUserOauthToken(token: String,
+                                        tokenType: String,
+                                        code: String, isDefault: Boolean): Completable = Completable.fromCallable {
     api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault))
   }
     .subscribeOn(Schedulers.io())
@@ -56,35 +59,29 @@ class UserManagerImpl(val api: UserApi,
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-
   override fun deleteCurrentUserToken(tokenId: String): Completable = Completable.fromCallable {
     api.deleteUserToken(tokenId)
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-
   override fun getPublicUser(userId: String): Single<PublicUser> = Single.fromCallable {
-    api.getPublicUser(userId).payload?: NULL_PUBLIC_USER
+    api.getPublicUser(userId).payload ?: NULL_PUBLIC_USER
   }
-  .subscribeOn(Schedulers.io())
-  .observeOn(AndroidSchedulers.mainThread())
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-
-
-
-  override fun register(registration: io.blockv.core.client.manager.UserManager.Registration): Single<User> = Single.fromCallable {
+  override fun register(registration: Registration): Single<User> = Single.fromCallable {
     val tokens = JSONArray()
     registration.tokens?.forEach {
       val data = JSONObject()
       data.put("token_type", it.type)
       data.put("token", it.value)
-      if (it is io.blockv.core.client.manager.UserManager.Registration.OauthToken) {
+      if (it is Registration.OauthToken) {
         data.put("auth_data", JSONObject().put("auth_data", it.auth))
       }
       tokens.put(data)
     }
-
     api.register(CreateUserRequest(
       registration.firstName,
       registration.lastName,
@@ -93,12 +90,13 @@ class UserManagerImpl(val api: UserApi,
       registration.password,
       registration.language,
       tokens)).payload ?: NULL_USER
-
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun login(token: String, tokenType: io.blockv.core.client.manager.UserManager.TokenType, password: String): Single<User> = Single.fromCallable {
+  override fun login(token: String,
+                     tokenType: TokenType,
+                     password: String): Single<User> = Single.fromCallable {
     api.login(LoginRequest(
       tokenType.name.toLowerCase(),
       token,
@@ -107,7 +105,8 @@ class UserManagerImpl(val api: UserApi,
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun loginOauth(provider: String, oauthToken: String): Single<User> = Single.fromCallable {
+  override fun loginOauth(provider: String,
+                          oauthToken: String): Single<User> = Single.fromCallable {
     api.oauthLogin(OauthLoginRequest(
       provider,
       oauthToken)).payload ?: NULL_USER
@@ -122,26 +121,27 @@ class UserManagerImpl(val api: UserApi,
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun verifyUserToken(token: String, tokenType: io.blockv.core.client.manager.UserManager.TokenType, code: String): Completable = Completable.fromCallable {
+  override fun verifyUserToken(token: String,
+                               tokenType: TokenType,
+                               code: String): Completable = Completable.fromCallable {
     api.verifyToken(VerifyTokenRequest(tokenType.name.toLowerCase(), token, code))
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-
-  override fun resetToken(token: String, tokenType: io.blockv.core.client.manager.UserManager.TokenType): Completable = Completable.fromCallable {
+  override fun resetToken(token: String,
+                          tokenType: TokenType): Completable = Completable.fromCallable {
     api.resetToken(ResetTokenRequest(tokenType.name.toLowerCase(), token)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-
-  override fun resendVerification(token: String, tokenType: io.blockv.core.client.manager.UserManager.TokenType): Completable = Completable.fromCallable {
+  override fun resendVerification(token: String,
+                                  tokenType: TokenType): Completable = Completable.fromCallable {
     api.resetVerificationToken(ResetTokenRequest(tokenType.name.toLowerCase(), token))
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
-
 
   override fun getCurrentUser(): Single<User> = Single.fromCallable {
     val user: User? = api.getCurrentUser().payload
@@ -179,7 +179,6 @@ class UserManagerImpl(val api: UserApi,
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-
   override fun uploadAvatar(avatar: Bitmap): Completable = Completable.fromCallable {
     val stream = ByteArrayOutputStream()
     avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
@@ -187,7 +186,6 @@ class UserManagerImpl(val api: UserApi,
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
-
 
   override fun isLoggedIn(): Boolean {
     val token = preferences.refreshToken
@@ -202,6 +200,5 @@ class UserManagerImpl(val api: UserApi,
     }
     return false
   }
-
 
 }

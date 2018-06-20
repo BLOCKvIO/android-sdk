@@ -32,14 +32,19 @@ class UserManagerImpl(var api: UserApi,
                       var preferences: Preferences,
                       var jwtDecoder: JwtDecoder) : UserManager {
 
-  override fun addCurrentUserToken(token: String, tokenType: UserManager.TokenType, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
+  override fun addCurrentUserToken(token: String,
+                                   tokenType: UserManager.TokenType,
+                                   isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload
       return null
     }
   }
 
-  override fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
+  override fun addCurrentUserOauthToken(token: String,
+                                        tokenType: String,
+                                        code: String,
+                                        isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault)).payload
       return null
@@ -100,7 +105,8 @@ class UserManagerImpl(var api: UserApi,
         guestId)).payload
   }
 
-  override fun loginOauth(provider: String, oauthToken: String): Callable<User?> = object : Callable<User?>() {
+  override fun loginOauth(provider: String,
+                          oauthToken: String): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? = api
       .oauthLogin(OauthLoginRequest(
         provider,
@@ -108,7 +114,9 @@ class UserManagerImpl(var api: UserApi,
   }
 
 
-  private fun login(token: String, tokenType: String, auth: String): Callable<User?> = object : Callable<User?>() {
+  private fun login(token: String,
+                    tokenType: String,
+                    auth: String): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? = api
       .login(LoginRequest(
         tokenType,
@@ -116,9 +124,12 @@ class UserManagerImpl(var api: UserApi,
         auth)).payload
   }
 
-  override fun login(token: String, tokenType: UserManager.TokenType, password: String): Callable<User?> = login(token, tokenType.name.toLowerCase(), password)
+  override fun login(token: String,
+                     tokenType: UserManager.TokenType,
+                     password: String): Callable<User?> = login(token, tokenType.name.toLowerCase(), password)
 
-  private fun resetToken(token: String, type: String): Callable<Void?> = object : Callable<Void?>() {
+  private fun resetToken(token: String,
+                         type: String): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
 
       api.resetToken(ResetTokenRequest(type, token)).payload
@@ -128,7 +139,8 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  override fun resetToken(token: String, tokenType: UserManager.TokenType): Callable<Void?> = resetToken(token, tokenType.name.toLowerCase())
+  override fun resetToken(token: String,
+                          tokenType: UserManager.TokenType): Callable<Void?> = resetToken(token, tokenType.name.toLowerCase())
 
   private fun resendVerification(token: String, type: String): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
@@ -137,7 +149,8 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  override fun resendVerification(token: String, tokenType: UserManager.TokenType): Callable<Void?> = resendVerification(token, tokenType.name.toLowerCase())
+  override fun resendVerification(token: String,
+                                  tokenType: UserManager.TokenType): Callable<Void?> = resendVerification(token, tokenType.name.toLowerCase())
 
   override fun register(registration: UserManager.Registration): Callable<User?> = object : Callable<User?>() {
     override fun getResult(): User? {
@@ -153,6 +166,7 @@ class UserManagerImpl(var api: UserApi,
         }
         tokens.put(data)
       }
+
       return api.register(CreateUserRequest(
         registration.firstName,
         registration.lastName,
@@ -164,14 +178,18 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  private fun verifyUserToken(token: String, type: String, code: String): Callable<Void?> = object : Callable<Void?>() {
+  private fun verifyUserToken(token: String,
+                              type: String,
+                              code: String): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
       api.verifyToken(VerifyTokenRequest(type, token, code))
       return null
     }
   }
 
-  override fun verifyUserToken(token: String, tokenType: UserManager.TokenType, code: String): Callable<Void?> = verifyUserToken(token, tokenType.name.toLowerCase(), code)
+  override fun verifyUserToken(token: String,
+                               tokenType: UserManager.TokenType,
+                               code: String): Callable<Void?> = verifyUserToken(token, tokenType.name.toLowerCase(), code)
 
   override fun logout(): Callable<Void?> = object : Callable<Void?>() {
     override fun getResult(): Void? {
