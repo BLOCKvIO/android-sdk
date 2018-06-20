@@ -62,7 +62,7 @@ interface VatomManager {
   fun geoDiscover(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, filter: VatomManager.GeoFilter): Single<Group>
 
   /**
-   * Fetches the count of vAtoms dropped in specified area.
+   * Fetches the count of vAtoms dropped in the specified area.
    *
    * @param bottomLeftLat is the bottom left latitude coordinate.
    * @param bottomLeftLon is the bottom left longitude coordinate.
