@@ -163,7 +163,6 @@ class UserApiImpl(val client: Client,
 
   override fun verifyToken(request: VerifyTokenRequest): BaseResponse<Void?> {
     val response: JSONObject = client.post("v1/user/verify_token", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
