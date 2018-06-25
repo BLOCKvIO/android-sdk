@@ -23,6 +23,7 @@ import io.blockv.core.model.PublicUser
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Callable
+import io.blockv.core.util.SingleCallable
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -34,48 +35,43 @@ class UserManagerImpl(var api: UserApi,
 
   override fun addCurrentUserToken(token: String,
                                    tokenType: UserManager.TokenType,
-                                   isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-      api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload
-      return null
-    }
-  }
+                                   isDefault: Boolean): Callable<Void?> = Callable.single({
+    api.createUserToken(
+      CreateTokenRequest(
+        tokenType.name.toLowerCase(),
+        token,
+        isDefault)).payload
+  })
+
 
   override fun addCurrentUserOauthToken(token: String,
                                         tokenType: String,
                                         code: String,
-                                        isDefault: Boolean): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-      api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault)).payload
-      return null
-    }
-  }
+                                        isDefault: Boolean): Callable<Void?> = Callable.single({
+    api.createUserOauthToken(
+      CreateOauthTokenRequest(tokenType,
+        token,
+        code,
+        isDefault)).payload
+  })
 
-  override fun setCurrentUserDefaultToken(tokenId: String): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-      api.setDefaultUserToken(tokenId).payload
-      return null
-    }
-  }
+  override fun setCurrentUserDefaultToken(tokenId: String): Callable<Void?> = Callable.single({
+    api.setDefaultUserToken(tokenId).payload
+  })
 
-  override fun deleteCurrentUserToken(tokenId: String): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-      api.deleteUserToken(tokenId).payload
-      return null
-    }
-  }
+  override fun deleteCurrentUserToken(tokenId: String): Callable<Void?> = Callable.single({
+    api.deleteUserToken(tokenId).payload
+  })
 
-  override fun getPublicUser(userId: String): Callable<PublicUser?> = object : Callable<PublicUser?>() {
-    override fun getResult(): PublicUser? = api
-      .getPublicUser(userId).payload
-  }
+  override fun getPublicUser(userId: String): Callable<PublicUser?> = Callable.single({
+    api.getPublicUser(userId).payload
+  })
 
 
-  override fun getAccessToken(): Callable<Jwt?> = object : Callable<Jwt?>() {
-    override fun getResult(): Jwt? {
-      return authenticator.refreshToken()
-    }
-  }
+  override fun getAccessToken(): Callable<Jwt?> = Callable.single({
+    authenticator.refreshToken()
+  })
+
 
   override fun isLoggedIn(): Boolean {
     val token = preferences.refreshToken
@@ -91,107 +87,88 @@ class UserManagerImpl(var api: UserApi,
     return false
   }
 
-  override fun uploadAvatar(avatar: Bitmap): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-      val stream = ByteArrayOutputStream()
-      avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
-      return api.uploadAvatar(UploadAvatarRequest("avatar", "avatar.png", "image/png", stream.toByteArray())).payload
-    }
-  }
+  override fun uploadAvatar(avatar: Bitmap): Callable<Void?> = Callable.single({
+    val stream = ByteArrayOutputStream()
+    avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    api.uploadAvatar(UploadAvatarRequest("avatar", "avatar.png", "image/png", stream.toByteArray())).payload
+  })
 
-  override fun loginGuest(guestId: String): Callable<User?> = object : Callable<User?>() {
-    override fun getResult(): User? = api
-      .loginGuest(GuestLoginRequest(
-        guestId)).payload
-  }
+  override fun loginGuest(guestId: String): Callable<User?> = Callable.single({
+    api.loginGuest(GuestLoginRequest(guestId)).payload
+  })
 
   override fun loginOauth(provider: String,
-                          oauthToken: String): Callable<User?> = object : Callable<User?>() {
-    override fun getResult(): User? = api
-      .oauthLogin(OauthLoginRequest(
-        provider,
-        oauthToken)).payload
-  }
-
+                          oauthToken: String): Callable<User?> = Callable.single({
+    api.oauthLogin(OauthLoginRequest(
+      provider,
+      oauthToken)).payload
+  })
 
   private fun login(token: String,
                     tokenType: String,
-                    auth: String): Callable<User?> = object : Callable<User?>() {
-    override fun getResult(): User? = api
-      .login(LoginRequest(
-        tokenType,
-        token,
-        auth)).payload
-  }
+                    auth: String): Callable<User?> = Callable.single({
+    api.login(LoginRequest(
+      tokenType,
+      token,
+      auth)).payload
+  })
 
   override fun login(token: String,
                      tokenType: UserManager.TokenType,
                      password: String): Callable<User?> = login(token, tokenType.name.toLowerCase(), password)
 
   private fun resetToken(token: String,
-                         type: String): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-
-      api.resetToken(ResetTokenRequest(type, token)).payload
-
-      Log.e("reset", "reset success")
-      return null
-    }
-  }
+                         type: String): Callable<Void?> = Callable.single({
+    api.resetToken(ResetTokenRequest(type, token)).payload
+  })
 
   override fun resetToken(token: String,
                           tokenType: UserManager.TokenType): Callable<Void?> = resetToken(token, tokenType.name.toLowerCase())
 
-  private fun resendVerification(token: String, type: String): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-      api.resetVerificationToken(ResetTokenRequest(type, token))
-      return null
-    }
-  }
+  private fun resendVerification(token: String,
+                                 type: String): Callable<Void?> = Callable.single({
+    api.resetVerificationToken(ResetTokenRequest(type, token))
+    null
+  })
 
   override fun resendVerification(token: String,
                                   tokenType: UserManager.TokenType): Callable<Void?> = resendVerification(token, tokenType.name.toLowerCase())
 
-  override fun register(registration: UserManager.Registration): Callable<User?> = object : Callable<User?>() {
-    override fun getResult(): User? {
+  override fun register(registration: UserManager.Registration): Callable<User?> = Callable.single({
+    val tokens = JSONArray()
 
-      val tokens = JSONArray()
-
-      registration.tokens?.forEach {
-        val data = JSONObject()
-        data.put("token_type", it.type)
-        data.put("token", it.value)
-        if (it is UserManager.Registration.OauthToken) {
-          data.put("auth_data", JSONObject().put("auth_data", it.auth))
-        }
-        tokens.put(data)
+    registration.tokens?.forEach {
+      val data = JSONObject()
+      data.put("token_type", it.type)
+      data.put("token", it.value)
+      if (it is UserManager.Registration.OauthToken) {
+        data.put("auth_data", JSONObject().put("auth_data", it.auth))
       }
-
-      return api.register(CreateUserRequest(
-        registration.firstName,
-        registration.lastName,
-        registration.birthday,
-        registration.avatarUri,
-        registration.password,
-        registration.language,
-        tokens)).payload
+      tokens.put(data)
     }
-  }
+
+    api.register(CreateUserRequest(
+      registration.firstName,
+      registration.lastName,
+      registration.birthday,
+      registration.avatarUri,
+      registration.password,
+      registration.language,
+      tokens)).payload
+  })
 
   private fun verifyUserToken(token: String,
                               type: String,
-                              code: String): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-      api.verifyToken(VerifyTokenRequest(type, token, code))
-      return null
-    }
-  }
+                              code: String): Callable<Void?> = Callable.single({
+    api.verifyToken(VerifyTokenRequest(type, token, code))
+    null
+  })
 
   override fun verifyUserToken(token: String,
                                tokenType: UserManager.TokenType,
                                code: String): Callable<Void?> = verifyUserToken(token, tokenType.name.toLowerCase(), code)
 
-  override fun logout(): Callable<Void?> = object : Callable<Void?>() {
+  override fun logout(): SingleCallable<Void?> = object : SingleCallable<Void?>() {
     override fun getResult(): Void? {
       preferences.refreshToken = null
       //remove asset providers
@@ -200,17 +177,17 @@ class UserManagerImpl(var api: UserApi,
     }
   }
 
-  override fun getCurrentUser(): Callable<User?> = object : Callable<User?>() {
+  override fun getCurrentUser(): SingleCallable<User?> = object : SingleCallable<User?>() {
     override fun getResult(): User? {
       return api.getCurrentUser().payload
     }
   }
 
-  override fun getCurrentUserTokens(): Callable<List<Token>> = object : Callable<List<Token>>() {
+  override fun getCurrentUserTokens(): SingleCallable<List<Token>> = object : SingleCallable<List<Token>>() {
     override fun getResult(): List<Token> = api.getUserTokens().payload
   }
 
-  override fun updateCurrentUser(update: UserManager.UserUpdate): Callable<User?> = object : Callable<User?>() {
+  override fun updateCurrentUser(update: UserManager.UserUpdate): SingleCallable<User?> = object : SingleCallable<User?>() {
     override fun getResult(): User? = api.updateCurrentUser(UpdateUserRequest(
       update.firstName,
       update.lastName,

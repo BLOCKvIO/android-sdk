@@ -10,9 +10,27 @@
  */
 package io.blockv.core.util
 
-class CompositeCancellable() : ArrayList<Cancellable>() {
+class CompositeCancellable : ArrayList<Cancellable>(), Cancellable {
 
-  fun cancel() {
+  override fun isComplete(): Boolean {
+    forEach {
+      if (!it.isComplete()) {
+        return false
+      }
+    }
+    return true
+  }
+
+  override fun isCanceled(): Boolean {
+    forEach {
+      if (!it.isCanceled()) {
+        return false
+      }
+    }
+    return true
+  }
+
+  override fun cancel() {
     forEach {
       if (!it.isCanceled() && !it.isComplete()) {
         it.cancel()

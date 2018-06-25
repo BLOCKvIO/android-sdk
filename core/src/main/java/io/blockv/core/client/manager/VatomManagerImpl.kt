@@ -24,62 +24,57 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
                            bottomLeftLon: Double,
                            topRightLat: Double,
                            topRightLon: Double,
-                           filter: VatomManager.GeoFilter): Callable<Group> =
-    object : Callable<Group>() {
-      override fun getResult(): Group {
-        return api.geoDiscover(GeoRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, filter.name.toLowerCase())).payload
-      }
-    }
+                           filter: VatomManager.GeoFilter): Callable<Group> = Callable.single({
+    api.geoDiscover(GeoRequest(
+      bottomLeftLon,
+      bottomLeftLat,
+      topRightLon,
+      topRightLat,
+      filter.name.toLowerCase())).payload
+  })
 
   override fun geoDiscoverGroups(bottomLeftLat: Double,
                                  bottomLeftLon: Double,
                                  topRightLat: Double,
                                  topRightLon: Double,
                                  precision: Int,
-                                 filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = object : Callable<List<GeoGroup>>() {
-    override fun getResult(): List<GeoGroup> {
-      assert(precision in 1..12) { "Precision required to be in the range  1 - 12" }
-      return api.geoGroupDiscover(GeoGroupRequest(bottomLeftLon, bottomLeftLat, topRightLon, topRightLat, precision, filter.name.toLowerCase())).payload
-    }
-  }
+                                 filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = Callable.single({
+    assert(precision in 1..12) { "Precision required to be in the range  1 - 12" }
+    api.geoGroupDiscover(GeoGroupRequest(
+      bottomLeftLon,
+      bottomLeftLat,
+      topRightLon,
+      topRightLat,
+      precision,
+      filter.name.toLowerCase())).payload
+  })
 
-  override fun updateVatom(payload: JSONObject): Callable<Void?> = object : Callable<Void?>() {
-    override fun getResult(): Void? {
-      api.updateVatom(payload).payload
-      return null
-    }
-  }
+  override fun updateVatom(payload: JSONObject): Callable<Void?> = Callable.single({
+    api.updateVatom(payload).payload
+  })
 
-  override fun discover(query: JSONObject): Callable<Group> = object : Callable<Group>() {
-    override fun getResult(): Group {
-      return api.discover(query).payload
-    }
-  }
+  override fun discover(query: JSONObject): Callable<Group> = Callable.single({
+    api.discover(query).payload
+  })
 
-  override fun getVatoms(vararg ids: String): Callable<Group> = object : Callable<Group>() {
-    override fun getResult(): Group {
-      return api.getUserVatom(VatomRequest(ids.toList())).payload
-    }
-  }
+  override fun getVatoms(vararg ids: String): Callable<Group> = Callable.single({
+    api.getUserVatom(VatomRequest(ids.toList())).payload
+  })
 
-  override fun getInventory(id: String?): Callable<Group> = object : Callable<Group>() {
-    override fun getResult(): Group {
-      return api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
-    }
-  }
 
-  override fun getVatomActions(templateId: String): Callable<List<Action>> = object : Callable<List<Action>>() {
-    override fun getResult(): List<Action> = api.getVatomActions(templateId).payload
-  }
+  override fun getInventory(id: String?): Callable<Group> = Callable.single({
+    api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
+  })
+
+  override fun getVatomActions(templateId: String): Callable<List<Action>> = Callable.single({
+    api.getVatomActions(templateId).payload
+  })
 
   override fun preformAction(action: String,
                              id: String,
-                             payload: JSONObject?): Callable<JSONObject?> = object : Callable<JSONObject?>() {
-    override fun getResult(): JSONObject? {
-      val response = api.preformAction(PerformActionRequest(action, id, payload))
-      return response.payload ?: JSONObject()
-    }
-  }
+                             payload: JSONObject?): Callable<JSONObject?> = Callable.single({
+    api.preformAction(PerformActionRequest(action, id, payload)).payload ?: JSONObject()
+  })
 
   override fun preformAction(action: VatomManager.Action,
                              id: String,
