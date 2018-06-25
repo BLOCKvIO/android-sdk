@@ -11,7 +11,7 @@
 package io.blockv.rx.client.manager
 
 import android.content.Context
-import io.blockv.core.client.manager.*
+import io.blockv.core.client.manager.ResourceManagerImpl
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.json.deserializer.*
 import io.blockv.core.internal.json.serializer.AssetProviderSerializer
@@ -55,13 +55,20 @@ class Blockv {
       JwtSerializer(),
       DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       PublicUserDeserializer(),
-      GeoGroupDeserializer()
+      GeoGroupDeserializer(),
+      InventoryEventDeserializer(),
+      StateEventDeserializer(),
+      ActivityEventDeserializer(),
+      WebsocketEventDeserializer()
     )
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
-    this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
+    this.preferences.environment = Environment(
+      Environment.DEFAULT_SERVER,
+      Environment.DEFAULT_WEBSOCKET,
+      appId)
     val resourceManager = ResourceManagerImpl(preferences)
-    val authenticator = AuthenticatorImpl(preferences,jsonModule)
+    val authenticator = AuthenticatorImpl(preferences, jsonModule)
     this.netModule = NetModule(
       authenticator,
       preferences,
@@ -94,14 +101,18 @@ class Blockv {
       JwtSerializer(),
       DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       PublicUserDeserializer(),
-      GeoGroupDeserializer()
+      GeoGroupDeserializer(),
+      InventoryEventDeserializer(),
+      StateEventDeserializer(),
+      ActivityEventDeserializer(),
+      WebsocketEventDeserializer()
     )
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
     val resourceManager = ResourceManagerImpl(preferences)
-    val authenticator = AuthenticatorImpl(preferences,jsonModule)
-    this.netModule = NetModule(authenticator,preferences, jsonModule)
+    val authenticator = AuthenticatorImpl(preferences, jsonModule)
+    this.netModule = NetModule(authenticator, preferences, jsonModule)
     this.userManager = UserManagerImpl(
       netModule.userApi,
       preferences,
@@ -119,12 +130,14 @@ class Blockv {
               vatomManager: VatomManager) {
     this.appId = appId
     this.preferences = preferences
-    this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
+    this.preferences.environment = Environment(
+      Environment.DEFAULT_SERVER,
+      Environment.DEFAULT_WEBSOCKET,
+      appId)
     this.jsonModule = jsonModule
     this.netModule = netModule
     this.userManager = userManager
     this.vatomManager = vatomManager
-
   }
 
 }

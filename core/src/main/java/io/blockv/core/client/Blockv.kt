@@ -56,11 +56,18 @@ class Blockv {
       JwtSerializer(),
       DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       PublicUserDeserializer(),
-      GeoGroupDeserializer()
+      GeoGroupDeserializer(),
+      InventoryEventDeserializer(),
+      StateEventDeserializer(),
+      ActivityEventDeserializer(),
+      WebsocketEventDeserializer()
     )
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
-    this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
+    this.preferences.environment = Environment(
+      Environment.DEFAULT_SERVER,
+      Environment.DEFAULT_WEBSOCKET,
+      appId)
     this.resourceManager = ResourceManagerImpl(preferences)
     val auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
@@ -95,7 +102,11 @@ class Blockv {
       JwtSerializer(),
       DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       PublicUserDeserializer(),
-      GeoGroupDeserializer()
+      GeoGroupDeserializer(),
+      InventoryEventDeserializer(),
+      StateEventDeserializer(),
+      ActivityEventDeserializer(),
+      WebsocketEventDeserializer()
     )
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
@@ -121,7 +132,10 @@ class Blockv {
               resourceManager: ResourceManager) {
     this.appId = appId
     this.preferences = preferences
-    this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
+    this.preferences.environment = Environment(
+      Environment.DEFAULT_SERVER,
+      Environment.DEFAULT_WEBSOCKET,
+      appId)
     this.jsonModule = jsonModule
     this.netModule = netModule
     this.userManager = userManager
