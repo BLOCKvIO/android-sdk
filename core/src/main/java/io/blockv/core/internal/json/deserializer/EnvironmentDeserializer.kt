@@ -16,7 +16,10 @@ import org.json.JSONObject
 class EnvironmentDeserialzier : Deserializer<Environment> {
   override fun deserialize(data: JSONObject): Environment? {
     try {
-      return Environment(data.getString("rest"),data.getString("app_id"))
+      return Environment(
+        data.getString("rest"),
+        data.getString("wss"),
+        data.getString("app_id"))
     } catch (e: Exception) {
       android.util.Log.w("EnvironmentDeserialzier", e.message)
     }
