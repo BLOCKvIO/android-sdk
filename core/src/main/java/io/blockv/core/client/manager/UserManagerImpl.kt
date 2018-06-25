@@ -23,7 +23,6 @@ import io.blockv.core.model.PublicUser
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.core.util.Callable
-import io.blockv.core.util.SingleCallable
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -168,27 +167,23 @@ class UserManagerImpl(var api: UserApi,
                                tokenType: UserManager.TokenType,
                                code: String): Callable<Void?> = verifyUserToken(token, tokenType.name.toLowerCase(), code)
 
-  override fun logout(): SingleCallable<Void?> = object : SingleCallable<Void?>() {
-    override fun getResult(): Void? {
-      preferences.refreshToken = null
-      //remove asset providers
-      api.logout()
-      return null
-    }
-  }
+  override fun logout(): Callable<Void?> = Callable.single({
+    preferences.refreshToken = null
+    //remove asset providers
+    api.logout()
+    null
+  })
 
-  override fun getCurrentUser(): SingleCallable<User?> = object : SingleCallable<User?>() {
-    override fun getResult(): User? {
-      return api.getCurrentUser().payload
-    }
-  }
+  override fun getCurrentUser(): Callable<User?> = Callable.single({
+    api.getCurrentUser().payload
+  })
 
-  override fun getCurrentUserTokens(): SingleCallable<List<Token>> = object : SingleCallable<List<Token>>() {
-    override fun getResult(): List<Token> = api.getUserTokens().payload
-  }
+  override fun getCurrentUserTokens(): Callable<List<Token>> = Callable.single({
+    api.getUserTokens().payload
+  })
 
-  override fun updateCurrentUser(update: UserManager.UserUpdate): SingleCallable<User?> = object : SingleCallable<User?>() {
-    override fun getResult(): User? = api.updateCurrentUser(UpdateUserRequest(
+  override fun updateCurrentUser(update: UserManager.UserUpdate): Callable<User?> = Callable.single({
+    api.updateCurrentUser(UpdateUserRequest(
       update.firstName,
       update.lastName,
       update.birthday,
@@ -196,5 +191,5 @@ class UserManagerImpl(var api: UserApi,
       update.language,
       update.password
     )).payload
-  }
+  })
 }
