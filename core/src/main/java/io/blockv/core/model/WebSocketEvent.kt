@@ -19,7 +19,7 @@ class WebSocketEvent<out T>(val messageType: String,
         return when (name) {
           "inventory" -> MessageType.INVENTORY
           "state_update" -> MessageType.STATE_UPDATE
-          "my_event" -> MessageType.ACTIVITY
+          "my_events" -> MessageType.ACTIVITY
           "info" -> MessageType.INFO
           else -> MessageType.UNKNOWN
         }
