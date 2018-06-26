@@ -10,7 +10,7 @@ class StateEventDeserializer : Deserializer<StateEvent> {
       val operation = data.getString("op")
       val vatomId = data.getString("id")
       val state = data.getJSONObject("new_object")
-      val whenModified = data.getString("when_modified")
+      val whenModified = state.getString("when_modified")
       return StateEvent(
         eventId,
         operation,
