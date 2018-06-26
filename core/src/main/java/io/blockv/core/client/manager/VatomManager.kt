@@ -10,10 +10,10 @@
  */
 package io.blockv.core.client.manager
 
+import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
-import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.model.DiscoverGroup
 import org.json.JSONObject
 import java.util.*
@@ -42,34 +42,39 @@ interface VatomManager {
   fun getInventory(id: String?): Callable<Group>
 
   /**
-   * Fetches the dropped vAtoms in the specified area.
+   * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
+   * dropped by the vAtom owners).
    *
-   * @param left
-   * @param bottom
-   * @param right
-   * @param top
-   * @param limit
-   * @param filter
+   * You must supply two coordinates (bottom-left and top-right) which from a rectangle.
+   * This rectangle defines the geo search region.
+   *
+   * @param bottomLeftLat is the bottom left latitude coordinate.
+   * @param bottomLeftLon is the bottom left longitude coordinate.
+   * @param topRightLat is the top right latitude coordinate.
+   * @param topRightLon is the top right longitude coordinate.
+   * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
    * @return new Callable<Group> instance.
    * @see GeoFilter
    * @see Group
    */
-  fun geoDiscover(left: Double, bottom: Double, right: Double, top: Double, limit: Int, filter: GeoFilter): Callable<Group>
+  fun geoDiscover(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, filter: GeoFilter): Callable<Group>
 
   /**
-   * Fetches the count of vAtoms dropped in specified area.
+   * Fetches the count of vAtoms dropped in the specified area.
    *
-   * @param left
-   * @param bottom
-   * @param right
-   * @param top
-   * @param precision
-   * @param filter
+   * @param bottomLeftLat is the bottom left latitude coordinate.
+   * @param bottomLeftLon is the bottom left longitude coordinate.
+   * @param topRightLat is the top right latitude coordinate.
+   * @param topRightLon is the top right longitude coordinate.
+   * @param precision controls the density of the group distribution. Defaults to 3.
+   *                  Lower values return fewer groups (with a higher vatom count) — less dense.
+   *                  Higher values return more groups (with a lower vatom count) - more dense.
+   * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
    * @return new Callable<List<GeoGroup> instance.
    * @see GeoFilter
    * @see GeoGroup
    */
-  fun geoDiscoverGroup(left: Double, bottom: Double, right: Double, top: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
+  fun geoDiscoverGroups(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
 
   /**
    * Updates the vAtom's properties.

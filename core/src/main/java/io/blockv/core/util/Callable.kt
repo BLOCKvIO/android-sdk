@@ -1,13 +1,3 @@
-/**
- *  BlockV AG. Copyright (c) 2018, all rights reserved.
- *
- *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
- *  compliance with the License accompanying it. Unless required by applicable law or agreed to in writing, the BlockV
- *  SDK distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
- *  ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations
- *  under the License.
- *
- */
 package io.blockv.core.util
 
 import android.os.Handler
@@ -16,149 +6,197 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
-abstract class Callable<out T> {
+interface Callable<T> {
 
-  companion object {
-    private val cores = Runtime.getRuntime().availableProcessors()
-    val ioPool: ThreadPoolExecutor = ThreadPoolExecutor(10, 100, Long.MAX_VALUE, TimeUnit.NANOSECONDS, LinkedBlockingQueue())
-    val compPool: ThreadPoolExecutor = ThreadPoolExecutor(cores * 2, cores * 4, 60L, TimeUnit.SECONDS, LinkedBlockingQueue())
-  }
+  fun runOn(scheduler: Scheduler): Callable<T>
+
+  fun returnOn(responseScheduler: Scheduler): Callable<T>
+
+  fun call(): Cancellable
+
+  fun call(success: ((T) -> Unit)?): Cancellable
+
+  fun call(success: ((T) -> Unit)?, error: ((Throwable) -> Unit)?): Cancellable
 
   enum class Scheduler {
-    IO,
-    COMP,
-    MAIN
-  }
-
-  var executionScheduler: Scheduler = Scheduler.IO
-  var responseScheduler: Scheduler = Scheduler.MAIN
-
-  fun runOn(scheduler: Scheduler): Callable<T> {
-    this.executionScheduler = scheduler
-    return this
-  }
-
-  fun returnOn(responseScheduler: Scheduler): Callable<T> {
-    this.responseScheduler = responseScheduler
-    return this
-  }
-
-  @Throws(Exception::class)
-  abstract fun getResult(): T?
-
-  fun call(): Cancellable {
-    return this.call(null)
-  }
-
-  fun call(success: OnSuccess<T>?): Cancellable {
-    return this.call(success, null)
-  }
-
-  fun call(success: OnSuccess<T>?, error: OnError?): Cancellable {
-
-    val runnable: Runnable = object : Runnable() {
-      override fun run() {
-        try {
-          val result = getResult()
-          this.completed = true
-          if (success != null && !canceled) {
-            when (responseScheduler) {
-              Scheduler.IO -> {
-                ioPool.execute({ success.onSuccess(result) })
-              }
-              Scheduler.COMP -> {
-                compPool.execute({ success.onSuccess(result) })
-              }
-              Scheduler.MAIN -> {
-                Handler(Looper.getMainLooper()).post({ success.onSuccess(result) })
-              }
-            }
-          }
-        } catch (e: Exception) {
-          this.completed = true
-          if (error != null && !canceled) {
-            when (responseScheduler) {
-              Scheduler.IO -> {
-                ioPool.execute({ error.onError(e) })
-              }
-              Scheduler.COMP -> {
-                compPool.execute({ error.onError(e) })
-              }
-              Scheduler.MAIN -> {
-                Handler(Looper.getMainLooper()).post({ error.onError(e) })
-              }
-            }
-
-          } else
-            throw e
-        }
+    IO {
+      override fun execute(runnable: java.lang.Runnable): Cancellable {
+        val run = Scheduler.wrapRunnable(runnable, { Scheduler.IO_POOL.remove(it) })
+        Scheduler.IO_POOL.execute(run)
+        return run
       }
-    }
-
-    when (executionScheduler) {
-      Scheduler.IO -> {
-        ioPool.execute(runnable)
-        return object : Cancellable(runnable) {
-          override fun cancel() {
-            runnable.canceled = true
-            ioPool.remove(runnable)
-          }
-        }
+    },
+    COMP {
+      override fun execute(runnable: java.lang.Runnable): Cancellable {
+        val run = Scheduler.wrapRunnable(runnable, { Scheduler.COMP_POOL.remove(it) })
+        Scheduler.COMP_POOL.execute(run)
+        return run
       }
-      Scheduler.COMP -> {
-        compPool.execute(runnable)
-        return object : Cancellable(runnable) {
-          override fun cancel() {
-            runnable.canceled = true
-            compPool.remove(runnable)
-          }
-        }
-      }
-      Scheduler.MAIN -> {
+    },
+    MAIN {
+      override fun execute(runnable: java.lang.Runnable): Cancellable {
         val handler = Handler(Looper.getMainLooper())
-        handler.post(runnable)
-        return object : Cancellable(runnable) {
-          override fun cancel() {
-            runnable.canceled = true
-            handler.removeCallbacks(runnable)
+        val run = Scheduler.wrapRunnable(runnable, { handler.removeCallbacks(it) })
+        handler.post(run)
+        return run
+      }
+    };
+
+    abstract fun execute(runnable: java.lang.Runnable): Cancellable
+
+    companion object {
+      private val cores = Runtime.getRuntime().availableProcessors()
+      val IO_POOL: ThreadPoolExecutor = ThreadPoolExecutor(10, 100, Long.MAX_VALUE, TimeUnit.NANOSECONDS, LinkedBlockingQueue())
+      val COMP_POOL: ThreadPoolExecutor = ThreadPoolExecutor(cores * 2, cores * 4, 60L, TimeUnit.SECONDS, LinkedBlockingQueue())
+
+      fun wrapRunnable(runnable: java.lang.Runnable, onCancel: (java.lang.Runnable) -> Unit): Runnable {
+
+        return object : Runnable() {
+          override fun onCancel(): Boolean {
+            onCancel.invoke(this)
+            return true
+          }
+
+          override fun onRun() {
+            runnable.run()
           }
         }
       }
-
     }
 
-  }
+    abstract class Runnable : java.lang.Runnable, Cancellable {
+      private var completed: Boolean = false
+      private var canceled: Boolean = false
 
-  abstract class Cancellable(private val runnable: Runnable) : io.blockv.core.util.Cancellable {
-    override fun isComplete(): Boolean {
-      return runnable.isComplete
-    }
-
-    override fun isCanceled(): Boolean {
-      return runnable.isCanceled
-    }
-  }
-
-  abstract class Runnable : java.lang.Runnable {
-    internal var completed: Boolean = false
-    internal var canceled: Boolean = false
-    val isComplete: Boolean
-      get() {
+      override fun isComplete(): Boolean {
         return completed
       }
-    val isCanceled: Boolean
-      get() {
+
+      override fun isCanceled(): Boolean {
         return canceled
       }
 
+      override fun cancel() {
+        if (!completed && !canceled) {
+          canceled = onCancel()
+        }
+      }
+
+      abstract fun onCancel(): Boolean
+
+      abstract fun onRun()
+
+      override fun run() {
+        onRun()
+        completed = true
+      }
+
+    }
+
   }
 
-  interface OnSuccess<in T> {
-    fun onSuccess(response: T?)
+  companion object {
+
+    fun <T> create(call: (ResultEmitter<T>) -> Unit): Callable<T> {
+      return object : Callable<T> {
+        var executionScheduler: Scheduler = Scheduler.IO
+        var responseScheduler: Scheduler = Scheduler.MAIN
+
+        override fun runOn(scheduler: Scheduler): Callable<T> {
+          this.executionScheduler = scheduler
+          return this
+        }
+
+        override fun returnOn(responseScheduler: Scheduler): Callable<T> {
+          this.responseScheduler = responseScheduler
+          return this
+        }
+
+        override fun call(): Cancellable {
+          return this.call(null)
+        }
+
+        override fun call(success: ((T) -> Unit)?): Cancellable {
+          return this.call(success, null)
+        }
+
+        override fun call(success: ((T) -> Unit)?, error: ((Throwable) -> Unit)?): Cancellable {
+
+          val emitter = object : ResultEmitter<T>, Cancellable {
+
+            var resp = responseScheduler
+            var onSuccess = success
+            var onError = error
+            val cancelable = CompositeCancellable()
+            var complete: Boolean = false
+            var canceled: Boolean = false
+
+            @Synchronized
+            override fun isComplete(): Boolean {
+              return complete
+            }
+
+            @Synchronized
+            override fun isCanceled(): Boolean {
+              return canceled
+            }
+
+            @Synchronized
+            override fun cancel() {
+              canceled = true
+              cancelable.cancel()
+            }
+
+            @Synchronized
+            override fun onResult(result: T) {
+              if (onSuccess != null && !isComplete() && !isCanceled()) {
+                resp.execute(Runnable { onSuccess?.invoke(result) })
+              }
+            }
+
+            override fun onError(error: Throwable) {
+              if (onError != null && !isCanceled()) {
+                resp.execute(Runnable { onError?.invoke(error) })
+                onError = null
+              } else
+                throw error
+            }
+
+            @Synchronized
+            override fun onComplete() {
+              complete = true
+              onSuccess = null
+              onError = null
+              cancelable.clear()
+            }
+          }
+          val cancel = CompositeCancellable()
+          cancel.add(emitter)
+          cancel.add(executionScheduler.execute(Runnable { call(emitter) }))
+          return cancel
+        }
+
+      }
+    }
+
+    fun <T> single(single: () -> T): Callable<T> {
+      return create {
+        try {
+          it.onResult(single())
+          it.onComplete()
+        } catch (e: Exception) {
+          it.onError(e)
+        }
+      }
+    }
   }
 
-  interface OnError {
-    fun onError(response: Throwable)
-  }
+  interface ResultEmitter<T> {
 
+    fun onResult(result: T)
+
+    fun onError(error: Throwable)
+
+    fun onComplete()
+  }
 }

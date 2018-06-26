@@ -15,16 +15,31 @@ import io.blockv.core.model.Token
 class TokenDeserializer : Deserializer<Token> {
   override fun deserialize(data: org.json.JSONObject): Token? {
     try {
+      val id: String = data.getString("id")
+      val meta: org.json.JSONObject = data.getJSONObject("meta")
+      val whenCreated: String = meta.getString("when_created")
+      val whenModified: String = meta.getString("when_modified")
       val properties: org.json.JSONObject = data.getJSONObject("properties")
+      val appId: String = properties.getString("app_id")
       val token: String = properties.getString("token")
       val tokenType: String = properties.getString("token_type")
-      val confirmed: Boolean = data.optBoolean("confirmed", false)
-      val primary: Boolean = properties.optBoolean("is_default",false)
+      val confirmed: Boolean = properties.optBoolean("confirmed", false)
+      val primary: Boolean = properties.optBoolean("is_default", false)
+      val userId: String = properties.getString("user_id")
+      val verifyCodeExpires: String = properties.optString("verify_code_expires", "")
+
       return Token(
+        id,
+        userId,
+        appId,
+        whenCreated,
+        whenModified,
         tokenType,
         token,
         confirmed,
-        primary)
+        primary,
+        verifyCodeExpires)
+
     } catch (e: Exception) {
       android.util.Log.w("TokenDeserializer", e.message)
     }

@@ -12,19 +12,17 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class GeoRequest(val left: Double,
-                 val bottom: Double,
-                 val right: Double,
-                 val top: Double,
-                 val limit: Int,
+class GeoRequest(val bottomLeftLon: Double,
+                 val bottomLeftLat: Double,
+                 val topRightLon: Double,
+                 val topRightLat: Double,
                  val filter: String) {
 
   fun toJson(): JSONObject {
     val out = JSONObject()
-    out.put("limit", limit)
     out.put("filter", filter)
-    out.put("bottom_left", JSONObject().put("lat", left).put("lon", bottom))
-    out.put("top_right", JSONObject().put("lat", right).put("lon", top))
+    out.put("bottom_left", JSONObject().put("lat", bottomLeftLat).put("lon", bottomLeftLon))
+    out.put("top_right", JSONObject().put("lat", topRightLat).put("lon", topRightLon))
     return out
   }
 

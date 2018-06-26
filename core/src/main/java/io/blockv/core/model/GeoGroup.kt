@@ -10,4 +10,4 @@ package io.blockv.core.model
  *  under the License.
  *
  */
-class GeoGroup(val longitude:Double, val latitude:Double,val count:Int)
+class GeoGroup(val geoHash:String, val longitude: Double, val latitude: Double, val count: Int)
