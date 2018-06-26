@@ -15,7 +15,7 @@ open class Environment(val rest: String,
                        val appId: String) {
   companion object {
     val DEFAULT_SERVER = "https://api.blockv.io/"
-    val DEFAULT_WEBSOCKET = "wss://ws.blockv.net/ws"
+    val DEFAULT_WEBSOCKET = "wss://newws.blockv.io/ws"
   }
 
 }
