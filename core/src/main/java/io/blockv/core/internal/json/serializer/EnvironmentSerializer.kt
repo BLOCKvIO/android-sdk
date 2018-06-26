@@ -16,9 +16,10 @@ import org.json.JSONObject
 class EnviromentSerializer : Serializer<Environment?> {
   override fun serialize(data: Environment?): JSONObject {
     val out: JSONObject = JSONObject()
-    if(data!=null) {
+    if (data != null) {
       out.put("app_id", data.appId)
       out.put("rest", data.rest)
+      out.put("wss", data.wss)
     }
     return out
   }
