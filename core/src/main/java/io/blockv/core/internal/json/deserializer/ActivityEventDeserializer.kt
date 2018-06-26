@@ -11,20 +11,18 @@ class ActivityEventDeserializer : Deserializer<ActivityEvent> {
       val eventId = data.getLong("msg_id")
       val targetUserId = data.getString("user_id")
       val triggeredBy = data.getString("triggered_by")
-      val vatomsIds: JSONArray? = data.optJSONArray("vatoms")
-      val resources = data.optJSONArray("resources")
+      val vatomsIds = data.optJSONArray("vatoms") ?: JSONArray()
+      val resources = data.optJSONArray("resources") ?: JSONArray()
       val message = data.getString("msg")
       val actionName = data.getString("action_name")
       val whenCreated = data.getString("when_created")
 
       val vatomsArray = ArrayList<String>()
-      if (vatomsIds != null) {
-        (0 until vatomsIds.length())
-          .forEach {
-            val vatom: String = vatomsIds.getString(it)
-            vatomsArray.add(vatom)
-          }
-      }
+      (0 until vatomsIds.length())
+        .forEach {
+          val vatom: String = vatomsIds.getString(it)
+          vatomsArray.add(vatom)
+        }
 
       val resourceArray: ArrayList<Resource> = ArrayList()
       (0 until resources.length())
