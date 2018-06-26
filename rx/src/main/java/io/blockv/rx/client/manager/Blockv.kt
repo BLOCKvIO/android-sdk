@@ -11,7 +11,8 @@
 package io.blockv.rx.client.manager
 
 import android.content.Context
-import io.blockv.core.client.manager.*
+import io.blockv.core.client.manager.ResourceManager
+import io.blockv.core.client.manager.ResourceManagerImpl
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.json.deserializer.*
 import io.blockv.core.internal.json.serializer.AssetProviderSerializer
@@ -34,6 +35,7 @@ class Blockv {
   private val jsonModule: JsonModule
   val userManager: UserManager
   val vatomManager: VatomManager
+  val resourceManager: ResourceManager
 
   constructor(context: Context, appId: String) {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
@@ -60,8 +62,8 @@ class Blockv {
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
-    val resourceManager = ResourceManagerImpl(preferences)
-    val authenticator = AuthenticatorImpl(preferences,jsonModule)
+    this.resourceManager = ResourceManagerImpl(preferences)
+    val authenticator = AuthenticatorImpl(preferences, jsonModule)
     this.netModule = NetModule(
       authenticator,
       preferences,
@@ -99,9 +101,9 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    val resourceManager = ResourceManagerImpl(preferences)
-    val authenticator = AuthenticatorImpl(preferences,jsonModule)
-    this.netModule = NetModule(authenticator,preferences, jsonModule)
+    this.resourceManager = ResourceManagerImpl(preferences)
+    val authenticator = AuthenticatorImpl(preferences, jsonModule)
+    this.netModule = NetModule(authenticator, preferences, jsonModule)
     this.userManager = UserManagerImpl(
       netModule.userApi,
       preferences,
@@ -116,7 +118,8 @@ class Blockv {
               jsonModule: JsonModule,
               netModule: NetModule,
               userManager: UserManager,
-              vatomManager: VatomManager) {
+              vatomManager: VatomManager,
+              resourceManager: ResourceManager) {
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(Environment.DEFAULT_SERVER, appId)
@@ -124,7 +127,7 @@ class Blockv {
     this.netModule = netModule
     this.userManager = userManager
     this.vatomManager = vatomManager
-
+    this.resourceManager = resourceManager
   }
 
 }
