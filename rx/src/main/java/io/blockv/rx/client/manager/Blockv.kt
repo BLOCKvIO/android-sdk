@@ -20,6 +20,7 @@ import io.blockv.core.internal.json.serializer.JwtSerializer
 import io.blockv.core.internal.net.NetModule
 import io.blockv.core.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
+import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.Action
 import io.blockv.core.model.Environment
@@ -34,6 +35,7 @@ class Blockv {
   private val jsonModule: JsonModule
   val userManager: UserManager
   val vatomManager: VatomManager
+  val eventManager: EventManager
 
   constructor(context: Context, appId: String) {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
@@ -80,6 +82,7 @@ class Blockv {
       JwtDecoderImpl()
     )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
+    this.eventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, authenticator), jsonModule)
   }
 
   constructor(context: Context, environment: Environment) {
@@ -119,15 +122,16 @@ class Blockv {
       resourceManager,
       JwtDecoderImpl())
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
+    this.eventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, authenticator), jsonModule)
   }
-
 
   constructor(appId: String,
               preferences: Preferences,
               jsonModule: JsonModule,
               netModule: NetModule,
               userManager: UserManager,
-              vatomManager: VatomManager) {
+              vatomManager: VatomManager,
+              eventManager: EventManager) {
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
@@ -138,6 +142,7 @@ class Blockv {
     this.netModule = netModule
     this.userManager = userManager
     this.vatomManager = vatomManager
+    this.eventManager = eventManager
   }
 
 }
