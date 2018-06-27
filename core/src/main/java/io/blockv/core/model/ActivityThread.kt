@@ -13,4 +13,7 @@ package io.blockv.core.model
 class ActivityThread(val id: String,
                      val whenModified: Long,
                      val lastActivityMessage: ActivityMessage,
-                     val lastMessageUser: PublicUser)
+                     val lastMessageUser: UserInfo) {
+
+  class UserInfo(val name:String, val avatarUri:String)
+}
