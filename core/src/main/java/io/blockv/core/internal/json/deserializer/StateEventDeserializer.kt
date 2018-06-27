@@ -10,13 +10,11 @@ class StateEventDeserializer : Deserializer<StateUpdateEvent> {
       val operation = data.getString("op")
       val vatomId = data.getString("id")
       val state = data.getJSONObject("new_object")
-      val whenModified = state.getString("when_modified")
       return StateUpdateEvent(
         eventId,
         operation,
         vatomId,
-        state,
-        whenModified)
+        state)
     } catch (e: Exception) {
       android.util.Log.e("StateEventDeserializer", e.message)
     }
