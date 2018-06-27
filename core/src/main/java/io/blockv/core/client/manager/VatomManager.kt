@@ -14,6 +14,7 @@ import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
+import io.blockv.core.model.DiscoverGroup
 import org.json.JSONObject
 import java.util.*
 
@@ -155,10 +156,11 @@ interface VatomManager {
    * Searches for vAtoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query.
-   * @return new Callable<Group>.
+   * @return new Callable<DiscoverGroup>.
    * @see DiscoverQueryBuilder
+   * @see DiscoverGroup
    */
-  fun discover(query: JSONObject): Callable<Group>
+  fun discover(query: JSONObject): Callable<DiscoverGroup>
 
   enum class TokenType {
     EMAIL,
