@@ -7,4 +7,28 @@ class ActivityEvent(val eventId: Long,
                     val resources: List<Resource>,
                     val message: String,
                     val actionName: String,
-                    val whenCreated: String)
+                    val whenCreated: String){
+
+  override fun toString(): String {
+    return "ActivityEvent{" +
+      "eventId='" + eventId + '\'' +
+      ", targetUserId='" + targetUserId + '\'' +
+      ", triggerUserId='" + triggerUserId + '\'' +
+      ", vatomIds='" + vatomIds + '\'' +
+      ", resources='" + resources + '\'' +
+      ", message='" + message + '\'' +
+      ", actionName='" + actionName + '\'' +
+      ", whenCreated='" + whenCreated + '\'' +
+      "}"
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is ActivityEvent) return false
+    return eventId == other.eventId
+  }
+
+  override fun hashCode(): Int {
+    return eventId.hashCode()
+  }
+}
