@@ -1,8 +1,8 @@
 package io.blockv.core.client.manager
 
 import io.blockv.core.internal.json.JsonModule
+import io.blockv.core.internal.net.websocket.Websocket
 import io.blockv.core.internal.net.websocket.WebsocketImpl
-import io.blockv.core.internal.net.websocket.WebsocketListener
 import io.blockv.core.model.ActivityEvent
 import io.blockv.core.model.InventoryEvent
 import io.blockv.core.model.StateEvent
@@ -131,7 +131,7 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
 
     return Callable.create<WebSocketEvent<JSONObject>>({
 
-      val listener: WebsocketListener = object : WebsocketListener {
+      val listener: Websocket.WebSocketListener = object : Websocket.WebSocketListener {
 
         override fun onEvent(event: WebSocketEvent<JSONObject>) {
           if (!it.isCanceled() && !it.isComplete()) {
@@ -142,12 +142,6 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
         override fun onError(throwable: Throwable) {
           if (!it.isCanceled() && !it.isComplete()) {
             it.onError(throwable)
-          }
-        }
-
-        override fun onDisconnect() {
-          if (!it.isCanceled() && !it.isComplete()) {
-            it.onError(IOException("WebSocket Disconnected"))
           }
         }
       }

@@ -20,9 +20,10 @@ class WebsocketImpl(val preferences: Preferences,
   private var webSocket: com.neovisionaries.ws.client.WebSocket? = null
 
   @Synchronized
-  override fun connect(listener: WebsocketListener) {
+  override fun connect(listener: Websocket.WebSocketListener) {
     this.disconnect()
     this.listener = object : WebSocketAdapter() {
+
       override fun onTextMessage(websocket: WebSocket?, message: String?) {
         if (message != null) {
           try {
@@ -30,19 +31,17 @@ class WebsocketImpl(val preferences: Preferences,
             if (event != null) {
               listener.onEvent(event)
             }
-
           } catch (exception: Exception) {
             Log.i("WebSocket", exception.message)
           }
         }
       }
 
-      @Throws(Exception::class)
       override fun onDisconnected(websocket: WebSocket,
                                   serverCloseFrame: WebSocketFrame,
                                   clientCloseFrame: WebSocketFrame,
                                   closedByServer: Boolean) {
-        listener.onDisconnect()
+        listener.onError(BlockvWsException(BlockvWsException.Error.CONNECTION_DISCONNECT, null))
         websocket.removeListener(this)
       }
     }
@@ -53,7 +52,9 @@ class WebsocketImpl(val preferences: Preferences,
         .addListener(this.listener)
         .connect()
     } catch (exception: Exception) {
-      listener.onError(exception)
+      listener.onError(BlockvWsException(
+        BlockvWsException.Error.CONNECTION_FAILED,
+        exception))
     }
 
   }
@@ -68,22 +69,22 @@ class WebsocketImpl(val preferences: Preferences,
     this.listener = null
   }
 
-  @Throws(NullPointerException::class)
+  @Throws(Exception::class)
   private fun getAddress(): String {
-    val environment = preferences.environment ?: throw NullPointerException("Environment is not set!")
-    val access = authenticator.refreshToken() ?: throw NullPointerException("Unable to acquire authorization")
-    val original = Uri.parse(environment.wss)
-    val out = Uri.parse(environment.wss).buildUpon().clearQuery()
+      val environment = preferences.environment ?: throw NullPointerException("Environment is not set!")
+      val access = authenticator.refreshToken() ?: throw NullPointerException("Unable to acquire authorization")
+      val original = Uri.parse(environment.wss)
+      val out = Uri.parse(environment.wss).buildUpon().clearQuery()
 
-    out.appendQueryParameter("app_id", environment.appId)
-    out.appendQueryParameter("token", access.token)
+      out.appendQueryParameter("app_id", environment.appId)
+      out.appendQueryParameter("token", access.token)
 
-    for (param in original.queryParameterNames) {
-      if (param != "token" || param != "app_id") {
-        out.appendQueryParameter(param, original.getQueryParameter(param))
+      for (param in original.queryParameterNames) {
+        if (param != "token" || param != "app_id") {
+          out.appendQueryParameter(param, original.getQueryParameter(param))
+        }
       }
-    }
-    return out.build().toString()
+      return out.build().toString()
   }
 
 }

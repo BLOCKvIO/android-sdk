@@ -1,8 +1,8 @@
 package io.blockv.rx.client.manager
 
 import io.blockv.core.internal.json.JsonModule
+import io.blockv.core.internal.net.websocket.Websocket
 import io.blockv.core.internal.net.websocket.WebsocketImpl
-import io.blockv.core.internal.net.websocket.WebsocketListener
 import io.blockv.core.model.ActivityEvent
 import io.blockv.core.model.InventoryEvent
 import io.blockv.core.model.StateEvent
@@ -12,7 +12,6 @@ import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
-import java.io.IOException
 
 class EventManagerImpl(val webSocket: WebsocketImpl,
                        val jsonModule: JsonModule) : EventManager {
@@ -100,7 +99,7 @@ class EventManagerImpl(val webSocket: WebsocketImpl,
   private fun connect(): Flowable<WebSocketEvent<JSONObject>> {
 
     return Flowable.create<WebSocketEvent<JSONObject>>({ subscriber ->
-      val listener: WebsocketListener = object : WebsocketListener {
+      val listener: Websocket.WebSocketListener = object : Websocket.WebSocketListener {
         override fun onEvent(event: WebSocketEvent<JSONObject>) {
           if (!subscriber.isCancelled) {
             subscriber.onNext(event)
@@ -110,13 +109,6 @@ class EventManagerImpl(val webSocket: WebsocketImpl,
         override fun onError(throwable: Throwable) {
           if (!subscriber.isCancelled) {
             subscriber.onError(throwable)
-            subscriber.onComplete()
-          }
-        }
-
-        override fun onDisconnect() {
-          if (!subscriber.isCancelled) {
-            subscriber.onError(IOException("WebSocket Disconnected"))
             subscriber.onComplete()
           }
         }
