@@ -154,11 +154,12 @@ open class DiscoverQueryBuilder {
    *             - `count` returns only the numerical count of the query and an empty vAtom array.
    * @return DiscoverQueryBuilder.
    */
-  fun setReturn(type: ResultType) {
+  fun setReturn(type: ResultType): DiscoverQueryBuilder {
     json.put("return",
       JSONObject()
         .put("type", type.result)
         .put("fields", JSONArray()))
+    return this
   }
 
   /**
