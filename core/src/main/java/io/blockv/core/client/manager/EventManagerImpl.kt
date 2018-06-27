@@ -15,7 +15,7 @@ import io.blockv.core.internal.net.websocket.Websocket
 import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.model.ActivityEvent
 import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateEvent
+import io.blockv.core.model.StateUpdateEvent
 import io.blockv.core.model.WebSocketEvent
 import io.blockv.core.util.Callable
 import io.blockv.core.util.Cancellable
@@ -26,7 +26,7 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
                        val jsonModule: JsonModule) : EventManager {
 
   companion object {
-    val NULL_STATE_EVENT = WebSocketEvent<StateEvent>("", "", null)
+    val NULL_STATE_EVENT = WebSocketEvent<StateUpdateEvent>("", "", null)
     val NULL_INVENTORY_EVENT = WebSocketEvent<InventoryEvent>("", "", null)
     val NULL_ACTIVITY_EVENT = WebSocketEvent<ActivityEvent>("", "", null)
   }
@@ -70,22 +70,22 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
       .returnOn(Callable.Scheduler.MAIN)
   }
 
-  override fun getVatomStateEvents(): Callable<WebSocketEvent<StateEvent>> {
+  override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
     return getEvents()
       .filter { it.type == WebSocketEvent.MessageType.STATE_UPDATE }
       .returnOn(Callable.Scheduler.IO)
       .map {
-        var event: WebSocketEvent<StateEvent> = NULL_STATE_EVENT
+        var updateEvent: WebSocketEvent<StateUpdateEvent> = NULL_STATE_EVENT
         if (it.payload != null) {
-          val stateEvent = jsonModule.stateEventDeserializer.deserialize(it.payload)
+          val stateEvent = jsonModule.stateUpdateEventDeserializer.deserialize(it.payload)
           if (stateEvent != null) {
-            event = WebSocketEvent(
+            updateEvent = WebSocketEvent(
               it.messageType,
               it.userId,
               stateEvent)
           }
         }
-        event
+        updateEvent
       }
       .filter { it !== NULL_STATE_EVENT }
       .runOn(Callable.Scheduler.IO)
@@ -157,7 +157,7 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
 
       webSocket.connect(listener)
     }).runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.IO)
+      .returnOn(Callable.Scheduler.COMP)
       .doFinally {
         webSocket.disconnect()
         synchronized(resultEmitters, {

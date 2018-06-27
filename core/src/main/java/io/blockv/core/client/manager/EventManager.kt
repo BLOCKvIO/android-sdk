@@ -12,7 +12,7 @@ package io.blockv.core.client.manager
 
 import io.blockv.core.model.ActivityEvent
 import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateEvent
+import io.blockv.core.model.StateUpdateEvent
 import io.blockv.core.model.WebSocketEvent
 import io.blockv.core.util.Callable
 import org.json.JSONObject
@@ -32,13 +32,13 @@ interface EventManager {
   /**
    *  Provides a stream of vAtom state update events.
    *
-   *  @return Callable<WebSocketEvent<StateEvent> instance.
+   *  @return Callable<WebSocketEvent<StateUpdateEvent> instance.
    */
-  fun getVatomStateEvents(): Callable<WebSocketEvent<StateEvent>>
+  fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>>
 
   /**
-   *  Provides a stream of inventory update events. This only indicates if a vAtom
-   *  has been added or removed from a specific inventory
+   *  Provides a stream of inventory update events. Receiving this event indicates
+   *  that a vAtom has been either added or removed from the user's inventory.
    *
    *  @return Callable<WebSocketEvent<InventoryEvent> instance
    */

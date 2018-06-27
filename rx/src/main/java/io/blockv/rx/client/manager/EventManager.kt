@@ -12,7 +12,7 @@ package io.blockv.rx.client.manager
 
 import io.blockv.core.model.ActivityEvent
 import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateEvent
+import io.blockv.core.model.StateUpdateEvent
 import io.blockv.core.model.WebSocketEvent
 import io.reactivex.Flowable
 import org.json.JSONObject
@@ -32,9 +32,9 @@ interface EventManager {
   /**
    *  Provides a stream of vAtom state update events.
    *
-   *  @return Flowable<WebSocketEvent<StateEvent>> instance.
+   *  @return Flowable<WebSocketEvent<StateUpdateEvent>> instance.
    */
-  fun getVatomStateEvents(): Flowable<WebSocketEvent<StateEvent>>
+  fun getVatomStateEvents(): Flowable<WebSocketEvent<StateUpdateEvent>>
 
   /**
    *  Provides a stream of inventory update events. This only indicates if a vAtom

@@ -6,6 +6,6 @@ class BlockvWsException(val error: Error,
                         val internalException: Exception?) : IOException("Web Socket Error: " + error.name) {
   enum class Error {
     CONNECTION_FAILED,
-    CONNECTION_DISCONNECT
+    CONNECTION_DISCONNECTED
   }
 }

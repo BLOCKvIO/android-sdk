@@ -15,7 +15,7 @@ import io.blockv.core.internal.net.websocket.Websocket
 import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.model.ActivityEvent
 import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateEvent
+import io.blockv.core.model.StateUpdateEvent
 import io.blockv.core.model.WebSocketEvent
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -30,7 +30,7 @@ class EventManagerImpl(val webSocket: WebsocketImpl,
   private var eventFlowable: Flowable<WebSocketEvent<JSONObject>>? = null
 
   companion object {
-    val NULL_STATE_EVENT = WebSocketEvent<StateEvent>("", "", null)
+    val NULL_STATE_EVENT = WebSocketEvent<StateUpdateEvent>("", "", null)
     val NULL_INVENTORY_EVENT = WebSocketEvent<InventoryEvent>("", "", null)
     val NULL_ACTIVITY_EVENT = WebSocketEvent<ActivityEvent>("", "", null)
   }
@@ -43,14 +43,14 @@ class EventManagerImpl(val webSocket: WebsocketImpl,
     return eventFlowable!!
   }
 
-  override fun getVatomStateEvents(): Flowable<WebSocketEvent<StateEvent>> {
+  override fun getVatomStateEvents(): Flowable<WebSocketEvent<StateUpdateEvent>> {
     return getEvents()
       .observeOn(Schedulers.computation())
       .filter { event -> event.type == WebSocketEvent.MessageType.STATE_UPDATE }
       .map { event ->
         var stateEvent = NULL_STATE_EVENT
         if (event.payload != null) {
-          val payload = jsonModule.stateEventDeserializer.deserialize(event.payload!!)
+          val payload = jsonModule.stateUpdateEventDeserializer.deserialize(event.payload!!)
           if (payload != null) {
             stateEvent = WebSocketEvent(
               event.messageType,

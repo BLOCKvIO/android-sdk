@@ -11,7 +11,6 @@
 package io.blockv.core.internal.json
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.internal.json.deserializer.WebsocketEventDeserializer
 import io.blockv.core.internal.json.serializer.Serializer
 import io.blockv.core.model.*
 import org.json.JSONObject
@@ -33,7 +32,7 @@ class JsonModule(
   val publicUserDeserializer: Deserializer<PublicUser?>,
   val geoDiscoverGroupDeserializer: Deserializer<GeoGroup?>,
   val inventoryEventDeserializer: Deserializer<InventoryEvent?>,
-  val stateEventDeserializer: Deserializer<StateEvent?>,
+  val stateUpdateEventDeserializer: Deserializer<StateUpdateEvent?>,
   val activityEventDeserializer: Deserializer<ActivityEvent?>,
   val websocketEventDeserializer: Deserializer<WebSocketEvent<JSONObject>?>
 

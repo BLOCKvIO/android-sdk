@@ -41,7 +41,7 @@ class WebsocketImpl(val preferences: Preferences,
                                   serverCloseFrame: WebSocketFrame,
                                   clientCloseFrame: WebSocketFrame,
                                   closedByServer: Boolean) {
-        listener.onError(BlockvWsException(BlockvWsException.Error.CONNECTION_DISCONNECT, null))
+        listener.onError(BlockvWsException(BlockvWsException.Error.CONNECTION_DISCONNECTED, null))
         websocket.removeListener(this)
       }
     }
