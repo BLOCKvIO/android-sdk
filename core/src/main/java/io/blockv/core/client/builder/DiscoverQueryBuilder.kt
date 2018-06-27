@@ -67,6 +67,10 @@ open class DiscoverQueryBuilder {
     return this
   }
 
+  fun setScopeToOwner(): DiscoverQueryBuilder {
+    json.put("scope", JSONObject().put("key", "vAtom::vAtomType.owner").put("value", "\$currentuser"))
+  }
+
   fun addFilter(field: Field, filterOperation: FilterOperation, value: String, combineOperation: CombineOperation): DiscoverQueryBuilder {
 
     this.addFilter(field.value, filterOperation.operator, value, combineOperation.operator)
