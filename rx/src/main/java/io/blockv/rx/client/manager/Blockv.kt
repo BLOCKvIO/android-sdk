@@ -11,6 +11,7 @@
 package io.blockv.rx.client.manager
 
 import android.content.Context
+import io.blockv.core.client.manager.ResourceManager
 import io.blockv.core.client.manager.ResourceManagerImpl
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.json.deserializer.*
@@ -36,6 +37,7 @@ class Blockv {
   val userManager: UserManager
   val vatomManager: VatomManager
   val eventManager: EventManager
+  val resourceManager: ResourceManager
 
   constructor(context: Context, appId: String) {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
@@ -69,7 +71,7 @@ class Blockv {
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
       appId)
-    val resourceManager = ResourceManagerImpl(preferences)
+    this.resourceManager = ResourceManagerImpl(preferences)
     val authenticator = AuthenticatorImpl(preferences, jsonModule)
     this.netModule = NetModule(
       authenticator,
@@ -113,7 +115,7 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    val resourceManager = ResourceManagerImpl(preferences)
+    this.resourceManager = ResourceManagerImpl(preferences)
     val authenticator = AuthenticatorImpl(preferences, jsonModule)
     this.netModule = NetModule(authenticator, preferences, jsonModule)
     this.userManager = UserManagerImpl(
@@ -131,7 +133,8 @@ class Blockv {
               netModule: NetModule,
               userManager: UserManager,
               vatomManager: VatomManager,
-              eventManager: EventManager) {
+              eventManager: EventManager,
+              resourceManager: ResourceManager) {
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
@@ -143,6 +146,7 @@ class Blockv {
     this.userManager = userManager
     this.vatomManager = vatomManager
     this.eventManager = eventManager
+    this.resourceManager = resourceManager
   }
 
 }

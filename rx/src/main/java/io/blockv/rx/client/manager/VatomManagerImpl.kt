@@ -14,9 +14,10 @@ import io.blockv.core.client.manager.VatomManager.GeoFilter
 import io.blockv.core.client.manager.VatomManager.TokenType
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
+import io.blockv.core.client.manager.VatomManager.Action
+import io.blockv.core.model.DiscoverGroup
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
-import io.blockv.core.client.manager.VatomManager.Action
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -115,9 +116,8 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
   override fun pickupVatom(id: String): Completable = preformAction(Action.PICKUP, id, null).toCompletable()
 
-  override fun discover(query: JSONObject): Single<Group> = Single.fromCallable {
-    val group: Group = api.discover(query).payload
-    group
+  override fun discover(query: JSONObject): Single<DiscoverGroup> = Single.fromCallable {
+    api.discover(query).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())

@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.model.Action
+import io.blockv.core.model.DiscoverGroup
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
@@ -53,7 +54,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     api.updateVatom(payload).payload
   })
 
-  override fun discover(query: JSONObject): Callable<Group> = Callable.single({
+  override fun discover(query: JSONObject): Callable<DiscoverGroup> = Callable.single({
     api.discover(query).payload
   })
 
@@ -78,8 +79,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
   override fun preformAction(action: VatomManager.Action,
                              id: String,
-                             payload: JSONObject?): Callable<JSONObject?> =
-    preformAction(action.action(), id, payload)
+                             payload: JSONObject?): Callable<JSONObject?> = preformAction(action.action(), id, payload)
 
   override fun acquireVatom(id: String): Callable<JSONObject?> = preformAction(VatomManager.Action.ACQUIRE, id, null)
 
