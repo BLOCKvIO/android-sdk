@@ -14,6 +14,11 @@ package io.blockv.core.client.builder
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * Builds discover query request payload.
+ * This object simplifies the construction of an otherwise involved discover
+ * query payload.
+ */
 open class DiscoverQueryBuilder {
 
   enum class Scope(val value: String) {
@@ -62,21 +67,62 @@ open class DiscoverQueryBuilder {
 
   private val json: JSONObject = JSONObject()
 
+  /**
+   * Sets the scope of the search query.
+   *
+   * A scope must always be supplied. Scopes are defined using a `key` and `value`.
+   * The key specifies the property of the vAtom to search. The value is the search term.
+   *
+   * @param scope is the search field.
+   * @param value is the lookup.
+   *
+   * @return DiscoverQueryBuilder.
+   */
   fun setScope(scope: Scope, value: String): DiscoverQueryBuilder {
     json.put("scope", JSONObject().put("key", scope.value).put("value", value))
     return this
   }
 
+  /**
+   * Sets the scope of the search query to the current user.
+   *
+   * @return DiscoverQueryBuilder.
+   */
   fun setScopeToOwner(): DiscoverQueryBuilder {
     json.put("scope", JSONObject().put("key", "vAtom::vAtomType.owner").put("value", "\$currentuser"))
+    return this
   }
 
+  /**
+   * Adds a defined filter element to the query.
+   *
+   * Filter elements, similar to scopes, are defined using a `field` and `value`. However, filters
+   * offer more flexibility because they allow a *filter operator* to be supplied, e.g. `GREATER_THAN` which
+   * filters those vAtoms whose value is greater than the supplied `value`. The combine operator is
+   * applied *between* filter elements.
+   *
+   * @param field is the property to search.
+   * @param filterOperation is the operator to apply between the `field` and `value` items.
+   * @param value is for lookup
+   * @param combineOperation controls the boolean operator applied between this element and the other filter elements
+   * @return DiscoverQueryBuilder.
+   */
   fun addFilter(field: Field, filterOperation: FilterOperation, value: String, combineOperation: CombineOperation): DiscoverQueryBuilder {
-
     this.addFilter(field.value, filterOperation.operator, value, combineOperation.operator)
     return this
   }
 
+  /**
+   * Adds a custom filter element to the query.
+   *
+   * This method provides you with full control over the contents of the filter element.
+   *
+   * @param field is the property to search.
+   * @param filterOperation is the operator to apply between the `field` and `value` items.
+   * @param value is for lookup
+   * @param combineOperation controls the boolean operator applied between this element and the other filter elements
+   * @return DiscoverQueryBuilder.
+   */
   fun addFilter(field: String, filterOperation: String, value: String, combineOperation: String): DiscoverQueryBuilder {
 
     if (!json.has("filters")) {
@@ -100,6 +146,14 @@ open class DiscoverQueryBuilder {
     return this
   }
 
+  /**
+   * Sets the return type.
+   *
+   * @param type controls the response payload of the query
+   *             - `*` returns vAtoms.
+   *             - `count` returns only the numerical count of the query and an empty vAtom array.
+   * @return DiscoverQueryBuilder.
+   */
   fun setReturn(type: ResultType) {
     json.put("return",
       JSONObject()
@@ -107,6 +161,11 @@ open class DiscoverQueryBuilder {
         .put("fields", JSONArray()))
   }
 
+  /**
+   * Returns the Json discover query.
+   *
+   * @return JSONObject.
+   */
   fun build(): JSONObject {
     if (!json.has("return")) {
       json.put("return",
@@ -114,7 +173,6 @@ open class DiscoverQueryBuilder {
           .put("type", ResultType.PAYLOAD)
           .put("fields", JSONArray()))
     }
-
     return json
   }
 }
