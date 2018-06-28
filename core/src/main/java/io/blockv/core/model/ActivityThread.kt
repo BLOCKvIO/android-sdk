@@ -12,7 +12,7 @@ package io.blockv.core.model
 
 class ActivityThread(val id: String,
                      val whenModified: Long,
-                     val lastActivityMessage: ActivityMessage,
+                     val lastMessage: ActivityMessage,
                      val lastMessageUser: UserInfo) {
 
   class UserInfo(val name: String, val avatarUri: String) {
@@ -28,7 +28,7 @@ class ActivityThread(val id: String,
     return "ActivityThread{" +
       "id='" + id + '\'' +
       ", whenModified='" + whenModified + '\'' +
-      ", lastActivityMessage='" + lastActivityMessage + '\'' +
+      ", lastMessage='" + lastMessage + '\'' +
       ", lastMessageUser='" + lastMessageUser + '\'' +
       "}"
   }
