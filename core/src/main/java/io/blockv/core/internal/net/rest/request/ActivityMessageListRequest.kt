@@ -1,8 +1,4 @@
-package io.blockv.core.internal.net.rest.request
-
-import org.json.JSONObject
-
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -12,6 +8,10 @@ import org.json.JSONObject
  *  under the License.
  *
  */
+package io.blockv.core.internal.net.rest.request
+
+import org.json.JSONObject
+
 class ActivityMessageListRequest(val id: String, val cursor: String, val count: Int) {
   fun toJson(): JSONObject {
     val out = JSONObject()
