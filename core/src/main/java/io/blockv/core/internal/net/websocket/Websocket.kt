@@ -10,7 +10,7 @@
  */
 package io.blockv.core.internal.net.websocket
 
-import io.blockv.core.model.event.WebSocketEvent
+import io.blockv.core.model.WebSocketEvent
 import org.json.JSONObject
 
 interface Websocket {

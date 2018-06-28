@@ -13,17 +13,16 @@ package io.blockv.core.internal.json
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.internal.json.serializer.Serializer
 import io.blockv.core.model.*
-import io.blockv.core.model.activity.ActivityMessageList
-import io.blockv.core.model.activity.ActivityThreadList
-import io.blockv.core.model.event.ActivityEvent
-import io.blockv.core.model.event.InventoryEvent
-import io.blockv.core.model.event.StateUpdateEvent
-import io.blockv.core.model.event.WebSocketEvent
-import io.blockv.core.model.resource.AssetProvider
-import io.blockv.core.model.user.PublicUser
-import io.blockv.core.model.user.Token
-import io.blockv.core.model.user.User
-import io.blockv.core.model.vatom.*
+import io.blockv.core.model.ActivityMessageList
+import io.blockv.core.model.ActivityThreadList
+import io.blockv.core.model.ActivityEvent
+import io.blockv.core.model.InventoryEvent
+import io.blockv.core.model.StateUpdateEvent
+import io.blockv.core.model.WebSocketEvent
+import io.blockv.core.model.AssetProvider
+import io.blockv.core.model.PublicUser
+import io.blockv.core.model.Token
+import io.blockv.core.model.User
 import org.json.JSONObject
 
 class JsonModule(

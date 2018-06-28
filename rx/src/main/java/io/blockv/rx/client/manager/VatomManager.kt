@@ -13,10 +13,10 @@ package io.blockv.rx.client.manager
 import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.client.manager.VatomManager
 import io.blockv.core.client.manager.VatomManager.GeoFilter
-import io.blockv.core.model.vatom.Action
-import io.blockv.core.model.vatom.DiscoverGroup
-import io.blockv.core.model.vatom.GeoGroup
-import io.blockv.core.model.vatom.Group
+import io.blockv.core.model.Action
+import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.GeoGroup
+import io.blockv.core.model.Group
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.json.JSONObject

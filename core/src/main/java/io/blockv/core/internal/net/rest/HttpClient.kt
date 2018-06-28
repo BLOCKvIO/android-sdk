@@ -16,7 +16,7 @@ import io.blockv.core.internal.net.rest.auth.Authenticator
 import io.blockv.core.internal.net.rest.exception.BlockvException
 import io.blockv.core.internal.net.rest.exception.ErrorMapper
 import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.resource.AssetProvider
+import io.blockv.core.model.AssetProvider
 import io.blockv.core.model.Environment
 import io.blockv.core.model.Error
 import io.blockv.core.model.Jwt

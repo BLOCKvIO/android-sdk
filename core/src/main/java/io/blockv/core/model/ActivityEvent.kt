@@ -8,9 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.event
-
-import io.blockv.core.model.vatom.Resource
+package io.blockv.core.model
 
 class ActivityEvent(val eventId: Long,
                     val targetUserId: String,

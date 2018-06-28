@@ -19,9 +19,9 @@ import io.blockv.core.internal.net.rest.auth.JwtDecoder
 import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.user.PublicUser
-import io.blockv.core.model.user.Token
-import io.blockv.core.model.user.User
+import io.blockv.core.model.PublicUser
+import io.blockv.core.model.Token
+import io.blockv.core.model.User
 import io.blockv.rx.client.manager.UserManager.Companion.NULL_PUBLIC_USER
 import io.blockv.rx.client.manager.UserManager.Companion.NULL_USER
 import io.reactivex.Completable

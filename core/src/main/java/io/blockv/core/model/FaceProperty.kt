@@ -8,26 +8,21 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-class Face(var id: String,
-           var templateId: String,
-           var createdBy: String?,
-           var whenCreated: String?,
-           var whenModified: String?,
-           var property: FaceProperty) {
+class FaceProperty(var displayUrl: String,
+                   var viewMode: String,
+                   var platform: String,
+                   var resources: List<String>) {
 
 
   override fun toString(): String {
-    return "Face{" +
-      "id='" + id + '\'' +
-      ", templateId='" + templateId + '\'' +
-      ", createdBy='" + createdBy + '\'' +
-      ", whenCreated='" + whenCreated + '\'' +
-      ", whenModified='" + whenModified + '\'' +
-      "," + property+ '\'' +
-    "}"
+    return "FaceProperty{" +
+      "displayUrl='" + displayUrl + '\'' +
+      ", viewMode='" + viewMode + '\'' +
+      ", platform='" + platform + '\'' +
+      ", resources='" + resources + '\'' +
+      "}"
   }
-
-
 }
+

@@ -13,7 +13,7 @@ package io.blockv.core.internal.json.deserializer.vatom
 
 import android.util.Log
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.vatom.GeoGroup
+import io.blockv.core.model.GeoGroup
 
 class GeoGroupDeserializer : Deserializer<GeoGroup?> {
 

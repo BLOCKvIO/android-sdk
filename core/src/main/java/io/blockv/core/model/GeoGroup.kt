@@ -8,15 +8,6 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-import io.blockv.core.model.vatom.Pricing
-
-class Commerce(var pricing: Pricing?) {
-
-  override fun toString(): String {
-    return "Commerce{" +
-      "pricing='" + pricing + '\'' +
-      "}"
-  }
-}
+class GeoGroup(val geoHash:String, val longitude: Double, val latitude: Double, val count: Int)

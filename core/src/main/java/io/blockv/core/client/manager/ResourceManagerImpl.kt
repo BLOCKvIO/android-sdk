@@ -12,7 +12,7 @@ package io.blockv.core.client.manager
 
 import android.net.Uri
 import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.resource.AssetProvider
+import io.blockv.core.model.AssetProvider
 
 class ResourceManagerImpl(private val preferences: Preferences) : ResourceManager {
 

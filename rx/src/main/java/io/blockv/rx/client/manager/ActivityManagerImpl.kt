@@ -14,8 +14,8 @@ import io.blockv.core.internal.net.rest.api.ActivityApi
 import io.blockv.core.internal.net.rest.request.ActivityMessageListRequest
 import io.blockv.core.internal.net.rest.request.ActivityThreadListRequest
 import io.blockv.core.internal.net.rest.request.SendMessageRequest
-import io.blockv.core.model.activity.ActivityMessageList
-import io.blockv.core.model.activity.ActivityThreadList
+import io.blockv.core.model.ActivityMessageList
+import io.blockv.core.model.ActivityThreadList
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers

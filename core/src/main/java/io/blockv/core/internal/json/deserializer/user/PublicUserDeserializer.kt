@@ -13,7 +13,7 @@ package io.blockv.core.internal.json.deserializer.user
 
 import android.util.Log
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.user.PublicUser
+import io.blockv.core.model.PublicUser
 
 class PublicUserDeserializer : Deserializer<PublicUser?> {
 

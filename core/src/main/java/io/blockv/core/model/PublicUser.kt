@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.user
+package io.blockv.core.model
 
 open class PublicUser {
 

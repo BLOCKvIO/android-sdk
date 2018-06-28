@@ -8,15 +8,26 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.activity
+package io.blockv.core.model
 
-class ActivityThreadList(val cursor: String, val threads: List<ActivityThread>)
-{
+class Face(var id: String,
+           var templateId: String,
+           var createdBy: String?,
+           var whenCreated: String?,
+           var whenModified: String?,
+           var property: FaceProperty) {
+
+
   override fun toString(): String {
-    return "ActivityThreadList{" +
-      "cursor='" + cursor + '\'' +
-      ", threads='" + threads + '\'' +
-      "}"
+    return "Face{" +
+      "id='" + id + '\'' +
+      ", templateId='" + templateId + '\'' +
+      ", createdBy='" + createdBy + '\'' +
+      ", whenCreated='" + whenCreated + '\'' +
+      ", whenModified='" + whenModified + '\'' +
+      "," + property+ '\'' +
+    "}"
   }
+
 
 }

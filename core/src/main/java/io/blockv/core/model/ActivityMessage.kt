@@ -8,9 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.activity
-
-import io.blockv.core.model.vatom.Resource
+package io.blockv.core.model
 
 class ActivityMessage(val id: Long,
                       val targetUserId: String,

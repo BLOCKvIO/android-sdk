@@ -12,8 +12,8 @@ package io.blockv.core.internal.json.deserializer.vatom
 
 import android.util.Log
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.vatom.Face
-import io.blockv.core.model.vatom.FaceProperty
+import io.blockv.core.model.Face
+import io.blockv.core.model.FaceProperty
 import org.json.JSONObject
 
 class FaceDeserializer : Deserializer<Face> {

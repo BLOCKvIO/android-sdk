@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.event
+package io.blockv.core.model
 
 class WebSocketEvent<out T>(val messageType: String,
                             val userId: String,

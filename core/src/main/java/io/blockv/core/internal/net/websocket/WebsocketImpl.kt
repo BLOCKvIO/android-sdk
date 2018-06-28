@@ -19,7 +19,7 @@ import com.neovisionaries.ws.client.WebSocketFrame
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.net.rest.auth.Authenticator
 import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.event.WebSocketEvent
+import io.blockv.core.model.WebSocketEvent
 import org.json.JSONObject
 
 class WebsocketImpl(val preferences: Preferences,

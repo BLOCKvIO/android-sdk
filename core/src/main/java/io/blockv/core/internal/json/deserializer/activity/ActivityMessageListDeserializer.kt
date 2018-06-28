@@ -11,8 +11,8 @@
 package io.blockv.core.internal.json.deserializer.activity
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.activity.ActivityMessage
-import io.blockv.core.model.activity.ActivityMessageList
+import io.blockv.core.model.ActivityMessage
+import io.blockv.core.model.ActivityMessageList
 import org.json.JSONArray
 import org.json.JSONObject
 

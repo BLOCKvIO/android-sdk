@@ -8,6 +8,9 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-class GeoGroup(val geoHash:String, val longitude: Double, val latitude: Double, val count: Int)
+class AssetProvider(var name: String,
+                    var uri: String,
+                    var type: String,
+                    var descriptor: Map<String, String?>)

@@ -13,9 +13,9 @@ package io.blockv.core.client.manager
 
 import android.graphics.Bitmap
 import io.blockv.core.model.Jwt
-import io.blockv.core.model.user.PublicUser
-import io.blockv.core.model.user.Token
-import io.blockv.core.model.user.User
+import io.blockv.core.model.PublicUser
+import io.blockv.core.model.Token
+import io.blockv.core.model.User
 import io.blockv.core.util.Callable
 
 /**

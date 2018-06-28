@@ -15,9 +15,9 @@ import io.blockv.core.client.manager.VatomManager.TokenType
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.client.manager.VatomManager.Action
-import io.blockv.core.model.vatom.DiscoverGroup
-import io.blockv.core.model.vatom.GeoGroup
-import io.blockv.core.model.vatom.Group
+import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.GeoGroup
+import io.blockv.core.model.Group
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -76,7 +76,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getVatomActions(templateId: String): Single<List<io.blockv.core.model.vatom.Action>> = Single.fromCallable {
+  override fun getVatomActions(templateId: String): Single<List<io.blockv.core.model.Action>> = Single.fromCallable {
     api.getVatomActions(templateId).payload
   }
     .subscribeOn(Schedulers.io())

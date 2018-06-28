@@ -8,33 +8,39 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-import org.json.JSONObject
+class ActivityThread(val id: String,
+                     val whenModified: Long,
+                     val lastActivityMessage: ActivityMessage,
+                     val lastMessageUser: UserInfo) {
 
-class Vatom(val id: String,
-            val whenCreated: String,
-            val whenModified: String,
-            val property: VatomProperty,
-            var private: JSONObject?) {
+  class UserInfo(val name: String, val avatarUri: String) {
+    override fun toString(): String {
+      return "UserInfo{" +
+        "name='" + name + '\'' +
+        ", avatarUri='" + avatarUri + '\'' +
+        "}"
+    }
+  }
 
   override fun toString(): String {
-    return "Vatom{" +
+    return "ActivityThread{" +
       "id='" + id + '\'' +
-      ",whenCreated='" + whenCreated + '\'' +
       ", whenModified='" + whenModified + '\'' +
-      "," + property + '\'' +
-      ", private='" + private + '\'' +
+      ", lastActivityMessage='" + lastActivityMessage + '\'' +
+      ", lastMessageUser='" + lastMessageUser + '\'' +
       "}"
   }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other !is Vatom) return false
-    return id == other.id
+    if (other !is ActivityThread) return false
+    return id == id
   }
 
   override fun hashCode(): Int {
     return id.hashCode()
   }
+
 }

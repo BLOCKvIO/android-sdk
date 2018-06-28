@@ -8,18 +8,6 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-class ChildPolicy(var count: Int?,
-                  var templateVariation: String?,
-                  var creationPolicy: CreationPolicy?) {
-
-  override fun toString(): String {
-    return "ChildPolicy{" +
-      "count='" + count + '\'' +
-      ", templateVariation='" + templateVariation + '\'' +
-      "," +creationPolicy + '\'' +
-      "}"
-  }
-
-}
+class DiscoverGroup(val count: Int, vatoms: List<Vatom>, faces: List<Face>, actions: List<Action>) : Group(vatoms, faces, actions)

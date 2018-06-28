@@ -8,6 +8,15 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-open class Group(val vatoms: List<Vatom>, val faces: List<Face>, val actions: List<Action>)
+class ActivityThreadList(val cursor: String, val threads: List<ActivityThread>)
+{
+  override fun toString(): String {
+    return "ActivityThreadList{" +
+      "cursor='" + cursor + '\'' +
+      ", threads='" + threads + '\'' +
+      "}"
+  }
+
+}

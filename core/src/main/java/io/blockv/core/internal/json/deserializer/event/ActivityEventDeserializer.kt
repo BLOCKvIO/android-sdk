@@ -11,8 +11,8 @@
 package io.blockv.core.internal.json.deserializer.event
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.event.ActivityEvent
-import io.blockv.core.model.vatom.Resource
+import io.blockv.core.model.ActivityEvent
+import io.blockv.core.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
 

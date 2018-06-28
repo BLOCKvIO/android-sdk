@@ -11,7 +11,7 @@
 package io.blockv.core.internal.json.deserializer.resource
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.resource.AssetProvider
+import io.blockv.core.model.AssetProvider
 import org.json.JSONObject
 
 class AssetProviderDeserialzier : Deserializer<AssetProvider> {

@@ -8,6 +8,6 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-class Action(val templateId:String,val name:String)
+open class Group(val vatoms: List<Vatom>, val faces: List<Face>, val actions: List<Action>)

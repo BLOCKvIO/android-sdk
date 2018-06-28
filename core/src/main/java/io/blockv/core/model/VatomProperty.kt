@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
 class VatomProperty {
 

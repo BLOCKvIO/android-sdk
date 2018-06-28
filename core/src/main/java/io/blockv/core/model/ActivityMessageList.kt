@@ -8,16 +8,15 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-class VatomVisibility(var type: String,
-                      var value: String) {
-
+class ActivityMessageList(val cursor:String,val messages:List<ActivityMessage>)
+{
   override fun toString(): String {
-    return "VatomVisibility{" +
-      "type='" + type + '\'' +
-      ", value='" + value + '\'' +
-      '}'
+    return "ActivityMessageList{" +
+      "cursor='" + cursor + '\'' +
+      ", messages='" + messages + '\'' +
+      "}"
   }
 
 }

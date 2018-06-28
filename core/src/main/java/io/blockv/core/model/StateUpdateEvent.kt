@@ -8,31 +8,27 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.event
+package io.blockv.core.model
 
-class InventoryEvent(val eventId: String,
-                     val operation: String,
-                     val vatomId: String,
-                     val newOwnerId: String,
-                     val oldOwnerId: String,
-                     val templateVariationId: String,
-                     val parentId: String) {
+import org.json.JSONObject
+
+class StateUpdateEvent(val eventId: String,
+                       val operation: String,
+                       val vatomId: String,
+                       val vatomProperties: JSONObject) {
 
   override fun toString(): String {
-    return "InventoryEvent{" +
+    return "StateUpdateEvent{" +
       "eventId='" + eventId + '\'' +
       ", operation='" + operation + '\'' +
       ", vatomId='" + vatomId + '\'' +
-      ", newOwnerId='" + newOwnerId + '\'' +
-      ", oldOwnerId='" + oldOwnerId + '\'' +
-      ", templateVariationId='" + templateVariationId + '\'' +
-      ", parentId='" + parentId + '\'' +
+      ", vatomProperties='" + vatomProperties.toString() + '\'' +
       "}"
   }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other !is InventoryEvent) return false
+    if (other !is StateUpdateEvent) return false
     return eventId == other.eventId
   }
 

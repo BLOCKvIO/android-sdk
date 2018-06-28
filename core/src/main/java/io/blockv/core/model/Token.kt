@@ -8,14 +8,15 @@
  *  under the License.
  *
  */
+package io.blockv.core.model
 
-package io.blockv.core.client.manager
-
-import io.blockv.core.model.AssetProvider
-
-interface ResourceManager {
-
-  val assetProviders: List<AssetProvider>?
-
-  fun encodeUrl(url: String?): String?
-}
+class Token(var id:String,
+            var userId:String,
+            var appId:String,
+            var whenCreated:String,
+            var whenModified:String,
+            var tokenType: String,
+            var token: String,
+            var isConfirmed: Boolean,
+            var isPrimary: Boolean,
+            var verifyCodeExpires:String)

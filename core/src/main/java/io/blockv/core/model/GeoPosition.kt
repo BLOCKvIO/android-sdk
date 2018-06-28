@@ -8,9 +8,15 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.resource
+package io.blockv.core.model
 
-class AssetProvider(var name: String,
-                    var uri: String,
-                    var type: String,
-                    var descriptor: Map<String, String?>)
+class GeoPosition(var type:String?,var reqType:String?,var coordinates:List<Float>?) {
+
+  override fun toString(): String {
+    return "GeoPos{" +
+      "type='" + type + '\'' +
+      ", reqType='" + reqType + '\'' +
+      ", coordinates=" + coordinates +
+      '}'
+  }
+}

@@ -8,31 +8,33 @@
  *  under the License.
  *
  */
-package io.blockv.core.model.vatom
+package io.blockv.core.model
 
-class Resource(var name: String,
-               var type: String,
-               var url: String) {
+import org.json.JSONObject
+
+class Vatom(val id: String,
+            val whenCreated: String,
+            val whenModified: String,
+            val property: VatomProperty,
+            var private: JSONObject?) {
 
   override fun toString(): String {
-    return "Resource{" +
-      "name='" + name + '\'' +
-      ", type='" + type + '\'' +
-      ", url='" + url + '\'' +
-      '}'
+    return "Vatom{" +
+      "id='" + id + '\'' +
+      ",whenCreated='" + whenCreated + '\'' +
+      ", whenModified='" + whenModified + '\'' +
+      "," + property + '\'' +
+      ", private='" + private + '\'' +
+      "}"
   }
 
-  override fun equals(o: Any?): Boolean {
-    if (this === o) return true
-    if (o !is Resource) return false
-    val resource = o
-    if (name != resource.name) return false
-    if (type != resource.type) return false
-    return url == resource.url
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is Vatom) return false
+    return id == other.id
   }
 
   override fun hashCode(): Int {
-    return (name+type+url).hashCode()
+    return id.hashCode()
   }
-
 }

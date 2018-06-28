@@ -35,10 +35,10 @@ import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.*
-import io.blockv.core.model.activity.ActivityMessage
-import io.blockv.core.model.vatom.Action
-import io.blockv.core.model.vatom.Face
-import io.blockv.core.model.vatom.Vatom
+import io.blockv.core.model.ActivityMessage
+import io.blockv.core.model.Action
+import io.blockv.core.model.Face
+import io.blockv.core.model.Vatom
 
 class Blockv {
 
