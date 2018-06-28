@@ -15,5 +15,32 @@ class ActivityThread(val id: String,
                      val lastActivityMessage: ActivityMessage,
                      val lastMessageUser: UserInfo) {
 
-  class UserInfo(val name:String, val avatarUri:String)
+  class UserInfo(val name: String, val avatarUri: String) {
+    override fun toString(): String {
+      return "UserInfo{" +
+        "name='" + name + '\'' +
+        ", avatarUri='" + avatarUri + '\'' +
+        "}"
+    }
+  }
+
+  override fun toString(): String {
+    return "ActivityThread{" +
+      "id='" + id + '\'' +
+      ", whenModified='" + whenModified + '\'' +
+      ", lastActivityMessage='" + lastActivityMessage + '\'' +
+      ", lastMessageUser='" + lastMessageUser + '\'' +
+      "}"
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is ActivityThread) return false
+    return id == id
+  }
+
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+
 }

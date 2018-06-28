@@ -11,12 +11,38 @@
 package io.blockv.core.model
 
 class ActivityMessage(val id: Long,
-                      val userId: String,
+                      val targetUserId: String,
                       val vatomIds: List<String>,
                       val templateVariationIds: List<String>,
                       val message: String,
-                      val action: String,
+                      val actionName: String,
                       val whenCreated: String,
-                      val triggeredBy: String,
+                      val triggerUserId: String,
                       val resources: List<Resource>,
-                      val geoPosition: List<Double>)
+                      val geoPosition: List<Double>) {
+
+  private val hash = toString().hashCode()
+
+  override fun toString(): String {
+    return "ActivityMessage{" +
+      "id='" + id + '\'' +
+      ", targetUserId='" + targetUserId + '\'' +
+      ", triggerUserId='" + triggerUserId + '\'' +
+      ", vatomIds='" + vatomIds + '\'' +
+      ", resources='" + resources + '\'' +
+      ", message='" + message + '\'' +
+      ", actionName='" + actionName + '\'' +
+      ", whenCreated='" + whenCreated + '\'' +
+      "}"
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is ActivityMessage) return false
+    return hashCode() == other.hashCode()
+  }
+
+  override fun hashCode(): Int {
+    return hash
+  }
+}
