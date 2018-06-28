@@ -10,32 +10,32 @@ import io.blockv.core.util.Callable
 
 class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
 
-  override fun getThreadList(cursor: String?, count: Int?): Callable<ActivityThreadList> = Callable.single {
+  override fun getThreadList(cursor: String, count: Int): Callable<ActivityThreadList> = Callable.single {
     api.getThreadList(ActivityThreadListRequest(cursor, count)).payload
   }
     .runOn(Callable.Scheduler.IO)
     .returnOn(Callable.Scheduler.MAIN)
 
-  override fun getThreadList(cursor: String?): Callable<ActivityThreadList> {
-    return getThreadList(cursor, null)
+  override fun getThreadList(cursor: String): Callable<ActivityThreadList> {
+    return getThreadList(cursor, 0)
   }
 
   override fun getThreadList(): Callable<ActivityThreadList> {
-    return getThreadList(null)
+    return getThreadList("")
   }
 
-  override fun getThreadMessages(id: String, cursor: String?, count: Int?): Callable<ActivityMessageList> = Callable.single {
+  override fun getThreadMessages(id: String, cursor: String, count: Int): Callable<ActivityMessageList> = Callable.single {
     api.getThreadMessages(ActivityMessageListRequest(id, cursor, count)).payload
   }
     .runOn(Callable.Scheduler.IO)
     .returnOn(Callable.Scheduler.MAIN)
 
-  override fun getThreadMessages(id: String, cursor: String?): Callable<ActivityMessageList> {
-    return getThreadMessages(id, cursor, null)
+  override fun getThreadMessages(id: String, cursor: String): Callable<ActivityMessageList> {
+    return getThreadMessages(id, cursor, 0)
   }
 
   override fun getThreadMessages(id: String): Callable<ActivityMessageList> {
-    return getThreadMessages(id, null)
+    return getThreadMessages(id, "")
   }
 
   override fun sendMessage(userId: String, message: String): Callable<Void?> = Callable.single {

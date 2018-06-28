@@ -12,32 +12,32 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
-  override fun getThreadList(cursor: String?, count: Int?): Single<ActivityThreadList> = Single.fromCallable {
+  override fun getThreadList(cursor: String, count: Int): Single<ActivityThreadList> = Single.fromCallable {
     api.getThreadList(ActivityThreadListRequest(cursor, count)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getThreadList(cursor: String?): Single<ActivityThreadList> {
-    return getThreadList(cursor, null)
+  override fun getThreadList(cursor: String): Single<ActivityThreadList> {
+    return getThreadList(cursor, 0)
   }
 
   override fun getThreadList(): Single<ActivityThreadList> {
-    return getThreadList(null)
+    return getThreadList("")
   }
 
-  override fun getThreadMessages(id: String, cursor: String?, count: Int?): Single<ActivityMessageList> = Single.fromCallable {
+  override fun getThreadMessages(id: String, cursor: String, count: Int): Single<ActivityMessageList> = Single.fromCallable {
     api.getThreadMessages(ActivityMessageListRequest(id, cursor, count)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getThreadMessages(id: String, cursor: String?): Single<ActivityMessageList> {
-    return getThreadMessages(id, cursor, null)
+  override fun getThreadMessages(id: String, cursor: String): Single<ActivityMessageList> {
+    return getThreadMessages(id, cursor, 0)
   }
 
   override fun getThreadMessages(id: String): Single<ActivityMessageList> {
-    return getThreadMessages(id, null)
+    return getThreadMessages(id, "")
   }
 
   override fun sendMessage(userId: String, message: String): Completable = Completable.fromCallable {
