@@ -8,21 +8,22 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.vatom
 
-import io.blockv.core.model.Environment
+import io.blockv.core.internal.json.deserializer.Deserializer
+import io.blockv.core.model.Action
 import org.json.JSONObject
 
-class EnvironmentDeserialzier : Deserializer<Environment> {
-  override fun deserialize(data: JSONObject): Environment? {
+class ActionDeserializer : Deserializer<Action> {
+  override fun deserialize(data: JSONObject): Action? {
     try {
-      return Environment(
-        data.getString("rest"),
-        data.getString("wss"),
-        data.getString("app_id"))
+      val name: String = data.getString("name")
+      val parts: List<String> = name.split("::Action::")
+      return Action(parts[0], parts[1])
     } catch (e: Exception) {
-      android.util.Log.w("EnvironmentDeserialzier", e.message)
+      android.util.Log.w("ActionDeserializer", e.message)
     }
     return null
   }
+
 }

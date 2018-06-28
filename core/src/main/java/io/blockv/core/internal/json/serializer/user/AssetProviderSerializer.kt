@@ -8,8 +8,9 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.serializer
+package io.blockv.core.internal.json.serializer.user
 
+import io.blockv.core.internal.json.serializer.Serializer
 import io.blockv.core.model.AssetProvider
 import org.json.JSONObject
 

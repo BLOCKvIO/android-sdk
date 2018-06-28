@@ -8,8 +8,9 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.vatom
 
+import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Action
 import io.blockv.core.model.Face
 import io.blockv.core.model.Group

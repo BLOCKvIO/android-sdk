@@ -8,18 +8,25 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.serializer
+package io.blockv.core.internal.json.deserializer.user
 
+import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Jwt
-import org.json.JSONObject
 
-class JwtSerializer : Serializer<Jwt?> {
-  override fun serialize(data: Jwt?): JSONObject {
-    val out = JSONObject()
-    if (data != null) {
-      out.put("token", data.token)
-      out.put("token_type", data.type)
+class JwtDeserializer : Deserializer<Jwt> {
+  override fun deserialize(data: org.json.JSONObject): Jwt? {
+    try {
+      val token: String = data.getString("token")
+      val tokenType: String = data.getString("token_type")
+
+      return Jwt(
+        token,
+        tokenType)
+
+    } catch (e: Exception) {
+      android.util.Log.w("JwtDeserializer", e.message)
     }
-    return out
+    return null
   }
+
 }

@@ -8,10 +8,11 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.user
 
 
 import android.util.Log
+import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.User
 
 class UserDeserializer : Deserializer<User?> {

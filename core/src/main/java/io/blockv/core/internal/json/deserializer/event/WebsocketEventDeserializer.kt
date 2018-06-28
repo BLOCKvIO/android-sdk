@@ -1,5 +1,6 @@
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.event
 
+import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.WebSocketEvent
 import org.json.JSONObject
 

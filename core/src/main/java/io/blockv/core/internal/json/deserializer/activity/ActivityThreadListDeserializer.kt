@@ -1,5 +1,6 @@
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.activity
 
+import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.ActivityThread
 import io.blockv.core.model.ActivityThreadList
 import org.json.JSONObject

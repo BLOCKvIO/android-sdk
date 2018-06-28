@@ -8,25 +8,22 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.user
 
+import io.blockv.core.internal.json.deserializer.Deserializer
+import io.blockv.core.model.Environment
+import org.json.JSONObject
 
-import android.util.Log
-import io.blockv.core.model.GeoGroup
-
-class GeoGroupDeserializer : Deserializer<GeoGroup?> {
-
-  override fun deserialize(data: org.json.JSONObject): GeoGroup? {
+class EnvironmentDeserialzier : Deserializer<Environment> {
+  override fun deserialize(data: JSONObject): Environment? {
     try {
-      val geoHash: String = data.optString("key","")
-      val lon: Double = data.optDouble("lon")
-      val lat: Double = data.optDouble("lat")
-      val count: Int = data.optInt("count")
-      return GeoGroup(geoHash, lon, lat, count)
+      return Environment(
+        data.getString("rest"),
+        data.getString("wss"),
+        data.getString("app_id"))
     } catch (e: Exception) {
-      Log.e("deserilizer", e.toString())
+      android.util.Log.w("EnvironmentDeserialzier", e.message)
     }
     return null
   }
-
 }

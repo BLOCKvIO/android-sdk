@@ -8,19 +8,24 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.vatom
 
-import io.blockv.core.model.Action
-import org.json.JSONObject
 
-class ActionDeserializer : Deserializer<Action> {
-  override fun deserialize(data: JSONObject): Action? {
+import android.util.Log
+import io.blockv.core.internal.json.deserializer.Deserializer
+import io.blockv.core.model.GeoGroup
+
+class GeoGroupDeserializer : Deserializer<GeoGroup?> {
+
+  override fun deserialize(data: org.json.JSONObject): GeoGroup? {
     try {
-      val name: String = data.getString("name")
-      val parts: List<String> = name.split("::Action::")
-      return Action(parts[0], parts[1])
+      val geoHash: String = data.optString("key","")
+      val lon: Double = data.optDouble("lon")
+      val lat: Double = data.optDouble("lat")
+      val count: Int = data.optInt("count")
+      return GeoGroup(geoHash, lon, lat, count)
     } catch (e: Exception) {
-      android.util.Log.w("ActionDeserializer", e.message)
+      Log.e("deserilizer", e.toString())
     }
     return null
   }
