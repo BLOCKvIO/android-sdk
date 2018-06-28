@@ -1,7 +1,3 @@
-package io.blockv.core.internal.net.rest.request
-
-import org.json.JSONObject
-
 /**
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
@@ -12,10 +8,14 @@ import org.json.JSONObject
  *  under the License.
  *
  */
-class ActivityThreadRequest(val cursor:String?,val count:Int) {
+package io.blockv.core.internal.net.rest.request
+
+import org.json.JSONObject
+
+class ActivityThreadListRequest(val cursor: String, val count: Int) {
   fun toJson(): JSONObject {
-    val out: JSONObject = JSONObject()
-    out.put("cursor", cursor?:"")
+    val out = JSONObject()
+    out.put("cursor", cursor)
     out.put("count", count)
     return out
   }
