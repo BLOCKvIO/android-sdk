@@ -1,7 +1,7 @@
 package io.blockv.core.client.manager
 
-import io.blockv.core.model.ActivityMessageList
-import io.blockv.core.model.ActivityThreadList
+import io.blockv.core.model.activity.ActivityMessageList
+import io.blockv.core.model.activity.ActivityThreadList
 import io.blockv.core.util.Callable
 
 /**

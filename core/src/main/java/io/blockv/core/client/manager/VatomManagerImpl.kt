@@ -12,10 +12,10 @@ package io.blockv.core.client.manager
 
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
-import io.blockv.core.model.Action
-import io.blockv.core.model.DiscoverGroup
-import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.vatom.Action
+import io.blockv.core.model.vatom.DiscoverGroup
+import io.blockv.core.model.vatom.GeoGroup
+import io.blockv.core.model.vatom.Group
 import io.blockv.core.util.Callable
 import org.json.JSONObject
 

@@ -14,7 +14,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import io.blockv.core.internal.json.JsonModule
-import io.blockv.core.model.AssetProvider
+import io.blockv.core.model.resource.AssetProvider
 import io.blockv.core.model.Environment
 import io.blockv.core.model.Jwt
 import org.json.JSONArray

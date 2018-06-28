@@ -11,10 +11,10 @@
 package io.blockv.core.internal.json.deserializer.vatom
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.Action
-import io.blockv.core.model.Face
-import io.blockv.core.model.Group
-import io.blockv.core.model.Vatom
+import io.blockv.core.model.vatom.Action
+import io.blockv.core.model.vatom.Face
+import io.blockv.core.model.vatom.Group
+import io.blockv.core.model.vatom.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
 

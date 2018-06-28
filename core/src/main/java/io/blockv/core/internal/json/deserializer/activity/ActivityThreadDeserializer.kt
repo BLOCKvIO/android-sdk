@@ -1,8 +1,8 @@
 package io.blockv.core.internal.json.deserializer.activity
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.ActivityMessage
-import io.blockv.core.model.ActivityThread
+import io.blockv.core.model.activity.ActivityMessage
+import io.blockv.core.model.activity.ActivityThread
 import org.json.JSONObject
 
 class ActivityThreadDeserializer(private val messageDeserializer: Deserializer<ActivityMessage?>) : Deserializer<ActivityThread> {

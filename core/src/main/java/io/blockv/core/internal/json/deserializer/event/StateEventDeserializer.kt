@@ -1,7 +1,7 @@
 package io.blockv.core.internal.json.deserializer.event
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.StateUpdateEvent
+import io.blockv.core.model.event.StateUpdateEvent
 import org.json.JSONObject
 
 class StateEventDeserializer : Deserializer<StateUpdateEvent> {

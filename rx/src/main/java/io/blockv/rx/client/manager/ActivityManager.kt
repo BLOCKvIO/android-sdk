@@ -1,7 +1,7 @@
 package io.blockv.rx.client.manager
 
-import io.blockv.core.model.ActivityMessageList
-import io.blockv.core.model.ActivityThreadList
+import io.blockv.core.model.activity.ActivityMessageList
+import io.blockv.core.model.activity.ActivityThreadList
 import io.reactivex.Completable
 import io.reactivex.Single
 

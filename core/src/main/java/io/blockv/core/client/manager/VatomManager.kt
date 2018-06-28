@@ -11,10 +11,10 @@
 package io.blockv.core.client.manager
 
 import io.blockv.core.client.builder.DiscoverQueryBuilder
-import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.vatom.GeoGroup
+import io.blockv.core.model.vatom.Group
 import io.blockv.core.util.Callable
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.vatom.DiscoverGroup
 import org.json.JSONObject
 import java.util.*
 
@@ -91,7 +91,7 @@ interface VatomManager {
    * @return new Callable<List<Action>> instance.
    * @see io.blockv.core.model.Action
    */
-  fun getVatomActions(templateId: String): Callable<List<io.blockv.core.model.Action>>
+  fun getVatomActions(templateId: String): Callable<List<io.blockv.core.model.vatom.Action>>
 
   /**
    * Performs an action on the BLOCKv Platform.

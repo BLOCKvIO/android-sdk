@@ -11,7 +11,7 @@
 package io.blockv.core.internal.json.deserializer.vatom
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.Action
+import io.blockv.core.model.vatom.Action
 import org.json.JSONObject
 
 class ActionDeserializer : Deserializer<Action> {

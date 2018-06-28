@@ -13,10 +13,10 @@ package io.blockv.rx.client.manager
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.net.websocket.Websocket
 import io.blockv.core.internal.net.websocket.WebsocketImpl
-import io.blockv.core.model.ActivityEvent
-import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateUpdateEvent
-import io.blockv.core.model.WebSocketEvent
+import io.blockv.core.model.event.ActivityEvent
+import io.blockv.core.model.event.InventoryEvent
+import io.blockv.core.model.event.StateUpdateEvent
+import io.blockv.core.model.event.WebSocketEvent
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers

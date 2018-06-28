@@ -12,10 +12,10 @@ package io.blockv.core.internal.net.rest.api
 
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.net.rest.response.BaseResponse
-import io.blockv.core.model.Action
-import io.blockv.core.model.DiscoverGroup
-import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.vatom.Action
+import io.blockv.core.model.vatom.DiscoverGroup
+import io.blockv.core.model.vatom.GeoGroup
+import io.blockv.core.model.vatom.Group
 import org.json.JSONObject
 
 interface VatomApi {

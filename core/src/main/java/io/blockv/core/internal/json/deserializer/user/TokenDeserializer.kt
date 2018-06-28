@@ -11,7 +11,7 @@
 package io.blockv.core.internal.json.deserializer.user
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.Token
+import io.blockv.core.model.user.Token
 
 class TokenDeserializer : Deserializer<Token> {
   override fun deserialize(data: org.json.JSONObject): Token? {

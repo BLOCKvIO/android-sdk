@@ -11,7 +11,7 @@
 
 package io.blockv.core.client.manager
 
-import io.blockv.core.model.AssetProvider
+import io.blockv.core.model.resource.AssetProvider
 
 interface ResourceManager {
 

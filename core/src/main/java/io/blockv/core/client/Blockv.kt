@@ -22,6 +22,7 @@ import io.blockv.core.internal.json.deserializer.event.ActivityEventDeserializer
 import io.blockv.core.internal.json.deserializer.event.InventoryEventDeserializer
 import io.blockv.core.internal.json.deserializer.event.StateEventDeserializer
 import io.blockv.core.internal.json.deserializer.event.WebsocketEventDeserializer
+import io.blockv.core.internal.json.deserializer.resource.AssetProviderDeserialzier
 import io.blockv.core.internal.json.deserializer.user.*
 import io.blockv.core.internal.json.deserializer.vatom.*
 import io.blockv.core.internal.json.serializer.user.AssetProviderSerializer
@@ -33,6 +34,10 @@ import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.*
+import io.blockv.core.model.activity.ActivityMessage
+import io.blockv.core.model.vatom.Action
+import io.blockv.core.model.vatom.Face
+import io.blockv.core.model.vatom.Vatom
 
 class Blockv {
 

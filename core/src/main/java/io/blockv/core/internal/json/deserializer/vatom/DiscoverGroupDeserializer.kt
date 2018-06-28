@@ -11,7 +11,10 @@
 package io.blockv.core.internal.json.deserializer.vatom
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.*
+import io.blockv.core.model.vatom.Action
+import io.blockv.core.model.vatom.DiscoverGroup
+import io.blockv.core.model.vatom.Face
+import io.blockv.core.model.vatom.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -59,7 +62,7 @@ class DiscoverGroupDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
             }
           }
       }
-      return DiscoverGroup(count,inventoryArray, facesArray, actionsArray)
+      return DiscoverGroup(count, inventoryArray, facesArray, actionsArray)
     } catch (e: Exception) {
       android.util.Log.e("DiscoverDeserializer", e.message)
     }

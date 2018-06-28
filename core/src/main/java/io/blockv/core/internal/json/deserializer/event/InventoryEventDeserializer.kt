@@ -1,7 +1,7 @@
 package io.blockv.core.internal.json.deserializer.event
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.InventoryEvent
+import io.blockv.core.model.event.InventoryEvent
 import org.json.JSONObject
 
 class InventoryEventDeserializer : Deserializer<InventoryEvent> {

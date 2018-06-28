@@ -11,7 +11,7 @@
 package io.blockv.core.internal.json.serializer.user
 
 import io.blockv.core.internal.json.serializer.Serializer
-import io.blockv.core.model.AssetProvider
+import io.blockv.core.model.resource.AssetProvider
 import org.json.JSONObject
 
 class AssetProviderSerializer : Serializer<AssetProvider?> {

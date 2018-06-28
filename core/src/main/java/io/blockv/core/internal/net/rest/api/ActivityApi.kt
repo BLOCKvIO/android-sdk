@@ -4,8 +4,8 @@ import io.blockv.core.internal.net.rest.request.ActivityMessageListRequest
 import io.blockv.core.internal.net.rest.request.ActivityThreadListRequest
 import io.blockv.core.internal.net.rest.request.SendMessageRequest
 import io.blockv.core.internal.net.rest.response.BaseResponse
-import io.blockv.core.model.ActivityMessageList
-import io.blockv.core.model.ActivityThreadList
+import io.blockv.core.model.activity.ActivityMessageList
+import io.blockv.core.model.activity.ActivityThreadList
 
 interface ActivityApi {
 
