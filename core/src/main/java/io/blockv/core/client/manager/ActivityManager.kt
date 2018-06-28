@@ -16,7 +16,7 @@ interface ActivityManager {
    * cursor and count param.
    *
    * @param cursor allows you to filter out all threads more recent than the cursor.
-   *               If omitted, the most recent threads are returned.
+   *               if omitted or set as zero, the most recent threads are returned.
    *               A new cursor is returned by the server in the ActivityThreadList model.
    * @param count is the number of threads to be returned.
    * @return new Callable<ActivityThreadList> instance
@@ -31,7 +31,7 @@ interface ActivityManager {
    * The count is defaulted to all.
    *
    * @param cursor allows you to filter out all threads more recent than the cursor.
-   *               If omitted, the most recent threads are returned.
+   *               if omitted or set as zero, the most recent threads are returned.
    *               A new cursor is returned by the server in the ActivityThreadList model.
    * @return new Callable<ActivityThreadList> instance.
    * @see ActivityThreadList
@@ -49,12 +49,12 @@ interface ActivityManager {
   fun getThreads(): Callable<ActivityThreadList>
 
   /**
-   * Fetches a list of messages from specified activity thread.
+   * Fetches a list of messages from the specified activity thread.
    *
    * This endpoint uses paging, the set of messages to be returned is determined by the cursor
    * and count param.
    *
-   * @param id is the identifier of the thread you want get messages from.
+   * @param id is the identifier of the thread you want to get messages from.
    * @param cursor allows you to filter out all messages more recent than the cursor.
    *               If omitted, the most recent messages are returned.
    *               A new cursor is returned by the server in the ActivityMessageList model.
@@ -65,12 +65,12 @@ interface ActivityManager {
   fun getThreadMessages(id: String, cursor: String, count: Int): Callable<ActivityMessageList>
 
   /**
-   * Fetches a list of messages from specified activity thread.
+   * Fetches a list of messages from the specified activity thread.
    *
    * This endpoint uses paging, the set of messages to be returned is determined by the cursor.
    * The count is defaulted to all.
    *
-   * @param id is the identifier of the thread you want get messages from.
+   * @param id is the identifier of the thread you want to get messages from.
    * @param cursor allows you to filter out all messages more recent than the cursor.
    *               If omitted, the most recent messages are returned.
    *               A new cursor is returned by the server in the ActivityMessageList model.
@@ -80,18 +80,18 @@ interface ActivityManager {
   fun getThreadMessages(id: String, cursor: String): Callable<ActivityMessageList>
 
   /**
-   * Fetches a list of messages from specified activity thread.
+   * Fetches a list of messages from the specified activity thread.
    *
    * This will return all the messages from the specified thread.
    *
-   * @param id is the identifier of the thread you want get messages from.
+   * @param id is the identifier of the thread you want to get messages from.
    * @return new Callable<ActivityMessageList> instance.
    * @see ActivityMessageList
    */
   fun getThreadMessages(id: String): Callable<ActivityMessageList>
 
   /**
-   * Sends a message to a specified BLOCKv user.
+   * Sends a message to the specified BLOCKv user.
    *
    * @param userId is the identifier of the BLOCKv user.
    * @param message is the message you want to send to the other user.
