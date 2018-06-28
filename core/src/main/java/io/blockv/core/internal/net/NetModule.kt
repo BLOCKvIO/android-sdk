@@ -10,16 +10,13 @@
  */
 package io.blockv.core.internal.net
 
+import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.net.rest.Client
 import io.blockv.core.internal.net.rest.HttpClient
-import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.internal.json.JsonModule
-import io.blockv.core.internal.net.rest.api.UserApi
-import io.blockv.core.internal.net.rest.api.UserApiImpl
-import io.blockv.core.internal.net.rest.api.VatomApi
-import io.blockv.core.internal.net.rest.api.VatomApiImpl
+import io.blockv.core.internal.net.rest.api.*
 import io.blockv.core.internal.net.rest.auth.Authenticator
 import io.blockv.core.internal.net.rest.exception.DefaultErrorMapper
+import io.blockv.core.internal.repository.Preferences
 
 
 class NetModule(val authenticator: Authenticator, val preferences: Preferences, val jsonModule: JsonModule) {
@@ -34,5 +31,5 @@ class NetModule(val authenticator: Authenticator, val preferences: Preferences, 
 
   val userApi: UserApi = UserApiImpl(client, jsonModule)
   val vatomApi: VatomApi = VatomApiImpl(client, jsonModule)
-
+  val activityApi: ActivityApi = ActivityApiImpl(client, jsonModule)
 }

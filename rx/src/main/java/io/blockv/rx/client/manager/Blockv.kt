@@ -35,6 +35,7 @@ class Blockv {
   val vatomManager: VatomManager
   val eventManager: EventManager
   val resourceManager: ResourceManager
+  val activityManager: ActivityManager
 
   constructor(context: Context, appId: String) {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
@@ -84,6 +85,7 @@ class Blockv {
     )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
     this.eventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, authenticator), jsonModule)
+    this.activityManager = ActivityManagerImpl(netModule.activityApi)
   }
 
   constructor(context: Context, environment: Environment) {
@@ -127,6 +129,7 @@ class Blockv {
       JwtDecoderImpl())
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
     this.eventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, authenticator), jsonModule)
+    this.activityManager = ActivityManagerImpl(netModule.activityApi)
   }
 
   constructor(appId: String,
@@ -135,6 +138,7 @@ class Blockv {
               netModule: NetModule,
               userManager: UserManager,
               vatomManager: VatomManager,
+              activityManager: ActivityManager,
               eventManager: EventManager,
               resourceManager: ResourceManager) {
     this.appId = appId
@@ -149,6 +153,7 @@ class Blockv {
     this.vatomManager = vatomManager
     this.eventManager = eventManager
     this.resourceManager = resourceManager
+    this.activityManager = activityManager
   }
 
 }
