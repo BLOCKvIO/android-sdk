@@ -15,7 +15,7 @@ class ActivityMessageListDeserializer(private val messageDeserializer: Deseriali
       (0 until messages.length()).forEach {
         val message = messages.getJSONObject(it)
         if (message != null) {
-          val out = messageDeserializer.deserialize(message)
+          val out = messageDeserializer.deserialize(message.optJSONObject("message") ?: JSONObject())
           if (out != null) {
             messageArray.add(out)
           }
