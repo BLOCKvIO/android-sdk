@@ -23,7 +23,7 @@ interface ActivityManager {
    * @return new Single<ActivityThreadList> instance
    * @see ActivityThreadList
    */
-  fun getThreadList(cursor: String, count: Int): Single<ActivityThreadList>
+  fun getThreads(cursor: String, count: Int): Single<ActivityThreadList>
 
   /**
    * Fetches a list of the current user's threads.
@@ -37,7 +37,7 @@ interface ActivityManager {
    * @return new Single<ActivityThreadList> instance.
    * @see ActivityThreadList
    */
-  fun getThreadList(cursor: String): Single<ActivityThreadList>
+  fun getThreads(cursor: String): Single<ActivityThreadList>
 
   /**
    * Fetches a list of the current user's threads.
@@ -47,7 +47,7 @@ interface ActivityManager {
    * @return new Single<ActivityThreadList> instance.
    * @see ActivityThreadList
    */
-  fun getThreadList(): Single<ActivityThreadList>
+  fun getThreads(): Single<ActivityThreadList>
 
   /**
    * Fetches a list of messages from specified activity thread.

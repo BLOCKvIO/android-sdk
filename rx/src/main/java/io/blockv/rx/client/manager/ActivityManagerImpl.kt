@@ -12,18 +12,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
-  override fun getThreadList(cursor: String, count: Int): Single<ActivityThreadList> = Single.fromCallable {
+  override fun getThreads(cursor: String, count: Int): Single<ActivityThreadList> = Single.fromCallable {
     api.getThreadList(ActivityThreadListRequest(cursor, count)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getThreadList(cursor: String): Single<ActivityThreadList> {
-    return getThreadList(cursor, 0)
+  override fun getThreads(cursor: String): Single<ActivityThreadList> {
+    return getThreads(cursor, 0)
   }
 
-  override fun getThreadList(): Single<ActivityThreadList> {
-    return getThreadList("")
+  override fun getThreads(): Single<ActivityThreadList> {
+    return getThreads("")
   }
 
   override fun getThreadMessages(id: String, cursor: String, count: Int): Single<ActivityMessageList> = Single.fromCallable {

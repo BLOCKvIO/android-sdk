@@ -10,18 +10,18 @@ import io.blockv.core.util.Callable
 
 class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
 
-  override fun getThreadList(cursor: String, count: Int): Callable<ActivityThreadList> = Callable.single {
+  override fun getThreads(cursor: String, count: Int): Callable<ActivityThreadList> = Callable.single {
     api.getThreadList(ActivityThreadListRequest(cursor, count)).payload
   }
     .runOn(Callable.Scheduler.IO)
     .returnOn(Callable.Scheduler.MAIN)
 
-  override fun getThreadList(cursor: String): Callable<ActivityThreadList> {
-    return getThreadList(cursor, 0)
+  override fun getThreads(cursor: String): Callable<ActivityThreadList> {
+    return getThreads(cursor, 0)
   }
 
-  override fun getThreadList(): Callable<ActivityThreadList> {
-    return getThreadList("")
+  override fun getThreads(): Callable<ActivityThreadList> {
+    return getThreads("")
   }
 
   override fun getThreadMessages(id: String, cursor: String, count: Int): Callable<ActivityMessageList> = Callable.single {

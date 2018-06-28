@@ -22,7 +22,7 @@ interface ActivityManager {
    * @return new Callable<ActivityThreadList> instance
    * @see ActivityThreadList
    */
-  fun getThreadList(cursor: String, count: Int): Callable<ActivityThreadList>
+  fun getThreads(cursor: String, count: Int): Callable<ActivityThreadList>
 
   /**
    * Fetches a list of the current user's threads.
@@ -36,7 +36,7 @@ interface ActivityManager {
    * @return new Callable<ActivityThreadList> instance.
    * @see ActivityThreadList
    */
-  fun getThreadList(cursor: String): Callable<ActivityThreadList>
+  fun getThreads(cursor: String): Callable<ActivityThreadList>
 
   /**
    * Fetches a list of the current user's threads.
@@ -46,7 +46,7 @@ interface ActivityManager {
    * @return new Callable<ActivityThreadList> instance.
    * @see ActivityThreadList
    */
-  fun getThreadList(): Callable<ActivityThreadList>
+  fun getThreads(): Callable<ActivityThreadList>
 
   /**
    * Fetches a list of messages from specified activity thread.
