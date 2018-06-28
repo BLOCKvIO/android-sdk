@@ -17,7 +17,7 @@ The BLOCKv SDK is dependant on Kotlin, if your version of Android Studio < 3.0 y
 
 ### Install and configure the SDK
 
-First, add the BLOCKv maven repository and Kotlin plugin to the root-level `build.gradle` file:
+Add the BLOCKv maven repository and Kotlin plugin to the root-level `build.gradle` file:
 
 ```java
 buildscript {
@@ -63,11 +63,12 @@ There is also an RxJava2 wrapped version, to use this you require to add the fol
 
 ```java
 dependencies {
+  // ...
   implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
   implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
   implementation 'io.blockv.sdk:rx:1.0.0'
 ]
-
+```
 To access the RxJava2 wrapped SDK in your application code, import the class:
 
 ```java
