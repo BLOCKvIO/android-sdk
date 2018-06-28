@@ -5,7 +5,7 @@ import io.blockv.core.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
 
-class ActivityMessageDeserializer : Deserializer<ActivityMessage> {
+class ActivityMessageDeserializer : Deserializer<ActivityMessage?> {
 
   override fun deserialize(data: JSONObject): ActivityMessage? {
     try {

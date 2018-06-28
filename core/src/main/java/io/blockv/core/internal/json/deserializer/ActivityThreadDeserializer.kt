@@ -4,7 +4,7 @@ import io.blockv.core.model.ActivityMessage
 import io.blockv.core.model.ActivityThread
 import org.json.JSONObject
 
-class ActivityThreadDeserializer(private val messageDeserializer: Deserializer<ActivityMessage>) : Deserializer<ActivityThread> {
+class ActivityThreadDeserializer(private val messageDeserializer: Deserializer<ActivityMessage?>) : Deserializer<ActivityThread> {
 
   override fun deserialize(data: JSONObject): ActivityThread? {
     try {

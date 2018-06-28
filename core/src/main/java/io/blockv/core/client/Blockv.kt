@@ -22,10 +22,7 @@ import io.blockv.core.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.Action
-import io.blockv.core.model.Environment
-import io.blockv.core.model.Face
-import io.blockv.core.model.Vatom
+import io.blockv.core.model.*
 
 class Blockv {
 
@@ -42,7 +39,7 @@ class Blockv {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
     val faceDeserilizer: Deserializer<Face?> = FaceDeserializer()
     val actionDeserilizer: Deserializer<Action?> = ActionDeserializer()
-
+    val messageDeserializer:Deserializer<ActivityMessage?> = ActivityMessageDeserializer()
     this.jsonModule = JsonModule(
       UserDeserializer(),
       TokenDeserializer(),
@@ -62,7 +59,9 @@ class Blockv {
       InventoryEventDeserializer(),
       StateEventDeserializer(),
       ActivityEventDeserializer(),
-      WebsocketEventDeserializer()
+      WebsocketEventDeserializer(),
+      ActivityThreadListDeserializer(ActivityThreadDeserializer(messageDeserializer)),
+      ActivityMessageListDeserializer(messageDeserializer)
     )
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
@@ -90,6 +89,7 @@ class Blockv {
     val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
     val faceDeserilizer: Deserializer<Face?> = FaceDeserializer()
     val actionDeserilizer: Deserializer<Action?> = ActionDeserializer()
+    val messageDeserializer:Deserializer<ActivityMessage?> = ActivityMessageDeserializer()
     this.jsonModule = JsonModule(
       UserDeserializer(),
       TokenDeserializer(),
@@ -109,7 +109,9 @@ class Blockv {
       InventoryEventDeserializer(),
       StateEventDeserializer(),
       ActivityEventDeserializer(),
-      WebsocketEventDeserializer()
+      WebsocketEventDeserializer(),
+      ActivityThreadListDeserializer(ActivityThreadDeserializer(messageDeserializer)),
+      ActivityMessageListDeserializer(messageDeserializer)
     )
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
