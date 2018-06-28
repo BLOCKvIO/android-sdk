@@ -12,11 +12,11 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class ActivityThreadListRequest(val cursor: String, val count: Int) {
+class ActivityThreadListRequest(val cursor: String?, val count: Int?) {
   fun toJson(): JSONObject {
     val out = JSONObject()
-    out.put("cursor", cursor)
-    out.put("count", count)
+    if (cursor != null) out.put("cursor", cursor)
+    if (count != null) out.put("count", count)
     return out
   }
 }

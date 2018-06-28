@@ -12,12 +12,12 @@ import org.json.JSONObject
  *  under the License.
  *
  */
-class ActivityMessageListRequest(val id: String, val cursor: String?, val count: Int) {
+class ActivityMessageListRequest(val id: String, val cursor: String?, val count: Int?) {
   fun toJson(): JSONObject {
-    val out: JSONObject = JSONObject()
+    val out = JSONObject()
     out.put("name", id)
-    out.put("cursor", cursor ?: "")
-    out.put("count", count)
+    if (cursor != null) out.put("cursor", cursor)
+    if (count != null) out.put("count", count)
     return out
   }
 }
