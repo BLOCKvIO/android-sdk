@@ -16,7 +16,7 @@ class ActivityApiImpl(val client: Client,
 
   override fun getThreadList(request: ActivityThreadListRequest): BaseResponse<ActivityThreadList> {
     val response: JSONObject = client.post("v1/activity/mythreads", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.optJSONObject("payload") ?: JSONObject()
 
     return BaseResponse(
       response.optInt("error"),
@@ -26,13 +26,12 @@ class ActivityApiImpl(val client: Client,
 
   override fun getThreadMessages(request: ActivityMessageListRequest): BaseResponse<ActivityMessageList> {
     val response: JSONObject = client.post("v1/activity/mythreadmessages", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.optJSONObject("payload") ?: JSONObject()
 
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
       jsonModule.activityMessageListDeserializer.deserialize(payload) ?: ActivityMessageList("", ArrayList()))
-
   }
 
   override fun sendMessage(request: SendMessageRequest): BaseResponse<Void?> {
