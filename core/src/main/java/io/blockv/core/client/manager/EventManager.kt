@@ -50,4 +50,6 @@ interface EventManager {
    * @return Callable<WebSocketEvent<InventoryEvent> instance
    */
   fun getActivityEvents(): Callable<WebSocketEvent<ActivityEvent>>
+
+  class MissingWebSocketDependencyException :Exception("Include dependency 'com.neovisionaries:nv-websocket-client:2.5' to use the event manager.")
 }
