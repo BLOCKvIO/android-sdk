@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -8,9 +8,10 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.vatom
 
 import android.util.Log
+import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Face
 import io.blockv.core.model.FaceProperty
 import org.json.JSONObject

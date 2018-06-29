@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -8,38 +8,29 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.user
 
 
 import android.util.Log
-import io.blockv.core.model.User
+import io.blockv.core.internal.json.deserializer.Deserializer
+import io.blockv.core.model.PublicUser
 
-class UserDeserializer : Deserializer<User?> {
+class PublicUserDeserializer : Deserializer<PublicUser?> {
 
-  override fun deserialize(data: org.json.JSONObject): User? {
+  override fun deserialize(data: org.json.JSONObject): PublicUser? {
     try {
-      val meta: org.json.JSONObject = data.getJSONObject("meta")
       val properties: org.json.JSONObject = data.getJSONObject("properties")
       val id: String? = data.getString("id")
-      val whenCreated: String? = meta.getString("when_created")
-      val whenModified: String? = meta.getString("when_modified")
       val firstName: String? = properties.optString("first_name")
       val lastName: String? = properties.optString("last_name")
-      val avatarUri: String? =  properties.optString("avatar_uri")
-      val birthday: String? = properties.optString("birthday")
-      val language: String? = properties.optString("language")
-
-      return User(
+      val avatarUri: String? = properties.optString("avatar_uri")
+      return PublicUser(
         id,
-        whenCreated,
-        whenModified,
         firstName,
         lastName,
-        avatarUri,
-        birthday,
-        language)
+        avatarUri)
     } catch (e: Exception) {
-      Log.e("deserilizer",e.toString())
+      Log.e("deserilizer", e.toString())
     }
     return null
   }

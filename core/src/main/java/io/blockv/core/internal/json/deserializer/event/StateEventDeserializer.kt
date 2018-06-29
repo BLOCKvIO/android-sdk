@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -8,21 +8,27 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.event
 
-import io.blockv.core.model.Action
+import io.blockv.core.internal.json.deserializer.Deserializer
+import io.blockv.core.model.StateUpdateEvent
 import org.json.JSONObject
 
-class ActionDeserializer : Deserializer<Action> {
-  override fun deserialize(data: JSONObject): Action? {
+class StateEventDeserializer : Deserializer<StateUpdateEvent> {
+  override fun deserialize(data: JSONObject): StateUpdateEvent? {
     try {
-      val name: String = data.getString("name")
-      val parts: List<String> = name.split("::Action::")
-      return Action(parts[0], parts[1])
+      val eventId = data.getString("event_id")
+      val operation = data.getString("op")
+      val vatomId = data.getString("id")
+      val state = data.getJSONObject("new_object")
+      return StateUpdateEvent(
+        eventId,
+        operation,
+        vatomId,
+        state)
     } catch (e: Exception) {
-      android.util.Log.w("ActionDeserializer", e.message)
+      android.util.Log.e("StateEventDeserializer", e.message)
     }
     return null
   }
-
 }

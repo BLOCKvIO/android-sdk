@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -13,4 +13,13 @@ package io.blockv.core.model
 class AssetProvider(var name: String,
                     var uri: String,
                     var type: String,
-                    var descriptor: Map<String, String?>)
+                    var descriptor: Map<String, String?>) {
+  override fun toString(): String {
+    return "AssetProvider{" +
+      " name='" + name + '\'' +
+      ", uri='" + uri + '\'' +
+      ", type='" + uri + '\'' +
+      ", descriptor='" + descriptor + '\'' +
+      "}"
+  }
+}

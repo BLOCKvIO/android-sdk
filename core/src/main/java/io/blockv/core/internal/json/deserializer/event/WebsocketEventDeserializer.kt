@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -8,22 +8,21 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.event
 
-import io.blockv.core.model.AssetProvider
+import io.blockv.core.internal.json.deserializer.Deserializer
+import io.blockv.core.model.WebSocketEvent
 import org.json.JSONObject
 
-class AssetProviderDeserialzier : Deserializer<AssetProvider> {
-  override fun deserialize(data: JSONObject): AssetProvider? {
+class WebsocketEventDeserializer : Deserializer<WebSocketEvent<JSONObject>> {
+  override fun deserialize(data: JSONObject): WebSocketEvent<JSONObject>? {
     try {
-      val descriptorObject: JSONObject = data.getJSONObject("descriptor")
-      val descriptor: HashMap<String, String> = HashMap()
-      for (key: String in descriptorObject.keys()) {
-        descriptor.put(key, descriptorObject.getString(key))
-      }
-      return AssetProvider(data.getString("name"),data.getString("uri"), data.getString("type"), descriptor)
+      val messageType = data.getString("msg_type")
+      val userId = data.optString("user_id", "")
+      val payload = data.getJSONObject("payload")
+      return WebSocketEvent<JSONObject>(messageType, userId, payload)
     } catch (e: Exception) {
-      android.util.Log.w("AssetProvDeserializer", e.message)
+      android.util.Log.e("WsDeserializer", e.message)
     }
     return null
   }

@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -8,17 +8,25 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.serializer
+package io.blockv.core.internal.json.serializer.user
 
-import io.blockv.core.model.Jwt
+import io.blockv.core.internal.json.serializer.Serializer
+import io.blockv.core.model.AssetProvider
 import org.json.JSONObject
 
-class JwtSerializer : Serializer<Jwt?> {
-  override fun serialize(data: Jwt?): JSONObject {
-    val out = JSONObject()
+class AssetProviderSerializer : Serializer<AssetProvider?> {
+  override fun serialize(data: AssetProvider?): JSONObject {
+    val out: JSONObject = JSONObject()
     if (data != null) {
-      out.put("token", data.token)
-      out.put("token_type", data.type)
+      out.put("name", data.name)
+      out.put("type", data.type)
+      out.put("uri", data.uri)
+
+      val descriptor: JSONObject = JSONObject()
+      for (key: String in data.descriptor.keys) {
+        descriptor.put(key, data.descriptor.getValue(key))
+      }
+      out.put("descriptor", descriptor)
     }
     return out
   }

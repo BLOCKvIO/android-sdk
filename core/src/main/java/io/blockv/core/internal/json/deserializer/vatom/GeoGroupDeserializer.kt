@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -8,26 +8,22 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.vatom
 
 
 import android.util.Log
-import io.blockv.core.model.PublicUser
+import io.blockv.core.internal.json.deserializer.Deserializer
+import io.blockv.core.model.GeoGroup
 
-class PublicUserDeserializer : Deserializer<PublicUser?> {
+class GeoGroupDeserializer : Deserializer<GeoGroup?> {
 
-  override fun deserialize(data: org.json.JSONObject): PublicUser? {
+  override fun deserialize(data: org.json.JSONObject): GeoGroup? {
     try {
-      val properties: org.json.JSONObject = data.getJSONObject("properties")
-      val id: String? = data.getString("id")
-      val firstName: String? = properties.optString("first_name")
-      val lastName: String? = properties.optString("last_name")
-      val avatarUri: String? = properties.optString("avatar_uri")
-      return PublicUser(
-        id,
-        firstName,
-        lastName,
-        avatarUri)
+      val geoHash: String = data.optString("key","")
+      val lon: Double = data.optDouble("lon")
+      val lat: Double = data.optDouble("lat")
+      val count: Int = data.optInt("count")
+      return GeoGroup(geoHash, lon, lat, count)
     } catch (e: Exception) {
       Log.e("deserilizer", e.toString())
     }

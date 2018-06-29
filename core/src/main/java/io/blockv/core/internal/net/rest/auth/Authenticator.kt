@@ -1,8 +1,4 @@
-package io.blockv.core.internal.net.rest.auth
-
-import io.blockv.core.model.Jwt
-
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -12,6 +8,10 @@ import io.blockv.core.model.Jwt
  *  under the License.
  *
  */
+package io.blockv.core.internal.net.rest.auth
+
+import io.blockv.core.model.Jwt
+
 interface Authenticator {
 
   fun refreshToken(): Jwt?

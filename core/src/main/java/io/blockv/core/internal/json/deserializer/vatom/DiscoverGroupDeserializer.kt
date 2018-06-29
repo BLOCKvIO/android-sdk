@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -8,9 +8,13 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.vatom
 
-import io.blockv.core.model.*
+import io.blockv.core.internal.json.deserializer.Deserializer
+import io.blockv.core.model.Action
+import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.Face
+import io.blockv.core.model.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -58,7 +62,7 @@ class DiscoverGroupDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
             }
           }
       }
-      return DiscoverGroup(count,inventoryArray, facesArray, actionsArray)
+      return DiscoverGroup(count, inventoryArray, facesArray, actionsArray)
     } catch (e: Exception) {
       android.util.Log.e("DiscoverDeserializer", e.message)
     }

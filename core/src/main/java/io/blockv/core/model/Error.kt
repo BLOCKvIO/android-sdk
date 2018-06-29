@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -16,12 +16,12 @@ enum class Error {
 
   UNKNOWN_APP_ID,// App Id is unacceptable.
   INTERNAL_SERVER_ISSUE,// Server encountered an error processing the request.
-  INVALID_PAYLOAD,// Request paylaod is invalid.
+  INVALID_PAYLOAD,// Request payload is invalid.
   TOKEN_UNAVAILABLE,// User token (phone, email) is already taken.
   INVALID_DATE_FORMAT,// Date format is invalid (e.g. invalid birthday in update user call).
   MALFORMED_REQUEST_BODY,// Invalid request payload on an action.
   VATOM_NOT_FOUND,// vAtom is unrecognized by the platform.
-  UNKNOWN_USER_TOKEN,// User token (phone, email, id) is unrecognized by the platfrom.
+  UNKNOWN_USER_TOKEN,// User token (phone, email, id) is unrecognized by the platform.
   AUTHENTICATION_FAILED,// Login phone/email wrong. password
   AVATAR_UPLOAD_FAILED, // Uploading the avatar data. failed.
   USER_REFRESH_TOKEN_INVALID,// Refresh token is not on the whitelist, or the token has expired.
@@ -38,7 +38,7 @@ enum class Error {
 
   companion object {
 
-    private val MAP: MutableMap<Int, Error> = HashMap<Int, Error>()
+    private val MAP: MutableMap<Int, Error> = HashMap()
 
     init {
       MAP[2] = UNKNOWN_APP_ID

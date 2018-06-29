@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,5 +10,12 @@
  */
 package io.blockv.core.model
 
-
-class Jwt(val token: String, val type: String)
+class Jwt(val token: String,
+          val type: String) {
+  override fun toString(): String {
+    return "Jwt{" +
+      " token='" + token + '\'' +
+      ", type='" + type + '\'' +
+      "}"
+  }
+}

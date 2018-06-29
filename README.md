@@ -17,9 +17,17 @@ The BLOCKv SDK is dependant on Kotlin, if your version of Android Studio < 3.0 y
 
 ### Install and configure the SDK
 
-First, add the BLOCKv maven repository to the root-level `build.gradle` file:
+Add the BLOCKv maven repository and Kotlin plugin to the root-level `build.gradle` file:
 
 ```java
+buildscript {
+  ext.kotlin_version = '1.2.41'
+  //...
+  dependencies {
+    //...
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
 allprojects {
   //...
   repositories {
@@ -31,14 +39,17 @@ allprojects {
 }
 ```
 
-Next, add the following dependencies to your module Gradle file (usually the `app/build.gradle`):
+Next, add the Kotlin plugin and following dependencies to your module Gradle file (usually the `app/build.gradle`):
 
 ```java
+apply plugin: 'kotlin-android' //This should be at the top of the file.
+// ...
+//
 dependencies {
   // ...
-  compile 'io.blockv.sdk:core:0.5.0'
+  implementation 'io.blockv.sdk:core:1.0.0'
   // Make sure android Studio version is > 3.0 or include the Kotlin Plugin
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
 ```
 
@@ -46,6 +57,22 @@ To access the BLOCKv SDK in your application code, import the class:
 
 ```java
 import io.blockv.core.Blockv
+```
+
+There is also an RxJava2 wrapped version, to use this you require to add the following additional dependencies to your module Gradle file:
+
+```java
+dependencies {
+  // ...
+  implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+  implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
+  implementation 'io.blockv.sdk:rx:1.0.0'
+]
+```
+To access the RxJava2 wrapped SDK in your application code, import the class:
+
+```java
+import io.blockv.rx.Blockv
 ```
 
 ### Configure your BLOCKv integration

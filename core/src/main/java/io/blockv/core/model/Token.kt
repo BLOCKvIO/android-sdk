@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,13 +10,28 @@
  */
 package io.blockv.core.model
 
-class Token(var id:String,
-            var userId:String,
-            var appId:String,
-            var whenCreated:String,
-            var whenModified:String,
+class Token(var id: String,
+            var userId: String,
+            var appId: String,
+            var whenCreated: String,
+            var whenModified: String,
             var tokenType: String,
             var token: String,
             var isConfirmed: Boolean,
             var isPrimary: Boolean,
-            var verifyCodeExpires:String)
+            var verifyCodeExpires: String) {
+  override fun toString(): String {
+    return "Token{" +
+      " id='" + id + '\'' +
+      ", userId='" + userId + '\'' +
+      ", appId='" + appId + '\'' +
+      ", whenCreated='" + whenCreated + '\'' +
+      ", whenModified='" + whenModified + '\'' +
+      ", tokenType='" + tokenType + '\'' +
+      ", token='" + token + '\'' +
+      ", isConfirmed='" + isConfirmed + '\'' +
+      ", isPrimary='" + isPrimary + '\'' +
+      ", verifyCodeExpires='" + verifyCodeExpires + '\'' +
+      "}"
+  }
+}

@@ -8,21 +8,23 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.deserializer
+package io.blockv.core.internal.json.deserializer.resource
 
 import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.model.Environment
+import io.blockv.core.model.AssetProvider
 import org.json.JSONObject
 
-class EnvironmentDeserialzier : Deserializer<Environment> {
-  override fun deserialize(data: JSONObject): Environment? {
+class AssetProviderDeserialzier : Deserializer<AssetProvider> {
+  override fun deserialize(data: JSONObject): AssetProvider? {
     try {
-      return Environment(
-        data.getString("rest"),
-        data.getString("wss"),
-        data.getString("app_id"))
+      val descriptorObject: JSONObject = data.getJSONObject("descriptor")
+      val descriptor: HashMap<String, String> = HashMap()
+      for (key: String in descriptorObject.keys()) {
+        descriptor.put(key, descriptorObject.getString(key))
+      }
+      return AssetProvider(data.getString("name"), data.getString("uri"), data.getString("type"), descriptor)
     } catch (e: Exception) {
-      android.util.Log.w("EnvironmentDeserialzier", e.message)
+      android.util.Log.w("AssetProvDeserializer", e.message)
     }
     return null
   }

@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -16,6 +16,14 @@ open class Environment(val rest: String,
   companion object {
     val DEFAULT_SERVER = "https://api.blockv.io/"
     val DEFAULT_WEBSOCKET = "wss://newws.blockv.io/ws"
+  }
+
+  override fun toString(): String {
+    return "Environment{" +
+      " rest='" + rest + '\'' +
+      ", wss='" + wss + '\'' +
+      ", appId='" + appId + '\'' +
+      "}"
   }
 
 }

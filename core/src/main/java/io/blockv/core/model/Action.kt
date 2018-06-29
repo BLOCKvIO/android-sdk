@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,4 +10,12 @@
  */
 package io.blockv.core.model
 
-class Action(val templateId:String,val name:String)
+class Action(val templateId: String,
+             val name: String) {
+  override fun toString(): String {
+    return "Action{" +
+      " templateId='" + templateId + '\'' +
+      ", name='" + name + '\'' +
+      "}"
+  }
+}

@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -8,18 +8,18 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.serializer
+package io.blockv.core.internal.json.serializer.user
 
-import io.blockv.core.model.Environment
+import io.blockv.core.internal.json.serializer.Serializer
+import io.blockv.core.model.Jwt
 import org.json.JSONObject
 
-class EnviromentSerializer : Serializer<Environment?> {
-  override fun serialize(data: Environment?): JSONObject {
-    val out: JSONObject = JSONObject()
+class JwtSerializer : Serializer<Jwt?> {
+  override fun serialize(data: Jwt?): JSONObject {
+    val out = JSONObject()
     if (data != null) {
-      out.put("app_id", data.appId)
-      out.put("rest", data.rest)
-      out.put("wss", data.wss)
+      out.put("token", data.token)
+      out.put("token_type", data.type)
     }
     return out
   }
