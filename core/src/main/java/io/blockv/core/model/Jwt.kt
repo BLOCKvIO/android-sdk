@@ -11,4 +11,5 @@
 package io.blockv.core.model
 
 
-class Jwt(val token: String, val type: String)
+class Jwt(val token: String,
+          val type: String)
