@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -20,6 +20,9 @@ class User {
   var avatarUri: String? = null
   var birthday: String? = null
   var language: String? = null
+  val name: String
+    get() = ((this.firstName ?: "") + " " + (this.lastName ?: "")).trim()
+
 
   constructor(id: String?,
               whenCreated: String?,

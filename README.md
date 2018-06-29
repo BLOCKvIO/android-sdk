@@ -1,25 +1,34 @@
-Blockv SDK
+BLOCKv SDK for Android
 ======================
 
-The Android SDK makes integration with the BlockV platform easy. It handles a number of operations on your behalf, including:
+This is the official BLOCKv SDK. It allows you to easily integrate your own apps into the BLOCKv Platform. It handles a number of operations on your behalf, including:
 
 - Wrapping API endpoints,
-- Parsing JSON to native Java models, and
-- Managing OAuth2 tokens.
+- Parsing JSON to native Java models,
+- Managing OAuth2 tokens, and
+- Interacting with the web socket.
 
 ### Requirements
 
-- Android Api 19+
+- Android API 19+
 - Kotlin
 
-The Blockv sdk is dependant on kotlin, if your version of Android Studio < 3.0 you will need to install it. Go to File | Settings | Plugins | Install JetBrains plugin… and then search for and install Kotlin. If you are looking at the "Welcome to Android Studio" screen, choose Configure | Plugins | Install JetBrains plugin… You'll need to restart the IDE after this completes.
+The BLOCKv SDK is dependant on Kotlin, if your version of Android Studio < 3.0 you will need to install it. Go to File | Settings | Plugins | Install JetBrains plugin… and then search for and install Kotlin. If you are looking at the "Welcome to Android Studio" screen, choose Configure | Plugins | Install JetBrains plugin… You'll need to restart the IDE after this completes.
 
 
 ### Install and configure the SDK
 
-First add the Blockv maven repository to the root-level `build.gradle` file.
+Add the BLOCKv maven repository and Kotlin plugin to the root-level `build.gradle` file:
 
 ```java
+buildscript {
+  ext.kotlin_version = '1.2.41'
+  //...
+  dependencies {
+    //...
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
 allprojects {
   //...
   repositories {
@@ -31,26 +40,49 @@ allprojects {
 }
 ```
 
-Next add the following dependencies to your module Gradle file (usually the `app/build.gradle`).
+Next, add the Kotlin plugin and following dependencies to your module Gradle file (usually the `app/build.gradle`):
 
 ```java
+apply plugin: 'kotlin-android' //This should be at the top of the file.
+// ...
+//
 dependencies {
   // ...
-  compile 'io.blockv.sdk:core:0.5.0'
+  implementation 'io.blockv.sdk:core:1.0.0'
   // Make sure android Studio version is > 3.0 or include the Kotlin Plugin
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version'
+  // (Optional) This is only required if you want to use the web socket.
+  // Attempting to access the EventManager will throw MissingWebSocketException
+  // if this is not included.
+  implementation 'com.neovisionaries:nv-websocket-client:2.5'
 }
 ```
 
-To access Blockv SDK in your application code, import the class.
+To access the BLOCKv SDK in your application code, import the class:
 
 ```java
 import io.blockv.core.Blockv
 ```
 
-### Configure your BlockV integration
+There is also an RxJava2 wrapped version, to use this you require to add the following additional dependencies to your module Gradle file:
 
-Next create an instance of the Blockv sdk, you will require an App Id. See [FAQ](https://developer-dev.blockv.io/docs/faq)
+```java
+dependencies {
+  // ...
+  implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+  implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
+  implementation 'io.blockv.sdk:rx:1.0.0'
+]
+```
+To access the [RxJava2](https://github.com/ReactiveX/RxJava) wrapped SDK in your application code, import the class:
+
+```java
+import io.blockv.rx.Blockv
+```
+
+### Configure your BLOCKv integration
+
+To configure your integration, create an instance of the BLOCKv SDK.
 
 ```java
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,4 +92,28 @@ Next create an instance of the Blockv sdk, you will require an App Id. See [FAQ]
     }
 ```
 
-Note: We recommend you use [Dagger 2](https://github.com/google/dagger) or any similar library for your singleton management of the Blockv sdk
+> At this point you will need an App Id. See [FAQ](https://developer.blockv.io/docs/faq)
+
+### Example
+
+Please see the [BLOCKv Android Example](https://github.com/BLOCKvIO/android-sample) for an example on using the BLOCKv SDK.
+
+### Dependencies
+1. [nv-websocket-client](https://github.com/TakahikoKawasaki/nv-websocket-client) is used for the web socket.
+
+### Recommendations
+
+We recommend you use [Dagger 2](https://github.com/google/dagger), or a similar library, for singleton management for the BLOCKv SDK.
+
+## Versioning
+
+The BLOCKv SDK for Android is still in pre-release and so may introduce breaking changes. Once the release is official, the SDK will follow [semantic versioning](https://semver.org), starting with release 1.0.0.
+
+## Author
+
+[BLOCKv](developer.blockv.io)
+
+## License
+
+BLOCKv is available under the BLOCKv AG license. See the [LICENSE](./LICENSE.md) file for more info.
+

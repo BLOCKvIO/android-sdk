@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,12 +10,12 @@
  */
 package io.blockv.core.model
 
-class Face(var id: String?,
-           var templateId: String?,
+class Face(var id: String,
+           var templateId: String,
            var createdBy: String?,
            var whenCreated: String?,
            var whenModified: String?,
-           var property: FaceProperty?) {
+           var property: FaceProperty) {
 
 
   override fun toString(): String {

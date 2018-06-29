@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,7 +10,6 @@
  */
 package io.blockv.core.internal.net.rest.response
 
-class BaseResponse<T>(val status:String?,
-                      val error:Int?,
+class BaseResponse<T>(val error:Int?,
                       val message:String?,
                       val payload:T)

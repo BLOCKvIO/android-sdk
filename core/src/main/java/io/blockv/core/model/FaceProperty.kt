@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,10 +10,10 @@
  */
 package io.blockv.core.model
 
-class FaceProperty(var displayUrl: String?,
-                   var viewMode: String?,
-                   var platform: String?,
-                   var resources: List<String>?) {
+class FaceProperty(var displayUrl: String,
+                   var viewMode: String,
+                   var platform: String,
+                   var resources: List<String>) {
 
 
   override fun toString(): String {

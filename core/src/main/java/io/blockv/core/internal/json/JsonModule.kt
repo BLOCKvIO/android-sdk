@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -13,21 +13,38 @@ package io.blockv.core.internal.json
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.internal.json.serializer.Serializer
 import io.blockv.core.model.*
+import io.blockv.core.model.ActivityMessageList
+import io.blockv.core.model.ActivityThreadList
+import io.blockv.core.model.ActivityEvent
+import io.blockv.core.model.InventoryEvent
+import io.blockv.core.model.StateUpdateEvent
+import io.blockv.core.model.WebSocketEvent
+import io.blockv.core.model.AssetProvider
+import io.blockv.core.model.PublicUser
+import io.blockv.core.model.Token
+import io.blockv.core.model.User
+import org.json.JSONObject
 
 class JsonModule(
-  val userDeserilizer: Deserializer<User?>,
-  val tokenDeserilizer: Deserializer<Token?>,
-  val vatomDeserilizer: Deserializer<Vatom?>,
-  val faceDeserilizer: Deserializer<Face?>,
-  val actionDeserilizer: Deserializer<Action?>,
+  val userDeserializer: Deserializer<User?>,
+  val tokenDeserializer: Deserializer<Token?>,
+  val vatomDeserializer: Deserializer<Vatom?>,
+  val faceDeserializer: Deserializer<Face?>,
+  val actionDeserializer: Deserializer<Action?>,
   val assetProviderDeserializer: Deserializer<AssetProvider?>,
   val assetProviderSerializer: Serializer<AssetProvider?>,
   val environmentDeserializer: Deserializer<Environment?>,
   val environmentSerializer: Serializer<Environment?>,
-  val groupDeserilizer: Deserializer<Group?>,
-  val jwtDeserilizer: Deserializer<Jwt?>,
+  val groupDeserializer: Deserializer<Group?>,
+  val jctDeserializer: Deserializer<Jwt?>,
   val jwtSerializer: Serializer<Jwt?>,
-  val discoverDeserilizer: Deserializer<DiscoverGroup?>
-
-
+  val discoverDeserializer: Deserializer<DiscoverGroup?>,
+  val publicUserDeserializer: Deserializer<PublicUser?>,
+  val geoDiscoverGroupDeserializer: Deserializer<GeoGroup?>,
+  val inventoryEventDeserializer: Deserializer<InventoryEvent?>,
+  val stateUpdateEventDeserializer: Deserializer<StateUpdateEvent?>,
+  val activityEventDeserializer: Deserializer<ActivityEvent?>,
+  val websocketEventDeserializer: Deserializer<WebSocketEvent<JSONObject>?>,
+  val activityThreadListDeserializer: Deserializer<ActivityThreadList?>,
+  val activityMessageListDeserializer: Deserializer<ActivityMessageList?>
 )

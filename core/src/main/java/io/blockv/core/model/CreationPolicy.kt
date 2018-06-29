@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,13 +10,13 @@
  */
 package io.blockv.core.model
 
-class CreationPolicy(var autoCreate: String?,
-                     var autoCreateCount: Int?,
-                     var isAutoCreateCountRandom: Boolean?,
-                     var isEnforcePolicyCountMax: Boolean?,
-                     var isEnforcePolicyCountMin: Boolean?,
-                     var policyCountMax: Int?,
-                     var policyCountMin: Int?) {
+class CreationPolicy(var autoCreate: String,
+                     var autoCreateCount: Int,
+                     var isAutoCreateCountRandom: Boolean,
+                     var isEnforcePolicyCountMax: Boolean,
+                     var isEnforcePolicyCountMin: Boolean,
+                     var policyCountMax: Int,
+                     var policyCountMin: Int) {
 
 
   override fun toString(): String {

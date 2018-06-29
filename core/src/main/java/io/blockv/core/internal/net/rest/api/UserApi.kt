@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -12,6 +12,7 @@ package io.blockv.core.internal.net.rest.api
 
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.net.rest.response.BaseResponse
+import io.blockv.core.model.PublicUser
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import org.json.JSONObject
@@ -37,6 +38,16 @@ interface UserApi {
   fun verifyToken(request: VerifyTokenRequest): BaseResponse<Void?>
 
   fun getUserTokens(): BaseResponse<List<Token>>
+
+  fun createUserToken(request: CreateTokenRequest): BaseResponse<Void?>
+
+  fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Void?>
+
+  fun setDefaultUserToken(tokenId:String): BaseResponse<Void?>
+
+  fun deleteUserToken(tokenId: String): BaseResponse<Void?>
+
+  fun getPublicUser(userId:String): BaseResponse<PublicUser?>
 
   fun logout(): BaseResponse<JSONObject>
 

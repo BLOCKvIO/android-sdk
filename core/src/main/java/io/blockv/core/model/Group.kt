@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,4 +10,14 @@
  */
 package io.blockv.core.model
 
-open class Group(val vatoms: List<Vatom>, val faces: List<Face>, val actions: List<Action>)
+open class Group(val vatoms: List<Vatom>,
+                 val faces: List<Face>,
+                 val actions: List<Action>) {
+  override fun toString(): String {
+    return "Group{" +
+      " vAtoms='" + vatoms + '\'' +
+      ", faces='" + faces + '\'' +
+      ", actions='" + actions + '\'' +
+      "}"
+  }
+}

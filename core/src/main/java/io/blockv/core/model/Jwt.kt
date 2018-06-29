@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,10 +10,12 @@
  */
 package io.blockv.core.model
 
-import java.util.*
-
-class Jwt(val token: String, val type: String, val expiresIn: Int, val expires: Int) {
-
-  fun hasExpired(): Boolean = (Date().time / 1000).toInt() > expires
+class Jwt(val token: String,
+          val type: String) {
+  override fun toString(): String {
+    return "Jwt{" +
+      " token='" + token + '\'' +
+      ", type='" + type + '\'' +
+      "}"
+  }
 }
-

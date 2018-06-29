@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -12,21 +12,23 @@ package io.blockv.core.internal.net.rest
 
 import org.json.JSONObject
 
-interface Client
-{
-  fun http(method: String, endpoint: String, payload: JSONObject?):JSONObject
+interface Client {
 
-  fun get(endpoint: String):JSONObject
+  fun http(method: String, endpoint: String, payload: JSONObject?): JSONObject
 
-  fun del(endpoint: String):JSONObject
+  fun get(endpoint: String): JSONObject
 
-  fun put(endpoint: String):JSONObject
+  fun del(endpoint: String): JSONObject
 
-  fun post(endpoint: String, payload: JSONObject?):JSONObject
+  fun put(endpoint: String): JSONObject
 
-  fun patch(endpoint: String, payload: JSONObject?):JSONObject
+  fun post(endpoint: String, payload: JSONObject?): JSONObject
 
-  fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray, retry: Int):JSONObject
+  fun patch(endpoint: String, payload: JSONObject?): JSONObject
 
-  fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray):JSONObject
+  fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray, retry: Int): JSONObject
+
+  fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray): JSONObject
+
+
 }

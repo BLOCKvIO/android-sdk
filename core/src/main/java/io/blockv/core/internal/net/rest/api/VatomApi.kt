@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,26 +10,30 @@
  */
 package io.blockv.core.internal.net.rest.api
 
-import io.blockv.core.internal.net.rest.request.InventoryRequest
-import io.blockv.core.internal.net.rest.request.PerformActionRequest
-import io.blockv.core.internal.net.rest.request.VatomRequest
+import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Action
 import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import org.json.JSONObject
 
 interface VatomApi {
 
-  fun getUserVatom(request: VatomRequest): BaseResponse<Group?>
+  fun getUserVatom(request: VatomRequest): BaseResponse<Group>
 
-  fun getUserInventory(request: InventoryRequest): BaseResponse<Group?>
+  fun getUserInventory(request: InventoryRequest): BaseResponse<Group>
 
   fun getVatomActions(template: String?): BaseResponse<List<Action>>
 
-  fun preformAction(request:PerformActionRequest): BaseResponse<JSONObject?>
+  fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?>
 
-  fun discover(request: JSONObject): BaseResponse<DiscoverGroup?>
+  fun discover(request: JSONObject): BaseResponse<DiscoverGroup>
 
+  fun geoDiscover(request: GeoRequest): BaseResponse<Group>
 
+  fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>>
+
+  fun updateVatom(request: JSONObject): BaseResponse<Void?>
 }
+

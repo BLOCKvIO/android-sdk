@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -12,15 +12,19 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class GeoRequest(val latitude: Double, val longitude: Double, val radius: Int, val limit: Int) {
+class GeoRequest(val bottomLeftLon: Double,
+                 val bottomLeftLat: Double,
+                 val topRightLon: Double,
+                 val topRightLat: Double,
+                 val filter: String) {
 
   fun toJson(): JSONObject {
     val out = JSONObject()
-    out.put("unit", "m")
-    out.put("radius",radius)
-    out.put("limit",limit)
-    out.put("center_geo_pos",JSONObject().put("Lat",latitude).put("Lon",longitude))
-
+    out.put("filter", filter)
+    out.put("bottom_left", JSONObject().put("lat", bottomLeftLat).put("lon", bottomLeftLon))
+    out.put("top_right", JSONObject().put("lat", topRightLat).put("lon", topRightLon))
     return out
   }
+
+
 }

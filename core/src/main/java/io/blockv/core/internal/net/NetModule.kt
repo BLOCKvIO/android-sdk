@@ -1,4 +1,4 @@
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,26 +10,26 @@
  */
 package io.blockv.core.internal.net
 
+import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.net.rest.Client
 import io.blockv.core.internal.net.rest.HttpClient
-import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.internal.json.JsonModule
-import io.blockv.core.internal.net.rest.api.UserApi
-import io.blockv.core.internal.net.rest.api.UserApiImpl
-import io.blockv.core.internal.net.rest.api.VatomApi
-import io.blockv.core.internal.net.rest.api.VatomApiImpl
+import io.blockv.core.internal.net.rest.api.*
+import io.blockv.core.internal.net.rest.auth.Authenticator
 import io.blockv.core.internal.net.rest.exception.DefaultErrorMapper
+import io.blockv.core.internal.repository.Preferences
 
-class NetModule(val preferences: Preferences, val jsonModule: JsonModule) {
+
+class NetModule(val authenticator: Authenticator, val preferences: Preferences, val jsonModule: JsonModule) {
 
   val client: Client = HttpClient(
     preferences,
     DefaultErrorMapper(),
     jsonModule,
+    authenticator,
     50000,
     60000)
 
   val userApi: UserApi = UserApiImpl(client, jsonModule)
   val vatomApi: VatomApi = VatomApiImpl(client, jsonModule)
-
+  val activityApi: ActivityApi = ActivityApiImpl(client, jsonModule)
 }
