@@ -19,29 +19,28 @@ class ResourceManagerImpl(private val preferences: Preferences) : ResourceManage
   override val assetProviders: List<AssetProvider>?
     get() = preferences.assetProviders
 
-  override fun encodeUrl(url: String?): String? {
-    if (url != null) {
-      assetProviders?.forEach {
-        if (url.startsWith(it.uri)) {
-          val descriptor: Map<String, String?> = it.descriptor
-          val original = Uri.parse(url)
-          val out = Uri.parse(url).buildUpon().clearQuery()
-          for (key in descriptor.keys) {
-            out.appendQueryParameter(key, descriptor.get(key))
-          }
-
-          for (param in original.queryParameterNames) {
-            if (!descriptor.keys.contains(param)) {
-              out.appendQueryParameter(param, original.getQueryParameter(param))
-            }
-          }
-
-          return out.build().toString()
-
+  @Throws(ResourceManager.MissingAssetProviderException::class)
+  override fun encodeUrl(url: String): String {
+    if (assetProviders == null || assetProviders?.size == 0) throw ResourceManager.MissingAssetProviderException()
+    assetProviders?.forEach {
+      if (url.startsWith(it.uri)) {
+        val descriptor: Map<String, String?> = it.descriptor
+        val original = Uri.parse(url)
+        val out = Uri.parse(url).buildUpon().clearQuery()
+        for (key in descriptor.keys) {
+          out.appendQueryParameter(key, descriptor.get(key))
         }
-      }
 
+        for (param in original.queryParameterNames) {
+          if (!descriptor.keys.contains(param)) {
+            out.appendQueryParameter(param, original.getQueryParameter(param))
+          }
+        }
+
+        return out.build().toString()
+      }
     }
+
     return url
   }
 }
