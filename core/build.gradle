@@ -40,14 +40,12 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'core'
-def libraryVersion = '0.5.3'
+def libraryVersion = '1.0.0'
 
-//Add this back in when repo is open source
-//
-//task sourceJar(type: Jar) {
-//  from android.sourceSets.main.java.srcDirs
-//  classifier "sources"
-//}
+task sourceJar(type: Jar) {
+  from android.sourceSets.main.java.srcDirs
+  classifier "sources"
+}
 
 publishing {
   publications {
@@ -55,13 +53,13 @@ publishing {
       groupId libraryGroupId
       artifactId libraryArtifactId
       version libraryVersion
-      //artifact(sourceJar)
+      artifact(sourceJar)
       artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
     }
   }
   repositories {
     maven {
-      url "https://maven.blockv.io/artifactory/Blockv-Debug/"
+      url "https://maven.blockv.io/artifactory/BLOCKv/"
       credentials {
         username = "${blockv_artifactory_username}"
         password = "${blockv_artifactory_password}"
