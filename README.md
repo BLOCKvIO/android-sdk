@@ -4,8 +4,9 @@ BLOCKv SDK for Android
 This is the official BLOCKv SDK. It allows you to easily integrate your own apps into the BLOCKv Platform. It handles a number of operations on your behalf, including:
 
 - Wrapping API endpoints,
-- Parsing JSON to native Java models, and
-- Managing OAuth2 tokens.
+- Parsing JSON to native Java models,
+- Managing OAuth2 tokens, and
+- Interacting with the web socket.
 
 ### Requirements
 
@@ -49,7 +50,10 @@ dependencies {
   // ...
   implementation 'io.blockv.sdk:core:1.0.0'
   // Make sure android Studio version is > 3.0 or include the Kotlin Plugin
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version'
+  // (Optional) This is only required if you want to use the web socket.
+  // Attempting to access the EventManager will throw MissingWebSocketException if this is not included.
+  implementation 'com.neovisionaries:nv-websocket-client:2.5'
 }
 ```
 
@@ -88,6 +92,9 @@ To configure your integration, create an instance of the BLOCKv SDK.
 ```
 
 > At this point you will need an App Id. See [FAQ](https://developer-dev.blockv.io/docs/faq)
+
+### Dependencies
+1. [nv-websocket-client](https://github.com/TakahikoKawasaki/nv-websocket-client) implementation used for the web socket.
 
 ### Recommendations
 
