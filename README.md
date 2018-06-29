@@ -99,7 +99,7 @@ To configure your integration, create an instance of the BLOCKv SDK.
 Please see the [BLOCKv Android Example](https://github.com/BLOCKvIO/android-sample) for an example on using the BLOCKv SDK.
 
 ### Dependencies
-1. [nv-websocket-client](https://github.com/TakahikoKawasaki/nv-websocket-client) implementation used for the web socket.
+1. [nv-websocket-client](https://github.com/TakahikoKawasaki/nv-websocket-client) is used for the web socket.
 
 ### Recommendations
 
