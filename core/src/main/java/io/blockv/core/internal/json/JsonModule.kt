@@ -34,7 +34,7 @@ class JsonModule(
   val inventoryEventDeserializer: Deserializer<InventoryEvent?>,
   val stateUpdateEventDeserializer: Deserializer<StateUpdateEvent?>,
   val activityEventDeserializer: Deserializer<ActivityEvent?>,
-  val websocketEventDeserializer: Deserializer<WebSocketEvent<JSONObject>?>
-
-
+  val websocketEventDeserializer: Deserializer<WebSocketEvent<JSONObject>?>,
+  val activityThreadListDeserializer: Deserializer<ActivityThreadList?>,
+  val activityMessageListDeserializer: Deserializer<ActivityMessageList?>
 )

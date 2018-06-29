@@ -1,6 +1,4 @@
-package io.blockv.core.model
-
-/**
+/*
  *  BlockV AG. Copyright (c) 2018, all rights reserved.
  *
  *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
@@ -10,14 +8,15 @@ package io.blockv.core.model
  *  under the License.
  *
  */
-class Message(val id:Long,
-              val userId:String,
-              val triggeredBy:String,
-              val whenCreated:String,
-              val whenModified:String,
-              val action:String,
-              val message:String,
-              val vatomIds:List<String>,
-              val templateVariations:List<String>,
-              val geoPosition: List<Double>,
-              val resources:List<Resource>)
+package io.blockv.core.model
+
+class ActivityThreadList(val cursor: String, val threads: List<ActivityThread>)
+{
+  override fun toString(): String {
+    return "ActivityThreadList{" +
+      "cursor='" + cursor + '\'' +
+      ", threads='" + threads + '\'' +
+      "}"
+  }
+
+}

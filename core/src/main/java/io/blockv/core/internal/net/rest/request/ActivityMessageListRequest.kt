@@ -12,11 +12,11 @@ import org.json.JSONObject
  *  under the License.
  *
  */
-class MessageThreadRequest(val id: String, val cursor: String?, val count: Int) {
+class ActivityMessageListRequest(val id: String, val cursor: String, val count: Int) {
   fun toJson(): JSONObject {
-    val out: JSONObject = JSONObject()
+    val out = JSONObject()
     out.put("name", id)
-    out.put("cursor", cursor ?: "")
+    out.put("cursor", cursor)
     out.put("count", count)
     return out
   }
