@@ -4,8 +4,9 @@ BLOCKv SDK for Android
 This is the official BLOCKv SDK. It allows you to easily integrate your own apps into the BLOCKv Platform. It handles a number of operations on your behalf, including:
 
 - Wrapping API endpoints,
-- Parsing JSON to native Java models, and
-- Managing OAuth2 tokens.
+- Parsing JSON to native Java models,
+- Managing OAuth2 tokens, and
+- Interacting with the web socket.
 
 ### Requirements
 
@@ -49,7 +50,11 @@ dependencies {
   // ...
   implementation 'io.blockv.sdk:core:1.0.0'
   // Make sure android Studio version is > 3.0 or include the Kotlin Plugin
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version'
+  // (Optional) This is only required if you want to use the web socket.
+  // Attempting to access the EventManager will throw MissingWebSocketException
+  // if this is not included.
+  implementation 'com.neovisionaries:nv-websocket-client:2.5'
 }
 ```
 
@@ -69,7 +74,7 @@ dependencies {
   implementation 'io.blockv.sdk:rx:1.0.0'
 ]
 ```
-To access the RxJava2 wrapped SDK in your application code, import the class:
+To access the [RxJava2](https://github.com/ReactiveX/RxJava) wrapped SDK in your application code, import the class:
 
 ```java
 import io.blockv.rx.Blockv
@@ -87,8 +92,28 @@ To configure your integration, create an instance of the BLOCKv SDK.
     }
 ```
 
-> At this point you will need an App Id. See [FAQ](https://developer-dev.blockv.io/docs/faq)
+> At this point you will need an App Id. See [FAQ](https://developer.blockv.io/docs/faq)
+
+### Example
+
+Please see the [BLOCKv Android Example](https://github.com/BLOCKvIO/android-sample) for an example on using the BLOCKv SDK.
+
+### Dependencies
+1. [nv-websocket-client](https://github.com/TakahikoKawasaki/nv-websocket-client) is used for the web socket.
 
 ### Recommendations
 
 We recommend you use [Dagger 2](https://github.com/google/dagger), or a similar library, for singleton management for the BLOCKv SDK.
+
+## Versioning
+
+The BLOCKv SDK for Android is still in pre-release and so may introduce breaking changes. Once the release is official, the SDK will follow [semantic versioning](https://semver.org), starting with release 1.0.0.
+
+## Author
+
+[BLOCKv](developer.blockv.io)
+
+## License
+
+BLOCKv is available under the BLOCKv AG license. See the [LICENSE](./LICENSE.md) file for more info.
+
