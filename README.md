@@ -92,7 +92,7 @@ To configure your integration, create an instance of the BLOCKv SDK.
     }
 ```
 
-> At this point you will need an App Id. See [FAQ](https://developer-dev.blockv.io/docs/faq)
+> At this point you will need an App Id. See [FAQ](https://developer.blockv.io/docs/faq)
 
 ### Example
 
