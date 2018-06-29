@@ -39,7 +39,7 @@ allprojects {
 }
 ```
 
-Next, add the kotlin plugin and following dependencies to your module Gradle file (usually the `app/build.gradle`):
+Next, add the Kotlin plugin and following dependencies to your module Gradle file (usually the `app/build.gradle`):
 
 ```java
 apply plugin: 'kotlin-android' //This should be at the top of the file.
