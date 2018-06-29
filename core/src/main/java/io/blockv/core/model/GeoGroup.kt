@@ -13,4 +13,14 @@ package io.blockv.core.model
 class GeoGroup(val geoHash:String,
                val longitude: Double,
                val latitude: Double,
-               val count: Int)
+               val count: Int){
+
+  override fun toString(): String {
+    return "GeoGroup{" +
+      " geoHash='" + geoHash + '\'' +
+      ", longitude='" + longitude + '\'' +
+      ", latitude='" + latitude + '\'' +
+      ", count='" + count + '\'' +
+      "}"
+  }
+}

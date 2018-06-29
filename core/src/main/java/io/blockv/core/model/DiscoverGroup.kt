@@ -13,4 +13,13 @@ package io.blockv.core.model
 class DiscoverGroup(val count: Int,
                     vatoms: List<Vatom>,
                     faces: List<Face>,
-                    actions: List<Action>) : Group(vatoms, faces, actions)
+                    actions: List<Action>) : Group(vatoms, faces, actions) {
+  override fun toString(): String {
+    return "DiscoverGroup{" +
+      " count='" + count + '\'' +
+      ", vatoms='" + vatoms + '\'' +
+      ", faces='" + faces + '\'' +
+      ", actions='" + actions + '\'' +
+      "}"
+  }
+}

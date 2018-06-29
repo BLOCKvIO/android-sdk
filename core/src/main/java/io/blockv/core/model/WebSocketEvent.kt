@@ -36,4 +36,12 @@ class WebSocketEvent<out T>(val messageType: String,
       }
     }
   }
+
+  override fun toString(): String {
+    return "WebSocketEvent{" +
+      " messageType='" + messageType + '\'' +
+      ", userId='" + userId + '\'' +
+      ", payload='" + payload + '\'' +
+      "}"
+  }
 }

@@ -18,4 +18,12 @@ open class Environment(val rest: String,
     val DEFAULT_WEBSOCKET = "wss://newws.blockv.io/ws"
   }
 
+  override fun toString(): String {
+    return "Environment{" +
+      " rest='" + rest + '\'' +
+      ", wss='" + wss + '\'' +
+      ", appId='" + appId + '\'' +
+      "}"
+  }
+
 }

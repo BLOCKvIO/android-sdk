@@ -10,6 +10,12 @@
  */
 package io.blockv.core.model
 
-
 class Jwt(val token: String,
-          val type: String)
+          val type: String) {
+  override fun toString(): String {
+    return "Jwt{" +
+      " token='" + token + '\'' +
+      ", type='" + type + '\'' +
+      "}"
+  }
+}
