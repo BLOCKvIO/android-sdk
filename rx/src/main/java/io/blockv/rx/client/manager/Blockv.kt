@@ -111,7 +111,6 @@ class Blockv {
     this.userManager = UserManagerImpl(
       netModule.userApi,
       preferences,
-      resourceManager,
       JwtDecoderImpl()
     )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
@@ -155,7 +154,6 @@ class Blockv {
     this.userManager = UserManagerImpl(
       netModule.userApi,
       preferences,
-      resourceManager,
       JwtDecoderImpl())
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)

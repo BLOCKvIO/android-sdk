@@ -34,7 +34,6 @@ import java.io.ByteArrayOutputStream
 
 class UserManagerImpl(val api: UserApi,
                       val preferences: Preferences,
-                      val resourceManager: ResourceManager,
                       val jwtDecoder: JwtDecoder) : UserManager {
 
   override fun addCurrentUserToken(token: String,
@@ -144,11 +143,7 @@ class UserManagerImpl(val api: UserApi,
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun getCurrentUser(): Single<User> = Single.fromCallable {
-    val user: User? = api.getCurrentUser().payload
-    if (user?.avatarUri != null) {
-      user.avatarUri = resourceManager.encodeUrl(user.avatarUri)
-    }
-    user ?: NULL_USER
+    api.getCurrentUser().payload?:NULL_USER
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
