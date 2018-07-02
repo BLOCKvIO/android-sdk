@@ -26,7 +26,7 @@ class UserDeserializer : Deserializer<User?> {
       val whenModified: String? = meta.getString("when_modified")
       val firstName: String? = properties.optString("first_name")
       val lastName: String? = properties.optString("last_name")
-      val avatarUri: String? =  properties.optString("avatar_uri")
+      val avatarUri: String? = properties.optString("avatar_uri")
       val birthday: String? = properties.optString("birthday")
       val language: String? = properties.optString("language")
 
@@ -38,9 +38,10 @@ class UserDeserializer : Deserializer<User?> {
         lastName,
         avatarUri,
         birthday,
-        language)
+        language
+      )
     } catch (e: Exception) {
-      Log.e("deserilizer",e.toString())
+      Log.e("deserilizer", e.toString())
     }
     return null
   }

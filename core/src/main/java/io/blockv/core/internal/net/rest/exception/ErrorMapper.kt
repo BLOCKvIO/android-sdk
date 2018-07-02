@@ -13,5 +13,5 @@ package io.blockv.core.internal.net.rest.exception
 import org.json.JSONObject
 
 interface ErrorMapper {
-  fun map(httpCode:Int,payload: JSONObject?): BlockvException
+  fun map(httpCode: Int, payload: JSONObject?): BlockvException
 }

@@ -12,7 +12,11 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class ActivityMessageListRequest(val id: String, val cursor: String, val count: Int) {
+class ActivityMessageListRequest(
+  val id: String,
+  val cursor: String,
+  val count: Int
+) {
   fun toJson(): JSONObject {
     val out = JSONObject()
     out.put("name", id)

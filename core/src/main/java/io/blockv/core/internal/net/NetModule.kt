@@ -27,7 +27,8 @@ class NetModule(val authenticator: Authenticator, val preferences: Preferences, 
     jsonModule,
     authenticator,
     50000,
-    60000)
+    60000
+  )
 
   val userApi: UserApi = UserApiImpl(client, jsonModule)
   val vatomApi: VatomApi = VatomApiImpl(client, jsonModule)

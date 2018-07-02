@@ -22,8 +22,10 @@ import io.blockv.core.util.Cancellable
 import org.json.JSONObject
 
 
-class EventManagerImpl(private val webSocket: WebsocketImpl,
-                       val jsonModule: JsonModule) : EventManager {
+class EventManagerImpl(
+  private val webSocket: WebsocketImpl,
+  val jsonModule: JsonModule
+) : EventManager {
 
   companion object {
     val NULL_STATE_EVENT = WebSocketEvent<StateUpdateEvent>("", "", null)
@@ -82,7 +84,8 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
             updateEvent = WebSocketEvent(
               it.messageType,
               it.userId,
-              stateEvent)
+              stateEvent
+            )
           }
         }
         updateEvent
@@ -104,7 +107,8 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
             event = WebSocketEvent(
               it.messageType,
               it.userId,
-              inventoryEvent)
+              inventoryEvent
+            )
           }
         }
         event
@@ -126,7 +130,8 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
             event = WebSocketEvent(
               it.messageType,
               it.userId,
-              activityEvent)
+              activityEvent
+            )
           }
         }
         event

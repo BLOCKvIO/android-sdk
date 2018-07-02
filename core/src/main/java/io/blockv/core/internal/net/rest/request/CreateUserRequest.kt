@@ -13,31 +13,15 @@ package io.blockv.core.internal.net.rest.request
 import org.json.JSONArray
 import org.json.JSONObject
 
-class CreateUserRequest {
-
-  var firstName: String? = null
-  var lastName: String? = null
-  var birthday: String? = null
-  var avatarUri: String? = null
-  var password: String? = null
-  var language: String? = null
-  var tokens: JSONArray? = null
-
-  constructor(firstName: String?,
-              lastName: String?,
-              birthday: String?,
-              avatarUri: String?,
-              password: String?,
-              language: String?,
-              tokens: JSONArray?) {
-    this.firstName = firstName
-    this.lastName = lastName
-    this.birthday = birthday
-    this.avatarUri = avatarUri
-    this.password = password
-    this.language = language
-    this.tokens = tokens
-  }
+class CreateUserRequest(
+  var firstName: String?,
+  var lastName: String?,
+  var birthday: String?,
+  var avatarUri: String?,
+  var password: String?,
+  var language: String?,
+  var tokens: JSONArray?
+) {
 
 
   fun toJson(): JSONObject {

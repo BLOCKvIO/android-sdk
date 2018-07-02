@@ -21,8 +21,10 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-class Preferences(context: Context,
-                  private val jsonModule: JsonModule) {
+class Preferences(
+  context: Context,
+  private val jsonModule: JsonModule
+) {
 
   enum class Key {
     ENVIRONMENT,
@@ -30,7 +32,8 @@ class Preferences(context: Context,
     ASSET_PROVIDER
   }
 
-  private val preferences: SharedPreferences = context.getSharedPreferences("io.blockv.core.prefs", Context.MODE_PRIVATE)
+  private val preferences: SharedPreferences =
+    context.getSharedPreferences("io.blockv.core.prefs", Context.MODE_PRIVATE)
 
   var environment: Environment?
     get() {
@@ -133,7 +136,8 @@ class Preferences(context: Context,
 
   @SuppressLint("ApplySharedPref")
   fun clear() {
-    preferences.edit().clear().commit()//prefs are expected be cleared directly when function is called, called before sdk reset
+    preferences.edit().clear()
+      .commit()//prefs are expected be cleared directly when function is called, called before sdk reset
   }
 
 

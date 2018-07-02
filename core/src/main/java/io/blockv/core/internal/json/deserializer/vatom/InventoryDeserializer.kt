@@ -18,9 +18,11 @@ import io.blockv.core.model.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
 
-class InventoryDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
-                            val faceDeserializer: Deserializer<Face?>,
-                            val actionDeserializer: Deserializer<Action?>) : Deserializer<Group> {
+class InventoryDeserializer(
+  val vatomDeserializer: Deserializer<Vatom?>,
+  val faceDeserializer: Deserializer<Face?>,
+  val actionDeserializer: Deserializer<Action?>
+) : Deserializer<Group> {
 
   override fun deserialize(data: JSONObject): Group? {
     try {

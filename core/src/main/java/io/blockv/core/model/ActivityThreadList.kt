@@ -10,8 +10,10 @@
  */
 package io.blockv.core.model
 
-class ActivityThreadList(val cursor: String, val threads: List<ActivityThread>)
-{
+class ActivityThreadList(
+  val cursor: String,
+  val threads: List<ActivityThread>
+) {
   override fun toString(): String {
     return "ActivityThreadList{" +
       "cursor='" + cursor + '\'' +

@@ -12,12 +12,14 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class GeoGroupRequest(val bottomLeftLon: Double,
-                      val bottomLeftLat: Double,
-                      val topRightLon: Double,
-                      val topRightLat: Double,
-                      val precision: Int,
-                      val filter: String) {
+class GeoGroupRequest(
+  val bottomLeftLon: Double,
+  val bottomLeftLat: Double,
+  val topRightLon: Double,
+  val topRightLat: Double,
+  val precision: Int,
+  val filter: String
+) {
 
   fun toJson(): JSONObject {
     val out = JSONObject()

@@ -12,10 +12,12 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class ResetTokenRequest(var tokenType: String, var token: String) {
+class ResetTokenRequest(
+  var tokenType: String,
+  var token: String
+) {
 
-  fun toJson():JSONObject
-  {
+  fun toJson(): JSONObject {
     val out = JSONObject()
     out.put("token", token)
     out.put("token_type", tokenType)

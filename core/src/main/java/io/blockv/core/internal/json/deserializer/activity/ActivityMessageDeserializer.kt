@@ -39,11 +39,13 @@ class ActivityMessageDeserializer : Deserializer<ActivityMessage?> {
       (0 until resources.length()).forEach({
         val resource = resources.getJSONObject(it)
         if (resource != null) {
-          resourceArray.add(Resource(
-            resource.optString("name"),
-            resource.optString("resourceType"),
-            resource.optJSONObject("value").optString("value")
-          ))
+          resourceArray.add(
+            Resource(
+              resource.optString("name"),
+              resource.optString("resourceType"),
+              resource.optJSONObject("value").optString("value")
+            )
+          )
         }
       })
       val geoPosArray = ArrayList<Double>()
@@ -59,7 +61,8 @@ class ActivityMessageDeserializer : Deserializer<ActivityMessage?> {
         whenCreated,
         triggeredBy,
         resourceArray,
-        geoPosArray)
+        geoPosArray
+      )
 
     } catch (e: Exception) {
       android.util.Log.w("Deserializer", "ActivityMessageDeserializer - " + e.message)

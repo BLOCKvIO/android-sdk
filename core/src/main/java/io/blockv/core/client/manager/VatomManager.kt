@@ -11,10 +11,10 @@
 package io.blockv.core.client.manager
 
 import io.blockv.core.client.builder.DiscoverQueryBuilder
+import io.blockv.core.model.DiscoverGroup
 import io.blockv.core.model.GeoGroup
 import io.blockv.core.model.Group
 import io.blockv.core.util.Callable
-import io.blockv.core.model.DiscoverGroup
 import org.json.JSONObject
 import java.util.*
 
@@ -57,7 +57,13 @@ interface VatomManager {
    * @see GeoFilter
    * @see Group
    */
-  fun geoDiscover(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, filter: GeoFilter): Callable<Group>
+  fun geoDiscover(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    filter: GeoFilter
+  ): Callable<Group>
 
   /**
    * Fetches the count of vAtoms dropped in the specified area.
@@ -74,7 +80,14 @@ interface VatomManager {
    * @see GeoFilter
    * @see GeoGroup
    */
-  fun geoDiscoverGroups(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
+  fun geoDiscoverGroups(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    precision: Int,
+    filter: GeoFilter
+  ): Callable<List<GeoGroup>>
 
   /**
    * Updates the vAtom's properties.
