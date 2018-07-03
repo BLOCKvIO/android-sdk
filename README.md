@@ -1,4 +1,4 @@
-BLOCKv SDK for Android
+BLOCKv SDK for Android (BETA)
 ======================
 
 This is the official BLOCKv SDK. It allows you to easily integrate your own apps into the BLOCKv Platform. It handles a number of operations on your behalf, including:
