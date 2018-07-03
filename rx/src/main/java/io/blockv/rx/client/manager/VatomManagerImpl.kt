@@ -13,9 +13,9 @@ package io.blockv.rx.client.manager
 import io.blockv.core.client.manager.VatomManager.*
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,7 +30,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: GeoFilter
-  ): Single<Group> = Single.fromCallable {
+  ): Single<Pack> = Single.fromCallable {
     api.geoDiscover(
       GeoRequest(
         bottomLeftLon,
@@ -72,13 +72,13 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getVatoms(vararg ids: String): Single<Group> = Single.fromCallable {
+  override fun getVatoms(vararg ids: String): Single<Pack> = Single.fromCallable {
     api.getUserVatom(VatomRequest(ids.toList())).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getInventory(id: String?): Single<Group> = Single.fromCallable {
+  override fun getInventory(id: String?): Single<Pack> = Single.fromCallable {
     api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
   }
     .subscribeOn(Schedulers.io())
@@ -130,7 +130,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
   override fun pickupVatom(id: String): Completable = preformAction(Action.PICKUP, id, null).toCompletable()
 
-  override fun discover(query: JSONObject): Single<DiscoverGroup> = Single.fromCallable {
+  override fun discover(query: JSONObject): Single<DiscoverPack> = Single.fromCallable {
     api.discover(query).payload
   }
     .subscribeOn(Schedulers.io())

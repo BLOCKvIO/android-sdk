@@ -14,9 +14,9 @@ import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.client.manager.VatomManager
 import io.blockv.core.client.manager.VatomManager.GeoFilter
 import io.blockv.core.model.Action
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.json.JSONObject
@@ -30,19 +30,19 @@ interface VatomManager {
    * Fetches vAtoms by id.
    *
    * @param ids is a list of vAtom id's in the current users inventory.
-   * @return new Single<Group> instance.
-   * @see Group
+   * @return new Single<Pack> instance.
+   * @see Pack
    */
-  fun getVatoms(vararg ids: String): Single<Group>
+  fun getVatoms(vararg ids: String): Single<Pack>
 
   /**
    * Fetches the current users inventory.
    *
    * @param id is the id of the inventory you want to fetch.
-   * @return new Single<Group> instance.
-   * @see Group
+   * @return new Single<Pack> instance.
+   * @see Pack
    */
-  fun getInventory(id: String?): Single<Group>
+  fun getInventory(id: String?): Single<Pack>
 
   /**
    * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
@@ -56,9 +56,9 @@ interface VatomManager {
    * @param topRightLat is the top right latitude coordinate.
    * @param topRightLon is the top right longitude coordinate.
    * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
-   * @return new Single<Group> instance.
+   * @return new Single<Pack> instance.
    * @see GeoFilter
-   * @see Group
+   * @see Pack
    */
   fun geoDiscover(
     bottomLeftLat: Double,
@@ -66,7 +66,7 @@ interface VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: VatomManager.GeoFilter
-  ): Single<Group>
+  ): Single<Pack>
 
   /**
    * Fetches the count of vAtoms dropped in the specified area.
@@ -181,10 +181,10 @@ interface VatomManager {
    * Searches for vAtoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query.
-   * @return new Single<DiscoverGroup>.
+   * @return new Single<DiscoverPack>.
    * @see DiscoverQueryBuilder
-   * @see DiscoverGroup
+   * @see DiscoverPack
    */
-  fun discover(query: JSONObject): Single<DiscoverGroup>
+  fun discover(query: JSONObject): Single<DiscoverPack>
 
 }

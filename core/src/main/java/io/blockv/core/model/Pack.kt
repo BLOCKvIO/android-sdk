@@ -10,13 +10,13 @@
  */
 package io.blockv.core.model
 
-open class Group(
+open class Pack(
   val vatoms: List<Vatom>,
   val faces: List<Face>,
   val actions: List<Action>
 ) {
   override fun toString(): String {
-    return "Group{" +
+    return "Pack{" +
       " vAtoms='" + vatoms + '\'' +
       ", faces='" + faces + '\'' +
       ", actions='" + actions + '\'' +

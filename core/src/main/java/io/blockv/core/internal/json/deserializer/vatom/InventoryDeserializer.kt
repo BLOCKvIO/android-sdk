@@ -13,7 +13,7 @@ package io.blockv.core.internal.json.deserializer.vatom
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Action
 import io.blockv.core.model.Face
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import io.blockv.core.model.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
@@ -22,9 +22,9 @@ class InventoryDeserializer(
   val vatomDeserializer: Deserializer<Vatom?>,
   val faceDeserializer: Deserializer<Face?>,
   val actionDeserializer: Deserializer<Action?>
-) : Deserializer<Group> {
+) : Deserializer<Pack> {
 
-  override fun deserialize(data: JSONObject): Group? {
+  override fun deserialize(data: JSONObject): Pack? {
     try {
       val inventory: JSONArray? = data.optJSONArray("vatoms")
 
@@ -62,7 +62,7 @@ class InventoryDeserializer(
             }
           }
       }
-      return Group(inventoryArray, facesArray, actionsArray)
+      return Pack(inventoryArray, facesArray, actionsArray)
     } catch (e: Exception) {
       android.util.Log.e("InventoryDeserializer", e.message)
     }

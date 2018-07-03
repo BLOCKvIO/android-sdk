@@ -13,24 +13,24 @@ package io.blockv.core.internal.net.rest.api
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.internal.net.rest.response.BaseResponse
 import io.blockv.core.model.Action
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import org.json.JSONObject
 
 interface VatomApi {
 
-  fun getUserVatom(request: VatomRequest): BaseResponse<Group>
+  fun getUserVatom(request: VatomRequest): BaseResponse<Pack>
 
-  fun getUserInventory(request: InventoryRequest): BaseResponse<Group>
+  fun getUserInventory(request: InventoryRequest): BaseResponse<Pack>
 
   fun getVatomActions(template: String?): BaseResponse<List<Action>>
 
   fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?>
 
-  fun discover(request: JSONObject): BaseResponse<DiscoverGroup>
+  fun discover(request: JSONObject): BaseResponse<DiscoverPack>
 
-  fun geoDiscover(request: GeoRequest): BaseResponse<Group>
+  fun geoDiscover(request: GeoRequest): BaseResponse<Pack>
 
   fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>>
 
