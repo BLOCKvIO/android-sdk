@@ -127,4 +127,9 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
   }
 
   override fun pickupVatom(id: String): Callable<JSONObject?> = preformAction(VatomManager.Action.PICKUP, id, null)
+
+  override fun deleteVatom(id: String): Callable<Void?> = Callable.single {
+    api.deleteVatom(DeleteVatomRequest(id))
+    null
+  }
 }

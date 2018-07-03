@@ -175,6 +175,8 @@ interface VatomManager {
    */
   fun discover(query: JSONObject): Callable<DiscoverGroup>
 
+  fun deleteVatom(id: String): Callable<Void?>
+
   enum class TokenType {
     EMAIL,
     PHONE_NUMBER,

@@ -187,4 +187,5 @@ interface VatomManager {
    */
   fun discover(query: JSONObject): Single<DiscoverGroup>
 
+  fun deleteVatom(id: String): Completable
 }
