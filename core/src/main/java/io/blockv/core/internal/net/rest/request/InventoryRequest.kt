@@ -12,11 +12,17 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class InventoryRequest(val parentId: String) {
+class InventoryRequest(
+  val parentId: String,
+  val page: Int,
+  val limit: Int
+) {
 
   fun toJson(): JSONObject {
     val out = JSONObject()
     out.put("id", parentId)
+    out.put("page", page)
+    out.put("limit", limit)
     return out
   }
 }
