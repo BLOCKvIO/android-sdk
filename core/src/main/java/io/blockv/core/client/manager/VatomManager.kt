@@ -175,6 +175,12 @@ interface VatomManager {
    */
   fun discover(query: JSONObject): Callable<DiscoverGroup>
 
+  /**
+   * Removes the specified vAtom from the current user's inventory.
+   *
+   * @param id is the identifier of the vAtom.
+   * @return new Callable<Void>.
+   */
   fun deleteVatom(id: String): Callable<Void?>
 
   enum class TokenType {
