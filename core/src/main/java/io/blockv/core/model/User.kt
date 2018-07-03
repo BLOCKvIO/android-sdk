@@ -24,14 +24,16 @@ class User {
     get() = ((this.firstName ?: "") + " " + (this.lastName ?: "")).trim()
 
 
-  constructor(id: String?,
-              whenCreated: String?,
-              whenModified: String?,
-              firstName: String?,
-              lastName: String?,
-              avatarUri: String?,
-              birthday: String?,
-              language: String?) {
+  constructor(
+    id: String?,
+    whenCreated: String?,
+    whenModified: String?,
+    firstName: String?,
+    lastName: String?,
+    avatarUri: String?,
+    birthday: String?,
+    language: String?
+  ) {
     this.id = id
     this.whenCreated = whenCreated
     this.whenModified = whenModified

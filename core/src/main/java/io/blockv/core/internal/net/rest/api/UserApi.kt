@@ -43,11 +43,11 @@ interface UserApi {
 
   fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Void?>
 
-  fun setDefaultUserToken(tokenId:String): BaseResponse<Void?>
+  fun setDefaultUserToken(tokenId: String): BaseResponse<Void?>
 
   fun deleteUserToken(tokenId: String): BaseResponse<Void?>
 
-  fun getPublicUser(userId:String): BaseResponse<PublicUser?>
+  fun getPublicUser(userId: String): BaseResponse<PublicUser?>
 
   fun logout(): BaseResponse<JSONObject>
 

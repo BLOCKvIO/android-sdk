@@ -10,8 +10,10 @@
  */
 package io.blockv.core.model
 
-class VatomVisibility(var type: String,
-                      var value: String) {
+class VatomVisibility(
+  var type: String,
+  var value: String
+) {
 
   override fun toString(): String {
     return "VatomVisibility{" +

@@ -15,7 +15,8 @@ import io.blockv.core.model.ActivityThread
 import io.blockv.core.model.ActivityThreadList
 import org.json.JSONObject
 
-class ActivityThreadListDeserializer(val threadDeserializer: Deserializer<ActivityThread>) : Deserializer<ActivityThreadList> {
+class ActivityThreadListDeserializer(val threadDeserializer: Deserializer<ActivityThread>) :
+  Deserializer<ActivityThreadList> {
   override fun deserialize(data: JSONObject): ActivityThreadList? {
     try {
       val cursor: String = data.getString("cursor")

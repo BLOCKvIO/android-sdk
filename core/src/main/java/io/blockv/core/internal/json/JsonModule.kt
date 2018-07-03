@@ -13,16 +13,6 @@ package io.blockv.core.internal.json
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.internal.json.serializer.Serializer
 import io.blockv.core.model.*
-import io.blockv.core.model.ActivityMessageList
-import io.blockv.core.model.ActivityThreadList
-import io.blockv.core.model.ActivityEvent
-import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateUpdateEvent
-import io.blockv.core.model.WebSocketEvent
-import io.blockv.core.model.AssetProvider
-import io.blockv.core.model.PublicUser
-import io.blockv.core.model.Token
-import io.blockv.core.model.User
 import org.json.JSONObject
 
 class JsonModule(

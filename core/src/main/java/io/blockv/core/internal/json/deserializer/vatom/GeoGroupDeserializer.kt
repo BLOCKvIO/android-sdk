@@ -19,7 +19,7 @@ class GeoGroupDeserializer : Deserializer<GeoGroup?> {
 
   override fun deserialize(data: org.json.JSONObject): GeoGroup? {
     try {
-      val geoHash: String = data.optString("key","")
+      val geoHash: String = data.optString("key", "")
       val lon: Double = data.optDouble("lon")
       val lat: Double = data.optDouble("lat")
       val count: Int = data.optInt("count")

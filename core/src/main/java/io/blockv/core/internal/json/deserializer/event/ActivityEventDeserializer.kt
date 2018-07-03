@@ -40,11 +40,13 @@ class ActivityEventDeserializer : Deserializer<ActivityEvent> {
         .forEach {
           val resource = resources.optJSONObject(it)
           if (resource != null) {
-            resourceArray.add(Resource(
-              resource.optString("name"),
-              resource.optString("resourceType"),
-              resource.optJSONObject("value").optString("value")
-            ))
+            resourceArray.add(
+              Resource(
+                resource.optString("name"),
+                resource.optString("resourceType"),
+                resource.optJSONObject("value").optString("value")
+              )
+            )
           }
         }
 
@@ -56,7 +58,8 @@ class ActivityEventDeserializer : Deserializer<ActivityEvent> {
         resourceArray,
         message,
         actionName,
-        whenCreated)
+        whenCreated
+      )
     } catch (e: Exception) {
       android.util.Log.e("ActEventDeserializer", e.message)
     }

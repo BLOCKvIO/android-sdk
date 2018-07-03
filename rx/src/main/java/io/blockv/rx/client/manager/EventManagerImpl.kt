@@ -23,8 +23,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 
-class EventManagerImpl(val webSocket: WebsocketImpl,
-                       val jsonModule: JsonModule) : EventManager {
+class EventManagerImpl(
+  val webSocket: WebsocketImpl,
+  val jsonModule: JsonModule
+) : EventManager {
 
   @Volatile
   private var eventFlowable: Flowable<WebSocketEvent<JSONObject>>? = null
@@ -55,7 +57,8 @@ class EventManagerImpl(val webSocket: WebsocketImpl,
             stateEvent = WebSocketEvent(
               event.messageType,
               event.userId,
-              payload)
+              payload
+            )
           }
         }
         stateEvent
@@ -76,7 +79,8 @@ class EventManagerImpl(val webSocket: WebsocketImpl,
             stateEvent = WebSocketEvent(
               event.messageType,
               event.userId,
-              payload)
+              payload
+            )
           }
         }
         stateEvent
@@ -97,7 +101,8 @@ class EventManagerImpl(val webSocket: WebsocketImpl,
             stateEvent = WebSocketEvent(
               event.messageType,
               event.userId,
-              payload)
+              payload
+            )
           }
         }
         stateEvent

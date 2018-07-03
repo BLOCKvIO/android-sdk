@@ -60,7 +60,13 @@ interface VatomManager {
    * @see GeoFilter
    * @see Group
    */
-  fun geoDiscover(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, filter: VatomManager.GeoFilter): Single<Group>
+  fun geoDiscover(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    filter: VatomManager.GeoFilter
+  ): Single<Group>
 
   /**
    * Fetches the count of vAtoms dropped in the specified area.
@@ -77,7 +83,14 @@ interface VatomManager {
    * @see GeoFilter
    * @see GeoGroup
    */
-  fun geoDiscoverGroups(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, precision: Int, filter: VatomManager.GeoFilter): Single<List<GeoGroup>>
+  fun geoDiscoverGroups(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    precision: Int,
+    filter: VatomManager.GeoFilter
+  ): Single<List<GeoGroup>>
 
   /**
    * Updates the vAtom's properties.
@@ -114,7 +127,11 @@ interface VatomManager {
    * @param payload contains the data required to do the action.
    * @return new Single<JSONObject> instance.
    */
-  fun preformAction(action: io.blockv.core.client.manager.VatomManager.Action, id: String, payload: JSONObject?): Single<JSONObject>
+  fun preformAction(
+    action: io.blockv.core.client.manager.VatomManager.Action,
+    id: String,
+    payload: JSONObject?
+  ): Single<JSONObject>
 
   /**
    * Performs an acquire action on a vAtom.
@@ -135,7 +152,11 @@ interface VatomManager {
    * @param token is the user's token matching the provided type.
    * @return new Completable instance.
    */
-  fun transferVatom(id: String, tokenType: io.blockv.core.client.manager.VatomManager.TokenType, token: String): Completable
+  fun transferVatom(
+    id: String,
+    tokenType: io.blockv.core.client.manager.VatomManager.TokenType,
+    token: String
+  ): Completable
 
   /**
    * Attempts to drop a vAtom on the map.

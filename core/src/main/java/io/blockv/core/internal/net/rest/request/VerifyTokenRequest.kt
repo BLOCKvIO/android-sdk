@@ -12,7 +12,11 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class VerifyTokenRequest(var tokenType: String, var token: String, var code: String) {
+class VerifyTokenRequest(
+  var tokenType: String,
+  var token: String,
+  var code: String
+) {
 
   fun toJson(): JSONObject {
     val out: JSONObject = JSONObject()

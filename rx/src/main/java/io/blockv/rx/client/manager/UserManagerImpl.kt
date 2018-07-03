@@ -12,7 +12,6 @@ package io.blockv.rx.client.manager
 
 import android.graphics.Bitmap
 import android.util.Log
-import io.blockv.core.client.manager.ResourceManager
 import io.blockv.core.client.manager.UserManager.*
 import io.blockv.core.internal.net.rest.api.UserApi
 import io.blockv.core.internal.net.rest.auth.JwtDecoder
@@ -32,21 +31,27 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
-class UserManagerImpl(val api: UserApi,
-                      val preferences: Preferences,
-                      val jwtDecoder: JwtDecoder) : UserManager {
+class UserManagerImpl(
+  val api: UserApi,
+  val preferences: Preferences,
+  val jwtDecoder: JwtDecoder
+) : UserManager {
 
-  override fun addCurrentUserToken(token: String,
-                                   tokenType: TokenType,
-                                   isDefault: Boolean): Completable = Completable.fromCallable {
+  override fun addCurrentUserToken(
+    token: String,
+    tokenType: TokenType,
+    isDefault: Boolean
+  ): Completable = Completable.fromCallable {
     api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault))
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun addCurrentUserOauthToken(token: String,
-                                        tokenType: String,
-                                        code: String, isDefault: Boolean): Completable = Completable.fromCallable {
+  override fun addCurrentUserOauthToken(
+    token: String,
+    tokenType: String,
+    code: String, isDefault: Boolean
+  ): Completable = Completable.fromCallable {
     api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault))
   }
     .subscribeOn(Schedulers.io())
@@ -81,82 +86,106 @@ class UserManagerImpl(val api: UserApi,
       }
       tokens.put(data)
     }
-    api.register(CreateUserRequest(
-      registration.firstName,
-      registration.lastName,
-      registration.birthday,
-      registration.avatarUri,
-      registration.password,
-      registration.language,
-      tokens)).payload ?: NULL_USER
+    api.register(
+      CreateUserRequest(
+        registration.firstName,
+        registration.lastName,
+        registration.birthday,
+        registration.avatarUri,
+        registration.password,
+        registration.language,
+        tokens
+      )
+    ).payload ?: NULL_USER
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun login(token: String,
-                     tokenType: TokenType,
-                     password: String): Single<User> = Single.fromCallable {
-    api.login(LoginRequest(
-      tokenType.name.toLowerCase(),
-      token,
-      password)).payload ?: NULL_USER
+  override fun login(
+    token: String,
+    tokenType: TokenType,
+    password: String
+  ): Single<User> = Single.fromCallable {
+    api.login(
+      LoginRequest(
+        tokenType.name.toLowerCase(),
+        token,
+        password
+      )
+    ).payload ?: NULL_USER
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun loginOauth(provider: String,
-                          oauthToken: String): Single<User> = Single.fromCallable {
-    api.oauthLogin(OauthLoginRequest(
-      provider,
-      oauthToken)).payload ?: NULL_USER
+  override fun loginOauth(
+    provider: String,
+    oauthToken: String
+  ): Single<User> = Single.fromCallable {
+    api.oauthLogin(
+      OauthLoginRequest(
+        provider,
+        oauthToken
+      )
+    ).payload ?: NULL_USER
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun loginGuest(guestId: String): Single<User> = Single.fromCallable {
-    api.loginGuest(GuestLoginRequest(
-      guestId)).payload ?: NULL_USER
+    api.loginGuest(
+      GuestLoginRequest(
+        guestId
+      )
+    ).payload ?: NULL_USER
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun verifyUserToken(token: String,
-                               tokenType: TokenType,
-                               code: String): Completable = Completable.fromCallable {
+  override fun verifyUserToken(
+    token: String,
+    tokenType: TokenType,
+    code: String
+  ): Completable = Completable.fromCallable {
     api.verifyToken(VerifyTokenRequest(tokenType.name.toLowerCase(), token, code))
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun resetToken(token: String,
-                          tokenType: TokenType): Completable = Completable.fromCallable {
+  override fun resetToken(
+    token: String,
+    tokenType: TokenType
+  ): Completable = Completable.fromCallable {
     api.resetToken(ResetTokenRequest(tokenType.name.toLowerCase(), token)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun resendVerification(token: String,
-                                  tokenType: TokenType): Completable = Completable.fromCallable {
+  override fun resendVerification(
+    token: String,
+    tokenType: TokenType
+  ): Completable = Completable.fromCallable {
     api.resetVerificationToken(ResetTokenRequest(tokenType.name.toLowerCase(), token))
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun getCurrentUser(): Single<User> = Single.fromCallable {
-    api.getCurrentUser().payload?:NULL_USER
+    api.getCurrentUser().payload ?: NULL_USER
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun updateCurrentUser(update: UserUpdate): Single<User> = Single.fromCallable {
-    api.updateCurrentUser(UpdateUserRequest(
-      update.firstName,
-      update.lastName,
-      update.birthday,
-      update.avatarUri,
-      update.language,
-      update.password
-    )).payload ?: NULL_USER
+    api.updateCurrentUser(
+      UpdateUserRequest(
+        update.firstName,
+        update.lastName,
+        update.birthday,
+        update.avatarUri,
+        update.language,
+        update.password
+      )
+    ).payload ?: NULL_USER
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())

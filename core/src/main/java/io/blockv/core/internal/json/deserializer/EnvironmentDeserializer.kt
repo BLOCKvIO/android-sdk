@@ -10,7 +10,6 @@
  */
 package io.blockv.core.internal.json.deserializer
 
-import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Environment
 import org.json.JSONObject
 
@@ -20,7 +19,8 @@ class EnvironmentDeserialzier : Deserializer<Environment> {
       return Environment(
         data.getString("rest"),
         data.getString("wss"),
-        data.getString("app_id"))
+        data.getString("app_id")
+      )
     } catch (e: Exception) {
       android.util.Log.w("EnvironmentDeserialzier", e.message)
     }

@@ -28,7 +28,8 @@ class PublicUserDeserializer : Deserializer<PublicUser?> {
         id,
         firstName,
         lastName,
-        avatarUri)
+        avatarUri
+      )
     } catch (e: Exception) {
       Log.e("deserilizer", e.toString())
     }

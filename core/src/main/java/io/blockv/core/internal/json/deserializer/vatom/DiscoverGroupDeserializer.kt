@@ -18,20 +18,22 @@ import io.blockv.core.model.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
 
-class DiscoverGroupDeserializer(val vatomDeserializer: Deserializer<Vatom?>,
-                                val faceDeserializer: Deserializer<Face?>,
-                                val actionDeserializer: Deserializer<Action?>) : Deserializer<DiscoverGroup> {
+class DiscoverGroupDeserializer(
+  val vatomDeserializer: Deserializer<Vatom?>,
+  val faceDeserializer: Deserializer<Face?>,
+  val actionDeserializer: Deserializer<Action?>
+) : Deserializer<DiscoverGroup> {
 
   override fun deserialize(data: JSONObject): DiscoverGroup? {
     try {
-      val count:Int = data.optInt("count")
+      val count: Int = data.optInt("count")
 
       val inventory: JSONArray? = data.optJSONArray("results")
 
       val faces: JSONArray? = data.optJSONArray("faces")
       val actions: JSONArray? = data.optJSONArray("actions")
 
-      var inventoryArray: ArrayList<Vatom> = ArrayList()
+      val inventoryArray: ArrayList<Vatom> = ArrayList()
       val facesArray: ArrayList<Face> = ArrayList()
       val actionsArray: ArrayList<Action> = ArrayList()
 

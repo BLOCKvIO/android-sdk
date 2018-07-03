@@ -12,7 +12,12 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class CreateOauthTokenRequest(var tokenType: String, var token: String, var code: String, var isPrimary: Boolean) {
+class CreateOauthTokenRequest(
+  var tokenType: String,
+  var token: String,
+  var code: String,
+  var isPrimary: Boolean
+) {
 
   fun toJson(): JSONObject {
     val out: JSONObject = JSONObject()

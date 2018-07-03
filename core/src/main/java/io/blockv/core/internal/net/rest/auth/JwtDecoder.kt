@@ -15,6 +15,6 @@ import io.blockv.core.model.Jwt
 
 interface JwtDecoder {
 
-fun decode(jwt:Jwt):DecodedJwt
+  fun decode(jwt: Jwt): DecodedJwt
 
 }

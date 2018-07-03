@@ -79,12 +79,11 @@ class VatomDeserializer : Deserializer<Vatom> {
       properties.visibility = VatomVisibility(visibility.optString("type"), visibility.optString("value", "*"))
 
       val tagArray: org.json.JSONArray? = prop.optJSONArray("tags")
-      if(tagArray!=null) {
+      if (tagArray != null) {
         val tags: ArrayList<String> = ArrayList(tagArray.length())
         (0..tagArray.length()).mapTo(tags) { tagArray.optString(it) }
         properties.tags = tags
-      }
-      else
+      } else
         properties.tags = ArrayList()
 
 
@@ -96,7 +95,8 @@ class VatomDeserializer : Deserializer<Vatom> {
       properties.geoPos = GeoPosition(
         geoPos.optString("type", "Point"),
         geoPos.optString("\$reql_type\$", "GEOMETRY"),
-        coordinates)
+        coordinates
+      )
 
       if (prop.has("commerce")) {
         val commerce: JSONObject = prop.optJSONObject("commerce")
@@ -110,7 +110,9 @@ class VatomDeserializer : Deserializer<Vatom> {
             value.optString("price"),
             value.optString("valid_from", "*"),
             value.optString("valid_through", "*"),
-            value.optBoolean("vat_included", false)))
+            value.optBoolean("vat_included", false)
+          )
+        )
       }
       val resourceArray = prop.optJSONArray("resources")
       val resources: ArrayList<Resource> = ArrayList()
@@ -118,11 +120,13 @@ class VatomDeserializer : Deserializer<Vatom> {
         .forEach {
           val resource = resourceArray.optJSONObject(it)
           if (resource != null) {
-            resources.add(Resource(
-              resource.optString("name"),
-              resource.optString("resourceType"),
-              resource.optJSONObject("value").optString("value")
-            ))
+            resources.add(
+              Resource(
+                resource.optString("name"),
+                resource.optString("resourceType"),
+                resource.optJSONObject("value").optString("value")
+              )
+            )
           }
         }
       properties.resources = resources
@@ -132,7 +136,8 @@ class VatomDeserializer : Deserializer<Vatom> {
         whenCreated,
         whenModified,
         properties,
-        private)
+        private
+      )
     } catch (e: Exception) {
       android.util.Log.e("VatomDeserializer", e.message)
     }

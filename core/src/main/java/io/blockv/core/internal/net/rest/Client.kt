@@ -26,7 +26,14 @@ interface Client {
 
   fun patch(endpoint: String, payload: JSONObject?): JSONObject
 
-  fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray, retry: Int): JSONObject
+  fun multipart(
+    endpoint: String,
+    fieldName: String,
+    fileName: String,
+    type: String,
+    payload: ByteArray,
+    retry: Int
+  ): JSONObject
 
   fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray): JSONObject
 

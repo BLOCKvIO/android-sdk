@@ -39,7 +39,8 @@ class TokenDeserializer : Deserializer<Token> {
         token,
         confirmed,
         primary,
-        verifyCodeExpires)
+        verifyCodeExpires
+      )
 
     } catch (e: Exception) {
       android.util.Log.w("TokenDeserializer", e.message)

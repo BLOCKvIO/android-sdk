@@ -12,7 +12,10 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class SendMessageRequest(val userId: String, val message: String) {
+class SendMessageRequest(
+  val userId: String,
+  val message: String
+) {
   fun toJson(): JSONObject {
     val out: JSONObject = JSONObject()
     out.put("id", userId)

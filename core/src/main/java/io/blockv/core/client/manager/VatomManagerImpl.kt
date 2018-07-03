@@ -21,33 +21,43 @@ import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
-  override fun geoDiscover(bottomLeftLat: Double,
-                           bottomLeftLon: Double,
-                           topRightLat: Double,
-                           topRightLon: Double,
-                           filter: VatomManager.GeoFilter): Callable<Group> = Callable.single({
-    api.geoDiscover(GeoRequest(
-      bottomLeftLon,
-      bottomLeftLat,
-      topRightLon,
-      topRightLat,
-      filter.name.toLowerCase())).payload
+  override fun geoDiscover(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    filter: VatomManager.GeoFilter
+  ): Callable<Group> = Callable.single({
+    api.geoDiscover(
+      GeoRequest(
+        bottomLeftLon,
+        bottomLeftLat,
+        topRightLon,
+        topRightLat,
+        filter.name.toLowerCase()
+      )
+    ).payload
   })
 
-  override fun geoDiscoverGroups(bottomLeftLat: Double,
-                                 bottomLeftLon: Double,
-                                 topRightLat: Double,
-                                 topRightLon: Double,
-                                 precision: Int,
-                                 filter: VatomManager.GeoFilter): Callable<List<GeoGroup>> = Callable.single({
+  override fun geoDiscoverGroups(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    precision: Int,
+    filter: VatomManager.GeoFilter
+  ): Callable<List<GeoGroup>> = Callable.single({
     assert(precision in 1..12) { "Precision required to be in the range  1 - 12" }
-    api.geoGroupDiscover(GeoGroupRequest(
-      bottomLeftLon,
-      bottomLeftLat,
-      topRightLon,
-      topRightLat,
-      precision,
-      filter.name.toLowerCase())).payload
+    api.geoGroupDiscover(
+      GeoGroupRequest(
+        bottomLeftLon,
+        bottomLeftLat,
+        topRightLon,
+        topRightLat,
+        precision,
+        filter.name.toLowerCase()
+      )
+    ).payload
   })
 
   override fun updateVatom(payload: JSONObject): Callable<Void?> = Callable.single({
@@ -71,22 +81,28 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     api.getVatomActions(templateId).payload
   })
 
-  override fun preformAction(action: String,
-                             id: String,
-                             payload: JSONObject?): Callable<JSONObject?> = Callable.single({
+  override fun preformAction(
+    action: String,
+    id: String,
+    payload: JSONObject?
+  ): Callable<JSONObject?> = Callable.single({
     api.preformAction(PerformActionRequest(action, id, payload)).payload ?: JSONObject()
   })
 
-  override fun preformAction(action: VatomManager.Action,
-                             id: String,
-                             payload: JSONObject?): Callable<JSONObject?> = preformAction(action.action(), id, payload)
+  override fun preformAction(
+    action: VatomManager.Action,
+    id: String,
+    payload: JSONObject?
+  ): Callable<JSONObject?> = preformAction(action.action(), id, payload)
 
   override fun acquireVatom(id: String): Callable<JSONObject?> = preformAction(VatomManager.Action.ACQUIRE, id, null)
 
 
-  override fun transferVatom(id: String,
-                             tokenType: VatomManager.TokenType,
-                             token: String): Callable<JSONObject?> {
+  override fun transferVatom(
+    id: String,
+    tokenType: VatomManager.TokenType,
+    token: String
+  ): Callable<JSONObject?> {
     val payload = JSONObject()
     when (tokenType) {
       VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
@@ -96,13 +112,17 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     return preformAction(VatomManager.Action.TRANSFER, id, payload)
   }
 
-  override fun dropVatom(id: String,
-                         latitude: Double,
-                         longitude: Double): Callable<JSONObject?> {
+  override fun dropVatom(
+    id: String,
+    latitude: Double,
+    longitude: Double
+  ): Callable<JSONObject?> {
     val payload = JSONObject()
-    payload.put("geo.pos", JSONObject()
-      .put("lat", latitude)
-      .put("lon", longitude))
+    payload.put(
+      "geo.pos", JSONObject()
+        .put("lat", latitude)
+        .put("lon", longitude)
+    )
     return preformAction(VatomManager.Action.DROP, id, payload)
   }
 
