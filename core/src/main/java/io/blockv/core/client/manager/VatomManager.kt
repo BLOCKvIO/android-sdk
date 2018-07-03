@@ -11,9 +11,9 @@
 package io.blockv.core.client.manager
 
 import io.blockv.core.client.builder.DiscoverQueryBuilder
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import io.blockv.core.util.Callable
 import org.json.JSONObject
 import java.util.*
@@ -27,19 +27,19 @@ interface VatomManager {
    * Fetches vAtoms by id.
    *
    * @param ids is a list of vAtom id's in the current users inventory.
-   * @return new Callable<Group> instance.
-   * @see Group
+   * @return new Callable<Pack> instance.
+   * @see Pack
    */
-  fun getVatoms(vararg ids: String): Callable<Group>
+  fun getVatoms(vararg ids: String): Callable<Pack>
 
   /**
    * Fetches the current users inventory.
    *
    * @param id is the id of the inventory you want to fetch.
-   * @return new Callable<Group> instance.
-   * @see Group
+   * @return new Callable<Pack> instance.
+   * @see Pack
    */
-  fun getInventory(id: String?): Callable<Group>
+  fun getInventory(id: String?): Callable<Pack>
 
   /**
    * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
@@ -53,9 +53,9 @@ interface VatomManager {
    * @param topRightLat is the top right latitude coordinate.
    * @param topRightLon is the top right longitude coordinate.
    * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
-   * @return new Callable<Group> instance.
+   * @return new Callable<Pack> instance.
    * @see GeoFilter
-   * @see Group
+   * @see Pack
    */
   fun geoDiscover(
     bottomLeftLat: Double,
@@ -63,7 +63,7 @@ interface VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: GeoFilter
-  ): Callable<Group>
+  ): Callable<Pack>
 
   /**
    * Fetches the count of vAtoms dropped in the specified area.
@@ -169,11 +169,11 @@ interface VatomManager {
    * Searches for vAtoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query.
-   * @return new Callable<DiscoverGroup>.
+   * @return new Callable<DiscoverPack>.
    * @see DiscoverQueryBuilder
-   * @see DiscoverGroup
+   * @see DiscoverPack
    */
-  fun discover(query: JSONObject): Callable<DiscoverGroup>
+  fun discover(query: JSONObject): Callable<DiscoverPack>
 
   /**
    * Removes the specified vAtom from the current user's inventory.
