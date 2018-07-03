@@ -12,7 +12,6 @@ package io.blockv.core.util
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -69,8 +68,10 @@ interface Callable<T> {
 
     companion object {
       private val cores = Runtime.getRuntime().availableProcessors()
-      val IO_POOL: ThreadPoolExecutor = ThreadPoolExecutor(10, 100, Long.MAX_VALUE, TimeUnit.NANOSECONDS, LinkedBlockingQueue())
-      val COMP_POOL: ThreadPoolExecutor = ThreadPoolExecutor(cores * 2, cores * 4, 60L, TimeUnit.SECONDS, LinkedBlockingQueue())
+      val IO_POOL: ThreadPoolExecutor =
+        ThreadPoolExecutor(10, 100, Long.MAX_VALUE, TimeUnit.NANOSECONDS, LinkedBlockingQueue())
+      val COMP_POOL: ThreadPoolExecutor =
+        ThreadPoolExecutor(cores * 2, cores * 4, 60L, TimeUnit.SECONDS, LinkedBlockingQueue())
 
       fun wrapRunnable(runnable: java.lang.Runnable, onCancel: (java.lang.Runnable) -> Unit): Runnable {
 

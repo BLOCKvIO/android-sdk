@@ -18,7 +18,7 @@ class CreateTokenRequest(var tokenType: String, var token: String, var isPrimary
     val out: JSONObject = JSONObject()
     out.put("token", token)
     out.put("token_type", tokenType)
-    out.put("is_primary",isPrimary)
+    out.put("is_primary", isPrimary)
     return out
   }
 }

@@ -100,13 +100,15 @@ class Blockv {
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
-      appId)
+      appId
+    )
     this.resourceManager = ResourceManagerImpl(preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
       auth,
       preferences,
-      jsonModule)
+      jsonModule
+    )
     this.userManager = UserManagerImpl(
       netModule.userApi,
       auth,
@@ -155,27 +157,31 @@ class Blockv {
       netModule.userApi,
       auth,
       preferences,
-      JwtDecoderImpl())
+      JwtDecoderImpl()
+    )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
   }
 
 
-  constructor(appId: String,
-              preferences: Preferences,
-              jsonModule: JsonModule,
-              netModule: NetModule,
-              userManager: UserManager,
-              vatomManager: VatomManager,
-              activityManager: ActivityManager,
-              eventManager: EventManager,
-              resourceManager: ResourceManager) {
+  constructor(
+    appId: String,
+    preferences: Preferences,
+    jsonModule: JsonModule,
+    netModule: NetModule,
+    userManager: UserManager,
+    vatomManager: VatomManager,
+    activityManager: ActivityManager,
+    eventManager: EventManager,
+    resourceManager: ResourceManager
+  ) {
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
-      appId)
+      appId
+    )
     this.jsonModule = jsonModule
     this.netModule = netModule
     this.userManager = userManager

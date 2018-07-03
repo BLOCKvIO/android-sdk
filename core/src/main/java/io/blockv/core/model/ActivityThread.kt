@@ -10,10 +10,12 @@
  */
 package io.blockv.core.model
 
-class ActivityThread(val id: String,
-                     val whenModified: Long,
-                     val lastMessage: ActivityMessage,
-                     val lastMessageUser: UserInfo) {
+class ActivityThread(
+  val id: String,
+  val whenModified: Long,
+  val lastMessage: ActivityMessage,
+  val lastMessageUser: UserInfo
+) {
 
   class UserInfo(val name: String, val avatarUri: String) {
     override fun toString(): String {

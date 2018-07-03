@@ -31,7 +31,8 @@ class InventoryEventDeserializer : Deserializer<InventoryEvent> {
         newOwner,
         oldOwner,
         templateVariationId,
-        parentId)
+        parentId
+      )
     } catch (e: Exception) {
       android.util.Log.e("InvEventDeserializer", e.message)
     }

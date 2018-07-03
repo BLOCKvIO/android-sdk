@@ -21,15 +21,18 @@ import io.blockv.core.model.Group
 import org.json.JSONArray
 import org.json.JSONObject
 
-class VatomApiImpl(val client: Client,
-                   val jsonModule: JsonModule) : VatomApi {
+class VatomApiImpl(
+  val client: Client,
+  val jsonModule: JsonModule
+) : VatomApi {
 
   override fun updateVatom(request: JSONObject): BaseResponse<Void?> {
     val response: JSONObject = client.patch("v1/vatoms", request)
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null)
+      null
+    )
   }
 
   override fun geoDiscover(request: GeoRequest): BaseResponse<Group> {
@@ -62,7 +65,8 @@ class VatomApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      list)
+      list
+    )
   }
 
   override fun getUserVatom(request: VatomRequest): BaseResponse<Group> {
@@ -86,7 +90,8 @@ class VatomApiImpl(val client: Client,
       response.optInt("error"),
       response.optString("message"),
       (if (payload != null) jsonModule.discoverDeserializer.deserialize(payload) else null)
-        ?: DiscoverGroup(0, ArrayList(), ArrayList(), ArrayList()))
+        ?: DiscoverGroup(0, ArrayList(), ArrayList(), ArrayList())
+    )
   }
 
 
@@ -98,7 +103,8 @@ class VatomApiImpl(val client: Client,
       response.optInt("error"),
       response.optString("message"),
       (if (payload != null) jsonModule.groupDeserializer.deserialize(payload) else null)
-        ?: Group(ArrayList(), ArrayList(), ArrayList()))
+        ?: Group(ArrayList(), ArrayList(), ArrayList())
+    )
 
   }
 
@@ -119,7 +125,8 @@ class VatomApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      list)
+      list
+    )
   }
 
   override fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?> {
@@ -128,6 +135,7 @@ class VatomApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      payload)
+      payload
+    )
   }
 }

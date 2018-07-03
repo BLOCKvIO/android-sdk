@@ -107,7 +107,12 @@ open class DiscoverQueryBuilder {
    * @param combineOperation controls the boolean operator applied between this element and the other filter elements
    * @return DiscoverQueryBuilder.
    */
-  fun addFilter(field: Field, filterOperation: FilterOperation, value: String, combineOperation: CombineOperation): DiscoverQueryBuilder {
+  fun addFilter(
+    field: Field,
+    filterOperation: FilterOperation,
+    value: String,
+    combineOperation: CombineOperation
+  ): DiscoverQueryBuilder {
     this.addFilter(field.value, filterOperation.operator, value, combineOperation.operator)
     return this
   }
@@ -137,11 +142,13 @@ open class DiscoverQueryBuilder {
 
     val elements = filters.getJSONObject(0).getJSONArray("filter_elems")
 
-    elements.put(JSONObject()
-      .put("field", field)
-      .put("filter_op", filterOperation)
-      .put("value", value)
-      .put("bool_op", combineOperation))
+    elements.put(
+      JSONObject()
+        .put("field", field)
+        .put("filter_op", filterOperation)
+        .put("value", value)
+        .put("bool_op", combineOperation)
+    )
 
     return this
   }
@@ -155,10 +162,12 @@ open class DiscoverQueryBuilder {
    * @return DiscoverQueryBuilder.
    */
   fun setReturn(type: ResultType): DiscoverQueryBuilder {
-    json.put("return",
+    json.put(
+      "return",
       JSONObject()
         .put("type", type.result)
-        .put("fields", JSONArray()))
+        .put("fields", JSONArray())
+    )
     return this
   }
 
@@ -169,10 +178,12 @@ open class DiscoverQueryBuilder {
    */
   fun build(): JSONObject {
     if (!json.has("return")) {
-      json.put("return",
+      json.put(
+        "return",
         JSONObject()
           .put("type", ResultType.PAYLOAD)
-          .put("fields", JSONArray()))
+          .put("fields", JSONArray())
+      )
     }
     return json
   }

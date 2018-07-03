@@ -34,11 +34,12 @@ class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
     return getThreads("")
   }
 
-  override fun getThreadMessages(id: String, cursor: String, count: Int): Callable<ActivityMessageList> = Callable.single {
-    api.getThreadMessages(ActivityMessageListRequest(id, cursor, count)).payload
-  }
-    .runOn(Callable.Scheduler.IO)
-    .returnOn(Callable.Scheduler.MAIN)
+  override fun getThreadMessages(id: String, cursor: String, count: Int): Callable<ActivityMessageList> =
+    Callable.single {
+      api.getThreadMessages(ActivityMessageListRequest(id, cursor, count)).payload
+    }
+      .runOn(Callable.Scheduler.IO)
+      .returnOn(Callable.Scheduler.MAIN)
 
   override fun getThreadMessages(id: String, cursor: String): Callable<ActivityMessageList> {
     return getThreadMessages(id, cursor, 0)

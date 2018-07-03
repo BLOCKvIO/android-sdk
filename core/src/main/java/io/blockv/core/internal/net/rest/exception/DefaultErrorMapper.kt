@@ -26,7 +26,8 @@ class DefaultErrorMapper : ErrorMapper {
       val error: Error?
       error = if ((httpCode == 401 && errorCode == 0)
         && payload.has("exp") && payload.getString("exp").equals("token expired", true)
-        || (payload.has("message") && payload.getString("message").equals("Unauthorized", true))) {
+        || (payload.has("message") && payload.getString("message").equals("Unauthorized", true))
+      ) {
         Error.USER_ACCESS_TOKEN_INVALID
       } else
         Error.from(errorCode)

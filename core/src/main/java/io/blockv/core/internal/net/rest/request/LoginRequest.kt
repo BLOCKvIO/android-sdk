@@ -12,9 +12,11 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class LoginRequest(var tokenType: String,
-                   var token: String?,
-                   var password: String?) {
+class LoginRequest(
+  var tokenType: String,
+  var token: String?,
+  var password: String?
+) {
 
   fun toJson(): JSONObject {
     val out: JSONObject = JSONObject()

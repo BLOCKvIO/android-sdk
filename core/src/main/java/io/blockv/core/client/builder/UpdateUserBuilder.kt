@@ -59,7 +59,8 @@ class UpdateUserBuilder {
       birthday,
       avatar,
       password,
-      language)
+      language
+    )
   }
 
 

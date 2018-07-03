@@ -10,12 +10,14 @@
  */
 package io.blockv.core.model
 
-class Face(var id: String,
-           var templateId: String,
-           var createdBy: String?,
-           var whenCreated: String?,
-           var whenModified: String?,
-           var property: FaceProperty) {
+class Face(
+  var id: String,
+  var templateId: String,
+  var createdBy: String?,
+  var whenCreated: String?,
+  var whenModified: String?,
+  var property: FaceProperty
+) {
 
 
   override fun toString(): String {
@@ -25,8 +27,8 @@ class Face(var id: String,
       ", createdBy='" + createdBy + '\'' +
       ", whenCreated='" + whenCreated + '\'' +
       ", whenModified='" + whenModified + '\'' +
-      "," + property+ '\'' +
-    "}"
+      "," + property + '\'' +
+      "}"
   }
 
 

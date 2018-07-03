@@ -10,16 +10,18 @@
  */
 package io.blockv.core.model
 
-class Token(var id: String,
-            var userId: String,
-            var appId: String,
-            var whenCreated: String,
-            var whenModified: String,
-            var tokenType: String,
-            var token: String,
-            var isConfirmed: Boolean,
-            var isPrimary: Boolean,
-            var verifyCodeExpires: String) {
+class Token(
+  var id: String,
+  var userId: String,
+  var appId: String,
+  var whenCreated: String,
+  var whenModified: String,
+  var tokenType: String,
+  var token: String,
+  var isConfirmed: Boolean,
+  var isPrimary: Boolean,
+  var verifyCodeExpires: String
+) {
   override fun toString(): String {
     return "Token{" +
       " id='" + id + '\'' +

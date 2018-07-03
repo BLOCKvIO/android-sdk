@@ -12,7 +12,11 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class PerformActionRequest(val action: String, val id: String, val payload: JSONObject?) {
+class PerformActionRequest(
+  val action: String,
+  val id: String,
+  val payload: JSONObject?
+) {
 
   fun toJson(): JSONObject {
     val data: JSONObject = payload ?: JSONObject()

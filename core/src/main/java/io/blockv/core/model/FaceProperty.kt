@@ -10,10 +10,12 @@
  */
 package io.blockv.core.model
 
-class FaceProperty(var displayUrl: String,
-                   var viewMode: String,
-                   var platform: String,
-                   var resources: List<String>) {
+class FaceProperty(
+  var displayUrl: String,
+  var viewMode: String,
+  var platform: String,
+  var resources: List<String>
+) {
 
 
   override fun toString(): String {

@@ -10,13 +10,15 @@
  */
 package io.blockv.core.model
 
-class CreationPolicy(var autoCreate: String,
-                     var autoCreateCount: Int,
-                     var isAutoCreateCountRandom: Boolean,
-                     var isEnforcePolicyCountMax: Boolean,
-                     var isEnforcePolicyCountMin: Boolean,
-                     var policyCountMax: Int,
-                     var policyCountMin: Int) {
+class CreationPolicy(
+  var autoCreate: String,
+  var autoCreateCount: Int,
+  var isAutoCreateCountRandom: Boolean,
+  var isEnforcePolicyCountMax: Boolean,
+  var isEnforcePolicyCountMin: Boolean,
+  var policyCountMax: Int,
+  var policyCountMin: Int
+) {
 
 
   override fun toString(): String {

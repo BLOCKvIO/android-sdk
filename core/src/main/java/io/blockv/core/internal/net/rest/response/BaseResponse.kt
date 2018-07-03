@@ -10,6 +10,8 @@
  */
 package io.blockv.core.internal.net.rest.response
 
-class BaseResponse<T>(val error:Int?,
-                      val message:String?,
-                      val payload:T)
+class BaseResponse<T>(
+  val error: Int?,
+  val message: String?,
+  val payload: T
+)

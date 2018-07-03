@@ -19,7 +19,7 @@ interface Websocket {
 
   fun disconnect()
 
-  interface WebSocketListener{
+  interface WebSocketListener {
 
     fun onEvent(event: WebSocketEvent<JSONObject>)
 
