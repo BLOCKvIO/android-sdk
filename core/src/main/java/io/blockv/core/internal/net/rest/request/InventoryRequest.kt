@@ -20,7 +20,7 @@ class InventoryRequest(
 
   fun toJson(): JSONObject {
     val out = JSONObject()
-    out.put("id", parentId)
+    out.put("parent_id", parentId)
     out.put("page", page)
     out.put("limit", limit)
     return out
