@@ -1,4 +1,4 @@
-BLOCKv SDK for Android
+BLOCKv SDK for Android (BETA)
 ======================
 
 This is the official BLOCKv SDK. It allows you to easily integrate your own apps into the BLOCKv Platform. It handles a number of operations on your behalf, including:
@@ -20,7 +20,7 @@ The BLOCKv SDK is dependant on Kotlin, if your version of Android Studio < 3.0 y
 
 Add the BLOCKv maven repository and Kotlin plugin to the root-level `build.gradle` file:
 
-```java
+```gradle
 buildscript {
   ext.kotlin_version = '1.2.41'
   //...
@@ -42,7 +42,7 @@ allprojects {
 
 Next, add the Kotlin plugin and following dependencies to your module Gradle file (usually the `app/build.gradle`):
 
-```java
+```gradle
 apply plugin: 'kotlin-android' //This should be at the top of the file.
 // ...
 //
@@ -58,26 +58,32 @@ dependencies {
 }
 ```
 
+Finally, add the following `uses-permission` element to the manifest:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
 To access the BLOCKv SDK in your application code, import the class:
 
 ```java
-import io.blockv.core.Blockv
+import io.blockv.core.Blockv;
 ```
 
-There is also an RxJava2 wrapped version, to use this you require to add the following additional dependencies to your module Gradle file:
+There is also an [RxJava2](https://github.com/ReactiveX/RxJava) wrapped version, to use this you require to add the following additional dependencies to your module Gradle file:
 
-```java
+```gradle
 dependencies {
   // ...
   implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
   implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
   implementation 'io.blockv.sdk:rx:1.0.0'
-]
+}
 ```
-To access the [RxJava2](https://github.com/ReactiveX/RxJava) wrapped SDK in your application code, import the class:
+To access the RxJava2 wrapped SDK in your application code, import the class:
 
 ```java
-import io.blockv.rx.Blockv
+import io.blockv.rx.Blockv;
 ```
 
 ### Configure your BLOCKv integration
@@ -85,11 +91,15 @@ import io.blockv.rx.Blockv
 To configure your integration, create an instance of the BLOCKv SDK.
 
 ```java
-    protected void onCreate(Bundle savedInstanceState) {
-       //Blockv instance should be maintained as a singleton
-        Blockv blockv = new Blockv(this,"Your app id");
-
-    }
+public class ExampleActivity extends Activity
+{ 
+  //...
+  protected void onCreate(Bundle savedInstanceState) {
+    //...
+    //BLOCKv instance should be maintained as a singleton
+    Blockv blockv = new Blockv(this,"Your app id"); 
+  }
+}
 ```
 
 > At this point you will need an App Id. See [FAQ](https://developer.blockv.io/docs/faq)
@@ -105,9 +115,13 @@ Please see the [BLOCKv Android Example](https://github.com/BLOCKvIO/android-samp
 
 We recommend you use [Dagger 2](https://github.com/google/dagger), or a similar library, for singleton management for the BLOCKv SDK.
 
+## Production Support
+
+The BLOCKv SDK for Android is currently in public **beta**. Breaking changes may still be introduced in the coming months.  This is *important* to consider if you are planning on releasing the SDK as part of your application.
+
 ## Versioning
 
-The BLOCKv SDK for Android is still in pre-release and so may introduce breaking changes. Once the release is official, the SDK will follow [semantic versioning](https://semver.org), starting with release 1.0.0.
+Once the release is official, the SDK will adhere to [semantic versioning](https://semver.org).
 
 ## Author
 

@@ -8,18 +8,17 @@
  *  under the License.
  *
  */
-package io.blockv.core.model
+package io.blockv.core.internal.net.rest.request
 
-open class Group(
-  val vatoms: List<Vatom>,
-  val faces: List<Face>,
-  val actions: List<Action>
+import org.json.JSONObject
+
+class DeleteVatomRequest(
+  var vatomId: String
 ) {
-  override fun toString(): String {
-    return "Group{" +
-      " vAtoms='" + vatoms + '\'' +
-      ", faces='" + faces + '\'' +
-      ", actions='" + actions + '\'' +
-      "}"
+
+  fun toJson(): JSONObject {
+    val out: JSONObject = JSONObject()
+    out.put("this.id", vatomId)
+    return out
   }
 }

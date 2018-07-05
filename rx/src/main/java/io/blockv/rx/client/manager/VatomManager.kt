@@ -14,9 +14,9 @@ import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.client.manager.VatomManager
 import io.blockv.core.client.manager.VatomManager.GeoFilter
 import io.blockv.core.model.Action
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.json.JSONObject
@@ -30,10 +30,10 @@ interface VatomManager {
    * Fetches vAtoms by id.
    *
    * @param ids is a list of vAtom id's in the current users inventory.
-   * @return new Single<Group> instance.
-   * @see Group
+   * @return new Single<Pack> instance.
+   * @see Pack
    */
-  fun getVatoms(vararg ids: String): Single<Group>
+  fun getVatoms(vararg ids: String): Single<Pack>
 
   /**
    * Fetches the current user's inventory of vAtoms.
@@ -44,10 +44,10 @@ interface VatomManager {
    *             zero, the first page is returned.
    * @param limit defines the number of vAtoms per response page (up to 100). If omitted or set as
    *              zero, the max number is returned.
-   * @return new Single<Group> instance.
-   * @see Group
+   * @return new Single<Pack> instance.
+   * @see Pack
    */
-  fun getInventory(id: String?, page: Int, limit: Int): Single<Group>
+  fun getInventory(id: String?, page: Int, limit: Int): Single<Pack>
 
   /**
    * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
@@ -61,9 +61,9 @@ interface VatomManager {
    * @param topRightLat is the top right latitude coordinate.
    * @param topRightLon is the top right longitude coordinate.
    * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
-   * @return new Single<Group> instance.
+   * @return new Single<Pack> instance.
    * @see GeoFilter
-   * @see Group
+   * @see Pack
    */
   fun geoDiscover(
     bottomLeftLat: Double,
@@ -71,7 +71,7 @@ interface VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: VatomManager.GeoFilter
-  ): Single<Group>
+  ): Single<Pack>
 
   /**
    * Fetches the count of vAtoms dropped in the specified area.
@@ -186,10 +186,17 @@ interface VatomManager {
    * Searches for vAtoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query.
-   * @return new Single<DiscoverGroup>.
+   * @return new Single<DiscoverPack>.
    * @see DiscoverQueryBuilder
-   * @see DiscoverGroup
+   * @see DiscoverPack
    */
-  fun discover(query: JSONObject): Single<DiscoverGroup>
+  fun discover(query: JSONObject): Single<DiscoverPack>
 
+  /**
+   * Removes the specified vAtom from the current user's inventory.
+   *
+   * @param id is the identifier of the vAtom.
+   * @return new Completable instance.
+   */
+  fun deleteVatom(id: String): Completable
 }

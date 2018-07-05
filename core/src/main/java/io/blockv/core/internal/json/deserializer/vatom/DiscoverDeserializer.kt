@@ -12,19 +12,19 @@ package io.blockv.core.internal.json.deserializer.vatom
 
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Action
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.Face
 import io.blockv.core.model.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
 
-class DiscoverGroupDeserializer(
+class DiscoverDeserializer(
   val vatomDeserializer: Deserializer<Vatom?>,
   val faceDeserializer: Deserializer<Face?>,
   val actionDeserializer: Deserializer<Action?>
-) : Deserializer<DiscoverGroup> {
+) : Deserializer<DiscoverPack> {
 
-  override fun deserialize(data: JSONObject): DiscoverGroup? {
+  override fun deserialize(data: JSONObject): DiscoverPack? {
     try {
       val count: Int = data.optInt("count")
 
@@ -64,7 +64,7 @@ class DiscoverGroupDeserializer(
             }
           }
       }
-      return DiscoverGroup(count, inventoryArray, facesArray, actionsArray)
+      return DiscoverPack(count, inventoryArray, facesArray, actionsArray)
     } catch (e: Exception) {
       android.util.Log.e("DiscoverDeserializer", e.message)
     }

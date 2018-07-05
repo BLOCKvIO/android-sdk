@@ -13,9 +13,9 @@ package io.blockv.core.client.manager
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.model.Action
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import io.blockv.core.util.Callable
 import org.json.JSONObject
 
@@ -27,7 +27,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: VatomManager.GeoFilter
-  ): Callable<Group> = Callable.single({
+  ): Callable<Pack> = Callable.single({
     api.geoDiscover(
       GeoRequest(
         bottomLeftLon,
@@ -64,15 +64,15 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     api.updateVatom(payload).payload
   })
 
-  override fun discover(query: JSONObject): Callable<DiscoverGroup> = Callable.single({
+  override fun discover(query: JSONObject): Callable<DiscoverPack> = Callable.single({
     api.discover(query).payload
   })
 
-  override fun getVatoms(vararg ids: String): Callable<Group> = Callable.single({
+  override fun getVatoms(vararg ids: String): Callable<Pack> = Callable.single({
     api.getUserVatom(VatomRequest(ids.toList())).payload
   })
 
-  override fun getInventory(id: String?, page: Int, limit: Int): Callable<Group> = Callable.single({
+  override fun getInventory(id: String?, page: Int, limit: Int): Callable<Pack> = Callable.single({
     api.getUserInventory(
       InventoryRequest(
         (if (id == null || id.isEmpty()) "." else id),
@@ -132,4 +132,9 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
   }
 
   override fun pickupVatom(id: String): Callable<JSONObject?> = preformAction(VatomManager.Action.PICKUP, id, null)
+
+  override fun deleteVatom(id: String): Callable<Void?> = Callable.single {
+    api.deleteVatom(DeleteVatomRequest(id))
+    null
+  }
 }
