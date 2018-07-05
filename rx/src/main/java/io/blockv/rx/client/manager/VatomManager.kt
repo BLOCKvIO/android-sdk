@@ -36,13 +36,18 @@ interface VatomManager {
   fun getVatoms(vararg ids: String): Single<Pack>
 
   /**
-   * Fetches the current users inventory.
+   * Fetches the current user's inventory of vAtoms.
    *
-   * @param id is the id of the inventory you want to fetch.
+   * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
+   *           user's root inventory will be returned.
+   * @param page indicates which slice of the vAtom inventory is returned. If set as
+   *             zero, the first page is returned.
+   * @param limit defines the number of vAtoms per response page (up to 100). If omitted or set as
+   *              zero, the max number is returned.
    * @return new Single<Pack> instance.
    * @see Pack
    */
-  fun getInventory(id: String?): Single<Pack>
+  fun getInventory(id: String?, page: Int, limit: Int): Single<Pack>
 
   /**
    * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been

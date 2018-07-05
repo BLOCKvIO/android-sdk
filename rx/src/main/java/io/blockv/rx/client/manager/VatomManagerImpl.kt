@@ -78,8 +78,14 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getInventory(id: String?): Single<Pack> = Single.fromCallable {
-    api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
+  override fun getInventory(id: String?, page: Int, limit: Int): Single<Pack> = Single.fromCallable {
+    api.getUserInventory(
+      InventoryRequest(
+        (if (id == null || id.isEmpty()) "." else id),
+        page,
+        limit
+      )
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())

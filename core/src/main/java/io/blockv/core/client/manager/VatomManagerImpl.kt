@@ -72,9 +72,14 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     api.getUserVatom(VatomRequest(ids.toList())).payload
   })
 
-
-  override fun getInventory(id: String?): Callable<Pack> = Callable.single({
-    api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
+  override fun getInventory(id: String?, page: Int, limit: Int): Callable<Pack> = Callable.single({
+    api.getUserInventory(
+      InventoryRequest(
+        (if (id == null || id.isEmpty()) "." else id),
+        page,
+        limit
+      )
+    ).payload
   })
 
   override fun getVatomActions(templateId: String): Callable<List<Action>> = Callable.single({
