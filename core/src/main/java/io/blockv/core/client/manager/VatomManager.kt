@@ -181,12 +181,14 @@ interface VatomManager {
   fun discover(query: JSONObject): Callable<DiscoverPack>
 
   /**
-   * Removes the specified vAtom from the current user's inventory.
+   * Trashes the specified vAtom.
+   *
+   * This will remove the vAtom from the current user's inventory.
    *
    * @param id is the identifier of the vAtom.
    * @return new Callable<Void>.
    */
-  fun deleteVatom(id: String): Callable<Void?>
+  fun trashVatom(id: String): Callable<Void?>
 
   enum class TokenType {
     EMAIL,

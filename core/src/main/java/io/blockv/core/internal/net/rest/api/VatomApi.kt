@@ -36,6 +36,6 @@ interface VatomApi {
 
   fun updateVatom(request: JSONObject): BaseResponse<Void?>
 
-  fun deleteVatom(request: DeleteVatomRequest): BaseResponse<JSONObject>
+  fun trashVatom(request: TrashVatomRequest): BaseResponse<JSONObject>
 }
 

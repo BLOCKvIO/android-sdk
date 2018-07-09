@@ -142,8 +142,8 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun deleteVatom(id: String): Completable = Completable.fromCallable {
-    api.deleteVatom(DeleteVatomRequest(id))
+  override fun trashVatom(id: String): Completable = Completable.fromCallable {
+    api.trashVatom(TrashVatomRequest(id))
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
