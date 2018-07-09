@@ -27,7 +27,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: VatomManager.GeoFilter
-  ): Callable<Pack> = Callable.single({
+  ): Callable<Pack> = Callable.single {
     api.geoDiscover(
       GeoRequest(
         bottomLeftLon,
@@ -37,7 +37,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
         filter.name.toLowerCase()
       )
     ).payload
-  })
+  }
 
   override fun geoDiscoverGroups(
     bottomLeftLat: Double,
@@ -46,7 +46,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLon: Double,
     precision: Int,
     filter: VatomManager.GeoFilter
-  ): Callable<List<GeoGroup>> = Callable.single({
+  ): Callable<List<GeoGroup>> = Callable.single {
     assert(precision in 1..12) { "Precision required to be in the range  1 - 12" }
     api.geoGroupDiscover(
       GeoGroupRequest(
@@ -58,21 +58,21 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
         filter.name.toLowerCase()
       )
     ).payload
-  })
+  }
 
-  override fun updateVatom(payload: JSONObject): Callable<Void?> = Callable.single({
+  override fun updateVatom(payload: JSONObject): Callable<Void?> = Callable.single {
     api.updateVatom(payload).payload
-  })
+  }
 
-  override fun discover(query: JSONObject): Callable<DiscoverPack> = Callable.single({
+  override fun discover(query: JSONObject): Callable<DiscoverPack> = Callable.single {
     api.discover(query).payload
-  })
+  }
 
-  override fun getVatoms(vararg ids: String): Callable<Pack> = Callable.single({
+  override fun getVatoms(vararg ids: String): Callable<Pack> = Callable.single {
     api.getUserVatom(VatomRequest(ids.toList())).payload
-  })
+  }
 
-  override fun getInventory(id: String?, page: Int, limit: Int): Callable<Pack> = Callable.single({
+  override fun getInventory(id: String?, page: Int, limit: Int): Callable<Pack> = Callable.single {
     api.getUserInventory(
       InventoryRequest(
         (if (id == null || id.isEmpty()) "." else id),
@@ -80,19 +80,19 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
         limit
       )
     ).payload
-  })
+  }
 
-  override fun getVatomActions(templateId: String): Callable<List<Action>> = Callable.single({
+  override fun getVatomActions(templateId: String): Callable<List<Action>> = Callable.single {
     api.getVatomActions(templateId).payload
-  })
+  }
 
   override fun preformAction(
     action: String,
     id: String,
     payload: JSONObject?
-  ): Callable<JSONObject?> = Callable.single({
+  ): Callable<JSONObject?> = Callable.single {
     api.preformAction(PerformActionRequest(action, id, payload)).payload ?: JSONObject()
-  })
+  }
 
   override fun preformAction(
     action: VatomManager.Action,
