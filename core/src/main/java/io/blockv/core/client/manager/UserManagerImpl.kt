@@ -38,7 +38,7 @@ class UserManagerImpl(
     token: String,
     tokenType: UserManager.TokenType,
     isDefault: Boolean
-  ): Callable<Void?> = Callable.single({
+  ): Callable<Void?> = Callable.single {
     api.createUserToken(
       CreateTokenRequest(
         tokenType.name.toLowerCase(),
@@ -46,7 +46,7 @@ class UserManagerImpl(
         isDefault
       )
     ).payload
-  })
+  }
 
 
   override fun addCurrentUserOauthToken(
@@ -54,7 +54,7 @@ class UserManagerImpl(
     tokenType: String,
     code: String,
     isDefault: Boolean
-  ): Callable<Void?> = Callable.single({
+  ): Callable<Void?> = Callable.single {
     api.createUserOauthToken(
       CreateOauthTokenRequest(
         tokenType,
@@ -63,24 +63,24 @@ class UserManagerImpl(
         isDefault
       )
     ).payload
-  })
+  }
 
-  override fun setCurrentUserDefaultToken(tokenId: String): Callable<Void?> = Callable.single({
+  override fun setCurrentUserDefaultToken(tokenId: String): Callable<Void?> = Callable.single {
     api.setDefaultUserToken(tokenId).payload
-  })
+  }
 
-  override fun deleteCurrentUserToken(tokenId: String): Callable<Void?> = Callable.single({
+  override fun deleteCurrentUserToken(tokenId: String): Callable<Void?> = Callable.single {
     api.deleteUserToken(tokenId).payload
-  })
+  }
 
-  override fun getPublicUser(userId: String): Callable<PublicUser?> = Callable.single({
+  override fun getPublicUser(userId: String): Callable<PublicUser?> = Callable.single {
     api.getPublicUser(userId).payload
-  })
+  }
 
 
-  override fun getAccessToken(): Callable<Jwt?> = Callable.single({
+  override fun getAccessToken(): Callable<Jwt?> = Callable.single {
     authenticator.refreshToken()
-  })
+  }
 
 
   override fun isLoggedIn(): Boolean {
@@ -97,33 +97,33 @@ class UserManagerImpl(
     return false
   }
 
-  override fun uploadAvatar(avatar: Bitmap): Callable<Void?> = Callable.single({
+  override fun uploadAvatar(avatar: Bitmap): Callable<Void?> = Callable.single {
     val stream = ByteArrayOutputStream()
     avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
     api.uploadAvatar(UploadAvatarRequest("avatar", "avatar.png", "image/png", stream.toByteArray())).payload
-  })
+  }
 
-  override fun loginGuest(guestId: String): Callable<User?> = Callable.single({
+  override fun loginGuest(guestId: String): Callable<User?> = Callable.single {
     api.loginGuest(GuestLoginRequest(guestId)).payload
-  })
+  }
 
   override fun loginOauth(
     provider: String,
     oauthToken: String
-  ): Callable<User?> = Callable.single({
+  ): Callable<User?> = Callable.single {
     api.oauthLogin(
       OauthLoginRequest(
         provider,
         oauthToken
       )
     ).payload
-  })
+  }
 
   private fun login(
     token: String,
     tokenType: String,
     auth: String
-  ): Callable<User?> = Callable.single({
+  ): Callable<User?> = Callable.single {
     api.login(
       LoginRequest(
         tokenType,
@@ -131,7 +131,7 @@ class UserManagerImpl(
         auth
       )
     ).payload
-  })
+  }
 
   override fun login(
     token: String,
@@ -142,9 +142,9 @@ class UserManagerImpl(
   private fun resetToken(
     token: String,
     type: String
-  ): Callable<Void?> = Callable.single({
+  ): Callable<Void?> = Callable.single {
     api.resetToken(ResetTokenRequest(type, token)).payload
-  })
+  }
 
   override fun resetToken(
     token: String,
@@ -154,17 +154,17 @@ class UserManagerImpl(
   private fun resendVerification(
     token: String,
     type: String
-  ): Callable<Void?> = Callable.single({
+  ): Callable<Void?> = Callable.single {
     api.resetVerificationToken(ResetTokenRequest(type, token))
     null
-  })
+  }
 
   override fun resendVerification(
     token: String,
     tokenType: UserManager.TokenType
   ): Callable<Void?> = resendVerification(token, tokenType.name.toLowerCase())
 
-  override fun register(registration: UserManager.Registration): Callable<User?> = Callable.single({
+  override fun register(registration: UserManager.Registration): Callable<User?> = Callable.single {
     val tokens = JSONArray()
 
     registration.tokens?.forEach {
@@ -188,16 +188,16 @@ class UserManagerImpl(
         tokens
       )
     ).payload
-  })
+  }
 
   private fun verifyUserToken(
     token: String,
     type: String,
     code: String
-  ): Callable<Void?> = Callable.single({
+  ): Callable<Void?> = Callable.single {
     api.verifyToken(VerifyTokenRequest(type, token, code))
     null
-  })
+  }
 
   override fun verifyUserToken(
     token: String,
@@ -205,22 +205,22 @@ class UserManagerImpl(
     code: String
   ): Callable<Void?> = verifyUserToken(token, tokenType.name.toLowerCase(), code)
 
-  override fun logout(): Callable<Void?> = Callable.single({
+  override fun logout(): Callable<Void?> = Callable.single {
     preferences.refreshToken = null
     //remove asset providers
     api.logout()
     null
-  })
+  }
 
-  override fun getCurrentUser(): Callable<User?> = Callable.single({
+  override fun getCurrentUser(): Callable<User?> = Callable.single {
     api.getCurrentUser().payload
-  })
+  }
 
-  override fun getCurrentUserTokens(): Callable<List<Token>> = Callable.single({
+  override fun getCurrentUserTokens(): Callable<List<Token>> = Callable.single {
     api.getUserTokens().payload
-  })
+  }
 
-  override fun updateCurrentUser(update: UserManager.UserUpdate): Callable<User?> = Callable.single({
+  override fun updateCurrentUser(update: UserManager.UserUpdate): Callable<User?> = Callable.single {
     api.updateCurrentUser(
       UpdateUserRequest(
         update.firstName,
@@ -231,5 +231,5 @@ class UserManagerImpl(
         update.password
       )
     ).payload
-  })
+  }
 }

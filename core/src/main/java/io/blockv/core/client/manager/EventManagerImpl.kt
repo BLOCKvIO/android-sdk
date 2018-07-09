@@ -39,36 +39,36 @@ class EventManagerImpl(
   private val resultEmitters: HashSet<Callable.ResultEmitter<WebSocketEvent<JSONObject>>> = HashSet()
 
   override fun getEvents(): Callable<WebSocketEvent<JSONObject>> {
-    return Callable.create<WebSocketEvent<JSONObject>>({
-      synchronized(resultEmitters, {
+    return Callable.create<WebSocketEvent<JSONObject>> {
+      synchronized(resultEmitters) {
         it.doOnCompletion {
-          synchronized(resultEmitters, {
+          synchronized(resultEmitters) {
             resultEmitters.remove(it)
             if (resultEmitters.size == 0) {
               cancellable?.cancel()
             }
-          })
+          }
         }
         resultEmitters.add(it)
         if (cancellable == null || cancellable!!.isComplete() || cancellable!!.isCanceled()) {
           cancellable = connect().call({
             val event = it
-            synchronized(resultEmitters, {
+            synchronized(resultEmitters) {
               resultEmitters.forEach {
                 it.onResult(event)
               }
-            })
-          }, {
-            synchronized(resultEmitters, {
+            }
+          }) {
+            synchronized(resultEmitters) {
               val throwable = it
               resultEmitters.forEach {
                 it.onError(throwable)
               }
-            })
-          })
+            }
+          }
         }
-      })
-    }).runOn(Callable.Scheduler.IO)
+      }
+    }.runOn(Callable.Scheduler.IO)
       .returnOn(Callable.Scheduler.MAIN)
   }
 
@@ -143,7 +143,7 @@ class EventManagerImpl(
 
   private fun connect(): Callable<WebSocketEvent<JSONObject>> {
 
-    return Callable.create<WebSocketEvent<JSONObject>>({
+    return Callable.create<WebSocketEvent<JSONObject>> {
 
       val listener: Websocket.WebSocketListener = object : Websocket.WebSocketListener {
 
@@ -161,13 +161,13 @@ class EventManagerImpl(
       }
 
       webSocket.connect(listener)
-    }).runOn(Callable.Scheduler.IO)
+    }.runOn(Callable.Scheduler.IO)
       .returnOn(Callable.Scheduler.COMP)
       .doFinally {
         webSocket.disconnect()
-        synchronized(resultEmitters, {
+        synchronized(resultEmitters) {
           resultEmitters.clear()
-        })
+        }
       }
 
 
