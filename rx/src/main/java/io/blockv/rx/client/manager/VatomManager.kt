@@ -193,10 +193,12 @@ interface VatomManager {
   fun discover(query: JSONObject): Single<DiscoverPack>
 
   /**
-   * Removes the specified vAtom from the current user's inventory.
+   * Trashes the specified vAtom.
+   *
+   * This will remove the vAtom from the current user's inventory.
    *
    * @param id is the identifier of the vAtom.
    * @return new Completable instance.
    */
-  fun deleteVatom(id: String): Completable
+  fun trashVatom(id: String): Completable
 }

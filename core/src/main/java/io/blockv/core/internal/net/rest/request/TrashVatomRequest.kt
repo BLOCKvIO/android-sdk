@@ -12,7 +12,7 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class DeleteVatomRequest(
+class TrashVatomRequest(
   var vatomId: String
 ) {
 

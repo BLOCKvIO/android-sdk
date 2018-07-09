@@ -138,7 +138,7 @@ class VatomApiImpl(
     )
   }
 
-  override fun deleteVatom(request: DeleteVatomRequest): BaseResponse<JSONObject> {
+  override fun trashVatom(request: TrashVatomRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("/v1/user/vatom/trash", request.toJson())
     return BaseResponse(
       response.optInt("error"),
