@@ -42,12 +42,12 @@ class EventManagerImpl(
     return Callable.create<WebSocketEvent<JSONObject>> {
       synchronized(resultEmitters) {
         it.doOnCompletion {
-          synchronized(lock = resultEmitters, block = {
+          synchronized(resultEmitters) {
             resultEmitters.remove(it)
             if (resultEmitters.size == 0) {
               cancellable?.cancel()
             }
-          })
+          }
         }
         resultEmitters.add(it)
         if (cancellable == null || cancellable!!.isComplete() || cancellable!!.isCanceled()) {
