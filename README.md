@@ -22,7 +22,7 @@ Add the BLOCKv maven repository and Kotlin plugin to the root-level `build.gradl
 
 ```gradle
 buildscript {
-  ext.kotlin_version = '1.2.41'
+  ext.kotlin_version = '1.2.50'
   //...
   dependencies {
     //...
@@ -48,7 +48,7 @@ apply plugin: 'kotlin-android' //This should be at the top of the file.
 //
 dependencies {
   // ...
-  implementation 'io.blockv.sdk:core:1.0.0'
+  implementation 'io.blockv.sdk:core:1.1.0'
   // Make sure android Studio version is > 3.0 or include the Kotlin Plugin
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version'
   // (Optional) This is only required if you want to use the web socket.
@@ -76,8 +76,8 @@ There is also an [RxJava2](https://github.com/ReactiveX/RxJava) wrapped version,
 dependencies {
   // ...
   implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-  implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
-  implementation 'io.blockv.sdk:rx:1.0.0'
+  implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
+  implementation 'io.blockv.sdk:rx:1.1.0'
 }
 ```
 To access the RxJava2 wrapped SDK in your application code, import the class:
