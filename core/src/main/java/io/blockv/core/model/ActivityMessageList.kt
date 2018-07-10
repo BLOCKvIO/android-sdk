@@ -10,8 +10,10 @@
  */
 package io.blockv.core.model
 
-class ActivityMessageList(val cursor:String,val messages:List<ActivityMessage>)
-{
+class ActivityMessageList(
+  val cursor: String,
+  val messages: List<ActivityMessage>
+) {
   override fun toString(): String {
     return "ActivityMessageList{" +
       "cursor='" + cursor + '\'' +

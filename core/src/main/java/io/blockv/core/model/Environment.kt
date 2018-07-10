@@ -10,9 +10,11 @@
  */
 package io.blockv.core.model
 
-open class Environment(val rest: String,
-                       val wss: String,
-                       val appId: String) {
+open class Environment(
+  val rest: String,
+  val wss: String,
+  val appId: String
+) {
   companion object {
     val DEFAULT_SERVER = "https://api.blockv.io/"
     val DEFAULT_WEBSOCKET = "wss://newws.blockv.io/ws"

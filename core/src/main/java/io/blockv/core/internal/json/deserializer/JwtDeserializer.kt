@@ -10,7 +10,6 @@
  */
 package io.blockv.core.internal.json.deserializer
 
-import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Jwt
 
 class JwtDeserializer : Deserializer<Jwt> {
@@ -21,7 +20,8 @@ class JwtDeserializer : Deserializer<Jwt> {
 
       return Jwt(
         token,
-        tokenType)
+        tokenType
+      )
 
     } catch (e: Exception) {
       android.util.Log.w("JwtDeserializer", e.message)

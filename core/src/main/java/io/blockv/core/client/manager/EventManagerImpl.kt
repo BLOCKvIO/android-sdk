@@ -22,8 +22,10 @@ import io.blockv.core.util.Cancellable
 import org.json.JSONObject
 
 
-class EventManagerImpl(private val webSocket: WebsocketImpl,
-                       val jsonModule: JsonModule) : EventManager {
+class EventManagerImpl(
+  private val webSocket: WebsocketImpl,
+  val jsonModule: JsonModule
+) : EventManager {
 
   companion object {
     val NULL_STATE_EVENT = WebSocketEvent<StateUpdateEvent>("", "", null)
@@ -37,36 +39,36 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
   private val resultEmitters: HashSet<Callable.ResultEmitter<WebSocketEvent<JSONObject>>> = HashSet()
 
   override fun getEvents(): Callable<WebSocketEvent<JSONObject>> {
-    return Callable.create<WebSocketEvent<JSONObject>>({
-      synchronized(resultEmitters, {
+    return Callable.create<WebSocketEvent<JSONObject>> {
+      synchronized(resultEmitters) {
         it.doOnCompletion {
-          synchronized(resultEmitters, {
+          synchronized(resultEmitters) {
             resultEmitters.remove(it)
             if (resultEmitters.size == 0) {
               cancellable?.cancel()
             }
-          })
+          }
         }
         resultEmitters.add(it)
         if (cancellable == null || cancellable!!.isComplete() || cancellable!!.isCanceled()) {
           cancellable = connect().call({
             val event = it
-            synchronized(resultEmitters, {
+            synchronized(resultEmitters) {
               resultEmitters.forEach {
                 it.onResult(event)
               }
-            })
-          }, {
-            synchronized(resultEmitters, {
+            }
+          }) {
+            synchronized(resultEmitters) {
               val throwable = it
               resultEmitters.forEach {
                 it.onError(throwable)
               }
-            })
-          })
+            }
+          }
         }
-      })
-    }).runOn(Callable.Scheduler.IO)
+      }
+    }.runOn(Callable.Scheduler.IO)
       .returnOn(Callable.Scheduler.MAIN)
   }
 
@@ -82,7 +84,8 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
             updateEvent = WebSocketEvent(
               it.messageType,
               it.userId,
-              stateEvent)
+              stateEvent
+            )
           }
         }
         updateEvent
@@ -104,7 +107,8 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
             event = WebSocketEvent(
               it.messageType,
               it.userId,
-              inventoryEvent)
+              inventoryEvent
+            )
           }
         }
         event
@@ -126,7 +130,8 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
             event = WebSocketEvent(
               it.messageType,
               it.userId,
-              activityEvent)
+              activityEvent
+            )
           }
         }
         event
@@ -138,7 +143,7 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
 
   private fun connect(): Callable<WebSocketEvent<JSONObject>> {
 
-    return Callable.create<WebSocketEvent<JSONObject>>({
+    return Callable.create<WebSocketEvent<JSONObject>> {
 
       val listener: Websocket.WebSocketListener = object : Websocket.WebSocketListener {
 
@@ -156,13 +161,13 @@ class EventManagerImpl(private val webSocket: WebsocketImpl,
       }
 
       webSocket.connect(listener)
-    }).runOn(Callable.Scheduler.IO)
+    }.runOn(Callable.Scheduler.IO)
       .returnOn(Callable.Scheduler.COMP)
       .doFinally {
         webSocket.disconnect()
-        synchronized(resultEmitters, {
+        synchronized(resultEmitters) {
           resultEmitters.clear()
-        })
+        }
       }
 
 

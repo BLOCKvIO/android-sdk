@@ -10,4 +10,9 @@
  */
 package io.blockv.core.internal.net.rest.request
 
-class UploadAvatarRequest(val fieldName: String, val fileName: String, val type: String, val payload: ByteArray)
+class UploadAvatarRequest(
+  val fieldName: String,
+  val fileName: String,
+  val type: String,
+  val payload: ByteArray
+)

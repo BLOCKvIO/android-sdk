@@ -31,30 +31,36 @@ import java.net.URLConnection
 import java.util.*
 import kotlin.collections.HashMap
 
-class HttpClient(val preferences: Preferences,
-                 val errorMapper: ErrorMapper,
-                 val jsonModule: JsonModule,
-                 val authenticator: Authenticator) : Client {
+class HttpClient(
+  val preferences: Preferences,
+  val errorMapper: ErrorMapper,
+  val jsonModule: JsonModule,
+  val authenticator: Authenticator
+) : Client {
 
   var readTimeout: Int? = null
   var connectTimeout: Int? = null
   var environment: Environment? = preferences.environment
 
 
-  constructor(preferences: Preferences,
-              errorMapper: ErrorMapper,
-              jsonModule: JsonModule,
-              authenticator: Authenticator,
-              readTimeout: Int?,
-              connectTimeout: Int?) : this(preferences, errorMapper, jsonModule,authenticator) {
+  constructor(
+    preferences: Preferences,
+    errorMapper: ErrorMapper,
+    jsonModule: JsonModule,
+    authenticator: Authenticator,
+    readTimeout: Int?,
+    connectTimeout: Int?
+  ) : this(preferences, errorMapper, jsonModule, authenticator) {
     this.readTimeout = readTimeout
     this.connectTimeout = connectTimeout
   }
 
-  internal fun http(method: String,
-                    endpoint: String,
-                    payload: JSONObject?,
-                    retry: Int): JSONObject {
+  internal fun http(
+    method: String,
+    endpoint: String,
+    payload: JSONObject?,
+    retry: Int
+  ): JSONObject {
 
     if (environment == null) {
       environment = preferences.environment
@@ -114,7 +120,7 @@ class HttpClient(val preferences: Preferences,
       Log.e("httpCLient", exception.toString())
       if (exception.error == Error.USER_ACCESS_TOKEN_INVALID && retry == 0) {
         authenticator.refreshToken()
-        return http( method, endpoint, payload, 1)
+        return http(method, endpoint, payload, 1)
       }
       throw exception
 
@@ -123,7 +129,7 @@ class HttpClient(val preferences: Preferences,
   }
 
   override fun http(method: String, endpoint: String, payload: JSONObject?): JSONObject {
-    return http( method, endpoint, payload, 0)
+    return http(method, endpoint, payload, 0)
 
   }
 
@@ -147,11 +153,24 @@ class HttpClient(val preferences: Preferences,
     return http("PATCH", endpoint, payload)
   }
 
-  override fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray): JSONObject {
+  override fun multipart(
+    endpoint: String,
+    fieldName: String,
+    fileName: String,
+    type: String,
+    payload: ByteArray
+  ): JSONObject {
     return multipart(endpoint, fieldName, fileName, type, payload, 0)
   }
 
-  override fun multipart(endpoint: String, fieldName: String, fileName: String, type: String, payload: ByteArray, retry: Int): JSONObject {
+  override fun multipart(
+    endpoint: String,
+    fieldName: String,
+    fileName: String,
+    type: String,
+    payload: ByteArray,
+    retry: Int
+  ): JSONObject {
     if (environment == null) {
       environment = preferences.environment
       if (environment == null) {

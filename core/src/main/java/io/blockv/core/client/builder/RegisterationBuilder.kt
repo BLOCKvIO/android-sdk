@@ -75,7 +75,8 @@ class RegistrationBuilder {
 
     if (provider != null
       && token != null
-      && auth != null) {
+      && auth != null
+    ) {
 
       tokens.add(UserManager.Registration.OauthToken(provider, token, auth))
     }
@@ -97,7 +98,8 @@ class RegistrationBuilder {
       avatar,
       password,
       language,
-      tokens)
+      tokens
+    )
   }
 
 

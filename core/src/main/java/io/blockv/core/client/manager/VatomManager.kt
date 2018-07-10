@@ -11,10 +11,10 @@
 package io.blockv.core.client.manager
 
 import io.blockv.core.client.builder.DiscoverQueryBuilder
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import io.blockv.core.util.Callable
-import io.blockv.core.model.DiscoverGroup
 import org.json.JSONObject
 import java.util.*
 
@@ -27,19 +27,24 @@ interface VatomManager {
    * Fetches vAtoms by id.
    *
    * @param ids is a list of vAtom id's in the current users inventory.
-   * @return new Callable<Group> instance.
-   * @see Group
+   * @return new Callable<Pack> instance.
+   * @see Pack
    */
-  fun getVatoms(vararg ids: String): Callable<Group>
+  fun getVatoms(vararg ids: String): Callable<Pack>
 
   /**
-   * Fetches the current users inventory.
+   * Fetches the current user's inventory of vAtoms.
    *
-   * @param id is the id of the inventory you want to fetch.
-   * @return new Callable<Group> instance.
-   * @see Group
+   * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
+   *           user's root inventory will be returned.
+   * @param page indicates which slice of the vAtom inventory is returned. If set as
+   *             zero, the first page is returned.
+   * @param limit defines the number of vAtoms per response page (up to 100). If omitted or set as
+   *              zero, the max number is returned.
+   * @return new Callable<Pack> instance.
+   * @see Pack
    */
-  fun getInventory(id: String?): Callable<Group>
+  fun getInventory(id: String?, page: Int, limit: Int): Callable<Pack>
 
   /**
    * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
@@ -53,11 +58,17 @@ interface VatomManager {
    * @param topRightLat is the top right latitude coordinate.
    * @param topRightLon is the top right longitude coordinate.
    * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
-   * @return new Callable<Group> instance.
+   * @return new Callable<Pack> instance.
    * @see GeoFilter
-   * @see Group
+   * @see Pack
    */
-  fun geoDiscover(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, filter: GeoFilter): Callable<Group>
+  fun geoDiscover(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    filter: GeoFilter
+  ): Callable<Pack>
 
   /**
    * Fetches the count of vAtoms dropped in the specified area.
@@ -74,7 +85,14 @@ interface VatomManager {
    * @see GeoFilter
    * @see GeoGroup
    */
-  fun geoDiscoverGroups(bottomLeftLat: Double, bottomLeftLon: Double, topRightLat: Double, topRightLon: Double, precision: Int, filter: GeoFilter): Callable<List<GeoGroup>>
+  fun geoDiscoverGroups(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    precision: Int,
+    filter: GeoFilter
+  ): Callable<List<GeoGroup>>
 
   /**
    * Updates the vAtom's properties.
@@ -156,11 +174,21 @@ interface VatomManager {
    * Searches for vAtoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query.
-   * @return new Callable<DiscoverGroup>.
+   * @return new Callable<DiscoverPack>.
    * @see DiscoverQueryBuilder
-   * @see DiscoverGroup
+   * @see DiscoverPack
    */
-  fun discover(query: JSONObject): Callable<DiscoverGroup>
+  fun discover(query: JSONObject): Callable<DiscoverPack>
+
+  /**
+   * Trashes the specified vAtom.
+   *
+   * This will remove the vAtom from the current user's inventory.
+   *
+   * @param id is the identifier of the vAtom.
+   * @return new Callable<Void>.
+   */
+  fun trashVatom(id: String): Callable<Void?>
 
   enum class TokenType {
     EMAIL,

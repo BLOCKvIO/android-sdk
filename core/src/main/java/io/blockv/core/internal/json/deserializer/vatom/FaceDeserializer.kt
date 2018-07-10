@@ -46,7 +46,8 @@ class FaceDeserializer : Deserializer<Face> {
           constraints.optString("view_mode"),
           constraints.optString("platform"),
           resources
-        ))
+        )
+      )
     } catch (e: Exception) {
       Log.w("FaceDeserializer", e.message)
     }

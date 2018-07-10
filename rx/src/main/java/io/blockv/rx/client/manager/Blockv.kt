@@ -86,7 +86,7 @@ class Blockv {
       InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      DiscoverDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       PublicUserDeserializer(),
       GeoGroupDeserializer(),
       InventoryEventDeserializer(),
@@ -101,13 +101,15 @@ class Blockv {
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
-      appId)
+      appId
+    )
     this.resourceManager = ResourceManagerImpl(preferences)
     this.auth = AuthenticatorImpl(preferences, jsonModule)
     this.netModule = NetModule(
       auth,
       preferences,
-      jsonModule)
+      jsonModule
+    )
     this.userManager = UserManagerImpl(
       netModule.userApi,
       preferences,
@@ -135,7 +137,7 @@ class Blockv {
       InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverGroupDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      DiscoverDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
       PublicUserDeserializer(),
       GeoGroupDeserializer(),
       InventoryEventDeserializer(),
@@ -154,26 +156,30 @@ class Blockv {
     this.userManager = UserManagerImpl(
       netModule.userApi,
       preferences,
-      JwtDecoderImpl())
+      JwtDecoderImpl()
+    )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
   }
 
-  constructor(appId: String,
-              preferences: Preferences,
-              jsonModule: JsonModule,
-              netModule: NetModule,
-              userManager: UserManager,
-              vatomManager: VatomManager,
-              activityManager: ActivityManager,
-              eventManager: EventManager,
-              resourceManager: ResourceManager) {
+  constructor(
+    appId: String,
+    preferences: Preferences,
+    jsonModule: JsonModule,
+    netModule: NetModule,
+    userManager: UserManager,
+    vatomManager: VatomManager,
+    activityManager: ActivityManager,
+    eventManager: EventManager,
+    resourceManager: ResourceManager
+  ) {
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
-      appId)
+      appId
+    )
     this.jsonModule = jsonModule
     this.netModule = netModule
     this.userManager = userManager

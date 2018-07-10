@@ -10,12 +10,14 @@
  */
 package io.blockv.core.model
 
-class DiscoverGroup(val count: Int,
-                    vatoms: List<Vatom>,
-                    faces: List<Face>,
-                    actions: List<Action>) : Group(vatoms, faces, actions) {
+class DiscoverPack(
+  val count: Int,
+  vatoms: List<Vatom>,
+  faces: List<Face>,
+  actions: List<Action>
+) : Pack(vatoms, faces, actions) {
   override fun toString(): String {
-    return "DiscoverGroup{" +
+    return "DiscoverPack{" +
       " count='" + count + '\'' +
       ", vatoms='" + vatoms + '\'' +
       ", faces='" + faces + '\'' +

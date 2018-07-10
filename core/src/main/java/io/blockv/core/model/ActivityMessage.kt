@@ -10,16 +10,18 @@
  */
 package io.blockv.core.model
 
-class ActivityMessage(val id: Long,
-                      val targetUserId: String,
-                      val vatomIds: List<String>,
-                      val templateVariationIds: List<String>,
-                      val message: String,
-                      val actionName: String,
-                      val whenCreated: String,
-                      val triggerUserId: String,
-                      val resources: List<Resource>,
-                      val geoPosition: List<Double>) {
+class ActivityMessage(
+  val id: Long,
+  val targetUserId: String,
+  val vatomIds: List<String>,
+  val templateVariationIds: List<String>,
+  val message: String,
+  val actionName: String,
+  val whenCreated: String,
+  val triggerUserId: String,
+  val resources: List<Resource>,
+  val geoPosition: List<Double>
+) {
 
   private val hash = toString().hashCode()
 

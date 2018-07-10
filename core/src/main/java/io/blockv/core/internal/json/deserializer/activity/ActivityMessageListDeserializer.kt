@@ -16,7 +16,8 @@ import io.blockv.core.model.ActivityMessageList
 import org.json.JSONArray
 import org.json.JSONObject
 
-class ActivityMessageListDeserializer(private val messageDeserializer: Deserializer<ActivityMessage?>) : Deserializer<ActivityMessageList> {
+class ActivityMessageListDeserializer(private val messageDeserializer: Deserializer<ActivityMessage?>) :
+  Deserializer<ActivityMessageList> {
 
   override fun deserialize(data: JSONObject): ActivityMessageList? {
     try {

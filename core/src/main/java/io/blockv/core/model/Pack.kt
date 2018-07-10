@@ -8,19 +8,18 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.net.rest.request
+package io.blockv.core.model
 
-import org.json.JSONObject
-
-class PerformActionRequest(
-  val action: String,
-  val id: String,
-  val payload: JSONObject?
+open class Pack(
+  val vatoms: List<Vatom>,
+  val faces: List<Face>,
+  val actions: List<Action>
 ) {
-
-  fun toJson(): JSONObject {
-    val data: JSONObject = payload ?: JSONObject()
-    data.put("this.id", id)
-    return data
+  override fun toString(): String {
+    return "Pack{" +
+      " vAtoms='" + vatoms + '\'' +
+      ", faces='" + faces + '\'' +
+      ", actions='" + actions + '\'' +
+      "}"
   }
 }

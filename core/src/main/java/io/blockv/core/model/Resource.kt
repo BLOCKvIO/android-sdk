@@ -10,9 +10,11 @@
  */
 package io.blockv.core.model
 
-class Resource(var name: String,
-               var type: String,
-               var url: String) {
+class Resource(
+  var name: String,
+  var type: String,
+  var url: String
+) {
 
   override fun toString(): String {
     return "Resource{" +
@@ -32,7 +34,7 @@ class Resource(var name: String,
   }
 
   override fun hashCode(): Int {
-    return (name+type+url).hashCode()
+    return (name + type + url).hashCode()
   }
 
 }

@@ -10,14 +10,12 @@
  */
 package io.blockv.rx.client.manager
 
-import io.blockv.core.client.manager.VatomManager.GeoFilter
-import io.blockv.core.client.manager.VatomManager.TokenType
+import io.blockv.core.client.manager.VatomManager.*
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
-import io.blockv.core.client.manager.VatomManager.Action
-import io.blockv.core.model.DiscoverGroup
+import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Group
+import io.blockv.core.model.Pack
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -26,34 +24,44 @@ import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
-  override fun geoDiscover(bottomLeftLat: Double,
-                           bottomLeftLon: Double,
-                           topRightLat: Double,
-                           topRightLon: Double,
-                           filter: GeoFilter): Single<Group> = Single.fromCallable {
-    api.geoDiscover(GeoRequest(
-      bottomLeftLon,
-      bottomLeftLat,
-      topRightLon,
-      topRightLat,
-      filter.name.toLowerCase())).payload
+  override fun geoDiscover(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    filter: GeoFilter
+  ): Single<Pack> = Single.fromCallable {
+    api.geoDiscover(
+      GeoRequest(
+        bottomLeftLon,
+        bottomLeftLat,
+        topRightLon,
+        topRightLat,
+        filter.name.toLowerCase()
+      )
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun geoDiscoverGroups(bottomLeftLat: Double,
-                                 bottomLeftLon: Double,
-                                 topRightLat: Double,
-                                 topRightLon: Double,
-                                 precision: Int,
-                                 filter: GeoFilter): Single<List<GeoGroup>> = Single.fromCallable {
-    api.geoGroupDiscover(GeoGroupRequest(
-      bottomLeftLon,
-      bottomLeftLat,
-      topRightLon,
-      topRightLat,
-      precision,
-      filter.name.toLowerCase())).payload
+  override fun geoDiscoverGroups(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double,
+    precision: Int,
+    filter: GeoFilter
+  ): Single<List<GeoGroup>> = Single.fromCallable {
+    api.geoGroupDiscover(
+      GeoGroupRequest(
+        bottomLeftLon,
+        bottomLeftLat,
+        topRightLon,
+        topRightLat,
+        precision,
+        filter.name.toLowerCase()
+      )
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -64,14 +72,20 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getVatoms(vararg ids: String): Single<Group> = Single.fromCallable {
+  override fun getVatoms(vararg ids: String): Single<Pack> = Single.fromCallable {
     api.getUserVatom(VatomRequest(ids.toList())).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getInventory(id: String?): Single<Group> = Single.fromCallable {
-    api.getUserInventory(InventoryRequest((if (id == null || id.isEmpty()) "." else id))).payload
+  override fun getInventory(id: String?, page: Int, limit: Int): Single<Pack> = Single.fromCallable {
+    api.getUserInventory(
+      InventoryRequest(
+        (if (id == null || id.isEmpty()) "." else id),
+        page,
+        limit
+      )
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -82,17 +96,21 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun preformAction(action: String,
-                             id: String,
-                             payload: JSONObject?): Single<JSONObject> = Single.fromCallable {
+  override fun preformAction(
+    action: String,
+    id: String,
+    payload: JSONObject?
+  ): Single<JSONObject> = Single.fromCallable {
     api.preformAction(PerformActionRequest(action, id, payload)).payload ?: JSONObject()
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun preformAction(action: Action,
-                             id: String,
-                             payload: JSONObject?): Single<JSONObject> = preformAction(action.action(), id, payload)
+  override fun preformAction(
+    action: Action,
+    id: String,
+    payload: JSONObject?
+  ): Single<JSONObject> = preformAction(action.action(), id, payload)
 
   override fun acquireVatom(id: String): Single<JSONObject> = preformAction(Action.ACQUIRE, id, null)
 
@@ -108,16 +126,24 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
   override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {
     val payload = JSONObject()
-    payload.put("geo.pos", JSONObject()
-      .put("lat", latitude)
-      .put("lon", longitude))
+    payload.put(
+      "geo.pos", JSONObject()
+        .put("lat", latitude)
+        .put("lon", longitude)
+    )
     return preformAction(Action.DROP, id, payload).toCompletable()
   }
 
   override fun pickupVatom(id: String): Completable = preformAction(Action.PICKUP, id, null).toCompletable()
 
-  override fun discover(query: JSONObject): Single<DiscoverGroup> = Single.fromCallable {
+  override fun discover(query: JSONObject): Single<DiscoverPack> = Single.fromCallable {
     api.discover(query).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun trashVatom(id: String): Completable = Completable.fromCallable {
+    api.trashVatom(TrashVatomRequest(id))
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())

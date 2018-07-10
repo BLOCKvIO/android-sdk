@@ -25,7 +25,8 @@ class StateEventDeserializer : Deserializer<StateUpdateEvent> {
         eventId,
         operation,
         vatomId,
-        state)
+        state
+      )
     } catch (e: Exception) {
       android.util.Log.e("StateEventDeserializer", e.message)
     }

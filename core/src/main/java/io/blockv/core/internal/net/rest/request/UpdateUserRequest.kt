@@ -12,28 +12,14 @@ package io.blockv.core.internal.net.rest.request
 
 import org.json.JSONObject
 
-class UpdateUserRequest {
-
-  var firstName: String? = null
-  var lastName: String? = null
-  var birthday: String? = null
-  var avatarUri: String? = null
-  var password: String? = null
-  var language: String? = null
-
-  constructor(firstName: String?,
-              lastName: String?,
-              birthday: String?,
-              avatarUri: String?,
-              language: String?,
-              password: String?) {
-    this.firstName = firstName
-    this.lastName = lastName
-    this.birthday = birthday
-    this.avatarUri = avatarUri
-    this.language = language
-    this.password = password
-  }
+class UpdateUserRequest(
+  var firstName: String?,
+  var lastName: String?,
+  var birthday: String?,
+  var avatarUri: String?,
+  var language: String?,
+  var password: String?
+) {
 
   fun toJson(): JSONObject {
     val json: JSONObject = JSONObject()

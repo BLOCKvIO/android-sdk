@@ -21,14 +21,17 @@ import io.blockv.core.model.User
 import org.json.JSONArray
 import org.json.JSONObject
 
-class UserApiImpl(val client: Client,
-                  val jsonModule: JsonModule) : UserApi {
+class UserApiImpl(
+  val client: Client,
+  val jsonModule: JsonModule
+) : UserApi {
   override fun setDefaultUserToken(tokenId: String): BaseResponse<Void?> {
     val response: JSONObject = client.put("v1/user/tokens/$tokenId/default")
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null)
+      null
+    )
   }
 
   override fun deleteUserToken(tokenId: String): BaseResponse<Void?> {
@@ -36,7 +39,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null)
+      null
+    )
   }
 
   override fun getPublicUser(userId: String): BaseResponse<PublicUser?> {
@@ -46,7 +50,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.publicUserDeserializer.deserialize(payload))
+      jsonModule.publicUserDeserializer.deserialize(payload)
+    )
   }
 
   override fun createUserToken(request: CreateTokenRequest): BaseResponse<Void?> {
@@ -54,7 +59,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null)
+      null
+    )
   }
 
   override fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Void?> {
@@ -62,7 +68,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null)
+      null
+    )
   }
 
   override fun uploadAvatar(request: UploadAvatarRequest): BaseResponse<Void?> {
@@ -71,11 +78,13 @@ class UserApiImpl(val client: Client,
       request.fieldName,
       request.fileName,
       request.type,
-      request.payload)
+      request.payload
+    )
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null)
+      null
+    )
   }
 
   override fun loginGuest(request: GuestLoginRequest): BaseResponse<User?> {
@@ -85,7 +94,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(user))
+      jsonModule.userDeserializer.deserialize(user)
+    )
   }
 
   override fun oauthLogin(request: OauthLoginRequest): BaseResponse<User?> {
@@ -94,7 +104,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(payload))
+      jsonModule.userDeserializer.deserialize(payload)
+    )
   }
 
   override fun register(request: CreateUserRequest): BaseResponse<User?> {
@@ -104,7 +115,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(payload.optJSONObject("user")))
+      jsonModule.userDeserializer.deserialize(payload.optJSONObject("user"))
+    )
   }
 
   override fun login(request: LoginRequest): BaseResponse<User?> {
@@ -117,7 +129,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(user))
+      jsonModule.userDeserializer.deserialize(user)
+    )
 
   }
 
@@ -127,7 +140,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(payload))
+      jsonModule.userDeserializer.deserialize(payload)
+    )
 
   }
 
@@ -137,7 +151,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(payload))
+      jsonModule.userDeserializer.deserialize(payload)
+    )
   }
 
   override fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token?> {
@@ -147,7 +162,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.tokenDeserializer.deserialize(payload))
+      jsonModule.tokenDeserializer.deserialize(payload)
+    )
   }
 
   override fun resetToken(request: ResetTokenRequest): BaseResponse<Void?> {
@@ -158,7 +174,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null)
+      null
+    )
   }
 
   override fun verifyToken(request: VerifyTokenRequest): BaseResponse<Void?> {
@@ -166,7 +183,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null)
+      null
+    )
   }
 
   override fun getUserTokens(): BaseResponse<List<Token>> {
@@ -186,7 +204,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      list)
+      list
+    )
   }
 
   override fun logout(): BaseResponse<JSONObject> {
@@ -195,7 +214,8 @@ class UserApiImpl(val client: Client,
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      payload)
+      payload
+    )
   }
 
 }
