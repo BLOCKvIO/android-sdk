@@ -10,42 +10,22 @@
  */
 package io.blockv.core.model
 
-class User {
+class User(
+  val id: String,
+  val whenCreated: String,
+  val whenModified: String,
+  val firstName: String,
+  val lastName: String,
+  val avatarUri: String,
+  val birthday: String,
+  val language: String,
+  val isNamePublic: Boolean,
+  val isAvatarPublic: Boolean,
+  val nonPushNotifications: Boolean
+) {
 
-  var id: String? = null
-  var whenCreated: String? = null
-  var whenModified: String? = null
-  var firstName: String? = null
-  var lastName: String? = null
-  var avatarUri: String? = null
-  var birthday: String? = null
-  var language: String? = null
   val name: String
-    get() = ((this.firstName ?: "") + " " + (this.lastName ?: "")).trim()
-
-
-  constructor(
-    id: String?,
-    whenCreated: String?,
-    whenModified: String?,
-    firstName: String?,
-    lastName: String?,
-    avatarUri: String?,
-    birthday: String?,
-    language: String?
-  ) {
-    this.id = id
-    this.whenCreated = whenCreated
-    this.whenModified = whenModified
-    this.firstName = firstName
-    this.lastName = lastName
-    this.avatarUri = avatarUri
-    this.birthday = birthday
-    this.language = language
-  }
-
-  constructor()
-
+    get() = (this.firstName + " " + this.lastName).trim()
 
   override fun toString(): String {
     return "User{" +

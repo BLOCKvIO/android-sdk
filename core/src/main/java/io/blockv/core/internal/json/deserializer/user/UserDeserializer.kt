@@ -21,14 +21,17 @@ class UserDeserializer : Deserializer<User?> {
     try {
       val meta: org.json.JSONObject = data.getJSONObject("meta")
       val properties: org.json.JSONObject = data.getJSONObject("properties")
-      val id: String? = data.getString("id")
-      val whenCreated: String? = meta.getString("when_created")
-      val whenModified: String? = meta.getString("when_modified")
-      val firstName: String? = properties.optString("first_name")
-      val lastName: String? = properties.optString("last_name")
-      val avatarUri: String? = properties.optString("avatar_uri")
-      val birthday: String? = properties.optString("birthday")
-      val language: String? = properties.optString("language")
+      val id: String = data.getString("id")
+      val whenCreated: String = meta.getString("when_created")
+      val whenModified: String = meta.getString("when_modified")
+      val firstName: String = properties.optString("first_name", "")
+      val lastName: String = properties.optString("last_name", "")
+      val avatarUri: String = properties.optString("avatar_uri", "")
+      val birthday: String = properties.optString("birthday", "")
+      val language: String = properties.optString("language", "")
+      val namePublic: Boolean = properties.optBoolean("name_public")
+      val avatarPublic: Boolean = properties.optBoolean("avatar_public")
+      val nonPush: Boolean = properties.optBoolean("nonpush_notification")
 
       return User(
         id,
@@ -38,7 +41,10 @@ class UserDeserializer : Deserializer<User?> {
         lastName,
         avatarUri,
         birthday,
-        language
+        language,
+        namePublic,
+        avatarPublic,
+        nonPush
       )
     } catch (e: Exception) {
       Log.e("deserilizer", e.toString())
