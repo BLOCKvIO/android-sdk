@@ -47,16 +47,16 @@ class VatomDeserializer : Deserializer<Vatom> {
       properties.title = prop.optString("title")
       properties.isTradeable = prop.optBoolean("tradeable")
       properties.isTransferable = prop.optBoolean("transferable")
-      properties.transferedBy = prop.optString("transfered_by")
+      properties.transferredBy = prop.optString("transferred_by")
       properties.isRedeemable = prop.optBoolean("redeemable")
 
-      if (prop.has("child_policy")) {
+      if (prop.has("child_policy") && !prop.isNull("child_policy")) {
         val policyArray = prop.optJSONArray("child_policy")
         val childPolicy: ArrayList<ChildPolicy> = ArrayList()
-        (0..policyArray.length())
+        (0 until policyArray.length())
           .mapTo(childPolicy) {
             val policy = policyArray.optJSONObject(it)
-            val creation = policy.optJSONObject("creation_policy")
+            val creation = policy.optJSONObject("creation_policy") ?: JSONObject()
             ChildPolicy(
               policy.optInt("count"),
               policy.optString("template_variation"),
@@ -81,7 +81,7 @@ class VatomDeserializer : Deserializer<Vatom> {
       val tagArray: org.json.JSONArray? = prop.optJSONArray("tags")
       if (tagArray != null) {
         val tags: ArrayList<String> = ArrayList(tagArray.length())
-        (0..tagArray.length()).mapTo(tags) { tagArray.optString(it) }
+        (0 until tagArray.length()).mapTo(tags) { tagArray.optString(it) }
         properties.tags = tags
       } else
         properties.tags = ArrayList()
@@ -90,7 +90,7 @@ class VatomDeserializer : Deserializer<Vatom> {
       val geoPos = prop.optJSONObject("geo_pos")
       val coordArray: org.json.JSONArray = geoPos.optJSONArray("coordinates")
       val coordinates: ArrayList<Float> = ArrayList(coordArray.length())
-      (0..coordArray.length()).mapTo(coordinates) { coordArray.optDouble(it).toFloat() }
+      (0 until coordArray.length()).mapTo(coordinates) { coordArray.optDouble(it).toFloat() }
 
       properties.geoPos = GeoPosition(
         geoPos.optString("type", "Point"),
