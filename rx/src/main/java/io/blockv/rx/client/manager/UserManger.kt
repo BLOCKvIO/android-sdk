@@ -193,7 +193,7 @@ interface UserManager {
   fun isLoggedIn(): Boolean
 
   companion object {
-    val NULL_USER = User()
+    val NULL_USER = User("", "", "", "", "", "", "", "", false, false, false)
     val NULL_PUBLIC_USER = PublicUser()
   }
 }
