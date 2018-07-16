@@ -14,6 +14,8 @@ import org.json.JSONObject
 
 interface Client {
 
+  fun http(method: String, endpoint: String, payload: JSONObject?,withAuth:Boolean): JSONObject
+
   fun http(method: String, endpoint: String, payload: JSONObject?): JSONObject
 
   fun get(endpoint: String): JSONObject
