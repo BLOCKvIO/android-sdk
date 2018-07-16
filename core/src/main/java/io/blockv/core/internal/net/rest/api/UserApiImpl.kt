@@ -88,7 +88,7 @@ class UserApiImpl(
   }
 
   override fun loginGuest(request: GuestLoginRequest): BaseResponse<User?> {
-    val response: JSONObject = client.post("v1/user/login", request.toJson())
+    val response: JSONObject = client.http("POST","v1/user/login", request.toJson(),false)
     val payload: JSONObject = response.optJSONObject("payload")
     val user: JSONObject = payload.optJSONObject("user")
     return BaseResponse(
@@ -99,7 +99,7 @@ class UserApiImpl(
   }
 
   override fun oauthLogin(request: OauthLoginRequest): BaseResponse<User?> {
-    val response: JSONObject = client.post("v1/user/login", request.toJson())
+    val response: JSONObject = client.http("POST","v1/user/login", request.toJson(),false)
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optInt("error"),
@@ -110,7 +110,7 @@ class UserApiImpl(
 
   override fun register(request: CreateUserRequest): BaseResponse<User?> {
     Log.e("register", request.toJson().toString())
-    val response: JSONObject = client.post("v1/users", request.toJson())
+    val response: JSONObject = client.http("POST", "v1/users", request.toJson(), false)
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optInt("error"),
@@ -122,7 +122,7 @@ class UserApiImpl(
   override fun login(request: LoginRequest): BaseResponse<User?> {
     Log.e("login", request.toJson().toString())
 
-    val response: JSONObject = client.post("v1/user/login", request.toJson())
+    val response: JSONObject = client.http("POST", "v1/user/login", request.toJson(), false)
 
     val payload: JSONObject = response.optJSONObject("payload")
     val user: JSONObject = payload.optJSONObject("user")
