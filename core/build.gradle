@@ -14,7 +14,11 @@ android {
     versionName "1.0"
 
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunnerArguments clearPackageData: 'true'
 
+  }
+  testOptions {
+    execution 'ANDROID_TEST_ORCHESTRATOR'
   }
   buildTypes {
     release {
@@ -31,8 +35,13 @@ dependencies {
   })
   implementation 'com.neovisionaries:nv-websocket-client:2.5'
   implementation 'com.android.support:appcompat-v7:27.1.1'
-  testImplementation 'junit:junit:4.12'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+  testImplementation 'junit:junit:4.12'
+  androidTestImplementation 'org.awaitility:awaitility-kotlin:3.1.1'
+  androidTestImplementation 'com.android.support.test:runner:1.0.2'
+  androidTestUtil 'com.android.support.test:orchestrator:1.0.2'
+
 }
 repositories {
   mavenCentral()
@@ -67,4 +76,6 @@ publishing {
     }
   }
 }
+
+
 
