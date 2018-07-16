@@ -59,7 +59,8 @@ class HttpClient(
     method: String,
     endpoint: String,
     payload: JSONObject?,
-    retry: Int
+    retry: Int,
+    withAuth: Boolean
   ): JSONObject {
 
     if (environment == null) {
@@ -76,9 +77,11 @@ class HttpClient(
     request.method = method
     val headers = HashMap<String, String>()
 
-    val token = authenticator.getToken()
-    if (token != null) {
-      headers["Authorization"] = token.type + " " + token.token
+    if (withAuth) {
+      val token = authenticator.getToken()
+      if (token != null) {
+        headers["Authorization"] = token.type + " " + token.token
+      }
     }
     headers["App-Id"] = environment!!.appId
     headers["Content-Type"] = "application/json"
@@ -117,10 +120,10 @@ class HttpClient(
       return response
     } else {
       val exception: BlockvException = errorMapper.map(requestResponse.first, requestResponse.second)
-      Log.e("httpCLient", exception.toString())
-      if (exception.error == Error.USER_ACCESS_TOKEN_INVALID && retry == 0) {
+      Log.e("httpClient", exception.toString())
+      if (withAuth && exception.error == Error.USER_ACCESS_TOKEN_INVALID && retry == 0) {
         authenticator.refreshToken()
-        return http(method, endpoint, payload, 1)
+        return http(method, endpoint, payload, 1, withAuth)
       }
       throw exception
 
@@ -129,8 +132,12 @@ class HttpClient(
   }
 
   override fun http(method: String, endpoint: String, payload: JSONObject?): JSONObject {
-    return http(method, endpoint, payload, 0)
+    return http(method, endpoint, payload, true)
 
+  }
+
+  override fun http(method: String, endpoint: String, payload: JSONObject?, withAuth: Boolean): JSONObject {
+    return http(method, endpoint, payload, 0, withAuth)
   }
 
   override fun get(endpoint: String): JSONObject {
@@ -138,7 +145,7 @@ class HttpClient(
   }
 
   override fun del(endpoint: String): JSONObject {
-    return http("DEL", endpoint, null)
+    return http("DELETE", endpoint, null)
   }
 
   override fun put(endpoint: String): JSONObject {
