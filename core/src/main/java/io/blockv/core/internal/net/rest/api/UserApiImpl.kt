@@ -88,7 +88,7 @@ class UserApiImpl(
   }
 
   override fun loginGuest(request: GuestLoginRequest): BaseResponse<User?> {
-    val response: JSONObject = client.http("POST","v1/user/login", request.toJson(),false)
+    val response: JSONObject = client.http("POST", "v1/user/login", request.toJson(), false)
     val payload: JSONObject = response.optJSONObject("payload")
     val user: JSONObject = payload.optJSONObject("user")
     return BaseResponse(
@@ -99,7 +99,7 @@ class UserApiImpl(
   }
 
   override fun oauthLogin(request: OauthLoginRequest): BaseResponse<User?> {
-    val response: JSONObject = client.http("POST","v1/user/login", request.toJson(),false)
+    val response: JSONObject = client.http("POST", "v1/user/login", request.toJson(), false)
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optInt("error"),
@@ -121,9 +121,7 @@ class UserApiImpl(
 
   override fun login(request: LoginRequest): BaseResponse<User?> {
     Log.e("login", request.toJson().toString())
-
     val response: JSONObject = client.http("POST", "v1/user/login", request.toJson(), false)
-
     val payload: JSONObject = response.optJSONObject("payload")
     val user: JSONObject = payload.optJSONObject("user")
     return BaseResponse(
@@ -131,7 +129,6 @@ class UserApiImpl(
       response.optString("message"),
       jsonModule.userDeserializer.deserialize(user)
     )
-
   }
 
   override fun getCurrentUser(): BaseResponse<User?> {
@@ -142,7 +139,6 @@ class UserApiImpl(
       response.optString("message"),
       jsonModule.userDeserializer.deserialize(payload)
     )
-
   }
 
   override fun updateCurrentUser(request: UpdateUserRequest): BaseResponse<User?> {
@@ -156,7 +152,6 @@ class UserApiImpl(
   }
 
   override fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token?> {
-
     val response: JSONObject = client.post("v1/user/reset_token_verification", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
@@ -167,8 +162,6 @@ class UserApiImpl(
   }
 
   override fun resetToken(request: ResetTokenRequest): BaseResponse<Void?> {
-
-
     val response: JSONObject = client.post("v1/user/reset_token", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
@@ -191,7 +184,6 @@ class UserApiImpl(
     val response: JSONObject = client.get("v1/user/tokens")
     val payload: JSONArray = response.optJSONArray("payload")
     val list: ArrayList<Token> = ArrayList()
-
     var count = 0
     while (count < payload.length()) {
       val token: Token? = jsonModule.tokenDeserializer.deserialize(payload.getJSONObject(count))
