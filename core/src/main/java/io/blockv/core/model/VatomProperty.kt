@@ -62,7 +62,7 @@ class VatomProperty {
 
   var isTransferable: Boolean = false
 
-  var transferedBy: String? = null
+  var transferredBy: String? = null
 
   var isRedeemable: Boolean = false
 
@@ -80,7 +80,7 @@ class VatomProperty {
 
   var visibility: VatomVisibility? = null
 
-  var isTradeable: Boolean? = null
+  var isTradeable: Boolean = false
 
 
   fun getResource(name: String): Resource? {
@@ -115,7 +115,7 @@ class VatomProperty {
       ", templateVariationId='" + templateVariationId + '\'' +
       ", title='" + title + '\'' +
       ", transferable=" + isTransferable +
-      ", transferedBy='" + transferedBy + '\'' +
+      ", transferredBy='" + transferredBy + '\'' +
       ", resources=" + resources +
       ", childPolicy=" + childPolicy +
       ", visibility=" + visibility +
