@@ -72,6 +72,9 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
 
   @Synchronized
   override fun getToken(): Jwt? {
+    if (preferences.refreshToken == null) {
+      return null
+    }
     try {
       lock.acquire()
       return accessToken

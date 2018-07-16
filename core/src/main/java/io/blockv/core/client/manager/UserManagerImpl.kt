@@ -207,7 +207,7 @@ class UserManagerImpl(
 
   override fun logout(): Callable<Void?> = Callable.single {
     preferences.refreshToken = null
-    //remove asset providers
+    preferences.assetProviders = ArrayList()
     api.logout()
     null
   }
