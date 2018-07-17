@@ -3,6 +3,7 @@ package io.blockv.core
 import android.content.Context
 import android.support.test.InstrumentationRegistry
 import io.blockv.core.client.Blockv
+import java.util.*
 
 class EnvironmentConfig {
   enum class Environment {
@@ -47,6 +48,11 @@ class EnvironmentConfig {
       )
     }
     reset()
+  }
+
+  fun createRandomEmailToken(testName: String): String {
+    val random = Random(System.currentTimeMillis())
+    return "ydangle.test+${testName}_rand_android_${random.nextInt(1000000)}@gmail.com"
   }
 
   fun reset() {
