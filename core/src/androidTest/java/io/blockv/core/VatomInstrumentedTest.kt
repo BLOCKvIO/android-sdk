@@ -5,8 +5,8 @@ import io.blockv.core.client.manager.UserManager
 import io.blockv.core.model.Pack
 import io.blockv.core.model.User
 import org.awaitility.Awaitility.await
-import org.junit.After
-import org.junit.Before
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.text.ParseException
@@ -19,32 +19,11 @@ import kotlin.test.junit.JUnitAsserter.fail
 @RunWith(AndroidJUnit4::class)
 class VatomInstrumentedTest {
 
-  private var env: EnvironmentConfig? = null
-  private var user: User? = null
-
-  @Before
-  fun setup() {
-    env = EnvironmentConfig()
-    env!!.blockv.userManager.login(
-      env!!.vatomEmail,
-      UserManager.TokenType.EMAIL,
-      env!!.password
-    ).call {
-      user = it
-    }
-    await().atMost(10000, TimeUnit.MILLISECONDS).until { user != null }
-  }
-
-  @After
-  fun clean() {
-    env!!.reset()
-  }
-
   @Test(timeout = 10000)
   fun fetchInventoryRoot() {
     var pack: Pack? = null
     try {
-      env!!.blockv.vatomManager.getInventory(".", 1, 100)
+      env.blockv.vatomManager.getInventory(".", 1, 100)
         .call {
           pack = it
         }
@@ -97,9 +76,9 @@ class VatomInstrumentedTest {
     var pack: Pack? = null
     try {
       val vatomId: String =
-        if (env!!.env == EnvironmentConfig.Environment.DEV) "df8d9f86-74db-44b0-8f76-a527a1265d8d" else "71cdced6-45d2-4b6c-8bcf-4b91f7d506f2"
+        if (env.env == EnvironmentConfig.Environment.DEV) "df8d9f86-74db-44b0-8f76-a527a1265d8d" else "71cdced6-45d2-4b6c-8bcf-4b91f7d506f2"
 
-      env!!.blockv.vatomManager.getInventory(vatomId, 1, 100)
+      env.blockv.vatomManager.getInventory(vatomId, 1, 100)
         .call {
           pack = it
         }
@@ -163,8 +142,8 @@ class VatomInstrumentedTest {
     var pack: Pack? = null
     try {
       val vatomId: String =
-        if (env!!.env == EnvironmentConfig.Environment.DEV) "df8d9f86-74db-44b0-8f76-a527a1265d8d" else "71cdced6-45d2-4b6c-8bcf-4b91f7d506f2"
-      env!!.blockv.vatomManager.getVatoms(vatomId)
+        if (env.env == EnvironmentConfig.Environment.DEV) "df8d9f86-74db-44b0-8f76-a527a1265d8d" else "71cdced6-45d2-4b6c-8bcf-4b91f7d506f2"
+      env.blockv.vatomManager.getVatoms(vatomId)
         .call {
           pack = it
         }
@@ -264,6 +243,33 @@ class VatomInstrumentedTest {
     }
 
 
+  }
+
+  companion object {
+
+    private val env: EnvironmentConfig = EnvironmentConfig()
+    private lateinit var user: User
+
+    @BeforeClass
+    @JvmStatic
+    fun setup() {
+      var login = false
+      env.blockv.userManager.login(
+        env.vatomEmail,
+        UserManager.TokenType.EMAIL,
+        env.password
+      ).call {
+        user = it!!
+        login = true
+      }
+      await().atMost(10000, TimeUnit.MILLISECONDS).until { login }
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun clean() {
+      env.reset()
+    }
   }
 
 }

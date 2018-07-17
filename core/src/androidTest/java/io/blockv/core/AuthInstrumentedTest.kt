@@ -7,42 +7,34 @@ import io.blockv.core.internal.net.rest.exception.BlockvException
 import io.blockv.core.model.Error
 import io.blockv.core.model.User
 import org.awaitility.Awaitility
-import org.junit.After
+import org.junit.AfterClass
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.test.junit.JUnitAsserter.fail
 
 @RunWith(AndroidJUnit4::class)
 class AuthInstrumentedTest {
 
-  private var env: EnvironmentConfig? = null
-
   @Before
-  fun setup() {
-    env = EnvironmentConfig()
-  }
-
-  @After
-  fun clean() {
-    env!!.reset()
+  fun reset() {
+    env.reset()
   }
 
   @Test(timeout = 10000)
   fun registerNewUserEmail() {
     try {
-      val random = Random(System.currentTimeMillis())
       var user: User? = null
 
-      env!!.blockv.userManager.register(
+      env.blockv.userManager.register(
         RegistrationBuilder()
-          .addEmail("ydangle.test+reg_rand_android_${random.nextInt(1000000)}@gmail.com")
+          .addEmail(env.createRandomEmailToken("reg"))
           .setFirstName("Joe")
           .setLastName("Soap")
           .setBirthday("1990-01-01")
-          .setPassword(env!!.password)
+          .setPassword(env.password)
           .build()
       )
         .call { user = it }
@@ -58,7 +50,7 @@ class AuthInstrumentedTest {
       if (!user!!.isNamePublic) fail("Name is not public")
       if (user!!.nonPushNotifications) fail("nonPushNotifications is not enabled")
 
-      env!!.blockv.netModule.client.del("/v1/user")
+      env.blockv.netModule.client.del("/v1/user")
     } catch (e: Exception) {
       fail(e.message)
     }
@@ -67,12 +59,10 @@ class AuthInstrumentedTest {
   @Test(timeout = 10000)
   fun registerExistingUserEmail() {
     try {
-      env!!.reset()
-      Awaitility.await().timeout(300, TimeUnit.MILLISECONDS)
 
       var error: Throwable? = null
 
-      env!!.blockv.userManager.register(
+      env.blockv.userManager.register(
         RegistrationBuilder()
           .addEmail(env!!.authEmail)
           .setFirstName("Joe")
@@ -103,15 +93,13 @@ class AuthInstrumentedTest {
   @Test(timeout = 10000)
   fun loginExistingUserEmail() {
     try {
-      env!!.reset()
-      Awaitility.await().timeout(300, TimeUnit.MILLISECONDS)
 
       var user: User? = null
 
-      env!!.blockv.userManager.login(
-        env!!.authEmail,
+      env.blockv.userManager.login(
+        env.authEmail,
         UserManager.TokenType.EMAIL,
-        env!!.password
+        env.password
       ).call({
         user = it
         if (user == null) {
@@ -134,5 +122,21 @@ class AuthInstrumentedTest {
       fail(e.message)
     }
 
+  }
+
+  companion object {
+
+    private val env: EnvironmentConfig = EnvironmentConfig()
+
+    @BeforeClass
+    @JvmStatic
+    fun setup() {
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun clean() {
+      env.reset()
+    }
   }
 }
