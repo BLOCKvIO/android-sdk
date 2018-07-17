@@ -103,6 +103,8 @@ class UserInstrumentedTest {
           .build()
       ).call {
         user = it
+        if (user == null)
+          throw Exception("user is null")
       }
       Awaitility.await().atMost(10000, TimeUnit.MILLISECONDS).until { user != null }
     }

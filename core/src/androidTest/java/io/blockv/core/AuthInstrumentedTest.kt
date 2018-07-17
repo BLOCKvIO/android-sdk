@@ -37,7 +37,11 @@ class AuthInstrumentedTest {
           .setPassword(env.password)
           .build()
       )
-        .call { user = it }
+        .call {
+          user = it
+          if (user == null)
+            fail("User is null")
+        }
 
       Awaitility.await().atMost(10000, TimeUnit.MILLISECONDS).until { user != null }
 
@@ -64,13 +68,15 @@ class AuthInstrumentedTest {
 
       env.blockv.userManager.register(
         RegistrationBuilder()
-          .addEmail(env!!.authEmail)
+          .addEmail(env.authEmail)
           .setFirstName("Joe")
           .setLastName("Soap")
-          .setPassword(env!!.password)
+          .setPassword(env.password)
           .build()
       )
-        .call({}, {
+        .call({
+          fail("Registration didn't fail")
+        }, {
           error = it
           if (error == null) {
             fail("Error is null")
