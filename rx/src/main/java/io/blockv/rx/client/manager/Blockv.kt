@@ -40,14 +40,15 @@ import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.*
+import io.blockv.rx.client.manager.*
 
 class Blockv {
 
-  val appId: String
   private val preferences: Preferences
-  private val netModule: NetModule
   private val jsonModule: JsonModule
   private val auth: Authenticator
+  val appId: String
+  val netModule: NetModule
   val userManager: UserManager
   val vatomManager: VatomManager
   val resourceManager: ResourceManager
@@ -58,7 +59,8 @@ class Blockv {
     get() {
       if (internalEventManager == null) {
         try {
-          internalEventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
+          internalEventManager =
+            EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
         } catch (e: NoClassDefFoundError) {
           throw io.blockv.core.client.manager.EventManager.MissingWebSocketDependencyException()
         } catch (e: Exception) {
