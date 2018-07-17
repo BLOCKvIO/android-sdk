@@ -22,6 +22,7 @@ import io.blockv.core.model.PublicUser
 import io.blockv.core.model.Token
 import io.blockv.core.model.User
 import io.blockv.rx.client.manager.UserManager.Companion.NULL_PUBLIC_USER
+import io.blockv.rx.client.manager.UserManager.Companion.NULL_TOKEN
 import io.blockv.rx.client.manager.UserManager.Companion.NULL_USER
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -41,8 +42,8 @@ class UserManagerImpl(
     token: String,
     tokenType: TokenType,
     isDefault: Boolean
-  ): Completable = Completable.fromCallable {
-    api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault))
+  ): Single<Token> = Single.fromCallable {
+    api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload ?: NULL_TOKEN
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -51,8 +52,8 @@ class UserManagerImpl(
     token: String,
     tokenType: String,
     code: String, isDefault: Boolean
-  ): Completable = Completable.fromCallable {
-    api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault))
+  ): Single<Token> = Single.fromCallable {
+    api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault)).payload ?: NULL_TOKEN
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
