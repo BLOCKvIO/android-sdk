@@ -123,7 +123,7 @@ interface UserManager {
    * @param isDefault determines whether the token is the primary token on this account.
    * @return new Completable instance.
    */
-  fun addCurrentUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Completable
+  fun addCurrentUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Single<Token>
 
   /**
    * Adds a OAuth user token to the current user.
@@ -134,7 +134,7 @@ interface UserManager {
    * @param isDefault determines whether the token is the primary token on this account.
    * @return new Completable instance.
    */
-  fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Completable
+  fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Single<Token>
 
   /**
    * Updates the specified token to be the current user's default token on the BLOCKv Platform.
@@ -195,5 +195,6 @@ interface UserManager {
   companion object {
     val NULL_USER = User("", "", "", "", "", "", "", "", false, false, false)
     val NULL_PUBLIC_USER = PublicUser()
+    val NULL_TOKEN = Token("", "", "", "", "", "", "", false, false, "")
   }
 }

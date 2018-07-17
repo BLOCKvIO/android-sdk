@@ -39,9 +39,9 @@ interface UserApi {
 
   fun getUserTokens(): BaseResponse<List<Token>>
 
-  fun createUserToken(request: CreateTokenRequest): BaseResponse<Void?>
+  fun createUserToken(request: CreateTokenRequest): BaseResponse<Token?>
 
-  fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Void?>
+  fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Token?>
 
   fun setDefaultUserToken(tokenId: String): BaseResponse<Void?>
 

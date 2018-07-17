@@ -38,7 +38,7 @@ class UserManagerImpl(
     token: String,
     tokenType: UserManager.TokenType,
     isDefault: Boolean
-  ): Callable<Void?> = Callable.single {
+  ): Callable<Token?> = Callable.single {
     api.createUserToken(
       CreateTokenRequest(
         tokenType.name.toLowerCase(),
@@ -54,7 +54,7 @@ class UserManagerImpl(
     tokenType: String,
     code: String,
     isDefault: Boolean
-  ): Callable<Void?> = Callable.single {
+  ): Callable<Token?> = Callable.single {
     api.createUserOauthToken(
       CreateOauthTokenRequest(
         tokenType,
