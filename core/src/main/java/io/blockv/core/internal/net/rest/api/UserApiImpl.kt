@@ -54,21 +54,23 @@ class UserApiImpl(
     )
   }
 
-  override fun createUserToken(request: CreateTokenRequest): BaseResponse<Void?> {
+  override fun createUserToken(request: CreateTokenRequest): BaseResponse<Token?> {
     val response: JSONObject = client.post("v1/user/tokens", request.toJson())
+    val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null
+      jsonModule.tokenDeserializer.deserialize(payload)
     )
   }
 
-  override fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Void?> {
+  override fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Token?> {
     val response: JSONObject = client.post("v1/user/tokens", request.toJson())
+    val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null
+      jsonModule.tokenDeserializer.deserialize(payload)
     )
   }
 
