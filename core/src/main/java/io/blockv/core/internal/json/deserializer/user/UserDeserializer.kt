@@ -31,6 +31,7 @@ class UserDeserializer : Deserializer<User?> {
       val language: String = properties.optString("language", "")
       val namePublic: Boolean = properties.optBoolean("name_public")
       val avatarPublic: Boolean = properties.optBoolean("avatar_public")
+      val passwordSet: Boolean = properties.optBoolean("is_password_set")
       val nonPush: Boolean = properties.optBoolean("nonpush_notification")
 
       return User(
@@ -44,6 +45,7 @@ class UserDeserializer : Deserializer<User?> {
         language,
         namePublic,
         avatarPublic,
+        passwordSet,
         nonPush
       )
     } catch (e: Exception) {
