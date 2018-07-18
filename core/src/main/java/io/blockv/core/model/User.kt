@@ -21,6 +21,7 @@ class User(
   val language: String,
   val isNamePublic: Boolean,
   val isAvatarPublic: Boolean,
+  val isPasswordSet: Boolean,
   val nonPushNotifications: Boolean
 ) {
 
