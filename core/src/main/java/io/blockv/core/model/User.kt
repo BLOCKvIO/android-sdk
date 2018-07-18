@@ -38,6 +38,10 @@ class User(
       ", avatarUrl='" + avatarUri + '\'' +
       ", birthday='" + birthday + '\'' +
       ", language='" + language + '\'' +
+      ", isNamePublic='" + isNamePublic + '\'' +
+      ", isAvatarPublic='" + isAvatarPublic + '\'' +
+      ", isPasswordSet='" + isPasswordSet + '\'' +
+      ", nonPushNotifications='" + nonPushNotifications + '\'' +
       '}'
   }
 
