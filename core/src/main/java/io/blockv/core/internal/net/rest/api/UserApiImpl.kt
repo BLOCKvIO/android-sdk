@@ -46,7 +46,6 @@ class UserApiImpl(
   override fun getPublicUser(userId: String): BaseResponse<PublicUser?> {
     val response: JSONObject = client.get("v1/users/$userId")
     val payload: JSONObject = response.optJSONObject("payload")
-    payload.put("id", userId);
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
