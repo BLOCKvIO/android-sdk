@@ -21,6 +21,7 @@ class User(
   val language: String,
   val isNamePublic: Boolean,
   val isAvatarPublic: Boolean,
+  val isPasswordSet: Boolean,
   val nonPushNotifications: Boolean
 ) {
 
@@ -37,6 +38,10 @@ class User(
       ", avatarUrl='" + avatarUri + '\'' +
       ", birthday='" + birthday + '\'' +
       ", language='" + language + '\'' +
+      ", isNamePublic='" + isNamePublic + '\'' +
+      ", isAvatarPublic='" + isAvatarPublic + '\'' +
+      ", isPasswordSet='" + isPasswordSet + '\'' +
+      ", nonPushNotifications='" + nonPushNotifications + '\'' +
       '}'
   }
 
