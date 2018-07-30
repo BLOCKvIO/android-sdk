@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import android.net.Uri
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.AssetProvider
+import io.blockv.core.util.Callable
 import java.net.Authenticator
 
 class ResourceManagerImpl(private val preferences: Preferences, private val authenticator: Authenticator) :
@@ -22,16 +23,19 @@ class ResourceManagerImpl(private val preferences: Preferences, private val auth
     get() = preferences.assetProviders
 
   @Throws(ResourceManager.MissingAssetProviderException::class)
-  override fun encodeUrl(url: String): String {
+  override fun encodeUrl(url: String): Callable<String> {
+    return Callable.single {
+      var out = url
       if (assetProviders == null || assetProviders?.size == 0) throw ResourceManager.MissingAssetProviderException()
-    assetProviders?.forEach {
-      if (url.startsWith(it.uri)) {
-        val descriptor: Map<String, String?> = it.descriptor
-        return encodeParams(url,descriptor)
+      for (provider: AssetProvider in assetProviders ?: ArrayList()) {
+        if (url.startsWith(provider.uri)) {
+          val descriptor: Map<String, String?> = provider.descriptor
+          out = encodeParams(url, descriptor)
+          break
+        }
       }
+      out
     }
-
-    return url
   }
 
   private fun encodeParams(url: String, params: Map<String, String?>): String {
