@@ -13,34 +13,42 @@ package io.blockv.core.client.manager
 import android.net.Uri
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.AssetProvider
+import java.net.Authenticator
 
-class ResourceManagerImpl(private val preferences: Preferences) : ResourceManager {
+class ResourceManagerImpl(private val preferences: Preferences, private val authenticator: Authenticator) :
+  ResourceManager {
 
   override val assetProviders: List<AssetProvider>?
     get() = preferences.assetProviders
 
   @Throws(ResourceManager.MissingAssetProviderException::class)
   override fun encodeUrl(url: String): String {
-    if (assetProviders == null || assetProviders?.size == 0) throw ResourceManager.MissingAssetProviderException()
+      if (assetProviders == null || assetProviders?.size == 0) throw ResourceManager.MissingAssetProviderException()
     assetProviders?.forEach {
       if (url.startsWith(it.uri)) {
         val descriptor: Map<String, String?> = it.descriptor
-        val original = Uri.parse(url)
-        val out = Uri.parse(url).buildUpon().clearQuery()
-        for (key in descriptor.keys) {
-          out.appendQueryParameter(key, descriptor.get(key))
-        }
-
-        for (param in original.queryParameterNames) {
-          if (!descriptor.keys.contains(param)) {
-            out.appendQueryParameter(param, original.getQueryParameter(param))
-          }
-        }
-
-        return out.build().toString()
+        return encodeParams(url,descriptor)
       }
     }
 
     return url
   }
+
+  private fun encodeParams(url: String, params: Map<String, String?>): String {
+    val original = Uri.parse(url)
+    val out = Uri.parse(url).buildUpon().clearQuery()
+    for (key in params.keys) {
+      out.appendQueryParameter(key, params[key])
+    }
+
+    for (param in original.queryParameterNames) {
+      if (!params.keys.contains(param)) {
+        out.appendQueryParameter(param, original.getQueryParameter(param))
+      }
+    }
+
+    return out.build().toString()
+  }
+
+
 }
