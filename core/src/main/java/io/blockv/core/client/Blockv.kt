@@ -103,8 +103,8 @@ class Blockv {
       "",
       appId
     )
-    this.resourceManager = ResourceManagerImpl(preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
+    this.resourceManager = ResourceManagerImpl(preferences,auth,JwtDecoderImpl())
     this.netModule = NetModule(
       auth,
       preferences,
@@ -151,8 +151,8 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
+    this.resourceManager = ResourceManagerImpl(preferences,auth,JwtDecoderImpl())
     this.netModule = NetModule(auth, preferences, jsonModule)
     this.userManager = UserManagerImpl(
       netModule.userApi,
