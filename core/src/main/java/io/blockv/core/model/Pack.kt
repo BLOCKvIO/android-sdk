@@ -15,6 +15,26 @@ open class Pack(
   val faces: List<Face>,
   val actions: List<Action>
 ) {
+  fun getVatom(vatomId: String): Vatom? {
+    return vatoms.find { it.id == vatomId }
+  }
+
+  fun getFaces(vatomId: String): List<Face> {
+    val vatom = getVatom(vatomId)
+    if (vatom != null) {
+      return faces.filter { it.templateId == vatom.property.templateId }
+    }
+    return ArrayList()
+  }
+
+  fun getActions(vatomId: String): List<Action> {
+    val vatom = getVatom(vatomId)
+    if (vatom != null) {
+      return actions.filter { it.templateId == vatom.property.templateId }
+    }
+    return ArrayList()
+  }
+
   override fun toString(): String {
     return "Pack{" +
       " vAtoms='" + vatoms + '\'' +
