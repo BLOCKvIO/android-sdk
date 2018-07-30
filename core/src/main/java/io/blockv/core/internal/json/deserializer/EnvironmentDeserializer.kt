@@ -19,6 +19,7 @@ class EnvironmentDeserialzier : Deserializer<Environment> {
       return Environment(
         data.getString("rest"),
         data.getString("wss"),
+        data.getString("cdn"),
         data.getString("app_id")
       )
     } catch (e: Exception) {

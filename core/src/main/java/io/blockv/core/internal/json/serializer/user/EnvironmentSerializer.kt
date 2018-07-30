@@ -20,6 +20,7 @@ class EnviromentSerializer : Serializer<Environment?> {
     if (data != null) {
       out.put("app_id", data.appId)
       out.put("rest", data.rest)
+      out.put("cdn", data.cdn)
       out.put("wss", data.wss)
     }
     return out

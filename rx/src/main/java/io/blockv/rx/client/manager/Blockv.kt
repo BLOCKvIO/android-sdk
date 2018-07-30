@@ -103,6 +103,7 @@ class Blockv {
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
+      "",
       appId
     )
     this.resourceManager = ResourceManagerImpl(preferences)
@@ -180,6 +181,7 @@ class Blockv {
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
+      "",
       appId
     )
     this.jsonModule = jsonModule
