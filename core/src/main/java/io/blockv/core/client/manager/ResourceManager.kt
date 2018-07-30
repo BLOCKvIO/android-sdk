@@ -19,7 +19,9 @@ interface ResourceManager {
   val assetProviders: List<AssetProvider>?
 
   @Throws(ResourceManager.MissingAssetProviderException::class)
-  fun encodeUrl(url: String): Callable<String>
+  fun encodeUrl(url: String): String
+
+  fun encodeWithCredentials(url: String): Callable<String>
 
   class MissingAssetProviderException : Exception("BLOCKv SDK does not have any asset provider credentials!")
 }
