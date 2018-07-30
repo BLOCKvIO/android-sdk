@@ -15,6 +15,7 @@ open class Pack(
   val faces: List<Face>,
   val actions: List<Action>
 ) {
+
   fun getVatom(vatomId: String): Vatom? {
     return vatoms.find { it.id == vatomId }
   }
@@ -33,6 +34,17 @@ open class Pack(
       return actions.filter { it.templateId == vatom.property.templateId }
     }
     return ArrayList()
+  }
+
+  fun subPack(vatomId: String): Pack {
+    val vatom = getVatom(vatomId)
+    val faces = getFaces(vatomId)
+    val actions = getActions(vatomId)
+    val vatoms = ArrayList<Vatom>()
+    if (vatom != null) {
+      vatoms.add(vatom)
+    }
+    return Pack(vatoms, faces, actions)
   }
 
   override fun toString(): String {
