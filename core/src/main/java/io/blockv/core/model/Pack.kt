@@ -16,10 +16,23 @@ open class Pack(
   val actions: List<Action>
 ) {
 
+  /**
+   * Finds the vAtom with the specified id.
+   *
+   * @param vatomId is the unique identifier of the vAtom.
+   * @return The first Vatom model of the sequence that satisfies the id predicate, or `null` if there is no
+   * Vatom model matching the predicate.
+   */
   fun findVatom(vatomId: String): Vatom? {
     return vatoms.find { it.id == vatomId }
   }
 
+  /**
+   * Returns the faces associated with the vAtom's template.
+   *
+   * @param vatomId is the unique identifier of the vAtom.
+   * @return new List<Face> instance.
+   */
   fun filterFaces(vatomId: String): List<Face> {
     val vatom = findVatom(vatomId)
     if (vatom != null) {
@@ -28,6 +41,12 @@ open class Pack(
     return ArrayList()
   }
 
+  /**
+   * Returns the actions associated with the vAtom's template.
+   *
+   * @param vatomId is the unique identifier of the vAtom.
+   * @return new List<Action> instance.
+   */
   fun filterActions(vatomId: String): List<Action> {
     val vatom = findVatom(vatomId)
     if (vatom != null) {
@@ -36,6 +55,12 @@ open class Pack(
     return ArrayList()
   }
 
+  /**
+   * Returns a Pack model for the specified vAtom id, or `null` if there is no Vatom model matching the predicate.
+   *
+   * @param vatomId is the unique identifier of the vAtom.
+   * @return new Pack instance.
+   */
   fun filterByVatomId(vatomId: String): Pack {
     val vatom = findVatom(vatomId)
     val faces = filterFaces(vatomId)
