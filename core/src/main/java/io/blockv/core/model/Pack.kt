@@ -61,7 +61,7 @@ open class Pack(
    * @param vatomId is the unique identifier of the vAtom.
    * @return new Pack instance.
    */
-  fun filterByVatomId(vatomId: String): Pack {
+  fun filter(vatomId: String): Pack {
     val vatom = findVatom(vatomId)
     val faces = filterFaces(vatomId)
     val actions = filterActions(vatomId)
