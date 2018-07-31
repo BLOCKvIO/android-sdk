@@ -36,7 +36,7 @@ open class Pack(
     return ArrayList()
   }
 
-  fun subPack(vatomId: String): Pack {
+  fun filterByVatom(vatomId: String): Pack {
     val vatom = getVatom(vatomId)
     val faces = getFaces(vatomId)
     val actions = getActions(vatomId)
