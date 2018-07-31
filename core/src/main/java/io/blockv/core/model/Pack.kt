@@ -56,7 +56,7 @@ open class Pack(
   }
 
   /**
-   * Returns a Pack model for the specified vAtom id, or `null` if there is no Vatom model matching the predicate.
+   * Returns a Pack model for the specified vAtom id.
    *
    * @param vatomId is the unique identifier of the vAtom.
    * @return new Pack instance.
