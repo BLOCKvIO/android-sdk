@@ -18,7 +18,24 @@ class Face(
   var whenModified: String?,
   var property: FaceProperty
 ) {
+  private var native: Boolean? = null
+  private var web: Boolean? = null
 
+  @Synchronized
+  fun isNative(): Boolean {
+    if (native == null) {
+      native = property.displayUrl.startsWith("native://")
+    }
+    return native!!
+  }
+
+  @Synchronized
+  fun isWeb(): Boolean {
+    if (web == null) {
+      web = property.displayUrl.startsWith("https://")
+    }
+    return web!!
+  }
 
   override fun toString(): String {
     return "Face{" +
