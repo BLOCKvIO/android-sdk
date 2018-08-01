@@ -1,1 +1,1 @@
-include ':app', ':core', ':rx'
+include ':app', ':core', ':rx', ':face'
