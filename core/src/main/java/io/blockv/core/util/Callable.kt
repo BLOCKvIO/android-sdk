@@ -34,6 +34,8 @@ interface Callable<T> {
 
   fun <R> map(map: (T) -> R): Callable<R>
 
+  fun <R> flatMap(map: (T) -> Callable<R>): Callable<R>
+
   fun filter(filter: ((T) -> Boolean)?): Callable<T>
 
   fun doFinally(final: (() -> Unit)?): Callable<T>
@@ -147,6 +149,27 @@ interface Callable<T> {
             it.doOnCompletion({
               cancel.cancel()
             })
+          }
+        }
+
+        override fun <R> flatMap(map: (T) -> Callable<R>): Callable<R> {
+          return create {
+            val emitter = it
+            val cancel = CompositeCancellable()
+            cancel.add(call({
+              val other = map.invoke(it)
+              cancel.add(other.call({
+                emitter.onResult(it)
+              }, {
+                emitter.onError(it)
+              }))
+            }, {
+              emitter.onError(it)
+            }))
+
+            it.doOnCompletion {
+              cancel.cancel()
+            }
           }
         }
 
