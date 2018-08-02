@@ -146,9 +146,9 @@ interface Callable<T> {
             }, {
               emitter.onError(it)
             })
-            it.doOnCompletion({
+            it.doOnCompletion {
               cancel.cancel()
-            })
+            }
           }
         }
 
