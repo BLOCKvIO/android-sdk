@@ -12,6 +12,7 @@ package io.blockv.core.util
 
 import android.os.Handler
 import android.os.Looper
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -33,6 +34,10 @@ interface Callable<T> {
   fun call(success: OnSuccess<T>?, error: OnError?): Cancellable
 
   fun <R> map(map: (T) -> R): Callable<R>
+
+  fun <R> flatMap(map: (T) -> Callable<R>): Callable<R>
+
+  fun first(): T?
 
   fun filter(filter: ((T) -> Boolean)?): Callable<T>
 
@@ -144,10 +149,51 @@ interface Callable<T> {
             }, {
               emitter.onError(it)
             })
-            it.doOnCompletion({
+            it.doOnCompletion {
               cancel.cancel()
-            })
+            }
           }
+        }
+
+        override fun <R> flatMap(map: (T) -> Callable<R>): Callable<R> {
+          return create {
+            val emitter = it
+            val cancel = CompositeCancellable()
+            cancel.add(call({
+              val other = map.invoke(it)
+              cancel.add(other.call({
+                emitter.onResult(it)
+              }, {
+                emitter.onError(it)
+              }))
+            }, {
+              emitter.onError(it)
+            }))
+
+            it.doOnCompletion {
+              cancel.cancel()
+            }
+          }
+        }
+
+        override fun first(): T? {
+          val latch = CountDownLatch(1)
+          var value: T? = null
+          var throwable: Throwable? = null
+          val cancel = CompositeCancellable()
+          cancel.add(call({
+            value = it
+            cancel.cancel()
+            latch.countDown()
+          }, {
+            throwable = it
+            latch.countDown()
+          }))
+          latch.await()
+
+          if (throwable != null) throw throwable!!
+
+          return value
         }
 
         override fun call(success: OnSuccess<T>?): Cancellable {
