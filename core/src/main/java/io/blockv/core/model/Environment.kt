@@ -13,6 +13,7 @@ package io.blockv.core.model
 open class Environment(
   val rest: String,
   val wss: String,
+  val cdn: String,
   val appId: String
 ) {
   companion object {

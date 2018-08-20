@@ -12,6 +12,7 @@
 package io.blockv.core.client.manager
 
 import io.blockv.core.model.AssetProvider
+import io.blockv.core.util.Callable
 
 interface ResourceManager {
 
@@ -19,6 +20,8 @@ interface ResourceManager {
 
   @Throws(ResourceManager.MissingAssetProviderException::class)
   fun encodeUrl(url: String): String
+
+  fun encodeWithCredentials(url: String): Callable<String>
 
   class MissingAssetProviderException : Exception("BLOCKv SDK does not have any asset provider credentials!")
 }

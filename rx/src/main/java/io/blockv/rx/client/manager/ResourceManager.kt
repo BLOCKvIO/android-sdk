@@ -8,21 +8,19 @@
  *  under the License.
  *
  */
-package io.blockv.core.internal.json.serializer.user
 
-import io.blockv.core.internal.json.serializer.Serializer
-import io.blockv.core.model.Environment
-import org.json.JSONObject
+package io.blockv.rx.client.manager
 
-class EnviromentSerializer : Serializer<Environment?> {
-  override fun serialize(data: Environment?): JSONObject {
-    val out: JSONObject = JSONObject()
-    if (data != null) {
-      out.put("app_id", data.appId)
-      out.put("rest", data.rest)
-      out.put("cdn", data.cdn)
-      out.put("wss", data.wss)
-    }
-    return out
-  }
+import io.blockv.core.client.manager.ResourceManager
+import io.blockv.core.model.AssetProvider
+import io.reactivex.Single
+
+interface ResourceManager {
+
+  val assetProviders: List<AssetProvider>?
+
+  @Throws(ResourceManager.MissingAssetProviderException::class)
+  fun encodeUrl(url: String): String
+
+  fun encodeWithCredentials(url: String): Single<String>
 }

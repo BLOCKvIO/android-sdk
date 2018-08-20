@@ -11,8 +11,6 @@
 package io.blockv.rx.client.manager
 
 import android.content.Context
-import io.blockv.core.client.manager.ResourceManager
-import io.blockv.core.client.manager.ResourceManagerImpl
 import io.blockv.core.internal.json.JsonModule
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.internal.json.deserializer.EnvironmentDeserialzier
@@ -40,7 +38,6 @@ import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.internal.repository.Preferences
 import io.blockv.core.model.*
-import io.blockv.rx.client.manager.*
 
 class Blockv {
 
@@ -103,10 +100,11 @@ class Blockv {
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
+      "",
       appId
     )
-    this.resourceManager = ResourceManagerImpl(preferences)
     this.auth = AuthenticatorImpl(preferences, jsonModule)
+    this.resourceManager = ResourceManagerImpl(preferences, auth, JwtDecoderImpl())
     this.netModule = NetModule(
       auth,
       preferences,
@@ -152,8 +150,8 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(preferences)
     this.auth = AuthenticatorImpl(preferences, jsonModule)
+    this.resourceManager = ResourceManagerImpl(preferences, auth, JwtDecoderImpl())
     this.netModule = NetModule(auth, preferences, jsonModule)
     this.userManager = UserManagerImpl(
       netModule.userApi,
@@ -180,6 +178,7 @@ class Blockv {
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
+      "",
       appId
     )
     this.jsonModule = jsonModule
