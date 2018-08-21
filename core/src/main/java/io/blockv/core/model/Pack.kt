@@ -61,7 +61,7 @@ open class Pack(
    * @param vatomId is the unique identifier of the vAtom.
    * @return new Pack instance.
    */
-  fun filter(vatomId: String): Pack {
+  fun filter(vatomId: String): VatomPack? {
     val vatom = findVatom(vatomId)
     val faces = filterFaces(vatomId)
     val actions = filterActions(vatomId)
@@ -69,7 +69,10 @@ open class Pack(
     if (vatom != null) {
       vatoms.add(vatom)
     }
-    return Pack(vatoms, faces, actions)
+    if (vatoms.size == 0)
+      return null
+
+    return VatomPack(vatoms[0], faces, actions)
   }
 
   override fun toString(): String {
