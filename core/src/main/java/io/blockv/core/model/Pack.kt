@@ -56,10 +56,10 @@ open class Pack(
   }
 
   /**
-   * Returns a Pack model for the specified vAtom id.
+   * Returns a VatomPack model for the specified vAtom id.
    *
    * @param vatomId is the unique identifier of the vAtom.
-   * @return new Pack instance.
+   * @return new VatomPack instance.
    */
   fun filter(vatomId: String): VatomPack? {
     val vatom = findVatom(vatomId)
