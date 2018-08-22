@@ -13,7 +13,7 @@ interface FaceManager {
     FULLSCREEN("fullscreen", ICON),
     CARD("card", ICON);
 
-    val routine: FaceSelectionProcedure
+    val procedure: FaceSelectionProcedure
       get() {
         val procedure = this
         return object : FaceManager.FaceSelectionProcedure {
