@@ -13,11 +13,11 @@ package io.blockv.core.model
 import org.json.JSONObject
 
 class FaceProperty(
-  var displayUrl: String,
-  var viewMode: String,
-  var platform: String,
-  var config: JSONObject,
-  var resources: List<String>
+  val displayUrl: String,
+  val viewMode: String,
+  val platform: String,
+  val config: JSONObject,
+  val resources: List<String>
 ) {
 
 
