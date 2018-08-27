@@ -14,6 +14,7 @@ import android.util.Log
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Face
 import io.blockv.core.model.FaceProperty
+import org.json.JSONArray
 import org.json.JSONObject
 
 class FaceDeserializer : Deserializer<Face> {
@@ -29,6 +30,7 @@ class FaceDeserializer : Deserializer<Face> {
       val displayUrl: String = properties.getString("display_url")
       val constraints: JSONObject = properties.optJSONObject("constraints")
       val resourceArray = properties.optJSONArray("resources")
+      val config = properties.optJSONObject("config")
       val resources: ArrayList<String> = ArrayList(resourceArray.length())
       (0..resourceArray.length())
         .mapTo(resources) {
@@ -45,6 +47,7 @@ class FaceDeserializer : Deserializer<Face> {
           displayUrl,
           constraints.optString("view_mode"),
           constraints.optString("platform"),
+          config,
           resources
         )
       )

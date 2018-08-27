@@ -10,10 +10,13 @@
  */
 package io.blockv.core.model
 
+import org.json.JSONObject
+
 class FaceProperty(
   var displayUrl: String,
   var viewMode: String,
   var platform: String,
+  var config: JSONObject,
   var resources: List<String>
 ) {
 
@@ -23,6 +26,7 @@ class FaceProperty(
       "displayUrl='" + displayUrl + '\'' +
       ", viewMode='" + viewMode + '\'' +
       ", platform='" + platform + '\'' +
+      ", config='" + config + '\'' +
       ", resources='" + resources + '\'' +
       "}"
   }
