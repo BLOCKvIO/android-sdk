@@ -74,6 +74,10 @@ interface FaceManager {
     }
   }
 
+  fun registerFace(factory: ViewFactory)
+
+  val faceRegistry: Map<String,ViewFactory>
+
   interface FaceSelectionProcedure {
     fun select(vatom: Vatom, faceRegistry: Set<String>): Face?
   }
