@@ -1,6 +1,5 @@
 package io.blockv.face.client
 
-import io.blockv.core.model.Action
 import io.blockv.core.model.Face
 import io.blockv.core.model.Vatom
 
@@ -19,13 +18,11 @@ interface FaceManager {
         return object : FaceManager.FaceSelectionProcedure {
           override fun select(
             vatom: Vatom,
-            faces: List<Face>,
-            actions: List<Action>,
             faceRegistry: Set<String>
           ): Face? {
             var context: EmbeddedProcedure? = procedure
             do {
-              val face = defaultRoutine(faces, faceRegistry, context!!.viewMode)
+              val face = defaultRoutine(vatom.faces, faceRegistry, context!!.viewMode)
               if (face != null)
                 return face
               context = context.fallback
@@ -78,6 +75,6 @@ interface FaceManager {
   }
 
   interface FaceSelectionProcedure {
-    fun select(vatom: Vatom, faces: List<Face>, actions: List<Action>, faceRegistry: Set<String>): Face?
+    fun select(vatom: Vatom, faceRegistry: Set<String>): Face?
   }
 }
