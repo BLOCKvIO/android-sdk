@@ -1,11 +1,12 @@
 package io.blockv.face.client
 
+import android.content.Context
 import android.view.View
 import io.blockv.core.model.Vatom
 
 interface FaceView {
 
-  fun onCreate(vatom: Vatom, bridge: FaceBridge): View
+  fun onCreate(context: Context, vatom: Vatom, bridge: FaceBridge): View
 
   fun onLoad(handler: LoadHandler)
 
