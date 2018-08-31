@@ -12,9 +12,11 @@ package io.blockv.core.internal.json.deserializer.vatom
 
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.*
+import org.json.JSONArray
 import org.json.JSONObject
 
-class VatomDeserializer : Deserializer<Vatom> {
+class VatomDeserializer(val faceDeserializer: Deserializer<Face?>,
+                        val actionDeserializer: Deserializer<Action?>) : Deserializer<Vatom> {
   override fun deserialize(data: JSONObject): Vatom? {
 
     try {
@@ -23,7 +25,7 @@ class VatomDeserializer : Deserializer<Vatom> {
       val private: JSONObject? = data.optJSONObject("private")
       val whenCreated: String = data.getString("when_created")
       val whenModified: String = data.getString("when_modified")
-      val properties: VatomProperty = VatomProperty()
+      val properties = VatomProperty()
       properties.author = prop.optString("author")
       properties.category = prop.optString("category")
       properties.clonedFrom = prop.optString("cloned_from")
@@ -114,7 +116,7 @@ class VatomDeserializer : Deserializer<Vatom> {
           )
         )
       }
-      val resourceArray = prop.optJSONArray("resources")
+      val resourceArray = prop.optJSONArray("resources") ?: JSONArray()
       val resources: ArrayList<Resource> = ArrayList()
       (0 until resourceArray.length())
         .forEach {
@@ -131,12 +133,38 @@ class VatomDeserializer : Deserializer<Vatom> {
         }
       properties.resources = resources
 
+      val faces: JSONArray? = data.optJSONArray("faces")
+      val actions: JSONArray? = data.optJSONArray("actions")
+      val facesArray: ArrayList<Face> = ArrayList()
+      val actionsArray: ArrayList<Action> = ArrayList()
+
+      if (faces != null) {
+        (0 until faces.length())
+          .forEach {
+            val face: Face? = faceDeserializer.deserialize(faces.optJSONObject(it))
+            if (face != null) {
+              facesArray.add(face)
+            }
+          }
+      }
+      if (actions != null) {
+        (0 until actions.length())
+          .forEach {
+            val action: Action? = actionDeserializer.deserialize(actions.optJSONObject(it))
+            if (action != null) {
+              actionsArray.add(action)
+            }
+          }
+      }
+
       return Vatom(
         id,
         whenCreated,
         whenModified,
         properties,
-        private
+        private,
+        facesArray,
+        actionsArray
       )
     } catch (e: Exception) {
       android.util.Log.e("VatomDeserializer", e.message)

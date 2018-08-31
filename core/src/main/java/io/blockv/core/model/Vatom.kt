@@ -12,12 +12,14 @@ package io.blockv.core.model
 
 import org.json.JSONObject
 
-class Vatom(
+open class Vatom(
   val id: String,
   val whenCreated: String,
   val whenModified: String,
   val property: VatomProperty,
-  var private: JSONObject?
+  val private: JSONObject?,
+  val faces: List<Face>,
+  val actions: List<Action>
 ) {
 
   override fun toString(): String {

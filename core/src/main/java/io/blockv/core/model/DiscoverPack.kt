@@ -12,16 +12,12 @@ package io.blockv.core.model
 
 class DiscoverPack(
   val count: Int,
-  vatoms: List<Vatom>,
-  faces: List<Face>,
-  actions: List<Action>
-) : Pack(vatoms, faces, actions) {
+  val vatoms: List<Vatom>
+)  {
   override fun toString(): String {
     return "DiscoverPack{" +
       " count='" + count + '\'' +
       ", vatoms='" + vatoms + '\'' +
-      ", faces='" + faces + '\'' +
-      ", actions='" + actions + '\'' +
       "}"
   }
 }

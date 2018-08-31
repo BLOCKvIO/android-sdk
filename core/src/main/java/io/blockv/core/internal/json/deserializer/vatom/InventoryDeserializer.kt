@@ -13,7 +13,6 @@ package io.blockv.core.internal.json.deserializer.vatom
 import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.model.Action
 import io.blockv.core.model.Face
-import io.blockv.core.model.Pack
 import io.blockv.core.model.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
@@ -22,51 +21,68 @@ class InventoryDeserializer(
   val vatomDeserializer: Deserializer<Vatom?>,
   val faceDeserializer: Deserializer<Face?>,
   val actionDeserializer: Deserializer<Action?>
-) : Deserializer<Pack> {
+) : Deserializer<List<Vatom>> {
 
-  override fun deserialize(data: JSONObject): Pack? {
+  override fun deserialize(data: JSONObject): List<Vatom> {
     try {
       val inventory: JSONArray? = data.optJSONArray("vatoms")
 
-      val faces: JSONArray? = data.optJSONArray("faces")
-      val actions: JSONArray? = data.optJSONArray("actions")
+      val facesArray: JSONArray? = data.optJSONArray("faces")
+      val actionsArray: JSONArray? = data.optJSONArray("actions")
 
-      var inventoryArray: ArrayList<Vatom> = ArrayList()
-      val facesArray: ArrayList<Face> = ArrayList()
-      val actionsArray: ArrayList<Action> = ArrayList()
+      val inventoryArray: ArrayList<Vatom> = ArrayList()
 
+      val faces: HashMap<String, ArrayList<Face>> = HashMap()
+      val actions: HashMap<String, ArrayList<Action>> = HashMap()
+
+      if (facesArray != null) {
+        (0 until facesArray.length())
+          .forEach {
+            val face: Face? = faceDeserializer.deserialize(facesArray.optJSONObject(it))
+            if (face != null) {
+              if (!faces.containsKey(face.templateId)) {
+                faces[face.templateId] = ArrayList()
+              }
+              faces[face.templateId]?.add(face)
+            }
+          }
+      }
+      if (actionsArray != null) {
+        (0 until actionsArray.length())
+          .forEach {
+            val action: Action? = actionDeserializer.deserialize(actionsArray.optJSONObject(it))
+            if (action != null) {
+              if (!actions.containsKey(action.templateId)) {
+                actions[action.templateId] = ArrayList()
+              }
+              actions[action.templateId]?.add(action)
+            }
+          }
+      }
       if (inventory != null) {
         (0 until inventory.length())
           .forEach {
             val vatom: Vatom? = vatomDeserializer.deserialize(inventory.optJSONObject(it))
             if (vatom != null) {
-              inventoryArray.add(vatom)
+              inventoryArray.add(
+                Vatom(
+                  vatom.id,
+                  vatom.whenCreated,
+                  vatom.whenModified,
+                  vatom.property,
+                  vatom.private,
+                  faces[vatom.property.templateId] ?: ArrayList(),
+                  actions[vatom.property.templateId] ?: ArrayList()
+                )
+              )
             }
           }
       }
-      if (faces != null) {
-        (0 until faces.length())
-          .forEach {
-            val face: Face? = faceDeserializer.deserialize(faces.optJSONObject(it))
-            if (face != null) {
-              facesArray.add(face)
-            }
-          }
-      }
-      if (actions != null) {
-        (0 until actions.length())
-          .forEach {
-            val action: Action? = actionDeserializer.deserialize(actions.optJSONObject(it))
-            if (action != null) {
-              actionsArray.add(action)
-            }
-          }
-      }
-      return Pack(inventoryArray, facesArray, actionsArray)
+      return inventoryArray
     } catch (e: Exception) {
       android.util.Log.e("InventoryDeserializer", e.message)
     }
-    return null
+    return ArrayList()
   }
 
 }
