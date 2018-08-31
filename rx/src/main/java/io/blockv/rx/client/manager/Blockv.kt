@@ -14,7 +14,6 @@ import android.content.Context
 import io.blockv.core.client.manager.ResourceManager
 import io.blockv.core.client.manager.ResourceManagerImpl
 import io.blockv.core.internal.json.JsonModule
-import io.blockv.core.internal.json.deserializer.Deserializer
 import io.blockv.core.internal.json.deserializer.EnvironmentDeserialzier
 import io.blockv.core.internal.json.deserializer.JwtDeserializer
 import io.blockv.core.internal.json.deserializer.activity.ActivityMessageDeserializer
@@ -39,8 +38,7 @@ import io.blockv.core.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.core.internal.net.websocket.WebsocketImpl
 import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.*
-import io.blockv.rx.client.manager.*
+import io.blockv.core.model.Environment
 
 class Blockv {
 
@@ -71,24 +69,26 @@ class Blockv {
     }
 
   constructor(context: Context, appId: String) {
-    val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
-    val faceDeserilizer: Deserializer<Face?> = FaceDeserializer()
-    val actionDeserilizer: Deserializer<Action?> = ActionDeserializer()
-    val messageDeserializer: Deserializer<ActivityMessage?> = ActivityMessageDeserializer()
+
+    val faceDeserializer = FaceDeserializer()
+    val actionDeserializer = ActionDeserializer()
+    val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
+    val inventoryDeserializer = InventoryDeserializer(vatomDeserializer, faceDeserializer, actionDeserializer)
+    val messageDeserializer = ActivityMessageDeserializer()
     this.jsonModule = JsonModule(
       UserDeserializer(),
       TokenDeserializer(),
-      vatomDeserilizer,
-      faceDeserilizer,
-      actionDeserilizer,
+      vatomDeserializer,
+      faceDeserializer,
+      actionDeserializer,
       AssetProviderDeserialzier(),
       AssetProviderSerializer(),
       EnvironmentDeserialzier(),
       EnviromentSerializer(),
-      InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      inventoryDeserializer,
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      DiscoverDeserializer(inventoryDeserializer),
       PublicUserDeserializer(),
       GeoGroupDeserializer(),
       InventoryEventDeserializer(),
@@ -122,24 +122,26 @@ class Blockv {
   }
 
   constructor(context: Context, environment: Environment) {
-    val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
-    val faceDeserilizer: Deserializer<Face?> = FaceDeserializer()
-    val actionDeserilizer: Deserializer<Action?> = ActionDeserializer()
-    val messageDeserializer: Deserializer<ActivityMessage?> = ActivityMessageDeserializer()
+
+    val faceDeserializer = FaceDeserializer()
+    val actionDeserializer = ActionDeserializer()
+    val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
+    val inventoryDeserializer = InventoryDeserializer(vatomDeserializer, faceDeserializer, actionDeserializer)
+    val messageDeserializer = ActivityMessageDeserializer()
     this.jsonModule = JsonModule(
       UserDeserializer(),
       TokenDeserializer(),
-      vatomDeserilizer,
-      faceDeserilizer,
-      actionDeserilizer,
+      vatomDeserializer,
+      faceDeserializer,
+      actionDeserializer,
       AssetProviderDeserialzier(),
       AssetProviderSerializer(),
       EnvironmentDeserialzier(),
       EnviromentSerializer(),
-      InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      inventoryDeserializer,
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      DiscoverDeserializer(inventoryDeserializer),
       PublicUserDeserializer(),
       GeoGroupDeserializer(),
       InventoryEventDeserializer(),

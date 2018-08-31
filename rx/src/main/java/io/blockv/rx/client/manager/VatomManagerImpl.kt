@@ -15,7 +15,7 @@ import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
 import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Pack
+import io.blockv.core.model.Vatom
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,7 +30,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: GeoFilter
-  ): Single<Pack> = Single.fromCallable {
+  ): Single<List<Vatom>> = Single.fromCallable {
     api.geoDiscover(
       GeoRequest(
         bottomLeftLon,
@@ -72,13 +72,13 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getVatoms(vararg ids: String): Single<Pack> = Single.fromCallable {
+  override fun getVatoms(vararg ids: String): Single<List<Vatom>> = Single.fromCallable {
     api.getUserVatom(VatomRequest(ids.toList())).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getInventory(id: String?, page: Int, limit: Int): Single<Pack> = Single.fromCallable {
+  override fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>> = Single.fromCallable {
     api.getUserInventory(
       InventoryRequest(
         (if (id == null || id.isEmpty()) "." else id),
