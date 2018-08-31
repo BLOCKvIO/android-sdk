@@ -1,7 +1,7 @@
 package io.blockv.face.client
 
 /**
- * Facc bridge provides access to sdk functions
+ * Face bridge provides access to sdk functions
  */
 interface FaceBridge {
 }
