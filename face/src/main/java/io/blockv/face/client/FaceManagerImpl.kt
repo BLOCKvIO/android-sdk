@@ -2,16 +2,12 @@ package io.blockv.face.client
 
 class FaceManagerImpl : FaceManager {
 
-  private val factories: HashMap<String, FaceViewFactory> = HashMap()
+  private val factories: HashMap<String, ViewFactory> = HashMap()
 
-  override fun registerFaceViewFactory(viewFactory: FaceViewFactory) {
-    factories[viewFactory.displayUrl] = viewFactory
+  override fun registerFace(factory: ViewFactory) {
+    factories[factory.displayUrl] = factory
   }
 
-  override fun getFaceViewFactory(registryId: String): FaceViewFactory? {
-    return factories[registryId]
-  }
-
-  override val faceRegistry: Set<String>
-    get() = factories.keys
+  override val faceRegistry: Map<String,ViewFactory>
+    get() = factories
 }

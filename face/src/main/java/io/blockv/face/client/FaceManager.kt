@@ -77,11 +77,9 @@ interface FaceManager {
     }
   }
 
-  fun registerFaceViewFactory(viewFactory: FaceViewFactory)
+  fun registerFace(factory: ViewFactory)
 
-  fun getFaceViewFactory(registryId: String):FaceViewFactory?
-
-  val faceRegistry: Set<String>
+  val faceRegistry: Map<String,ViewFactory>
 
   interface FaceSelectionProcedure {
     fun select(vatom: Vatom, faces: List<Face>, actions: List<Action>, faceRegistry: Set<String>): Face?
