@@ -1,14 +1,27 @@
 package io.blockv.face.client
 
-import android.view.View
-import io.blockv.core.model.Action
-import io.blockv.core.model.Face
 import io.blockv.core.model.Vatom
 
-interface FaceViewFactory<T : View, FaceView> {
+interface ViewFactory {
 
   val displayUrl: String
 
-  fun emitFaceView(vatom: Vatom, face: Face, actions: List<Action>, bridge: FaceBridge?): T
+  fun emit(vatom: Vatom, bridge: FaceBridge?): FaceView
+
+  companion object {
+
+    fun wrap(displayUrl: String, emitter: (vatom: Vatom, bridge: FaceBridge?) -> FaceView): ViewFactory {
+
+      return object : ViewFactory {
+
+        override fun emit(vatom: Vatom, bridge: FaceBridge?): FaceView {
+          return emitter.invoke(vatom, bridge)
+        }
+
+        override val displayUrl: String
+          get() = displayUrl
+      }
+    }
+  }
 
 }
