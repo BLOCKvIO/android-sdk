@@ -10,10 +10,14 @@
  */
 package io.blockv.core.client.manager
 
+import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
-import io.blockv.core.model.*
+import io.blockv.core.model.Action
+import io.blockv.core.model.GeoGroup
+import io.blockv.core.model.Vatom
 import io.blockv.core.util.Callable
+import org.json.JSONArray
 import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi) : VatomManager {
@@ -61,9 +65,26 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     api.updateVatom(payload).payload
   }
 
-  override fun discover(query: JSONObject): Callable<DiscoverPack> = Callable.single {
-    api.discover(query).payload
+  override fun discover(query: JSONObject): Callable<List<Vatom>> = Callable.single {
+    query.put(
+      "return",
+      JSONObject()
+        .put("type", DiscoverQueryBuilder.ResultType.PAYLOAD)
+        .put("fields", JSONArray())
+    )
+    api.discover(query).payload.vatoms
   }
+
+  override fun discoverCount(query: JSONObject): Callable<Int> = Callable.single {
+    query.put(
+      "return",
+      JSONObject()
+        .put("type", DiscoverQueryBuilder.ResultType.COUNT)
+        .put("fields", JSONArray())
+    )
+    api.discover(query).payload.count
+  }
+
 
   override fun getVatoms(vararg ids: String): Callable<List<Vatom>> = Callable.single {
     api.getUserVatom(VatomRequest(ids.toList())).payload
