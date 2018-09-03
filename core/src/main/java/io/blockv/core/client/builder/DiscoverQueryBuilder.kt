@@ -150,24 +150,6 @@ open class DiscoverQueryBuilder {
   }
 
   /**
-   * Sets the return type.
-   *
-   * @param type controls the response payload of the query
-   *             - `*` returns vAtoms.
-   *             - `count` returns only the numerical count of the query and an empty vAtom array.
-   * @return DiscoverQueryBuilder.
-   */
-  /*fun setReturn(type: ResultType): DiscoverQueryBuilder {
-    json.put(
-      "return",
-      JSONObject()
-        .put("type", type.result)
-        .put("fields", JSONArray())
-    )
-    return this
-  }*/
-
-  /**
    * Returns the Json discover query.
    *
    * @return JSONObject.
