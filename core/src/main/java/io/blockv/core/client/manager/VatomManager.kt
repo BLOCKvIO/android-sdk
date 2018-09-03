@@ -171,14 +171,22 @@ interface VatomManager {
   fun pickupVatom(id: String): Callable<JSONObject?>
 
   /**
-   * Searches for vAtoms on the BLOCKv Platform.
+   * Searches for vAtoms on the BLOCKv platform.
    *
    * @param query is a JSONObject containing the discover query.
-   * @return new Callable<DiscoverPack>.
+   * @return new Callable<List<Vatom>>.
    * @see DiscoverQueryBuilder
-   * @see DiscoverPack
    */
-  fun discover(query: JSONObject): Callable<DiscoverPack>
+  fun discover(query: JSONObject): Callable<List<Vatom>>
+
+  /**
+   * Tallies vAtoms on the BLOCKv platform based on the search query.
+   *
+   * @param query is a JSONObject containing the discover query.
+   * @return new Callable<Int>.
+   * @see DiscoverQueryBuilder
+   */
+  fun discoverCount(query: JSONObject): Callable<Int>
 
   /**
    * Trashes the specified vAtom.
