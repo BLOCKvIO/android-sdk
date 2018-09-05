@@ -25,7 +25,7 @@ class JsonModule(
   val assetProviderSerializer: Serializer<AssetProvider?>,
   val environmentDeserializer: Deserializer<Environment?>,
   val environmentSerializer: Serializer<Environment?>,
-  val packDeserializer: Deserializer<Pack?>,
+  val inventoryDeserializer: Deserializer<List<Vatom>>,
   val jctDeserializer: Deserializer<Jwt?>,
   val jwtSerializer: Serializer<Jwt?>,
   val discoverDeserializer: Deserializer<DiscoverPack?>,

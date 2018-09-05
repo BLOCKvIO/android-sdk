@@ -30,19 +30,15 @@ open class DiscoverQueryBuilder {
   }
 
   enum class Field(val value: String) {
-    ID("id"),
-    WHEN_CREATED("when_created"),
-    WHEN_MODIFIED("when_modified"),
-    PARENT_ID("vAtom::vAtomType.parent_id"),
-    OWNER("vAtom::vAtomType.owner"),
-    AUTHOR("vAtom::vAtomType.author"),
+    PUBLISHER_FQDN("vAtom::vAtomType.publisher_fqdn"),
     TEMPLATE("vAtom::vAtomType.template"),
     TEMPLATE_VARIATION("vAtom::vAtomType.template_variation"),
-    DROPPED("vAtom::vAtomType.dropped"),
-    TRANSFERABLE("vAtom::vAtomType.transferable"),
-    ACQUIRABLE("vAtom::vAtomType.acquirable"),
+    OWNER("vAtom::vAtomType.owner"),
+    AUTHOR("vAtom::vAtomType.author"),
+    PARENT_ID("vAtom::vAtomType.parent_id"),
     CATEGORY("vAtom::vAtomType.category"),
-    TITLE("vAtom::vAtomType.title");
+    IN_CONTRACT("vAtom::vAtomType.in_contract"),
+    VISIBILITY_TYPE("vAtom::vAtomType.visibility_type"),
   }
 
   enum class FilterOperation(val operator: String) {
@@ -150,24 +146,6 @@ open class DiscoverQueryBuilder {
         .put("bool_op", combineOperation)
     )
 
-    return this
-  }
-
-  /**
-   * Sets the return type.
-   *
-   * @param type controls the response payload of the query
-   *             - `*` returns vAtoms.
-   *             - `count` returns only the numerical count of the query and an empty vAtom array.
-   * @return DiscoverQueryBuilder.
-   */
-  fun setReturn(type: ResultType): DiscoverQueryBuilder {
-    json.put(
-      "return",
-      JSONObject()
-        .put("type", type.result)
-        .put("fields", JSONArray())
-    )
     return this
   }
 

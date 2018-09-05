@@ -10,16 +10,17 @@
  */
 package io.blockv.rx.client.manager
 
+import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.client.manager.VatomManager.*
 import io.blockv.core.internal.net.rest.api.VatomApi
 import io.blockv.core.internal.net.rest.request.*
-import io.blockv.core.model.DiscoverPack
 import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Pack
+import io.blockv.core.model.Vatom
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONArray
 import org.json.JSONObject
 
 class VatomManagerImpl(val api: VatomApi) : VatomManager {
@@ -30,7 +31,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: GeoFilter
-  ): Single<Pack> = Single.fromCallable {
+  ): Single<List<Vatom>> = Single.fromCallable {
     api.geoDiscover(
       GeoRequest(
         bottomLeftLon,
@@ -72,13 +73,13 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getVatoms(vararg ids: String): Single<Pack> = Single.fromCallable {
+  override fun getVatoms(vararg ids: String): Single<List<Vatom>> = Single.fromCallable {
     api.getUserVatom(VatomRequest(ids.toList())).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getInventory(id: String?, page: Int, limit: Int): Single<Pack> = Single.fromCallable {
+  override fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>> = Single.fromCallable {
     api.getUserInventory(
       InventoryRequest(
         (if (id == null || id.isEmpty()) "." else id),
@@ -136,11 +137,27 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
   override fun pickupVatom(id: String): Completable = preformAction(Action.PICKUP, id, null).toCompletable()
 
-  override fun discover(query: JSONObject): Single<DiscoverPack> = Single.fromCallable {
-    api.discover(query).payload
+  override fun discover(query: JSONObject): Single<List<Vatom>> = Single.fromCallable {
+    query.put(
+      "return",
+      JSONObject()
+        .put("type", DiscoverQueryBuilder.ResultType.PAYLOAD)
+        .put("fields", JSONArray())
+    )
+    api.discover(query).payload.vatoms
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
+
+  override fun discoverCount(query: JSONObject): Single<Int> = Single.fromCallable {
+    query.put(
+      "return",
+      JSONObject()
+        .put("type", DiscoverQueryBuilder.ResultType.COUNT)
+        .put("fields", JSONArray())
+    )
+    api.discover(query).payload.count
+  }
 
   override fun trashVatom(id: String): Completable = Completable.fromCallable {
     api.trashVatom(TrashVatomRequest(id))
