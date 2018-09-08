@@ -11,8 +11,6 @@
 package io.blockv.rx.client
 
 import android.content.Context
-import io.blockv.core.client.manager.ResourceManager
-import io.blockv.core.client.manager.ResourceManagerImpl
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.json.deserializer.EnvironmentDeserialzier
 import io.blockv.common.internal.json.deserializer.JwtDeserializer
@@ -36,9 +34,12 @@ import io.blockv.common.internal.net.NetModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
+import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
+import io.blockv.core.client.manager.ResourceManager
+import io.blockv.core.client.manager.ResourceManagerImpl
 import io.blockv.rx.client.manager.*
 
 class Blockv {
@@ -61,9 +62,9 @@ class Blockv {
           internalEventManager =
             EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
         } catch (e: NoClassDefFoundError) {
-          throw io.blockv.core.client.manager.EventManager.MissingWebSocketDependencyException()
+          throw MissingWebSocketDependencyException()
         } catch (e: Exception) {
-          throw io.blockv.core.client.manager.EventManager.MissingWebSocketDependencyException()
+          throw MissingWebSocketDependencyException()
         }
       }
       return internalEventManager!!
@@ -106,7 +107,7 @@ class Blockv {
       Environment.DEFAULT_WEBSOCKET,
       appId
     )
-    this.resourceManager = ResourceManagerImpl(preferences)
+    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences),preferences)
     this.auth = AuthenticatorImpl(preferences, jsonModule)
     this.netModule = NetModule(
       auth,
@@ -155,7 +156,7 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(preferences)
+    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences),preferences)
     this.auth = AuthenticatorImpl(preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     this.userManager = UserManagerImpl(
@@ -194,5 +195,8 @@ class Blockv {
     this.activityManager = activityManager
     this.auth = AuthenticatorImpl(preferences, jsonModule)
   }
+
+  class MissingWebSocketDependencyException :
+    Exception("Include dependency 'com.neovisionaries:nv-websocket-client:2.5' to use the event manager.")
 
 }
