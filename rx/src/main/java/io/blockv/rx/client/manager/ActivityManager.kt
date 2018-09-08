@@ -10,8 +10,8 @@
  */
 package io.blockv.rx.client.manager
 
-import io.blockv.core.model.ActivityMessageList
-import io.blockv.core.model.ActivityThreadList
+import io.blockv.common.model.ActivityMessageList
+import io.blockv.common.model.ActivityThreadList
 import io.reactivex.Completable
 import io.reactivex.Single
 

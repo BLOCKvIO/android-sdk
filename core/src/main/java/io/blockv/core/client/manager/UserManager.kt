@@ -12,11 +12,11 @@
 package io.blockv.core.client.manager
 
 import android.graphics.Bitmap
-import io.blockv.core.model.Jwt
-import io.blockv.core.model.PublicUser
-import io.blockv.core.model.Token
-import io.blockv.core.model.User
-import io.blockv.core.util.Callable
+import io.blockv.common.model.Jwt
+import io.blockv.common.model.PublicUser
+import io.blockv.common.model.Token
+import io.blockv.common.model.User
+import io.blockv.common.util.Callable
 
 /**
  *  This interface contains the available BLOCKv user functions.

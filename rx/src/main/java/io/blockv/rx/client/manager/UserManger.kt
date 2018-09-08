@@ -12,9 +12,9 @@ package io.blockv.rx.client.manager
 
 import android.graphics.Bitmap
 import io.blockv.core.client.manager.UserManager.*
-import io.blockv.core.model.PublicUser
-import io.blockv.core.model.Token
-import io.blockv.core.model.User
+import io.blockv.common.model.PublicUser
+import io.blockv.common.model.Token
+import io.blockv.common.model.User
 import io.reactivex.Completable
 import io.reactivex.Single
 

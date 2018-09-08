@@ -11,8 +11,8 @@
 package io.blockv.core.client.manager
 
 import android.net.Uri
-import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.AssetProvider
+import io.blockv.common.internal.repository.Preferences
+import io.blockv.common.model.AssetProvider
 
 class ResourceManagerImpl(private val preferences: Preferences) : ResourceManager {
 

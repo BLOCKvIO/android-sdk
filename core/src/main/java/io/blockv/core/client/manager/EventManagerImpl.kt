@@ -10,15 +10,15 @@
  */
 package io.blockv.core.client.manager
 
-import io.blockv.core.internal.json.JsonModule
-import io.blockv.core.internal.net.websocket.Websocket
-import io.blockv.core.internal.net.websocket.WebsocketImpl
-import io.blockv.core.model.ActivityEvent
-import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateUpdateEvent
-import io.blockv.core.model.WebSocketEvent
-import io.blockv.core.util.Callable
-import io.blockv.core.util.Cancellable
+import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.net.websocket.Websocket
+import io.blockv.common.internal.net.websocket.WebsocketImpl
+import io.blockv.common.model.ActivityEvent
+import io.blockv.common.model.InventoryEvent
+import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.WebSocketEvent
+import io.blockv.common.util.Callable
+import io.blockv.common.util.Cancellable
 import org.json.JSONObject
 
 

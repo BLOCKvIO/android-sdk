@@ -10,11 +10,11 @@
  */
 package io.blockv.core.client.manager
 
-import io.blockv.core.model.ActivityEvent
-import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateUpdateEvent
-import io.blockv.core.model.WebSocketEvent
-import io.blockv.core.util.Callable
+import io.blockv.common.model.ActivityEvent
+import io.blockv.common.model.InventoryEvent
+import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.WebSocketEvent
+import io.blockv.common.util.Callable
 import org.json.JSONObject
 
 /**

@@ -12,10 +12,10 @@ package io.blockv.rx.client.manager
 
 import io.blockv.core.client.builder.DiscoverQueryBuilder
 import io.blockv.core.client.manager.VatomManager.*
-import io.blockv.core.internal.net.rest.api.VatomApi
-import io.blockv.core.internal.net.rest.request.*
-import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Vatom
+import io.blockv.common.internal.net.rest.api.VatomApi
+import io.blockv.common.internal.net.rest.request.*
+import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.Vatom
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -91,7 +91,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getVatomActions(templateId: String): Single<List<io.blockv.core.model.Action>> = Single.fromCallable {
+  override fun getVatomActions(templateId: String): Single<List<io.blockv.common.model.Action>> = Single.fromCallable {
     api.getVatomActions(templateId).payload
   }
     .subscribeOn(Schedulers.io())
