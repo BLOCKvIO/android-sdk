@@ -18,10 +18,7 @@ import io.blockv.common.internal.net.rest.auth.JwtDecoder
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.Jwt
-import io.blockv.common.model.PublicUser
-import io.blockv.common.model.Token
-import io.blockv.common.model.User
+import io.blockv.common.model.*
 import io.blockv.common.util.Callable
 import org.json.JSONArray
 import org.json.JSONObject
@@ -164,14 +161,14 @@ class UserManagerImpl(
     tokenType: UserManager.TokenType
   ): Callable<Void?> = resendVerification(token, tokenType.name.toLowerCase())
 
-  override fun register(registration: UserManager.Registration): Callable<User?> = Callable.single {
+  override fun register(registration: Registration): Callable<User?> = Callable.single {
     val tokens = JSONArray()
 
     registration.tokens?.forEach {
       val data = JSONObject()
       data.put("token_type", it.type)
       data.put("token", it.value)
-      if (it is UserManager.Registration.OauthToken) {
+      if (it is Registration.OauthToken) {
         data.put("auth_data", JSONObject().put("auth_data", it.auth))
       }
       tokens.put(data)
@@ -220,7 +217,7 @@ class UserManagerImpl(
     api.getUserTokens().payload
   }
 
-  override fun updateCurrentUser(update: UserManager.UserUpdate): Callable<User?> = Callable.single {
+  override fun updateCurrentUser(update: UserUpdate): Callable<User?> = Callable.single {
     api.updateCurrentUser(
       UpdateUserRequest(
         update.firstName,

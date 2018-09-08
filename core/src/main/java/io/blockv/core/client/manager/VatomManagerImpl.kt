@@ -10,7 +10,7 @@
  */
 package io.blockv.core.client.manager
 
-import io.blockv.core.client.builder.DiscoverQueryBuilder
+import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.model.Action

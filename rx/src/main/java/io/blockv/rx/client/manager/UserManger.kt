@@ -11,10 +11,7 @@
 package io.blockv.rx.client.manager
 
 import android.graphics.Bitmap
-import io.blockv.core.client.manager.UserManager.*
-import io.blockv.common.model.PublicUser
-import io.blockv.common.model.Token
-import io.blockv.common.model.User
+import io.blockv.common.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -197,4 +194,10 @@ interface UserManager {
     val NULL_PUBLIC_USER = PublicUser()
     val NULL_TOKEN = Token("", "", "", "", "", "", "", false, false, "")
   }
+
+  enum class TokenType {
+    EMAIL,
+    PHONE_NUMBER
+  }
+
 }

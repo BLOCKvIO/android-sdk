@@ -10,13 +10,12 @@
  */
 package io.blockv.rx.client.manager
 
-import io.blockv.core.client.builder.DiscoverQueryBuilder
-import io.blockv.core.client.manager.VatomManager
-import io.blockv.core.client.manager.VatomManager.GeoFilter
+import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.json.JSONObject
+import java.util.HashMap
 
 /**
  *  This interface contains the available BLOCKv vAtom functions.
@@ -107,9 +106,9 @@ interface VatomManager {
    *
    * @param templateId is the unique identified of the template.
    * @return new Single<List<Action>> instance.
-   * @see Action
+   * @see io.blockv.common.model.Action
    */
-  fun getVatomActions(templateId: String): Single<List<Action>>
+  fun getVatomActions(templateId: String): Single<List<io.blockv.common.model.Action>>
 
   /**
    * Performs an action on the BLOCKv Platform.
@@ -130,7 +129,7 @@ interface VatomManager {
    * @return new Single<JSONObject> instance.
    */
   fun preformAction(
-    action: io.blockv.core.client.manager.VatomManager.Action,
+    action: Action,
     id: String,
     payload: JSONObject?
   ): Single<JSONObject>
@@ -156,7 +155,7 @@ interface VatomManager {
    */
   fun transferVatom(
     id: String,
-    tokenType: io.blockv.core.client.manager.VatomManager.TokenType,
+    tokenType: TokenType,
     token: String
   ): Completable
 
@@ -206,4 +205,48 @@ interface VatomManager {
    * @return new Completable instance.
    */
   fun trashVatom(id: String): Completable
+
+
+  enum class TokenType {
+    EMAIL,
+    PHONE_NUMBER,
+    ID
+  }
+
+  enum class GeoFilter {
+    ALL,
+    VATOMS,
+    AVATARS
+  }
+
+  enum class Action {
+
+    ACQUIRE {
+      override fun action(): String = "Acquire"
+    },
+    TRANSFER {
+      override fun action(): String = "Transfer"
+    },
+    DROP {
+      override fun action(): String = "Drop"
+    },
+    PICKUP {
+      override fun action(): String = "Pickup"
+    };
+
+    abstract fun action(): String
+
+    companion object {
+
+      private val MAP: MutableMap<String, Action> = HashMap()
+
+      init {
+        for (action in Action.values()) {
+          MAP.put(action.action().toLowerCase(), action)
+        }
+      }
+
+      fun from(action: String): Action? = MAP[action.toLowerCase()]
+    }
+  }
 }

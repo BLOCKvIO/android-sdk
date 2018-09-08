@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.rx.client.manager
+package io.blockv.rx.client
 
 import android.content.Context
 import io.blockv.core.client.manager.ResourceManager
@@ -39,6 +39,7 @@ import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
+import io.blockv.rx.client.manager.*
 
 class Blockv {
 
