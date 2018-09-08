@@ -9,7 +9,7 @@
  *
  */
 
-package io.blockv.core.client.builder
+package io.blockv.common.builder
 
 import org.json.JSONArray
 import org.json.JSONObject

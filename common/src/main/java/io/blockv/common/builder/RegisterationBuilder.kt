@@ -9,9 +9,9 @@
  *
  */
 
-package io.blockv.core.client.builder
+package io.blockv.common.builder
 
-import io.blockv.core.client.manager.UserManager
+import io.blockv.common.model.Registration
 import java.util.*
 
 class RegistrationBuilder {
@@ -22,7 +22,7 @@ class RegistrationBuilder {
   private var avatar: String? = null
   private var password: String? = null
   private var language: String? = null
-  private var tokens: MutableList<UserManager.Registration.Token> = ArrayList()
+  private var tokens: MutableList<Registration.Token> = ArrayList()
 
   fun setFirstName(firstName: String?): RegistrationBuilder {
     if (firstName != null) {
@@ -52,21 +52,21 @@ class RegistrationBuilder {
     return this
   }
 
-  fun addToken(token: UserManager.Registration.Token): RegistrationBuilder {
+  fun addToken(token: Registration.Token): RegistrationBuilder {
     tokens.add(token)
     return this
   }
 
   fun addEmail(email: String?): RegistrationBuilder {
     if (email != null && email.isNotEmpty()) {
-      tokens.add(UserManager.Registration.Token("email", email))
+      tokens.add(Registration.Token("email", email))
     }
     return this
   }
 
   fun addPhoneNumber(phoneNumber: String?): RegistrationBuilder {
     if (phoneNumber != null && phoneNumber.isNotEmpty()) {
-      tokens.add(UserManager.Registration.Token("phone_number", phoneNumber))
+      tokens.add(Registration.Token("phone_number", phoneNumber))
     }
     return this
   }
@@ -78,7 +78,7 @@ class RegistrationBuilder {
       && auth != null
     ) {
 
-      tokens.add(UserManager.Registration.OauthToken(provider, token, auth))
+      tokens.add(Registration.OauthToken(provider, token, auth))
     }
     return this
   }
@@ -90,8 +90,8 @@ class RegistrationBuilder {
     return this
   }
 
-  fun build(): UserManager.Registration {
-    return UserManager.Registration(
+  fun build(): Registration {
+    return Registration(
       firstName,
       lastName,
       birthday,

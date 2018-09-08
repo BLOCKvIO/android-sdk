@@ -9,9 +9,9 @@
  *
  */
 
-package io.blockv.core.client.builder
+package io.blockv.common.builder
 
-import io.blockv.core.client.manager.UserManager
+import io.blockv.common.model.UserUpdate
 
 class UpdateUserBuilder {
 
@@ -52,8 +52,8 @@ class UpdateUserBuilder {
     return this
   }
 
-  fun build(): UserManager.UserUpdate {
-    return UserManager.UserUpdate(
+  fun build(): UserUpdate {
+    return UserUpdate(
       firstName,
       lastName,
       birthday,

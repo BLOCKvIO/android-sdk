@@ -12,10 +12,7 @@
 package io.blockv.core.client.manager
 
 import android.graphics.Bitmap
-import io.blockv.common.model.Jwt
-import io.blockv.common.model.PublicUser
-import io.blockv.common.model.Token
-import io.blockv.common.model.User
+import io.blockv.common.model.*
 import io.blockv.common.util.Callable
 
 /**
@@ -209,29 +206,7 @@ interface UserManager {
     PHONE_NUMBER
   }
 
-  class Registration(
-    var firstName: String?,
-    var lastName: String?,
-    var birthday: String?,
-    var avatarUri: String?,
-    var password: String?,
-    var language: String?,
-    var tokens: List<Token>?
-  ) {
-    open class Token(val type: String, val value: String)
 
-    class OauthToken(type: String, value: String, val auth: String) : Token(type, value)
-
-  }
-
-  class UserUpdate(
-    var firstName: String?,
-    var lastName: String?,
-    var birthday: String?,
-    var avatarUri: String?,
-    var password: String?,
-    var language: String?
-  )
 
 
 }
