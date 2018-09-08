@@ -10,13 +10,13 @@
  */
 package io.blockv.core.client.manager
 
-import io.blockv.core.client.builder.DiscoverQueryBuilder
-import io.blockv.core.internal.net.rest.api.VatomApi
-import io.blockv.core.internal.net.rest.request.*
-import io.blockv.core.model.Action
-import io.blockv.core.model.GeoGroup
-import io.blockv.core.model.Vatom
-import io.blockv.core.util.Callable
+import io.blockv.common.builder.DiscoverQueryBuilder
+import io.blockv.common.internal.net.rest.api.VatomApi
+import io.blockv.common.internal.net.rest.request.*
+import io.blockv.common.model.Action
+import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.Vatom
+import io.blockv.common.util.Callable
 import org.json.JSONArray
 import org.json.JSONObject
 
