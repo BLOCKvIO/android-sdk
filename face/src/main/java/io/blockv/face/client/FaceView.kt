@@ -1,18 +1,19 @@
 package io.blockv.face.client
 
-import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 
 
 abstract class FaceView(
-var vatom: Vatom,
-var face: Face,
-val bridge: FaceBridge)
-{
+  var vatom: Vatom,
+  var face: Face,
+  val bridge: FaceBridge
+) {
 
-  abstract fun onCreate(context: Context): View
+  abstract fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View
 
   abstract fun onLoad(handler: LoadHandler)
 
