@@ -10,8 +10,7 @@
  */
 package io.blockv.rx.client.manager
 
-import io.blockv.core.client.builder.DiscoverQueryBuilder
-import io.blockv.core.client.manager.VatomManager.*
+import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.model.GeoGroup
@@ -30,7 +29,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     bottomLeftLon: Double,
     topRightLat: Double,
     topRightLon: Double,
-    filter: GeoFilter
+    filter: VatomManager.GeoFilter
   ): Single<List<Vatom>> = Single.fromCallable {
     api.geoDiscover(
       GeoRequest(
@@ -51,7 +50,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     precision: Int,
-    filter: GeoFilter
+    filter: VatomManager.GeoFilter
   ): Single<List<GeoGroup>> = Single.fromCallable {
     api.geoGroupDiscover(
       GeoGroupRequest(
@@ -108,21 +107,21 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun preformAction(
-    action: Action,
+    action: VatomManager.Action,
     id: String,
     payload: JSONObject?
   ): Single<JSONObject> = preformAction(action.action(), id, payload)
 
-  override fun acquireVatom(id: String): Single<JSONObject> = preformAction(Action.ACQUIRE, id, null)
+  override fun acquireVatom(id: String): Single<JSONObject> = preformAction(VatomManager.Action.ACQUIRE, id, null)
 
-  override fun transferVatom(id: String, tokenType: TokenType, token: String): Completable {
+  override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Completable {
     val payload = JSONObject()
     when (tokenType) {
-      TokenType.EMAIL -> payload.put("new.owner.email", token)
-      TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
-      TokenType.ID -> payload.put("new.owner.email", token)
+      VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
+      VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
+      VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
     }
-    return preformAction(Action.TRANSFER, id, payload).toCompletable()
+    return preformAction(VatomManager.Action.TRANSFER, id, payload).toCompletable()
   }
 
   override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {
@@ -132,10 +131,10 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
         .put("lat", latitude)
         .put("lon", longitude)
     )
-    return preformAction(Action.DROP, id, payload).toCompletable()
+    return preformAction(VatomManager.Action.DROP, id, payload).toCompletable()
   }
 
-  override fun pickupVatom(id: String): Completable = preformAction(Action.PICKUP, id, null).toCompletable()
+  override fun pickupVatom(id: String): Completable = preformAction(VatomManager.Action.PICKUP, id, null).toCompletable()
 
   override fun discover(query: JSONObject): Single<List<Vatom>> = Single.fromCallable {
     query.put(
