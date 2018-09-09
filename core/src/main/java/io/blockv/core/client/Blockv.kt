@@ -36,6 +36,8 @@ import io.blockv.common.internal.net.rest.auth.*
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
+import io.blockv.face.client.FaceManager
+import io.blockv.face.client.FaceManagerImpl
 
 class Blockv {
   private val preferences: Preferences
@@ -63,6 +65,23 @@ class Blockv {
       }
       return internalEventManager!!
     }
+
+  @Volatile
+  private var internalFaceManager: FaceManager? = null
+  val faceManager: FaceManager
+    get() {
+      if (internalFaceManager == null) {
+        try {
+          internalFaceManager = FaceManagerImpl()
+        } catch (e: NoClassDefFoundError) {
+          throw MissingFaceModuleException()
+        } catch (e: Exception) {
+          throw MissingFaceModuleException()
+        }
+      }
+      return internalFaceManager!!
+    }
+
 
   constructor(context: Context, appId: String) {
 
@@ -194,5 +213,9 @@ class Blockv {
 
   class MissingWebSocketDependencyException :
     Exception("Include dependency 'com.neovisionaries:nv-websocket-client:2.5' to use the event manager.")
+
+  class MissingFaceModuleException :
+    Exception("Include dependency 'io.blockv.sdk:face:+' to use the face manager.")
+
 
 }
