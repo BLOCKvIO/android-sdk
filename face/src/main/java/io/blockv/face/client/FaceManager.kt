@@ -1,7 +1,9 @@
 package io.blockv.face.client
 
+import android.view.View
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
+import io.blockv.common.util.Callable
 
 interface FaceManager {
 
@@ -80,5 +82,30 @@ interface FaceManager {
 
   interface FaceSelectionProcedure {
     fun select(vatom: Vatom, faceRegistry: Set<String>): Face?
+  }
+
+  fun load(vatom: Vatom): Builder
+
+  interface Builder {
+
+    fun into(vatomView: VatomView): Callable<FaceView>
+
+    fun setEmbeddedProcedure(embeddedProcedure: EmbeddedProcedure): Builder
+
+    fun setFaceSelectionProcedure(routine: FaceSelectionProcedure): Builder
+
+    fun setErrorView(view: View): Builder
+
+    fun setLoaderView(view: View): Builder
+
+    enum class Error(val message: String) {
+      FACTORY_NOT_FOUND("The face's display url is not a registered native face"),
+      FACE_MODEL_IS_NULL("The face selection procedure has returned null");
+
+      val exception: Exception
+        get() = VatomViewException(this)
+    }
+
+    class VatomViewException(error: Error) : Exception(error.message)
   }
 }
