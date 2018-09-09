@@ -6,15 +6,19 @@ import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 
 
-interface FaceView {
+abstract class FaceView(
+var vatom: Vatom,
+var face: Face,
+val bridge: FaceBridge)
+{
 
-  fun onCreate(context: Context, vatom: Vatom, face: Face, bridge: FaceBridge): View
+  abstract fun onCreate(context: Context): View
 
-  fun onLoad(handler: LoadHandler)
+  abstract fun onLoad(handler: LoadHandler)
 
-  fun onVatomUpdate(vatom: Vatom)
+  abstract fun onVatomUpdate(vatom: Vatom)
 
-  fun onUnload()
+  abstract fun onUnload()
 
   interface LoadHandler {
 
