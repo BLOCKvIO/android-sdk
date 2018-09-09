@@ -5,10 +5,8 @@ apply plugin: 'kotlin-android-extensions'
 android {
   compileSdkVersion 27
 
-
-
   defaultConfig {
-    minSdkVersion 24
+    minSdkVersion 19
     targetSdkVersion 27
     versionCode 1
     versionName "1.0"
@@ -36,7 +34,7 @@ dependencies {
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-  implementation project(':core')
+  implementation project(':common')
 }
 repositories {
   mavenCentral()

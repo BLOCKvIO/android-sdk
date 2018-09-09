@@ -2,8 +2,9 @@ package io.blockv.face.client
 
 import android.content.Context
 import android.view.View
-import io.blockv.core.model.Face
-import io.blockv.core.model.Vatom
+import io.blockv.common.model.Face
+import io.blockv.common.model.Vatom
+
 
 interface FaceView {
 
