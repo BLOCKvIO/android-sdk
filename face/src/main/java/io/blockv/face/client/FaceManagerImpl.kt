@@ -30,18 +30,23 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder) : FaceManager {
         val faceProcedure: FaceManager.FaceSelectionProcedure = this.faceProcedure
 
         return Callable.single {
-          val face = faceProcedure.select(vatom, faceRegistry.keys)
-            ?: throw FaceManager.Builder.Error.FACE_MODEL_IS_NULL.exception
-          val factory = faceRegistry[face.property.displayUrl]
-            ?: throw FaceManager.Builder.Error.FACTORY_NOT_FOUND.exception
-          Pair(face, factory)
+          vatomView.loaderView = loaderView
+          vatomView.errorView = errorView
+          vatomView.showLoader(true)
         }
+          .runOn(Callable.Scheduler.MAIN)
+          .returnOn(Callable.Scheduler.COMP)
+          .map {
+            val face = faceProcedure.select(vatom, faceRegistry.keys)
+              ?: throw FaceManager.Builder.Error.FACE_MODEL_IS_NULL.exception
+            val factory = faceRegistry[face.property.displayUrl]
+              ?: throw FaceManager.Builder.Error.FACTORY_NOT_FOUND.exception
+            Pair(face, factory)
+          }
           .runOn(Callable.Scheduler.COMP)
           .returnOn(Callable.Scheduler.MAIN)
           .map {
-            vatomView.loaderView = loaderView
-            vatomView.errorView = errorView
-            vatomView.showLoader(true)
+
             val view = it.second.emit(vatom, it.first, FaceBridge(resourceEncoder))
             vatomView.faceView = view
             view
@@ -67,6 +72,9 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder) : FaceManager {
             it
           }
           .runOn(Callable.Scheduler.MAIN)
+          .doOnError {
+            vatomView.showError(true)
+          }
 
       }
 
