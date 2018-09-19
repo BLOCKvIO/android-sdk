@@ -1,7 +1,7 @@
 package io.blockv.face.client
 
-import io.blockv.core.model.Face
-import io.blockv.core.model.Vatom
+import io.blockv.common.model.Face
+import io.blockv.common.model.Vatom
 
 interface FaceManager {
 
@@ -76,7 +76,7 @@ interface FaceManager {
 
   fun registerFace(factory: ViewFactory)
 
-  val faceRegistry: Map<String,ViewFactory>
+  val faceRegistry: Map<String, ViewFactory>
 
   interface FaceSelectionProcedure {
     fun select(vatom: Vatom, faceRegistry: Set<String>): Face?

@@ -11,11 +11,8 @@
 package io.blockv.common.internal.json.deserializer.vatom
 
 import io.blockv.common.internal.json.deserializer.Deserializer
-import io.blockv.common.model.Action
 import io.blockv.common.model.DiscoverPack
-import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
-import org.json.JSONArray
 import org.json.JSONObject
 
 class DiscoverDeserializer(

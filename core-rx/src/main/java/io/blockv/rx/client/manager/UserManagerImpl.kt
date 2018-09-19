@@ -12,15 +12,13 @@ package io.blockv.rx.client.manager
 
 import android.graphics.Bitmap
 import android.util.Log
-import io.blockv.core.client.manager.UserManager.*
+
 import io.blockv.common.internal.net.rest.api.UserApi
 import io.blockv.common.internal.net.rest.auth.JwtDecoder
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.PublicUser
-import io.blockv.common.model.Token
-import io.blockv.common.model.User
+import io.blockv.common.model.*
 import io.blockv.rx.client.manager.UserManager.Companion.NULL_PUBLIC_USER
 import io.blockv.rx.client.manager.UserManager.Companion.NULL_TOKEN
 import io.blockv.rx.client.manager.UserManager.Companion.NULL_USER
@@ -40,7 +38,7 @@ class UserManagerImpl(
 
   override fun addCurrentUserToken(
     token: String,
-    tokenType: TokenType,
+    tokenType: UserManager.TokenType,
     isDefault: Boolean
   ): Single<Token> = Single.fromCallable {
     api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload ?: NULL_TOKEN
@@ -104,7 +102,7 @@ class UserManagerImpl(
 
   override fun login(
     token: String,
-    tokenType: TokenType,
+    tokenType: UserManager.TokenType,
     password: String
   ): Single<User> = Single.fromCallable {
     api.login(
@@ -144,7 +142,7 @@ class UserManagerImpl(
 
   override fun verifyUserToken(
     token: String,
-    tokenType: TokenType,
+    tokenType: UserManager.TokenType,
     code: String
   ): Completable = Completable.fromCallable {
     api.verifyToken(VerifyTokenRequest(tokenType.name.toLowerCase(), token, code))
@@ -154,7 +152,7 @@ class UserManagerImpl(
 
   override fun resetToken(
     token: String,
-    tokenType: TokenType
+    tokenType: UserManager.TokenType
   ): Completable = Completable.fromCallable {
     api.resetToken(ResetTokenRequest(tokenType.name.toLowerCase(), token)).payload
   }
@@ -163,7 +161,7 @@ class UserManagerImpl(
 
   override fun resendVerification(
     token: String,
-    tokenType: TokenType
+    tokenType: UserManager.TokenType
   ): Completable = Completable.fromCallable {
     api.resetVerificationToken(ResetTokenRequest(tokenType.name.toLowerCase(), token))
   }
