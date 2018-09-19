@@ -225,57 +225,6 @@ interface Callable<T> {
           }.runOn(respScheduler)
         }
 
-
-        /* override fun <R> map(map: (T) -> R): Callable<R> {
-           return create { emitter ->
-             val cancel = call({
-               emitter.onResult(map.invoke(it))
-             }, {
-               emitter.onError(it)
-             })
-             emitter.doOnCompletion {
-               cancel.cancel()//below stream is canceled, cancel above stream
-             }
-             doFinally {
-               emitter.onComplete()///above stream is complete, complete mapped stream
-             }
-           }
-         }
-
-         override fun <R> flatMap(map: (T) -> Callable<R>): Callable<R> {
-           return create { emitter ->
-
-             val cancel = CompositeCancellable()
-
-             cancel.add(
-               call({ result ->
-                 Log.e("flatmap", "got a result")
-                 cancel.add(
-                   map.invoke(result)
-                     .runOn(emitter.executionScheduler)
-                     .returnOn(emitter.responseScheduler)
-                     .call({
-                       Log.e("callable", "mapped result")
-                       emitter.onResult(it)
-                     }, {
-                       emitter.onError(it)
-                     })
-                 )
-
-               }, {
-                 emitter.onError(it)
-               })
-             )
-
-             /*emitter.doOnCompletion {
-               cancel.cancel() //below stream is canceled, cancel above stream
-             }
-             doFinally {
-               emitter.onComplete()///above stream is complete, complete mapped stream
-             }*/
-           }
-         }
- */
         override fun first(): T? {
           val latch = CountDownLatch(1)
           var value: T? = null
