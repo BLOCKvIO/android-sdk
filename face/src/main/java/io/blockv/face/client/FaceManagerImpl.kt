@@ -1,10 +1,11 @@
 package io.blockv.face.client
 
 import android.view.View
+import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
 
-class FaceManagerImpl : FaceManager {
+class FaceManagerImpl(val resourceEncoder: ResourceEncoder) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
 
@@ -24,8 +25,6 @@ class FaceManagerImpl : FaceManager {
 
       override fun into(vatomView: VatomView): Callable<FaceView> {
 
-        val faces = vatom.faces
-        val actions = vatom.actions
         val errorView: View? = this.errorView
         val loaderView: View? = this.loaderView
         val faceProcedure: FaceManager.FaceSelectionProcedure = this.faceProcedure
@@ -43,21 +42,31 @@ class FaceManagerImpl : FaceManager {
             vatomView.loaderView = loaderView
             vatomView.errorView = errorView
             vatomView.showLoader(true)
-            val view = it.second.emit(vatom, it.first, FaceBridge())
+            val view = it.second.emit(vatom, it.first, FaceBridge(resourceEncoder))
             vatomView.faceView = view
             view
           }
           .runOn(Callable.Scheduler.MAIN)
-          .map {
-            it
+          .flatMap { faceView ->
+            Callable.create<FaceView> { emitter ->
+              faceView.onLoad(object : FaceView.LoadHandler {
+                override fun onComplete() {
+                  emitter.onResult(faceView)
+                  emitter.onComplete()
+                }
+
+                override fun onError(error: Throwable) {
+                  emitter.onError(error)
+                }
+              })
+            }
           }
-          .runOn(Callable.Scheduler.COMP)
+          .runOn(Callable.Scheduler.MAIN)
           .map {
             vatomView.showVatomView(true)
             it
           }
           .runOn(Callable.Scheduler.MAIN)
-
 
       }
 
