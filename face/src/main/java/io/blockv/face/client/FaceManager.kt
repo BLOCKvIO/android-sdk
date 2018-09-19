@@ -10,9 +10,9 @@ interface FaceManager {
   enum class EmbeddedProcedure(val viewMode: String, val fallback: EmbeddedProcedure?) {
 
     ICON("icon", null),
-    ACTIVATED("activated", ICON),
-    FULLSCREEN("fullscreen", ICON),
-    CARD("card", ICON);
+    ENGAGED("engaged", ICON),
+    FULLSCREEN("fullscreen", null),
+    CARD("card", null);
 
     val procedure: FaceSelectionProcedure
       get() {
