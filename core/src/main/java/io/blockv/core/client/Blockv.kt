@@ -72,7 +72,7 @@ class Blockv {
     get() {
       if (internalFaceManager == null) {
         try {
-          internalFaceManager = FaceManagerImpl()
+          internalFaceManager = FaceManagerImpl(ResourceEncoderImpl(preferences))
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {
