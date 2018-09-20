@@ -16,6 +16,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
+
 
 interface Callable<T> {
 
@@ -133,6 +135,8 @@ interface Callable<T> {
     fun <T> create(call: (ResultEmitter<T>) -> Unit): Callable<T> {
       return object : Callable<T> {
 
+        val concurrent = 10
+        val lock = Semaphore(concurrent)
         var execScheduler: Scheduler = Scheduler.IO
         var respScheduler: Scheduler = Scheduler.MAIN
 
@@ -150,31 +154,24 @@ interface Callable<T> {
         override fun <R> map(map: (T) -> R): Callable<R> {
           return create<R> { emitter ->
             val cancel = call({ result ->
-              synchronized(this)
-              {
-                try {
-                  emitter.onResult(map.invoke(result))
-                } catch (e: Exception) {
-                  emitter.onError(e)
-                }
+              try {
+                emitter.onResult(map.invoke(result))
+              } catch (e: Exception) {
+                emitter.onError(e)
               }
-            }, { throwable ->
-              synchronized(this)
-              {
+            },
+              { throwable ->
                 emitter.onError(throwable)
-              }
-            })
+              })
+
             emitter.doOnCompletion {
-              synchronized(this)
-              {
-                cancel.cancel()
-              }
+              cancel.cancel()
             }
+
+            val oldDoFinally = doFinally
             doFinally {
-              synchronized(this)
-              {
-                emitter.onComplete()
-              }
+              oldDoFinally?.invoke()
+              emitter.onComplete()
             }
           }.runOn(respScheduler)
 
@@ -343,14 +340,12 @@ interface Callable<T> {
               if (onSuccess != null && !isComplete() && !isCanceled()) {
                 if (filter == null || filter!!.invoke(result)) {
                   val internalSuccess = onSuccess
-                  val lock = this
+                  lock.acquire()
                   resp.execute(Runnable {
-                    synchronized(lock)
-                    {
-                      if (!isCanceled()) {
-                        internalSuccess?.invoke(result)
-                      }
+                    if (!isCanceled()) {
+                      internalSuccess?.invoke(result)
                     }
+                    lock.release()
                   })
                 }
               }
@@ -376,21 +371,20 @@ interface Callable<T> {
 
             @Synchronized
             override fun onComplete() {
-              val lock = this
+
               resp.execute(Runnable {
-                synchronized(lock)
-                {
-                  complete = true
-                  doFinally?.invoke()
-                  completion?.invoke()
-                  onSuccess = null
-                  onError = null
-                  cancelable.cancel()
-                  cancelable.clear()
-                  doFinally = null
-                  completion = null
-                  filter = null
-                }
+                lock.acquire(concurrent)
+                complete = true
+                doFinally?.invoke()
+                completion?.invoke()
+                onSuccess = null
+                onError = null
+                cancelable.cancel()
+                cancelable.clear()
+                doFinally = null
+                completion = null
+                filter = null
+                lock.release(concurrent)
               })
 
             }
