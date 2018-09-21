@@ -1,11 +1,12 @@
 package io.blockv.face.client
 
+import android.util.Log
 import android.view.View
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
 
-class FaceManagerImpl(val resourceEncoder: ResourceEncoder) : FaceManager {
+class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager: ResourceManager) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
 
@@ -47,7 +48,8 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder) : FaceManager {
           .returnOn(Callable.Scheduler.MAIN)
           .map {
 
-            val view = it.second.emit(vatom, it.first, FaceBridge(resourceEncoder))
+            Log.e("facemanager", "face ${it.first}")
+            val view = it.second.emit(vatom, it.first, FaceBridge(resourceEncoder, resourceManager))
             vatomView.faceView = view
             view
           }

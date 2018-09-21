@@ -11,7 +11,6 @@
 package io.blockv.core.client
 
 import android.content.Context
-import io.blockv.core.client.manager.*
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.json.deserializer.EnvironmentDeserialzier
 import io.blockv.common.internal.json.deserializer.JwtDeserializer
@@ -32,12 +31,17 @@ import io.blockv.common.internal.json.serializer.user.AssetProviderSerializer
 import io.blockv.common.internal.json.serializer.user.EnviromentSerializer
 import io.blockv.common.internal.json.serializer.user.JwtSerializer
 import io.blockv.common.internal.net.NetModule
-import io.blockv.common.internal.net.rest.auth.*
+import io.blockv.common.internal.net.rest.auth.Authenticator
+import io.blockv.common.internal.net.rest.auth.AuthenticatorImpl
+import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
+import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
+import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
+import java.io.File
 
 class Blockv {
   private val preferences: Preferences
@@ -49,6 +53,8 @@ class Blockv {
   val vatomManager: VatomManager
   val resourceManager: ResourceManager
   val activityManager: ActivityManager
+
+  private val cacheDir: File
 
   @Volatile
   private var internalEventManager: EventManager? = null
@@ -72,7 +78,8 @@ class Blockv {
     get() {
       if (internalFaceManager == null) {
         try {
-          internalFaceManager = FaceManagerImpl(ResourceEncoderImpl(preferences))
+          val encoder = ResourceEncoderImpl(preferences)
+          internalFaceManager = FaceManagerImpl(encoder, io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {
@@ -85,6 +92,7 @@ class Blockv {
 
   constructor(context: Context, appId: String) {
 
+    this.cacheDir = context.cacheDir
     val faceDeserializer = FaceDeserializer()
     val actionDeserializer = ActionDeserializer()
     val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
@@ -120,7 +128,7 @@ class Blockv {
       Environment.DEFAULT_WEBSOCKET,
       appId
     )
-    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences),preferences)
+    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
       auth,
@@ -138,6 +146,7 @@ class Blockv {
   }
 
   constructor(context: Context, environment: Environment) {
+    this.cacheDir = context.cacheDir
     val faceDeserializer = FaceDeserializer()
     val actionDeserializer = ActionDeserializer()
     val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
@@ -169,7 +178,7 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences),preferences)
+    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     this.userManager = UserManagerImpl(
@@ -184,6 +193,7 @@ class Blockv {
 
 
   constructor(
+    context: Context,
     appId: String,
     preferences: Preferences,
     jsonModule: JsonModule,
@@ -194,6 +204,7 @@ class Blockv {
     eventManager: EventManager,
     resourceManager: ResourceManager
   ) {
+    this.cacheDir = context.cacheDir
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
