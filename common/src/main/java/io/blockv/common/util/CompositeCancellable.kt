@@ -11,7 +11,7 @@
 package io.blockv.common.util
 
 class CompositeCancellable : ArrayList<Cancellable>(), Cancellable {
-
+  @Synchronized
   override fun isComplete(): Boolean {
     forEach {
       if (!it.isComplete()) {
@@ -21,6 +21,7 @@ class CompositeCancellable : ArrayList<Cancellable>(), Cancellable {
     return true
   }
 
+  @Synchronized
   override fun isCanceled(): Boolean {
     forEach {
       if (!it.isCanceled()) {
@@ -30,6 +31,7 @@ class CompositeCancellable : ArrayList<Cancellable>(), Cancellable {
     return true
   }
 
+  @Synchronized
   override fun cancel() {
     forEach {
       if (!it.isCanceled() && !it.isComplete()) {
