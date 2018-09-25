@@ -138,7 +138,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
           }
           .runOn(Callable.Scheduler.MAIN)
           .map {
-            vatomView.showVatomView(true)
+            vatomView.showFaceView(true)
             it
           }
           .runOn(Callable.Scheduler.MAIN)

@@ -76,7 +76,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
     if (show) {
       showLoader(false)
-      showVatomView(false)
+      showFaceView(false)
       if (error != null && error?.parent == null) {
         addView(error)
       }
@@ -97,7 +97,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
     if (show) {
       showError(false)
-      showVatomView(false)
+      showFaceView(false)
       if (loader != null && loader?.parent == null) {
         addView(loader)
       }
@@ -131,7 +131,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
 
   @Synchronized
-  fun showVatomView(show: Boolean) {
+  fun showFaceView(show: Boolean) {
 
     if (show) {
       showError(false)
