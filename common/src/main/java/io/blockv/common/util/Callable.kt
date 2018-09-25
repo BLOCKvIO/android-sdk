@@ -12,7 +12,6 @@ package io.blockv.common.util
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -45,6 +44,10 @@ interface Callable<T> {
   fun doFinally(final: (() -> Unit)?): Callable<T>
 
   fun doFinally(final: DoFinally?): Callable<T>
+
+  fun doOnError(onError: ((Throwable) -> Unit)?): Callable<T>
+
+  fun doOnError(onError: OnError?): Callable<T>
 
   enum class Scheduler {
     IO {
@@ -135,6 +138,8 @@ interface Callable<T> {
 
         private var doFinally: (() -> Unit)? = null
 
+        private var doOnError: ((Throwable) -> Unit)? = null
+
         var flter: ((T) -> Boolean)? = null
 
         override fun filter(filter: ((T) -> Boolean)?): Callable<T> {
@@ -147,7 +152,11 @@ interface Callable<T> {
             val cancel = call({ result ->
               synchronized(this)
               {
-                emitter.onResult(map.invoke(result))
+                try {
+                  emitter.onResult(map.invoke(result))
+                } catch (e: Exception) {
+                  emitter.onError(e)
+                }
               }
             }, { throwable ->
               synchronized(this)
@@ -262,6 +271,15 @@ interface Callable<T> {
           return this
         }
 
+        override fun doOnError(onError: OnError?): Callable<T> {
+          return doOnError { onError?.onError(it) }
+        }
+
+        override fun doOnError(onError: ((Throwable) -> Unit)?): Callable<T> {
+          this.doOnError = onError
+          return this
+        }
+
         override fun runOn(scheduler: Scheduler): Callable<T> {
           this.execScheduler = scheduler
           return this
@@ -341,12 +359,15 @@ interface Callable<T> {
             override fun onError(error: Throwable) {
               if (onError != null && !isCanceled() && !isComplete()) {
                 val internalOnError = onError
+                val internalDoOnError = doOnError
                 resp.execute(Runnable {
                   if (!isCanceled()) {
                     internalOnError?.invoke(error)
+                    internalDoOnError?.invoke(error)
                   }
+                  onComplete()
                 })
-                onComplete()
+
               } else
                 if (!isCanceled() && !isComplete()) {
                   throw error
