@@ -47,6 +47,10 @@ interface Callable<T> {
 
   fun doFinally(final: DoFinally?): Callable<T>
 
+  fun doOnError(onError: ((Throwable) -> Unit)?): Callable<T>
+
+  fun doOnError(onError: OnError?): Callable<T>
+
   enum class Scheduler {
     IO {
       override fun execute(runnable: java.lang.Runnable): Cancellable {
@@ -137,6 +141,8 @@ interface Callable<T> {
         var respScheduler: Scheduler = Scheduler.MAIN
 
         private var doFinally: (() -> Unit)? = null
+
+        private var doOnError: ((Throwable) -> Unit)? = null
 
         var flter: ((T) -> Boolean)? = null
 
@@ -262,6 +268,15 @@ interface Callable<T> {
           return this
         }
 
+        override fun doOnError(onError: OnError?): Callable<T> {
+          return doOnError { onError?.onError(it) }
+        }
+
+        override fun doOnError(onError: ((Throwable) -> Unit)?): Callable<T> {
+          this.doOnError = onError
+          return this
+        }
+
         override fun runOn(scheduler: Scheduler): Callable<T> {
           this.execScheduler = scheduler
           return this
@@ -339,12 +354,15 @@ interface Callable<T> {
             override fun onError(error: Throwable) {
               if (onError != null && !isCanceled() && !isComplete()) {
                 val internalOnError = onError
+                val internalDoOnError = doOnError
                 resp.execute(Runnable {
                   if (!isCanceled()) {
                     internalOnError?.invoke(error)
+                    internalDoOnError?.invoke(error)
                   }
+                  onComplete()
                 })
-                onComplete()
+
               } else
                 if (!isCanceled() && !isComplete()) {
                   throw error
