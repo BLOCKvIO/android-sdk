@@ -1,6 +1,9 @@
 package io.blockv.face.client
 
+import android.content.Context
+import android.util.AttributeSet
 import android.view.View
+import android.widget.FrameLayout
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
@@ -80,6 +83,10 @@ interface FaceManager {
 
   val faceRegistry: Map<String, ViewFactory>
 
+  var defaultLoader: ViewEmitter?
+
+  var defaultError: ViewEmitter?
+
   interface FaceSelectionProcedure {
     fun select(vatom: Vatom, faceRegistry: Set<String>): Face?
   }
@@ -108,4 +115,5 @@ interface FaceManager {
 
     class VatomViewException(error: Error) : Exception(error.message)
   }
+
 }

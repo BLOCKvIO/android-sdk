@@ -1,14 +1,68 @@
 package io.blockv.face.client
 
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
+import io.blockv.common.util.CompositeCancellable
+import io.blockv.face.R
 
 class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager: ResourceManager) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
+  private var loader: ViewEmitter? = object : ViewEmitter {
+    override fun emit(
+      inflater: LayoutInflater,
+      parent: ViewGroup,
+      vatom: Vatom,
+      resourceManager: ResourceManager
+    ): View {
+      return inflater.inflate(R.layout.view_basic_loader, parent, false)
+    }
+  }
+  private var error: ViewEmitter? = object : ViewEmitter {
+    override fun emit(
+      inflater: LayoutInflater,
+      parent: ViewGroup,
+      vatom: Vatom,
+      resourceManager: ResourceManager
+    ): View {
+      val layout = inflater.inflate(R.layout.view_vatom_error, parent, false) as ViewGroup
+      val activated: ImageView = layout.findViewById(R.id.activated)
+      var cancellable = CompositeCancellable()
+      val resource = vatom.property.getResource("ActivatedImage")
+
+      layout.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+
+        override fun onViewDetachedFromWindow(v: View?) {
+          cancellable.cancel()
+          layout.removeOnAttachStateChangeListener(this)
+        }
+
+        override fun onViewAttachedToWindow(v: View?) {
+          cancellable = CompositeCancellable()
+          if (resource != null) {
+            cancellable.add(
+              resourceManager.getBitmap(resource, parent.width, parent.height)
+                .returnOn(Callable.Scheduler.MAIN)
+                .call({
+                  activated.setImageBitmap(it)
+                }, {
+
+                })
+            )
+          }
+        }
+
+      })
+
+      return layout
+    }
+  }
 
   override fun registerFace(factory: ViewFactory) {
     factories[factory.displayUrl] = factory
@@ -16,6 +70,17 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
 
   override val faceRegistry: Map<String, ViewFactory>
     get() = factories
+
+  override var defaultLoader: ViewEmitter?
+    get() = loader
+    set(value) {
+      loader = value
+    }
+  override var defaultError: ViewEmitter?
+    get() = error
+    set(value) {
+      error = value
+    }
 
   override fun load(vatom: Vatom): FaceManager.Builder {
     return object : FaceManager.Builder {
@@ -30,9 +95,11 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
         val loaderView: View? = this.loaderView
         val faceProcedure: FaceManager.FaceSelectionProcedure = this.faceProcedure
 
+        val inflater = LayoutInflater.from(vatomView.context)
+
         return Callable.single {
-          vatomView.loaderView = loaderView
-          vatomView.errorView = errorView
+          vatomView.loaderView = loaderView ?: defaultLoader?.emit(inflater, vatomView, vatom, resourceManager)
+          vatomView.errorView = errorView ?: defaultError?.emit(inflater, vatomView, vatom, resourceManager)
           vatomView.showLoader(true)
         }
           .runOn(Callable.Scheduler.MAIN)
