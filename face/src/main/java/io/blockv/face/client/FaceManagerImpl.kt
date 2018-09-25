@@ -88,6 +88,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
       var faceProcedure: FaceManager.FaceSelectionProcedure = FaceManager.EmbeddedProcedure.ICON.procedure
       var errorView: View? = null
       var loaderView: View? = null
+      var loaderDelay: Long = 0
 
       override fun into(vatomView: VatomView): Callable<FaceView> {
 
@@ -100,7 +101,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
         return Callable.single {
           vatomView.loaderView = loaderView ?: defaultLoader?.emit(inflater, vatomView, vatom, resourceManager)
           vatomView.errorView = errorView ?: defaultError?.emit(inflater, vatomView, vatom, resourceManager)
-          vatomView.showLoader(true)
+          vatomView.showLoader(true, loaderDelay)
         }
           .runOn(Callable.Scheduler.MAIN)
           .returnOn(Callable.Scheduler.COMP)
@@ -164,6 +165,11 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
 
       override fun setLoaderView(view: View): FaceManager.Builder {
         loaderView = view
+        return this
+      }
+
+      override fun setLoaderDelay(time: Long): FaceManager.Builder {
+        loaderDelay = time
         return this
       }
     }

@@ -1,9 +1,6 @@
 package io.blockv.face.client
 
-import android.content.Context
-import android.util.AttributeSet
 import android.view.View
-import android.widget.FrameLayout
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
@@ -104,6 +101,8 @@ interface FaceManager {
     fun setErrorView(view: View): Builder
 
     fun setLoaderView(view: View): Builder
+
+    fun setLoaderDelay(time: Long): Builder
 
     enum class Error(val message: String) {
       FACTORY_NOT_FOUND("The face's display url is not a registered native face"),

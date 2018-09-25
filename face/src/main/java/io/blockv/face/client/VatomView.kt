@@ -1,10 +1,13 @@
 package io.blockv.face.client
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import java.util.*
 
 class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   FrameLayout(context, attrs, defStyleAttr) {
@@ -12,6 +15,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, -1)
 
   constructor(context: Context?) : this(context, null)
+
 
   private var loader: View? = null
   var loaderView: View?
@@ -45,6 +49,9 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
   private var faceCode: FaceView? = null
   private var view: View? = null
+
+  @Volatile
+  private var loaderDelayTimer: Timer? = null
 
   var faceView: FaceView?
     set(value) {
@@ -83,6 +90,11 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   @Synchronized
   fun showLoader(show: Boolean) {
 
+    if (loaderDelayTimer != null) {
+      loaderDelayTimer?.cancel()
+      loaderDelayTimer = null
+    }
+
     if (show) {
       showError(false)
       showVatomView(false)
@@ -95,6 +107,28 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
       }
     }
   }
+
+  @Synchronized
+  fun showLoader(show: Boolean, delay: Long) {
+    if (delay > 0) {
+      if (loaderDelayTimer != null) {
+        loaderDelayTimer?.cancel()
+      }
+      loaderDelayTimer = Timer()
+      loaderDelayTimer?.schedule(object : TimerTask() {
+        override fun run() {
+          val handler = Handler(Looper.getMainLooper())
+          handler.post {
+            if (loaderDelayTimer != null) {
+              showLoader(show)
+            }
+          }
+        }
+      }, delay)
+    } else
+      showLoader(show)
+  }
+
 
   @Synchronized
   fun showVatomView(show: Boolean) {
