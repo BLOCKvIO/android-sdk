@@ -18,7 +18,9 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
     set(value) {
       if (this.loader?.parent != null) {
         removeView(this.loader)
-        this.addView(value)
+        if (value != null) {
+          this.addView(value)
+        }
       }
       loader = value
     }
@@ -31,7 +33,9 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
     set(value) {
       if (this.error?.parent != null) {
         removeView(this.error)
-        this.addView(value)
+        if (value != null) {
+          this.addView(value)
+        }
       }
       error = value
     }
@@ -66,7 +70,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
     if (show) {
       showLoader(false)
       showVatomView(false)
-      if (error?.parent == null) {
+      if (error != null && error?.parent == null) {
         addView(error)
       }
     } else {
@@ -82,7 +86,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
     if (show) {
       showError(false)
       showVatomView(false)
-      if (loader?.parent == null) {
+      if (loader != null && loader?.parent == null) {
         addView(loader)
       }
     } else {
