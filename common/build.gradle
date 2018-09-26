@@ -32,6 +32,7 @@ dependencies {
 
   implementation 'com.android.support:appcompat-v7:27.1.1'
   testImplementation 'junit:junit:4.12'
+  testImplementation 'com.github.cbismuth:junit-repeat-rule:1.1.2'
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
   androidTestImplementation 'org.awaitility:awaitility-kotlin:3.1.1'
