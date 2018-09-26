@@ -210,12 +210,12 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
               if (vatomView.faceView == it) {
                 vatomView.showFaceView(true)
               } else
-                throw FaceManager.Builder.Error.VATOM_VIEW_FACE_CHANGED.exception//face view being displayed has changed
+                throw FaceManager.Builder.Error.FACE_VIEW_CHANGED.exception//face view being displayed has changed
               it
             }
             .runOn(Callable.Scheduler.MAIN)
             .doOnError {
-              if (it !is FaceManager.Builder.VatomViewException || it.error != FaceManager.Builder.Error.VATOM_VIEW_FACE_CHANGED) {
+              if (it !is FaceManager.Builder.VatomViewException || it.error != FaceManager.Builder.Error.FACE_VIEW_CHANGED) {
                 vatomView.showError(true)
                 vatomView.faceView = null
               }

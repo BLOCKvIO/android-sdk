@@ -107,7 +107,7 @@ interface FaceManager {
     enum class Error(val message: String) {
       FACTORY_NOT_FOUND("The face's display url is not a registered native face"),
       FACE_MODEL_IS_NULL("The face selection procedure has returned null"),
-      VATOM_VIEW_FACE_CHANGED("The face view being displayed in vatom view has been changed");
+      FACE_VIEW_CHANGED("The face view being displayed has been changed");
 
       val exception: Exception
         get() = VatomViewException(this)
