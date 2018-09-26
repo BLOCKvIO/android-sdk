@@ -71,7 +71,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
     factories[factory.displayUrl] = factory
   }
 
-  override val faceRegistry: Map<String, ViewFactory>
+  override val faceRoster: Map<String, ViewFactory>
     get() = factories
 
   override var defaultLoader: ViewEmitter?
@@ -103,9 +103,9 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
           .runOn(Callable.Scheduler.MAIN)
           .returnOn(Callable.Scheduler.COMP)
           .map {
-            val face = faceProcedure.select(vatom, faceRegistry.keys)
+            val face = faceProcedure.select(vatom, faceRoster.keys)
               ?: throw FaceManager.Builder.Error.FACE_MODEL_IS_NULL.exception
-            val factory = faceRegistry[face.property.displayUrl]
+            val factory = faceRoster[face.property.displayUrl]
               ?: throw FaceManager.Builder.Error.FACTORY_NOT_FOUND.exception
             Pair(face, factory)
           }
@@ -170,7 +170,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
                 //update
                 faceView.isLoaded = false
                 Callable.single {
-                  faceProcedure.select(vatom, faceRegistry.keys)
+                  faceProcedure.select(vatom, faceRoster.keys)
                 }
                   .runOn(Callable.Scheduler.COMP)
                   .returnOn(Callable.Scheduler.MAIN)

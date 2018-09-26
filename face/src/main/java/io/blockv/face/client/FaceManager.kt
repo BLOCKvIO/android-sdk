@@ -78,7 +78,7 @@ interface FaceManager {
 
   fun registerFace(factory: ViewFactory)
 
-  val faceRegistry: Map<String, ViewFactory>
+  val faceRoster: Map<String, ViewFactory>
 
   var defaultLoader: ViewEmitter?
 
