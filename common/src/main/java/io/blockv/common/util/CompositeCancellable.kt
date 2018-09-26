@@ -14,7 +14,7 @@ class CompositeCancellable : ArrayList<Cancellable>(), Cancellable {
   @Synchronized
   override fun isComplete(): Boolean {
     forEach {
-      if (!it.isComplete()) {
+      if (it != null &&!it.isComplete()) {
         return false
       }
     }
@@ -24,7 +24,7 @@ class CompositeCancellable : ArrayList<Cancellable>(), Cancellable {
   @Synchronized
   override fun isCanceled(): Boolean {
     forEach {
-      if (!it.isCanceled()) {
+      if (it != null &&!it.isCanceled()) {
         return false
       }
     }
@@ -34,7 +34,7 @@ class CompositeCancellable : ArrayList<Cancellable>(), Cancellable {
   @Synchronized
   override fun cancel() {
     forEach {
-      if (!it.isCanceled() && !it.isComplete()) {
+      if (it != null && !it.isCanceled() && !it.isComplete()) {
         it.cancel()
       }
     }
