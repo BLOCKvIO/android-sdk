@@ -10,12 +10,16 @@ import android.widget.FrameLayout
 import java.util.*
 
 class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
-  FrameLayout(context, attrs, defStyleAttr) {
+  FrameLayout(context, attrs, defStyleAttr), View.OnAttachStateChangeListener {
 
   constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, -1)
 
   constructor(context: Context?) : this(context, null)
 
+
+  init {
+    this.addOnAttachStateChangeListener(this)
+  }
 
   private var loader: View? = null
   var loaderView: View?
@@ -146,4 +150,15 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
     }
   }
 
+  fun isFaceViewVisibile(): Boolean {
+    return view?.alpha == 1f
+  }
+
+
+  override fun onViewDetachedFromWindow(v: View?) {
+    faceView?.onUnload()
+  }
+
+  override fun onViewAttachedToWindow(v: View?) {
+  }
 }
