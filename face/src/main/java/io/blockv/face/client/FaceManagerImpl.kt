@@ -112,7 +112,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
           .runOn(Callable.Scheduler.COMP)
           .returnOn(Callable.Scheduler.MAIN)
           .map {
-            val view = it.second.emit(vatom, it.first, FaceBridge(resourceEncoder, resourceManager))
+            val view = it.second.emit(vatom, it.first, FaceBridge(resourceManager))
             vatomView.faceView = view
             view
           }

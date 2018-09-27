@@ -15,7 +15,7 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 
-open class ResourceManagerImpl(cacheDir: File, val resourceEncoder: ResourceEncoder) : ResourceManager {
+open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: ResourceEncoder) : ResourceManager {
 
   val downloads = HashMap<String, Download>()
 
