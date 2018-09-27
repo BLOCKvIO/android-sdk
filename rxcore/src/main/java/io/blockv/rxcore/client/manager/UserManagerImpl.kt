@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.rx.client.manager
+package io.blockv.rxcore.client.manager
 
 import android.graphics.Bitmap
 import android.util.Log
@@ -19,9 +19,9 @@ import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
-import io.blockv.rx.client.manager.UserManager.Companion.NULL_PUBLIC_USER
-import io.blockv.rx.client.manager.UserManager.Companion.NULL_TOKEN
-import io.blockv.rx.client.manager.UserManager.Companion.NULL_USER
+import io.blockv.rxcore.client.manager.UserManager.Companion.NULL_PUBLIC_USER
+import io.blockv.rxcore.client.manager.UserManager.Companion.NULL_TOKEN
+import io.blockv.rxcore.client.manager.UserManager.Companion.NULL_USER
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
