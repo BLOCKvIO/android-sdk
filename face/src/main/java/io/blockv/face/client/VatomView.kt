@@ -9,6 +9,14 @@ import android.view.View
 import android.widget.FrameLayout
 import java.util.*
 
+/**
+ * VatomView is used to display a FaceView for a vAtom.
+ *
+ * You should not directly interact this view but rather use the functions provided by the
+ * FaceManager.
+ *
+ * @see FaceManager
+ */
 class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   FrameLayout(context, attrs, defStyleAttr), View.OnAttachStateChangeListener {
 
