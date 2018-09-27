@@ -31,7 +31,7 @@ abstract class FaceView(
 
   @get:Synchronized
   @set:Synchronized
-  internal var isLoaded: Boolean = false
+  var isLoaded: Boolean = false
 
   init {
     cancellable = CompositeCancellable()

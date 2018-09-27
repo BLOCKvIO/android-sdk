@@ -20,8 +20,6 @@ interface ViewFactory {
 
   /**
    * The display url of the FaceView, used when registering and selecting a ViewFactory.
-   *
-   * @see FaceManager.registerFace
    */
   val displayUrl: String
 
