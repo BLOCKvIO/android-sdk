@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.core.client.manager
+package io.blockv.rxcore.client.manager
 
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
