@@ -1,6 +1,8 @@
 package io.blockv.face.client
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
@@ -114,6 +116,11 @@ interface FaceManager {
     }
 
     class VatomViewException(val error: Error) : Exception(error.message)
+  }
+
+  interface ViewEmitter {
+
+    fun emit(inflater: LayoutInflater, parent: ViewGroup, vatom: Vatom, resourceManager: ResourceManager): View
   }
 
 }

@@ -4,17 +4,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
 import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
 
-class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager: ResourceManager) : FaceManager {
+class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
-  private var loader: ViewEmitter? = object : ViewEmitter {
+  private var loader: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {
     override fun emit(
       inflater: LayoutInflater,
       parent: ViewGroup,
@@ -24,7 +23,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
       return inflater.inflate(R.layout.view_basic_loader, parent, false)
     }
   }
-  private var error: ViewEmitter? = object : ViewEmitter {
+  private var error: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {
     override fun emit(
       inflater: LayoutInflater,
       parent: ViewGroup,
@@ -74,12 +73,12 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
   override val faceRoster: Map<String, ViewFactory>
     get() = factories
 
-  override var defaultLoader: ViewEmitter?
+  override var defaultLoader: FaceManager.ViewEmitter?
     get() = loader
     set(value) {
       loader = value
     }
-  override var defaultError: ViewEmitter?
+  override var defaultError: FaceManager.ViewEmitter?
     get() = error
     set(value) {
       error = value
@@ -112,7 +111,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
           .runOn(Callable.Scheduler.COMP)
           .returnOn(Callable.Scheduler.MAIN)
           .map {
-            val view = it.second.emit(vatom, it.first, FaceBridge(resourceEncoder, resourceManager))
+            val view = it.second.emit(vatom, it.first, FaceBridge(resourceManager))
             vatomView.faceView = view
             view
           }
