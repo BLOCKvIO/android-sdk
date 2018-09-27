@@ -14,7 +14,7 @@ import io.blockv.face.R
 class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager: ResourceManager) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
-  private var loader: ViewEmitter? = object : ViewEmitter {
+  private var loader: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {
     override fun emit(
       inflater: LayoutInflater,
       parent: ViewGroup,
@@ -24,7 +24,7 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
       return inflater.inflate(R.layout.view_basic_loader, parent, false)
     }
   }
-  private var error: ViewEmitter? = object : ViewEmitter {
+  private var error: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {
     override fun emit(
       inflater: LayoutInflater,
       parent: ViewGroup,
@@ -74,12 +74,12 @@ class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager:
   override val faceRoster: Map<String, ViewFactory>
     get() = factories
 
-  override var defaultLoader: ViewEmitter?
+  override var defaultLoader: FaceManager.ViewEmitter?
     get() = loader
     set(value) {
       loader = value
     }
-  override var defaultError: ViewEmitter?
+  override var defaultError: FaceManager.ViewEmitter?
     get() = error
     set(value) {
       error = value
