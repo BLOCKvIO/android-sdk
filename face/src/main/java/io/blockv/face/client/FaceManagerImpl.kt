@@ -4,14 +4,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
 import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
 
-class FaceManagerImpl(val resourceEncoder: ResourceEncoder, var resourceManager: ResourceManager) : FaceManager {
+class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
   private var loader: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {

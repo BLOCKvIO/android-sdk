@@ -79,7 +79,7 @@ class Blockv {
       if (internalFaceManager == null) {
         try {
           val encoder = ResourceEncoderImpl(preferences)
-          internalFaceManager = FaceManagerImpl(encoder, io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
+          internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {
