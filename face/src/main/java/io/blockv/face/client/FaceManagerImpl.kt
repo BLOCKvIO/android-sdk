@@ -92,7 +92,7 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
       var loaderView: View? = null
       var loaderDelay: Long = 0
 
-      fun load(vatomView: VatomView, errorView: View?, loaderView: View?): Callable<FaceView> {
+      fun load(vatomView: VatomView): Callable<FaceView> {
         return Callable.single {
           //unload previous face view
           vatomView.faceView?.onUnload()
@@ -197,13 +197,13 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
                         }
                       }
                     } else {
-                      load(vatomView, errorView, loaderView)
+                      load(vatomView)
                     }
                   }
                   .runOn(Callable.Scheduler.MAIN)
                   .returnOn(Callable.Scheduler.MAIN)
               } else
-                load(vatomView, errorView, loaderView)
+                load(vatomView)
             }
             .map {
               if (vatomView.faceView == it) {
@@ -232,8 +232,8 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
         return this
       }
 
-      override fun setFaceSelectionProcedure(routine: FaceManager.FaceSelectionProcedure): FaceManager.Builder {
-        this.faceProcedure = routine
+      override fun setFaceSelectionProcedure(procedure: FaceManager.FaceSelectionProcedure): FaceManager.Builder {
+        this.faceProcedure = procedure
         return this
       }
 
