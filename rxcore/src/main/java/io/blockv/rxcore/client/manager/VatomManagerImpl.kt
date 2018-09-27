@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.rx.client.manager
+package io.blockv.rxcore.client.manager
 
 import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.internal.net.rest.api.VatomApi

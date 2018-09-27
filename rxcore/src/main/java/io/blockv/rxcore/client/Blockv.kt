@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.rx.client
+package io.blockv.rxcore.client
 
 import android.content.Context
 import io.blockv.common.internal.json.JsonModule
@@ -40,7 +40,7 @@ import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
 import io.blockv.core.client.manager.ResourceManager
 import io.blockv.core.client.manager.ResourceManagerImpl
-import io.blockv.rx.client.manager.*
+import io.blockv.rxcore.client.manager.*
 
 class Blockv {
 
