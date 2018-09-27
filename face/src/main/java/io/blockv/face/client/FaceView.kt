@@ -38,7 +38,7 @@ abstract class FaceView(
       handler.onComplete()
   }
 
-  open fun onVatomChanged(updatedVatom: Vatom) {}
+  open fun onVatomChanged(vatom: Vatom) {}
 
   open fun onVatomChanged(oldVatom: Vatom, newVatom: Vatom): Boolean {
     return true
