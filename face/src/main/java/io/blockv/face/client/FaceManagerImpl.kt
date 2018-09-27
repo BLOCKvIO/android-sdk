@@ -1,3 +1,13 @@
+/*
+ *  BlockV AG. Copyright (c) 2018, all rights reserved.
+ *
+ *  Licensed under the BlockV SDK License (the "License"); you may not use this file or the BlockV SDK except in
+ *  compliance with the License accompanying it. Unless required by applicable law or agreed to in writing, the BlockV
+ *  SDK distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ *  ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
 package io.blockv.face.client
 
 import android.view.LayoutInflater
@@ -92,7 +102,7 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
       var loaderView: View? = null
       var loaderDelay: Long = 0
 
-      fun load(vatomView: VatomView, errorView: View?, loaderView: View?): Callable<FaceView> {
+      fun load(vatomView: VatomView): Callable<FaceView> {
         return Callable.single {
           //unload previous face view
           vatomView.faceView?.onUnload()
@@ -197,13 +207,13 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
                         }
                       }
                     } else {
-                      load(vatomView, errorView, loaderView)
+                      load(vatomView)
                     }
                   }
                   .runOn(Callable.Scheduler.MAIN)
                   .returnOn(Callable.Scheduler.MAIN)
               } else
-                load(vatomView, errorView, loaderView)
+                load(vatomView)
             }
             .map {
               if (vatomView.faceView == it) {
@@ -232,8 +242,8 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
         return this
       }
 
-      override fun setFaceSelectionProcedure(routine: FaceManager.FaceSelectionProcedure): FaceManager.Builder {
-        this.faceProcedure = routine
+      override fun setFaceSelectionProcedure(procedure: FaceManager.FaceSelectionProcedure): FaceManager.Builder {
+        this.faceProcedure = procedure
         return this
       }
 
