@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.rx.client.manager
+package io.blockv.rxcore.client.manager
 
 import android.graphics.Bitmap
 import io.blockv.common.model.*
