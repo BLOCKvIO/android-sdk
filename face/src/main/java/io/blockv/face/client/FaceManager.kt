@@ -23,16 +23,16 @@ interface FaceManager {
   /**
    * EmbeddedProcedure enum contains a set of default face selection procedures.
    *
-   * By default these procedures will only look at native faces that have a platform value 'Generic'
+   * By default these procedures will only consider native faces that have a platform value 'Generic'
    * or 'Android'.
    *
    * Faces with a platform value of 'Android' will be selected over 'Generic' in the case where there are
    * multiple faces per view mode.
    *
-   * @see ICON - Selects a Face model that is in icon mode, if none is available it returns null.
-   * @see ENGAGED - Selects a Face model in engaged mode,if none is available it falls back on ICON procedure.
-   * @see FULLSCREEN - Selects a Face model that is in fullscreen mode, if none is available it returns null.
-   * @see CARD - Selects a Face model that is card mode, if none is available it returns null.
+   * @see ICON - Selects a Face model in icon mode, returns null if none are available.
+   * @see ENGAGED - Selects a Face model in engaged mode, falls back on the ICON procedure if none are available.
+   * @see FULLSCREEN - Selects a Face model in fullscreen mode, returns null if none are available.
+   * @see CARD - Selects a Face model in card mode, returns null if none are available.
    *
    * @see FaceSelectionProcedure
    */
@@ -106,8 +106,8 @@ interface FaceManager {
   }
 
   /**
-   * Adds a FaceView factory to the roster. If a factory with the same display url already exists
-   * this will overwrite it.
+   * Adds a FaceView factory to the roster. If a factory with the same display url exists it
+   * will be overwritten.
    *
    * @param factory is responsible for emitting a FaceView for a specific display url.
    * @see FaceView
@@ -146,7 +146,7 @@ interface FaceManager {
     /**
      * Selects a Face model for a vAtom base on some custom logic.
      *
-     * @param vatom contains the list Face models that should be used by the procedure.
+     * @param vatom contains the list of Face models that should be used by the procedure.
      * @param displayUrls is a set of all available FaceView factories.
      * @return an optional Face model.
      *

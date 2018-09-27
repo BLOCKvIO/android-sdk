@@ -51,7 +51,7 @@ abstract class FaceView(
   /**
    * All logic needed to display this FaceView should be done here.
    *
-   * This called after after onCreateView and optionally after onVatomChanged.
+   * This is called after after onCreateView and optionally after onVatomChanged.
    *
    * After the load completes or fails you are required to call the corresponding function on the handler.
    *

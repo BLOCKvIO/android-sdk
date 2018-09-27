@@ -50,8 +50,8 @@ interface ResourceManager {
   fun getInputStream(resource: Resource): Callable<InputStream>
 
   /**
-   * Provides a bitmap representing the specified resource. The resource requires to
-   * be of the type image.
+   * Provides a bitmap representing the specified resource. The resource is required to
+   * be of type image.
    *
    * This can either come from directly from cache or via the network.
    *
@@ -61,8 +61,8 @@ interface ResourceManager {
   fun getBitmap(resource: Resource): Callable<Bitmap>
 
   /**
-   * Provides a scaled bitmap representing the specified resource. The resource requires to
-   * be of the type image.
+   * Provides a scaled bitmap representing the specified resource. The resource is required to
+   * be of type image.
    *
    * This can either come from directly from cache or via the network.
    *
