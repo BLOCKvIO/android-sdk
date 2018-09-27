@@ -1,17 +1,25 @@
 package io.blockv.face.client
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import java.util.*
 
 class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
-  FrameLayout(context, attrs, defStyleAttr) {
+  FrameLayout(context, attrs, defStyleAttr), View.OnAttachStateChangeListener {
 
   constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, -1)
 
   constructor(context: Context?) : this(context, null)
+
+
+  init {
+    this.addOnAttachStateChangeListener(this)
+  }
 
   private var loader: View? = null
   var loaderView: View?
@@ -46,6 +54,9 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   private var faceCode: FaceView? = null
   private var view: View? = null
 
+  @Volatile
+  private var loaderDelayTimer: Timer? = null
+
   var faceView: FaceView?
     set(value) {
       if (view != null) {
@@ -69,7 +80,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
     if (show) {
       showLoader(false)
-      showVatomView(false)
+      showFaceView(false)
       if (error != null && error?.parent == null) {
         addView(error)
       }
@@ -83,9 +94,14 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   @Synchronized
   fun showLoader(show: Boolean) {
 
+    if (loaderDelayTimer != null) {
+      loaderDelayTimer?.cancel()
+      loaderDelayTimer = null
+    }
+
     if (show) {
       showError(false)
-      showVatomView(false)
+      showFaceView(false)
       if (loader != null && loader?.parent == null) {
         addView(loader)
       }
@@ -97,7 +113,29 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   }
 
   @Synchronized
-  fun showVatomView(show: Boolean) {
+  fun showLoader(show: Boolean, delay: Long) {
+    if (delay > 0) {
+      if (loaderDelayTimer != null) {
+        loaderDelayTimer?.cancel()
+      }
+      loaderDelayTimer = Timer()
+      loaderDelayTimer?.schedule(object : TimerTask() {
+        override fun run() {
+          val handler = Handler(Looper.getMainLooper())
+          handler.post {
+            if (loaderDelayTimer != null) {
+              showLoader(show)
+            }
+          }
+        }
+      }, delay)
+    } else
+      showLoader(show)
+  }
+
+
+  @Synchronized
+  fun showFaceView(show: Boolean) {
 
     if (show) {
       showError(false)
@@ -112,4 +150,15 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
     }
   }
 
+  fun isFaceViewVisibile(): Boolean {
+    return view?.alpha == 1f
+  }
+
+
+  override fun onViewDetachedFromWindow(v: View?) {
+    faceView?.onUnload()
+  }
+
+  override fun onViewAttachedToWindow(v: View?) {
+  }
 }
