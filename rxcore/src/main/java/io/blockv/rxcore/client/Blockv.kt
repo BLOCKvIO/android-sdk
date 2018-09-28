@@ -38,8 +38,8 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
-import io.blockv.core.client.manager.ResourceManager
-import io.blockv.core.client.manager.ResourceManagerImpl
+import io.blockv.rxcore.client.manager.ResourceManager
+import io.blockv.rxcore.client.manager.ResourceManagerImpl
 import io.blockv.rxcore.client.manager.*
 
 class Blockv {

@@ -8,13 +8,9 @@
  *  under the License.
  *
  */
-package io.blockv.common.internal.net.rest.auth
+package io.blockv.face.client
 
-interface ResourceEncoder {
-
-  @Throws(MissingAssetProviderException::class)
-  fun encodeUrl(url: String): String
-
-  class MissingAssetProviderException : Exception("BLOCKv SDK does not have any asset provider credentials!")
-
-}
+/**
+ * Face bridge provides access to sdk functions
+ */
+class FaceBridge(val resourceManager: ResourceManager)

@@ -1,2 +1,1 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.blockv.face"/>
+<manifest package="io.blockv.face"/>
