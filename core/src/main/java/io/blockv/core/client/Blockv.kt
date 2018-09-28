@@ -11,6 +11,7 @@
 package io.blockv.core.client
 
 import android.content.Context
+import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.json.deserializer.EnvironmentDeserialzier
 import io.blockv.common.internal.json.deserializer.JwtDeserializer
@@ -41,6 +42,7 @@ import io.blockv.common.model.Environment
 import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
+import io.blockv.faces.NativeImageFace
 import java.io.File
 
 class Blockv {
@@ -80,6 +82,7 @@ class Blockv {
         try {
           val encoder = ResourceEncoderImpl(preferences)
           internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
+          internalFaceManager!!.registerFace(NativeImageFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {
