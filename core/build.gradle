@@ -36,6 +36,7 @@ dependencies {
   implementation project(':common')
   implementation project(':face')
   implementation project(':faceview')
+  implementation ("io.blockv.faces:image-face:1.0.3")
 }
 repositories {
   mavenCentral()
