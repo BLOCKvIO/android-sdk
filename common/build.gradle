@@ -1,11 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'maven-publish'
 
 android {
   compileSdkVersion 27
-
-
 
   defaultConfig {
     minSdkVersion 19
@@ -44,4 +43,33 @@ dependencies {
 }
 repositories {
   mavenCentral()
+}
+def libraryGroupId = 'io.blockv.sdk'
+def libraryArtifactId = 'common'
+def libraryVersion = '1.0.0'
+
+task sourceJar(type: Jar) {
+  from android.sourceSets.main.java.srcDirs
+  classifier "sources"
+}
+
+publishing {
+  publications {
+    common(MavenPublication) {
+      groupId libraryGroupId
+      artifactId libraryArtifactId
+      version libraryVersion
+      artifact(sourceJar)
+      artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+    }
+  }
+  repositories {
+    maven {
+      url "https://maven.blockv.io/artifactory/BLOCKv/"
+      credentials {
+        username = "${blockv_artifactory_username}"
+        password = "${blockv_artifactory_password}"
+      }
+    }
+  }
 }

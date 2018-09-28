@@ -11,7 +11,6 @@
 package io.blockv.core.client
 
 import android.content.Context
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.json.deserializer.EnvironmentDeserialzier
 import io.blockv.common.internal.json.deserializer.JwtDeserializer

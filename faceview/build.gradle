@@ -1,11 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'maven-publish'
 
 android {
   compileSdkVersion 27
-
-
 
   defaultConfig {
     minSdkVersion 19
@@ -35,4 +34,41 @@ dependencies {
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation project(':common')
+}
+
+def libraryGroupId = 'io.blockv.sdk'
+def libraryArtifactId = 'faceview'
+def libraryVersion = '1.0.0'
+
+task sourceJar(type: Jar) {
+  from android.sourceSets.main.java.srcDirs
+  classifier "sources"
+}
+
+publishing {
+  publications {
+    faceview(MavenPublication) {
+      groupId libraryGroupId
+      artifactId libraryArtifactId
+      version libraryVersion
+      artifact(sourceJar)
+      artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+      pom.withXml {
+        def dependenciesNode = asNode().appendNode('dependencies')
+        def dependencyNode = dependenciesNode.appendNode('dependency')
+        dependencyNode.appendNode('groupId', 'io.blockv.sdk')
+        dependencyNode.appendNode('artifactId', 'common')
+        dependencyNode.appendNode('version', '[1.0.0,2.0.0)')
+      }
+    }
+  }
+  repositories {
+    maven {
+      url "https://maven.blockv.io/artifactory/BLOCKv/"
+      credentials {
+        username = "${blockv_artifactory_username}"
+        password = "${blockv_artifactory_password}"
+      }
+    }
+  }
 }

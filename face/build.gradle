@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'maven-publish'
 
 android {
   compileSdkVersion 27
@@ -35,7 +36,52 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation project(':common')
   implementation project(':faceview')
+  implementation ("io.blockv.faces:image-face:1.0.4")
 }
 repositories {
   mavenCentral()
+}
+def libraryGroupId = 'io.blockv.sdk'
+def libraryArtifactId = 'face'
+def libraryVersion = '1.0.0'
+
+task sourceJar(type: Jar) {
+  from android.sourceSets.main.java.srcDirs
+  classifier "sources"
+}
+
+publishing {
+  publications {
+    face(MavenPublication) {
+      groupId libraryGroupId
+      artifactId libraryArtifactId
+      version libraryVersion
+      artifact(sourceJar)
+      artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+      pom.withXml {
+        def dependenciesNode = asNode().appendNode('dependencies')
+        def commonDependency = dependenciesNode.appendNode('dependency')
+        commonDependency.appendNode('groupId', 'io.blockv.sdk')
+        commonDependency.appendNode('artifactId', 'common')
+        commonDependency.appendNode('version', '[1.0.0,2.0.0)')
+        def faceviewDependency = dependenciesNode.appendNode('dependency')
+        faceviewDependency.appendNode('groupId', 'io.blockv.sdk')
+        faceviewDependency.appendNode('artifactId', 'faceview')
+        faceviewDependency.appendNode('version', '[1.0.0,2.0.0)')
+        def imageFaceDependency = dependenciesNode.appendNode('dependency')
+        imageFaceDependency.appendNode('groupId', 'io.blockv.faces')
+        imageFaceDependency.appendNode('artifactId', 'image-face')
+        imageFaceDependency.appendNode('version', '[1.0.4,2.0.0)')
+      }
+    }
+  }
+  repositories {
+    maven {
+      url "https://maven.blockv.io/artifactory/BLOCKv/"
+      credentials {
+        username = "${blockv_artifactory_username}"
+        password = "${blockv_artifactory_password}"
+      }
+    }
+  }
 }
