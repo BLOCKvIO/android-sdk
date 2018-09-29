@@ -10,37 +10,18 @@
  */
 package io.blockv.core.client.manager
 
-import android.net.Uri
-import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.AssetProvider
+import io.blockv.common.internal.net.rest.auth.ResourceEncoder
+import io.blockv.common.internal.repository.Preferences
+import io.blockv.common.model.AssetProvider
 
-class ResourceManagerImpl(private val preferences: Preferences) : ResourceManager {
+class ResourceManagerImpl(private val encoder: ResourceEncoder, private val preferences: Preferences) :
+  ResourceManager {
 
   override val assetProviders: List<AssetProvider>?
     get() = preferences.assetProviders
 
-  @Throws(ResourceManager.MissingAssetProviderException::class)
+  @Throws(ResourceEncoder.MissingAssetProviderException::class)
   override fun encodeUrl(url: String): String {
-    if (assetProviders == null || assetProviders?.size == 0) throw ResourceManager.MissingAssetProviderException()
-    assetProviders?.forEach {
-      if (url.startsWith(it.uri)) {
-        val descriptor: Map<String, String?> = it.descriptor
-        val original = Uri.parse(url)
-        val out = Uri.parse(url).buildUpon().clearQuery()
-        for (key in descriptor.keys) {
-          out.appendQueryParameter(key, descriptor.get(key))
-        }
-
-        for (param in original.queryParameterNames) {
-          if (!descriptor.keys.contains(param)) {
-            out.appendQueryParameter(param, original.getQueryParameter(param))
-          }
-        }
-
-        return out.build().toString()
-      }
-    }
-
-    return url
+    return encoder.encodeUrl(url);
   }
 }

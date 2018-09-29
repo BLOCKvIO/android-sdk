@@ -10,15 +10,15 @@
  */
 package io.blockv.core.client.manager
 
-import io.blockv.core.internal.json.JsonModule
-import io.blockv.core.internal.net.websocket.Websocket
-import io.blockv.core.internal.net.websocket.WebsocketImpl
-import io.blockv.core.model.ActivityEvent
-import io.blockv.core.model.InventoryEvent
-import io.blockv.core.model.StateUpdateEvent
-import io.blockv.core.model.WebSocketEvent
-import io.blockv.core.util.Callable
-import io.blockv.core.util.Cancellable
+import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.net.websocket.Websocket
+import io.blockv.common.internal.net.websocket.WebsocketImpl
+import io.blockv.common.model.ActivityEvent
+import io.blockv.common.model.InventoryEvent
+import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.WebSocketEvent
+import io.blockv.common.util.Callable
+import io.blockv.common.util.Cancellable
 import org.json.JSONObject
 
 
@@ -79,7 +79,7 @@ class EventManagerImpl(
       .map {
         var updateEvent: WebSocketEvent<StateUpdateEvent> = NULL_STATE_EVENT
         if (it.payload != null) {
-          val stateEvent = jsonModule.stateUpdateEventDeserializer.deserialize(it.payload)
+          val stateEvent = jsonModule.stateUpdateEventDeserializer.deserialize(it.payload!!)
           if (stateEvent != null) {
             updateEvent = WebSocketEvent(
               it.messageType,
@@ -102,7 +102,7 @@ class EventManagerImpl(
       .map {
         var event: WebSocketEvent<InventoryEvent> = NULL_INVENTORY_EVENT
         if (it.payload != null) {
-          val inventoryEvent = jsonModule.inventoryEventDeserializer.deserialize(it.payload)
+          val inventoryEvent = jsonModule.inventoryEventDeserializer.deserialize(it.payload!!)
           if (inventoryEvent != null) {
             event = WebSocketEvent(
               it.messageType,
@@ -125,7 +125,7 @@ class EventManagerImpl(
       .map {
         var event: WebSocketEvent<ActivityEvent> = NULL_ACTIVITY_EVENT
         if (it.payload != null) {
-          val activityEvent = jsonModule.activityEventDeserializer.deserialize(it.payload)
+          val activityEvent = jsonModule.activityEventDeserializer.deserialize(it.payload!!)
           if (activityEvent != null) {
             event = WebSocketEvent(
               it.messageType,

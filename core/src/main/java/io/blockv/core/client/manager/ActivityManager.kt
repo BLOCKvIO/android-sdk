@@ -10,9 +10,9 @@
  */
 package io.blockv.core.client.manager
 
-import io.blockv.core.model.ActivityMessageList
-import io.blockv.core.model.ActivityThreadList
-import io.blockv.core.util.Callable
+import io.blockv.common.model.ActivityMessageList
+import io.blockv.common.model.ActivityThreadList
+import io.blockv.common.util.Callable
 
 /**
  * This interface contains the available BLOCKv activity functions.

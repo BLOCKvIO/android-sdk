@@ -11,14 +11,14 @@
 
 package io.blockv.core.client.manager
 
-import io.blockv.core.model.AssetProvider
+import io.blockv.common.internal.net.rest.auth.ResourceEncoder
+import io.blockv.common.model.AssetProvider
 
 interface ResourceManager {
 
   val assetProviders: List<AssetProvider>?
 
-  @Throws(ResourceManager.MissingAssetProviderException::class)
+  @Throws(ResourceEncoder.MissingAssetProviderException::class)
   fun encodeUrl(url: String): String
 
-  class MissingAssetProviderException : Exception("BLOCKv SDK does not have any asset provider credentials!")
 }

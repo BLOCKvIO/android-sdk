@@ -1,0 +1,75 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'maven-publish'
+
+android {
+  compileSdkVersion 27
+  buildToolsVersion "27.0.3"
+
+  defaultConfig {
+    minSdkVersion 19
+    targetSdkVersion 27
+    versionCode 1
+    versionName "1.0"
+
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+
+  }
+}
+
+dependencies {
+  // RxJava/RxAndroid
+  implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+  implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation 'com.neovisionaries:nv-websocket-client:2.5'
+  implementation project(':common')
+}
+repositories {
+  mavenCentral()
+}
+
+def libraryGroupId = 'io.blockv.sdk'
+def libraryArtifactId = 'rxcore'
+def libraryVersion = '2.0.0'
+
+task sourceJar(type: Jar) {
+  from android.sourceSets.main.java.srcDirs
+  classifier "sources"
+}
+
+publishing {
+  publications {
+    rxcore(MavenPublication) {
+      groupId libraryGroupId
+      artifactId libraryArtifactId
+      version libraryVersion
+      artifact(sourceJar)
+      artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+      pom.withXml {
+        def dependenciesNode = asNode().appendNode('dependencies')
+        def dependencyNode = dependenciesNode.appendNode('dependency')
+        dependencyNode.appendNode('groupId', 'io.blockv.sdk')
+        dependencyNode.appendNode('artifactId', 'common')
+        dependencyNode.appendNode('version', '[1.0.0,2.0.0)')
+      }
+    }
+  }
+  repositories {
+    maven {
+      url "https://maven.blockv.io/artifactory/BLOCKv/"
+      credentials {
+        username = "${blockv_artifactory_username}"
+        password = "${blockv_artifactory_password}"
+      }
+    }
+  }
+}
