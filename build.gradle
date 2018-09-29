@@ -23,6 +23,7 @@ allprojects {
     }
     maven {
       url "https://maven.blockv.io/artifactory/BLOCKv"
+
     }
   }
 }

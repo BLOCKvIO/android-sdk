@@ -38,8 +38,8 @@ repositories {
 }
 
 def libraryGroupId = 'io.blockv.sdk'
-def libraryArtifactId = 'rx'
-def libraryVersion = '1.1.0'
+def libraryArtifactId = 'rxcore'
+def libraryVersion = '2.0.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -48,12 +48,19 @@ task sourceJar(type: Jar) {
 
 publishing {
   publications {
-    rx(MavenPublication) {
+    rxcore(MavenPublication) {
       groupId libraryGroupId
       artifactId libraryArtifactId
       version libraryVersion
       artifact(sourceJar)
       artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+      pom.withXml {
+        def dependenciesNode = asNode().appendNode('dependencies')
+        def dependencyNode = dependenciesNode.appendNode('dependency')
+        dependencyNode.appendNode('groupId', 'io.blockv.sdk')
+        dependencyNode.appendNode('artifactId', 'common')
+        dependencyNode.appendNode('version', '[1.0.0,2.0.0)')
+      }
     }
   }
   repositories {

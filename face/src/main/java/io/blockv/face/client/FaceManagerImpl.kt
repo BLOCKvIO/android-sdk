@@ -18,7 +18,7 @@ import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
 import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
-import io.blockv.face.*
+import io.blockv.face.R
 
 class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
 
