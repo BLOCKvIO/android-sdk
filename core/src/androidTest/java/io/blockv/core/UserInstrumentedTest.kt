@@ -1,11 +1,11 @@
 package io.blockv.core
 
 import android.support.test.runner.AndroidJUnit4
-import io.blockv.core.client.builder.RegistrationBuilder
+import io.blockv.common.builder.RegistrationBuilder
 import io.blockv.core.client.manager.UserManager
-import io.blockv.core.model.Token
-import io.blockv.core.model.User
-import io.blockv.core.util.Callable
+import io.blockv.common.model.Token
+import io.blockv.common.model.User
+import io.blockv.common.util.Callable
 import org.awaitility.Awaitility
 import org.junit.AfterClass
 import org.junit.BeforeClass

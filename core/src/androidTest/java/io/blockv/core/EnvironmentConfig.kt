@@ -31,7 +31,7 @@ class EnvironmentConfig {
     if (env == "dev") {
       this.env = Environment.DEV
       blockv = Blockv(
-        context, io.blockv.core.model.Environment(
+        context, io.blockv.common.model.Environment(
           "https://apidev.blockv.net/",
           "wss://ws.blockv.net/ws",
           appId
@@ -40,7 +40,7 @@ class EnvironmentConfig {
     } else {
       this.env = Environment.PROD
       blockv = Blockv(
-        context, io.blockv.core.model.Environment(
+        context, io.blockv.common.model.Environment(
           "https://api.blockv.io/",
           "wss://newws.blockv.io/ws",
           appId

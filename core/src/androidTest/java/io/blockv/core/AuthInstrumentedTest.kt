@@ -1,11 +1,10 @@
 package io.blockv.core
 
 import android.support.test.runner.AndroidJUnit4
-import io.blockv.core.client.builder.RegistrationBuilder
+import io.blockv.common.builder.RegistrationBuilder
+import io.blockv.common.internal.net.rest.exception.BlockvException
+import io.blockv.common.model.User
 import io.blockv.core.client.manager.UserManager
-import io.blockv.core.internal.net.rest.exception.BlockvException
-import io.blockv.core.model.Error
-import io.blockv.core.model.User
 import org.awaitility.Awaitility
 import org.junit.AfterClass
 import org.junit.Before
@@ -89,7 +88,7 @@ class AuthInstrumentedTest {
 
       val blockvException: BlockvException = error as BlockvException
 
-      if (blockvException.error != Error.TOKEN_UNAVAILABLE) fail("Error is not TOKEN_UNAVAILABLE $error")
+      if (blockvException.error != io.blockv.common.model.Error.TOKEN_UNAVAILABLE) fail("Error is not TOKEN_UNAVAILABLE $error")
 
     } catch (e: Exception) {
       fail(e.message)
