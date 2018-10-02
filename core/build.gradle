@@ -42,6 +42,10 @@ dependencies {
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestUtil 'com.android.support.test:orchestrator:1.0.2'
 
+  implementation ("io.blockv.faces:image-face:1.0.4")
+  implementation project(':common')
+  implementation project(':face')
+  implementation project(':faceview')
 }
 repositories {
   mavenCentral()
@@ -49,7 +53,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'core'
-def libraryVersion = '1.1.0'
+def libraryVersion = '2.0.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -64,6 +68,15 @@ publishing {
       version libraryVersion
       artifact(sourceJar)
       artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+
+      pom.withXml {
+        def dependenciesNode = asNode().appendNode('dependencies')
+        def common = dependenciesNode.appendNode('dependency')
+        common.appendNode('groupId', 'io.blockv.sdk')
+        common.appendNode('artifactId', 'common')
+        common.appendNode('version', '1.0.0')
+      }
+
     }
   }
   repositories {

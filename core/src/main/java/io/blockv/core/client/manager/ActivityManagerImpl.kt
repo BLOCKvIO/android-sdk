@@ -10,13 +10,13 @@
  */
 package io.blockv.core.client.manager
 
-import io.blockv.core.internal.net.rest.api.ActivityApi
-import io.blockv.core.internal.net.rest.request.ActivityMessageListRequest
-import io.blockv.core.internal.net.rest.request.ActivityThreadListRequest
-import io.blockv.core.internal.net.rest.request.SendMessageRequest
-import io.blockv.core.model.ActivityMessageList
-import io.blockv.core.model.ActivityThreadList
-import io.blockv.core.util.Callable
+import io.blockv.common.internal.net.rest.api.ActivityApi
+import io.blockv.common.internal.net.rest.request.ActivityMessageListRequest
+import io.blockv.common.internal.net.rest.request.ActivityThreadListRequest
+import io.blockv.common.internal.net.rest.request.SendMessageRequest
+import io.blockv.common.model.ActivityMessageList
+import io.blockv.common.model.ActivityThreadList
+import io.blockv.common.util.Callable
 
 class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
 

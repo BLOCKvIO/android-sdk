@@ -12,11 +12,8 @@
 package io.blockv.core.client.manager
 
 import android.graphics.Bitmap
-import io.blockv.core.model.Jwt
-import io.blockv.core.model.PublicUser
-import io.blockv.core.model.Token
-import io.blockv.core.model.User
-import io.blockv.core.util.Callable
+import io.blockv.common.model.*
+import io.blockv.common.util.Callable
 
 /**
  *  This interface contains the available BLOCKv user functions.
@@ -209,29 +206,7 @@ interface UserManager {
     PHONE_NUMBER
   }
 
-  class Registration(
-    var firstName: String?,
-    var lastName: String?,
-    var birthday: String?,
-    var avatarUri: String?,
-    var password: String?,
-    var language: String?,
-    var tokens: List<Token>?
-  ) {
-    open class Token(val type: String, val value: String)
 
-    class OauthToken(type: String, value: String, val auth: String) : Token(type, value)
-
-  }
-
-  class UserUpdate(
-    var firstName: String?,
-    var lastName: String?,
-    var birthday: String?,
-    var avatarUri: String?,
-    var password: String?,
-    var language: String?
-  )
 
 
 }

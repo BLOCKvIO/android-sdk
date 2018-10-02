@@ -11,34 +11,38 @@
 package io.blockv.core.client
 
 import android.content.Context
+import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.deserializer.EnvironmentDeserialzier
+import io.blockv.common.internal.json.deserializer.JwtDeserializer
+import io.blockv.common.internal.json.deserializer.activity.ActivityMessageDeserializer
+import io.blockv.common.internal.json.deserializer.activity.ActivityMessageListDeserializer
+import io.blockv.common.internal.json.deserializer.activity.ActivityThreadDeserializer
+import io.blockv.common.internal.json.deserializer.activity.ActivityThreadListDeserializer
+import io.blockv.common.internal.json.deserializer.event.ActivityEventDeserializer
+import io.blockv.common.internal.json.deserializer.event.InventoryEventDeserializer
+import io.blockv.common.internal.json.deserializer.event.StateEventDeserializer
+import io.blockv.common.internal.json.deserializer.event.WebsocketEventDeserializer
+import io.blockv.common.internal.json.deserializer.resource.AssetProviderDeserialzier
+import io.blockv.common.internal.json.deserializer.user.PublicUserDeserializer
+import io.blockv.common.internal.json.deserializer.user.TokenDeserializer
+import io.blockv.common.internal.json.deserializer.user.UserDeserializer
+import io.blockv.common.internal.json.deserializer.vatom.*
+import io.blockv.common.internal.json.serializer.user.AssetProviderSerializer
+import io.blockv.common.internal.json.serializer.user.EnviromentSerializer
+import io.blockv.common.internal.json.serializer.user.JwtSerializer
+import io.blockv.common.internal.net.NetModule
+import io.blockv.common.internal.net.rest.auth.Authenticator
+import io.blockv.common.internal.net.rest.auth.AuthenticatorImpl
+import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
+import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
+import io.blockv.common.internal.net.websocket.WebsocketImpl
+import io.blockv.common.internal.repository.Preferences
+import io.blockv.common.model.Environment
 import io.blockv.core.client.manager.*
-import io.blockv.core.internal.json.JsonModule
-import io.blockv.core.internal.json.deserializer.Deserializer
-import io.blockv.core.internal.json.deserializer.EnvironmentDeserialzier
-import io.blockv.core.internal.json.deserializer.JwtDeserializer
-import io.blockv.core.internal.json.deserializer.activity.ActivityMessageDeserializer
-import io.blockv.core.internal.json.deserializer.activity.ActivityMessageListDeserializer
-import io.blockv.core.internal.json.deserializer.activity.ActivityThreadDeserializer
-import io.blockv.core.internal.json.deserializer.activity.ActivityThreadListDeserializer
-import io.blockv.core.internal.json.deserializer.event.ActivityEventDeserializer
-import io.blockv.core.internal.json.deserializer.event.InventoryEventDeserializer
-import io.blockv.core.internal.json.deserializer.event.StateEventDeserializer
-import io.blockv.core.internal.json.deserializer.event.WebsocketEventDeserializer
-import io.blockv.core.internal.json.deserializer.resource.AssetProviderDeserialzier
-import io.blockv.core.internal.json.deserializer.user.PublicUserDeserializer
-import io.blockv.core.internal.json.deserializer.user.TokenDeserializer
-import io.blockv.core.internal.json.deserializer.user.UserDeserializer
-import io.blockv.core.internal.json.deserializer.vatom.*
-import io.blockv.core.internal.json.serializer.user.AssetProviderSerializer
-import io.blockv.core.internal.json.serializer.user.EnviromentSerializer
-import io.blockv.core.internal.json.serializer.user.JwtSerializer
-import io.blockv.core.internal.net.NetModule
-import io.blockv.core.internal.net.rest.auth.Authenticator
-import io.blockv.core.internal.net.rest.auth.AuthenticatorImpl
-import io.blockv.core.internal.net.rest.auth.JwtDecoderImpl
-import io.blockv.core.internal.net.websocket.WebsocketImpl
-import io.blockv.core.internal.repository.Preferences
-import io.blockv.core.model.*
+import io.blockv.face.client.FaceManager
+import io.blockv.face.client.FaceManagerImpl
+import io.blockv.faces.NativeImageFace
+import java.io.File
 
 class Blockv {
   private val preferences: Preferences
@@ -51,6 +55,8 @@ class Blockv {
   val resourceManager: ResourceManager
   val activityManager: ActivityManager
 
+  private val cacheDir: File
+
   @Volatile
   private var internalEventManager: EventManager? = null
   val eventManager: EventManager
@@ -59,33 +65,55 @@ class Blockv {
         try {
           internalEventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
         } catch (e: NoClassDefFoundError) {
-          throw EventManager.MissingWebSocketDependencyException()
+          throw MissingWebSocketDependencyException()
         } catch (e: Exception) {
-          throw EventManager.MissingWebSocketDependencyException()
+          throw MissingWebSocketDependencyException()
         }
       }
       return internalEventManager!!
     }
 
+  @Volatile
+  private var internalFaceManager: FaceManager? = null
+  val faceManager: FaceManager
+    get() {
+      if (internalFaceManager == null) {
+        try {
+          val encoder = ResourceEncoderImpl(preferences)
+          internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
+          internalFaceManager!!.registerFace(NativeImageFace.factory)
+        } catch (e: NoClassDefFoundError) {
+          throw MissingFaceModuleException()
+        } catch (e: Exception) {
+          throw MissingFaceModuleException()
+        }
+      }
+      return internalFaceManager!!
+    }
+
+
   constructor(context: Context, appId: String) {
-    val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
-    val faceDeserilizer: Deserializer<Face?> = FaceDeserializer()
-    val actionDeserilizer: Deserializer<Action?> = ActionDeserializer()
-    val messageDeserializer: Deserializer<ActivityMessage?> = ActivityMessageDeserializer()
+
+    this.cacheDir = context.cacheDir
+    val faceDeserializer = FaceDeserializer()
+    val actionDeserializer = ActionDeserializer()
+    val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
+    val inventoryDeserializer = InventoryDeserializer(vatomDeserializer, faceDeserializer, actionDeserializer)
+    val messageDeserializer = ActivityMessageDeserializer()
     this.jsonModule = JsonModule(
       UserDeserializer(),
       TokenDeserializer(),
-      vatomDeserilizer,
-      faceDeserilizer,
-      actionDeserilizer,
+      vatomDeserializer,
+      faceDeserializer,
+      actionDeserializer,
       AssetProviderDeserialzier(),
       AssetProviderSerializer(),
       EnvironmentDeserialzier(),
       EnviromentSerializer(),
-      InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      inventoryDeserializer,
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      DiscoverDeserializer(inventoryDeserializer),
       PublicUserDeserializer(),
       GeoGroupDeserializer(),
       InventoryEventDeserializer(),
@@ -102,7 +130,7 @@ class Blockv {
       Environment.DEFAULT_WEBSOCKET,
       appId
     )
-    this.resourceManager = ResourceManagerImpl(preferences)
+    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
       auth,
@@ -120,24 +148,26 @@ class Blockv {
   }
 
   constructor(context: Context, environment: Environment) {
-    val vatomDeserilizer: Deserializer<Vatom?> = VatomDeserializer()
-    val faceDeserilizer: Deserializer<Face?> = FaceDeserializer()
-    val actionDeserilizer: Deserializer<Action?> = ActionDeserializer()
-    val messageDeserializer: Deserializer<ActivityMessage?> = ActivityMessageDeserializer()
+    this.cacheDir = context.cacheDir
+    val faceDeserializer = FaceDeserializer()
+    val actionDeserializer = ActionDeserializer()
+    val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
+    val inventoryDeserializer = InventoryDeserializer(vatomDeserializer, faceDeserializer, actionDeserializer)
+    val messageDeserializer = ActivityMessageDeserializer()
     this.jsonModule = JsonModule(
       UserDeserializer(),
       TokenDeserializer(),
-      vatomDeserilizer,
-      faceDeserilizer,
-      actionDeserilizer,
+      vatomDeserializer,
+      faceDeserializer,
+      actionDeserializer,
       AssetProviderDeserialzier(),
       AssetProviderSerializer(),
       EnvironmentDeserialzier(),
       EnviromentSerializer(),
-      InventoryDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      inventoryDeserializer,
       JwtDeserializer(),
       JwtSerializer(),
-      DiscoverDeserializer(vatomDeserilizer, faceDeserilizer, actionDeserilizer),
+      DiscoverDeserializer(inventoryDeserializer),
       PublicUserDeserializer(),
       GeoGroupDeserializer(),
       InventoryEventDeserializer(),
@@ -150,7 +180,7 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(preferences)
+    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     this.userManager = UserManagerImpl(
@@ -165,6 +195,7 @@ class Blockv {
 
 
   constructor(
+    context: Context,
     appId: String,
     preferences: Preferences,
     jsonModule: JsonModule,
@@ -175,6 +206,7 @@ class Blockv {
     eventManager: EventManager,
     resourceManager: ResourceManager
   ) {
+    this.cacheDir = context.cacheDir
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
@@ -191,5 +223,12 @@ class Blockv {
     this.activityManager = activityManager
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
   }
+
+  class MissingWebSocketDependencyException :
+    Exception("Include dependency 'com.neovisionaries:nv-websocket-client:2.5' to use the event manager.")
+
+  class MissingFaceModuleException :
+    Exception("Include dependency 'io.blockv.sdk:face:+' to use the face manager.")
+
 
 }
