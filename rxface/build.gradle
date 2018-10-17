@@ -5,7 +5,6 @@ apply plugin: 'maven-publish'
 
 android {
   compileSdkVersion 27
-  buildToolsVersion "27.0.3"
 
   defaultConfig {
     minSdkVersion 19
@@ -16,34 +15,38 @@ android {
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
   }
+
   buildTypes {
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
-
   }
+
 }
 
 dependencies {
-  // RxJava/RxAndroid
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation 'com.android.support:appcompat-v7:27.1.1'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
   implementation 'io.reactivex.rxjava2:rxjava:2.2.1'
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-  implementation 'com.neovisionaries:nv-websocket-client:2.5'
-  implementation ("io.blockv.faces:image-face:1.0.4")
   implementation project(':common')
-  implementation project(':face')
-  implementation project(':rxface')
   implementation project(':faceview')
+  implementation project(':face')
+  implementation ("io.blockv.faces:image-face:1.0.4")
+
+  testImplementation 'junit:junit:4.12'
+  androidTestImplementation 'com.android.support.test:runner:1.0.2'
+  androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+
 repositories {
   mavenCentral()
 }
-
 def libraryGroupId = 'io.blockv.sdk'
-def libraryArtifactId = 'rxcore'
-def libraryVersion = '2.1.0'
+def libraryArtifactId = 'rxface'
+def libraryVersion = '1.0.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -52,7 +55,7 @@ task sourceJar(type: Jar) {
 
 publishing {
   publications {
-    rxcore(MavenPublication) {
+    face(MavenPublication) {
       groupId libraryGroupId
       artifactId libraryArtifactId
       version libraryVersion
@@ -60,10 +63,18 @@ publishing {
       artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
       pom.withXml {
         def dependenciesNode = asNode().appendNode('dependencies')
-        def dependencyNode = dependenciesNode.appendNode('dependency')
-        dependencyNode.appendNode('groupId', 'io.blockv.sdk')
-        dependencyNode.appendNode('artifactId', 'common')
-        dependencyNode.appendNode('version', '[1.0.0,2.0.0)')
+        def commonDependency = dependenciesNode.appendNode('dependency')
+        commonDependency.appendNode('groupId', 'io.blockv.sdk')
+        commonDependency.appendNode('artifactId', 'common')
+        commonDependency.appendNode('version', '[1.0.0,2.0.0)')
+        def faceviewDependency = dependenciesNode.appendNode('dependency')
+        faceviewDependency.appendNode('groupId', 'io.blockv.sdk')
+        faceviewDependency.appendNode('artifactId', 'faceview')
+        faceviewDependency.appendNode('version', '[1.0.0,2.0.0)')
+        def imageFaceDependency = dependenciesNode.appendNode('dependency')
+        imageFaceDependency.appendNode('groupId', 'io.blockv.faces')
+        imageFaceDependency.appendNode('artifactId', 'image-face')
+        imageFaceDependency.appendNode('version', '[1.0.4,2.0.0)')
       }
     }
   }
