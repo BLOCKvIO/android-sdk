@@ -25,7 +25,7 @@ import java.io.InputStream
 interface ResourceManager {
 
   /**
-   * Encoder used at add access parameters to the resource url.
+   * Encoder used to add access parameters to the resource url.
    */
   val resourceEncoder: ResourceEncoder
 
