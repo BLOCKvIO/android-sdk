@@ -38,9 +38,13 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
+import io.blockv.faces.NativeImageFace
 import io.blockv.rxcore.client.manager.ResourceManager
 import io.blockv.rxcore.client.manager.ResourceManagerImpl
 import io.blockv.rxcore.client.manager.*
+import io.blockv.rxface.client.FaceManager
+import io.blockv.rxface.client.FaceManagerImpl
+import java.io.File
 
 class Blockv {
 
@@ -53,6 +57,9 @@ class Blockv {
   val vatomManager: VatomManager
   val resourceManager: ResourceManager
   val activityManager: ActivityManager
+
+  private val cacheDir: File
+
   @Volatile
   private var internalEventManager: EventManager? = null
   val eventManager: EventManager
@@ -70,8 +77,28 @@ class Blockv {
       return internalEventManager!!
     }
 
+  @Volatile
+  private var internalFaceManager: FaceManager? = null
+  val faceManager: FaceManager
+    get() {
+      if (internalFaceManager == null) {
+        try {
+          val encoder = ResourceEncoderImpl(preferences)
+          internalFaceManager =
+            FaceManagerImpl(io.blockv.rxface.client.ResourceManagerImpl(cacheDir, encoder))
+          internalFaceManager!!.registerFace(NativeImageFace.factory)
+        } catch (e: NoClassDefFoundError) {
+          throw MissingFaceModuleException()
+        } catch (e: Exception) {
+          throw MissingFaceModuleException()
+        }
+      }
+      return internalFaceManager!!
+    }
+
   constructor(context: Context, appId: String) {
 
+    this.cacheDir = context.cacheDir
     val faceDeserializer = FaceDeserializer()
     val actionDeserializer = ActionDeserializer()
     val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
@@ -125,6 +152,7 @@ class Blockv {
 
   constructor(context: Context, environment: Environment) {
 
+    this.cacheDir = context.cacheDir
     val faceDeserializer = FaceDeserializer()
     val actionDeserializer = ActionDeserializer()
     val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
@@ -169,6 +197,7 @@ class Blockv {
   }
 
   constructor(
+    context: Context,
     appId: String,
     preferences: Preferences,
     jsonModule: JsonModule,
@@ -179,6 +208,7 @@ class Blockv {
     eventManager: EventManager,
     resourceManager: ResourceManager
   ) {
+    this.cacheDir = context.cacheDir
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
@@ -198,5 +228,8 @@ class Blockv {
 
   class MissingWebSocketDependencyException :
     Exception("Include dependency 'com.neovisionaries:nv-websocket-client:2.5' to use the event manager.")
+
+  class MissingFaceModuleException :
+    Exception("Include dependency 'io.blockv.sdk:face:+' to use the face manager.")
 
 }
