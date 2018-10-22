@@ -10,10 +10,23 @@
  */
 package io.blockv.common.model
 
-class VatomVisibility(
-  var type: String,
+import io.blockv.common.internal.json.JsonModule
+
+class VatomVisibility {
+
+  @JsonModule.Serialize
+  var type: String
+  @JsonModule.Serialize
   var value: String
-) {
+
+  @JsonModule.Serializable
+  constructor(
+    type: String,
+    value: String
+  ) {
+    this.type = type
+    this.value = value
+  }
 
   override fun toString(): String {
     return "VatomVisibility{" +

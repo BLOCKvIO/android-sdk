@@ -10,11 +10,27 @@
  */
 package io.blockv.common.model
 
-class ChildPolicy(
-  var count: Int?,
-  var templateVariation: String?,
+import io.blockv.common.internal.json.JsonModule
+
+class ChildPolicy {
+  @JsonModule.Serialize
+  var count: Int?
+  @JsonModule.Serialize(name = "template_variation")
+  var templateVariation: String?
+  @JsonModule.Serialize(name = "creation_policy")
   var creationPolicy: CreationPolicy?
-) {
+
+  @JsonModule.Serializable
+  constructor(
+    count: Int?,
+    templateVariation: String?,
+    creationPolicy: CreationPolicy?
+  ) {
+    this.count = count
+    this.templateVariation = templateVariation
+    this.creationPolicy = creationPolicy
+  }
+
 
   override fun toString(): String {
     return "ChildPolicy{" +

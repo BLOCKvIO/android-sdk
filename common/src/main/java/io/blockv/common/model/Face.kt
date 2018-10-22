@@ -10,14 +10,39 @@
  */
 package io.blockv.common.model
 
-class Face(
-  var id: String,
-  var templateId: String,
-  var createdBy: String?,
-  var whenCreated: String?,
-  var whenModified: String?,
+import io.blockv.common.internal.json.JsonModule
+
+class Face {
+  @JsonModule.Serialize
+  var id: String
+  @JsonModule.Serialize(name = "template")
+  var templateId: String
+  @JsonModule.Serialize(name = "created_by", path = "meta")
+  var createdBy: String?
+  @JsonModule.Serialize(name = "when_created", path = "meta")
+  var whenCreated: String?
+  @JsonModule.Serialize(name = "when_modified", path = "meta")
+  var whenModified: String?
+  @JsonModule.Serialize(name = "properties")
   var property: FaceProperty
-) {
+
+  @JsonModule.Serializable
+  constructor(
+    id: String,
+    templateId: String,
+    createdBy: String?,
+    whenCreated: String?,
+    whenModified: String?,
+    property: FaceProperty
+  ) {
+    this.id = id
+    this.templateId = templateId
+    this.createdBy = createdBy
+    this.whenCreated = whenCreated
+    this.whenModified = whenModified
+    this.property = property
+  }
+
   private var native: Boolean? = null
   private var web: Boolean? = null
 

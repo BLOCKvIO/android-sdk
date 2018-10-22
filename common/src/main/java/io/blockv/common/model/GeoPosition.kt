@@ -10,11 +10,23 @@
  */
 package io.blockv.common.model
 
-class GeoPosition(
-  var type: String?,
-  var reqType: String?,
+import io.blockv.common.internal.json.JsonModule
+
+class GeoPosition {
+
+  @JsonModule.Serialize
+  var type: String?
+  @JsonModule.Serialize(name = "\$reql_type\$")
+  var reqType: String?
+  @JsonModule.Serialize
   var coordinates: List<Float>?
-) {
+
+  @JsonModule.Serializable
+  constructor(type: String?, reqType: String?, coordinates: List<Float>?) {
+    this.type = type
+    this.reqType = reqType
+    this.coordinates = coordinates
+  }
 
   override fun toString(): String {
     return "GeoPos{" +

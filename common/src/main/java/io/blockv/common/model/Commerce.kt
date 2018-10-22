@@ -10,7 +10,17 @@
  */
 package io.blockv.common.model
 
-class Commerce(var pricing: Pricing?) {
+import io.blockv.common.internal.json.JsonModule
+
+class Commerce {
+
+  @JsonModule.Serialize
+  var pricing: Pricing?
+
+  @JsonModule.Serializable
+  constructor(pricing: Pricing?) {
+    this.pricing = pricing
+  }
 
   override fun toString(): String {
     return "Commerce{" +

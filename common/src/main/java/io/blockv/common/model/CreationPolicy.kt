@@ -10,16 +10,43 @@
  */
 package io.blockv.common.model
 
-class CreationPolicy(
-  var autoCreate: String,
-  var autoCreateCount: Int,
-  var isAutoCreateCountRandom: Boolean,
-  var isEnforcePolicyCountMax: Boolean,
-  var isEnforcePolicyCountMin: Boolean,
-  var policyCountMax: Int,
-  var policyCountMin: Int
-) {
+import io.blockv.common.internal.json.JsonModule
 
+class CreationPolicy {
+
+  @JsonModule.Serialize(name = "auto_create")
+  var autoCreate: String
+  @JsonModule.Serialize(name = "auto_create_count")
+  var autoCreateCount: Int
+  @JsonModule.Serialize(name = "auto_create_count_random")
+  var isAutoCreateCountRandom: Boolean
+  @JsonModule.Serialize(name = "enforce_policy_count_max")
+  var isEnforcePolicyCountMax: Boolean
+  @JsonModule.Serialize(name = "enforce_policy_count_min")
+  var isEnforcePolicyCountMin: Boolean
+  @JsonModule.Serialize(name = "policy_count_max")
+  var policyCountMax: Int
+  @JsonModule.Serialize(name = "policy_count_min")
+  var policyCountMin: Int
+
+  @JsonModule.Serializable
+  constructor(
+    autoCreate: String,
+    autoCreateCount: Int,
+    isAutoCreateCountRandom: Boolean,
+    isEnforcePolicyCountMax: Boolean,
+    isEnforcePolicyCountMin: Boolean,
+    policyCountMax: Int,
+    policyCountMin: Int
+  ) {
+    this.autoCreate = autoCreate
+    this.autoCreateCount = autoCreateCount
+    this.isAutoCreateCountRandom = isAutoCreateCountRandom
+    this.isEnforcePolicyCountMax = isEnforcePolicyCountMax
+    this.isEnforcePolicyCountMin = isEnforcePolicyCountMin
+    this.policyCountMax = policyCountMax
+    this.policyCountMin = policyCountMin
+  }
 
   override fun toString(): String {
     return "CreationPolicy{" +
