@@ -11,8 +11,20 @@
 package io.blockv.common.internal.json.deserializer
 
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-interface Deserializer<out T> {
+abstract class Deserializer<T> {
+  abstract fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): T?
 
-  fun deserialize(data: JSONObject): T?
+  fun newList(): ArrayList<T> {
+    return ArrayList()
+  }
+
+  fun newSet(): HashSet<T> {
+    return HashSet()
+  }
 }

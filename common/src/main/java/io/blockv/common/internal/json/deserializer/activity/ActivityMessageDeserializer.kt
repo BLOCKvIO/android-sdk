@@ -15,10 +15,15 @@ import io.blockv.common.model.ActivityMessage
 import io.blockv.common.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class ActivityMessageDeserializer : Deserializer<ActivityMessage?> {
+class ActivityMessageDeserializer : Deserializer<ActivityMessage>() {
 
-  override fun deserialize(data: JSONObject): ActivityMessage? {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): ActivityMessage? {
     try {
       val id = data.getLong("msg_id")
       val userId = data.getString("user_id")
@@ -36,7 +41,7 @@ class ActivityMessageDeserializer : Deserializer<ActivityMessage?> {
       val tempVarArray = ArrayList<String>()
       (0 until tempVariations.length()).forEach({ tempVarArray.add(tempVariations.getString(it)) })
       val resourceArray = ArrayList<Resource>()
-      (0 until resources.length()).forEach({
+      (0 until resources.length()).forEach {
         val resource = resources.getJSONObject(it)
         if (resource != null) {
           resourceArray.add(
@@ -47,7 +52,7 @@ class ActivityMessageDeserializer : Deserializer<ActivityMessage?> {
             )
           )
         }
-      })
+      }
       val geoPosArray = ArrayList<Double>()
       (0 until geoPos.length()).forEach({ geoPosArray.add(geoPos.getDouble(it)) })
 

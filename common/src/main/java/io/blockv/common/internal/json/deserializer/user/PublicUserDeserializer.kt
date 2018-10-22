@@ -14,10 +14,16 @@ package io.blockv.common.internal.json.deserializer.user
 import android.util.Log
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.PublicUser
+import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class PublicUserDeserializer : Deserializer<PublicUser?> {
+class PublicUserDeserializer : Deserializer<PublicUser>() {
 
-  override fun deserialize(data: org.json.JSONObject): PublicUser? {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): PublicUser? {
     try {
       val properties: org.json.JSONObject = data.getJSONObject("properties")
       val id: String? = data.getString("id")

@@ -13,9 +13,10 @@ package io.blockv.common.internal.json.serializer.user
 import io.blockv.common.internal.json.serializer.Serializer
 import io.blockv.common.model.AssetProvider
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
 class AssetProviderSerializer : Serializer<AssetProvider?> {
-  override fun serialize(data: AssetProvider?): JSONObject {
+  override fun serialize(data: AssetProvider?,serializers: Map<KClass<*>, Serializer<Any>>): JSONObject {
     val out: JSONObject = JSONObject()
     if (data != null) {
       out.put("name", data.name)

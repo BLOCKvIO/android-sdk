@@ -13,9 +13,15 @@ package io.blockv.common.internal.json.deserializer.vatom
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.Action
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class ActionDeserializer : Deserializer<Action> {
-  override fun deserialize(data: JSONObject): Action? {
+class ActionDeserializer : Deserializer<Action>() {
+
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): Action? {
     try {
       val name: String = data.getString("name")
       val parts: List<String> = name.split("::Action::")

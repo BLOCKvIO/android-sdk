@@ -15,9 +15,14 @@ import io.blockv.common.model.ActivityEvent
 import io.blockv.common.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class ActivityEventDeserializer : Deserializer<ActivityEvent> {
-  override fun deserialize(data: JSONObject): ActivityEvent? {
+class ActivityEventDeserializer : Deserializer<ActivityEvent>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): ActivityEvent? {
     try {
       val eventId = data.getLong("msg_id")
       val targetUserId = data.getString("user_id")

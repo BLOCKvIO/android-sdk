@@ -13,14 +13,19 @@ package io.blockv.common.internal.json.deserializer.event
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.WebSocketEvent
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class WebsocketEventDeserializer : Deserializer<WebSocketEvent<JSONObject>> {
-  override fun deserialize(data: JSONObject): WebSocketEvent<JSONObject>? {
+class WebsocketEventDeserializer : Deserializer<WebSocketEvent<JSONObject>>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): WebSocketEvent<JSONObject>? {
     try {
       val messageType = data.getString("msg_type")
       val userId = data.optString("user_id", "")
       val payload = data.getJSONObject("payload")
-      return WebSocketEvent<JSONObject>(messageType, userId, payload)
+      return WebSocketEvent(messageType, userId, payload)
     } catch (e: Exception) {
       android.util.Log.e("WsDeserializer", e.message)
     }

@@ -14,10 +14,16 @@ package io.blockv.common.internal.json.deserializer.vatom
 import android.util.Log
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.GeoGroup
+import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class GeoGroupDeserializer : Deserializer<GeoGroup?> {
+class GeoGroupDeserializer : Deserializer<GeoGroup?>() {
 
-  override fun deserialize(data: org.json.JSONObject): GeoGroup? {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): GeoGroup? {
     try {
       val geoHash: String = data.optString("key", "")
       val lon: Double = data.optDouble("lon")

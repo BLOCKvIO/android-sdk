@@ -16,9 +16,14 @@ import io.blockv.common.model.Face
 import io.blockv.common.model.FaceProperty
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class FaceDeserializer : Deserializer<Face> {
-  override fun deserialize(data: JSONObject): Face? {
+class FaceDeserializer : Deserializer<Face>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): Face? {
     try {
       val meta: JSONObject = data.getJSONObject("meta")
       val properties: JSONObject = data.getJSONObject("properties")
@@ -28,9 +33,9 @@ class FaceDeserializer : Deserializer<Face> {
       val whenCreated: String? = meta.getString("when_created")
       val whenModified: String? = meta.optString("when_modified", whenCreated)
       val displayUrl: String = properties.getString("display_url")
-      val constraints: JSONObject = properties.optJSONObject("constraints")?:JSONObject()
-      val resourceArray = properties.optJSONArray("resources")?: JSONArray()
-      val config = properties.optJSONObject("config")?: JSONObject()
+      val constraints: JSONObject = properties.optJSONObject("constraints") ?: JSONObject()
+      val resourceArray = properties.optJSONArray("resources") ?: JSONArray()
+      val config = properties.optJSONObject("config") ?: JSONObject()
       val resources: ArrayList<String> = ArrayList(resourceArray.length())
       (0..resourceArray.length())
         .mapTo(resources) {
@@ -45,8 +50,8 @@ class FaceDeserializer : Deserializer<Face> {
         whenModified,
         FaceProperty(
           displayUrl,
-          constraints.optString("view_mode",""),
-          constraints.optString("platform",""),
+          constraints.optString("view_mode", ""),
+          constraints.optString("platform", ""),
           config,
           resources
         )

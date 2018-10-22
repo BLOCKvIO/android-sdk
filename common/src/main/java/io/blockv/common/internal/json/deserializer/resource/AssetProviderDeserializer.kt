@@ -13,9 +13,14 @@ package io.blockv.common.internal.json.deserializer.resource
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.AssetProvider
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class AssetProviderDeserialzier : Deserializer<AssetProvider> {
-  override fun deserialize(data: JSONObject): AssetProvider? {
+class AssetProviderDeserialzier : Deserializer<AssetProvider>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): AssetProvider? {
     try {
       val descriptorObject: JSONObject = data.getJSONObject("descriptor")
       val descriptor: HashMap<String, String> = HashMap()

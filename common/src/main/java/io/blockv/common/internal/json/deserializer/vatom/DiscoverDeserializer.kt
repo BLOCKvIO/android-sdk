@@ -12,18 +12,23 @@ package io.blockv.common.internal.json.deserializer.vatom
 
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.DiscoverPack
-import io.blockv.common.model.Vatom
+import io.blockv.common.model.Inventory
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class DiscoverDeserializer(
-  val inventoryDeserializer: Deserializer<List<Vatom>>
-) : Deserializer<DiscoverPack> {
+class DiscoverDeserializer : Deserializer<DiscoverPack>() {
 
-  override fun deserialize(data: JSONObject): DiscoverPack? {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): DiscoverPack? {
     try {
       val count: Int = data.optInt("count")
-      data.put("vatoms",data.optJSONArray("results"))
-      return DiscoverPack(count, inventoryDeserializer.deserialize(data)?:ArrayList())
+      data.put("vatoms", data.optJSONArray("results"))
+      val inventory = deserializers[Inventory::class]?.deserialize(type, data, deserializers)
+
+      return DiscoverPack(count, if (inventory != null) inventory as Inventory else ArrayList())
     } catch (e: Exception) {
       android.util.Log.e("DiscoverDeserializer", e.message)
     }

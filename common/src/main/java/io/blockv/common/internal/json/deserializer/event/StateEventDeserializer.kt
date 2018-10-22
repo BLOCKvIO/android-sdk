@@ -13,9 +13,14 @@ package io.blockv.common.internal.json.deserializer.event
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.StateUpdateEvent
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class StateEventDeserializer : Deserializer<StateUpdateEvent> {
-  override fun deserialize(data: JSONObject): StateUpdateEvent? {
+class StateEventDeserializer : Deserializer<StateUpdateEvent>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): StateUpdateEvent? {
     try {
       val eventId = data.getString("event_id")
       val operation = data.getString("op")

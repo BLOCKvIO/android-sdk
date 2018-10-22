@@ -12,9 +12,14 @@ package io.blockv.common.internal.json.deserializer
 
 import io.blockv.common.model.Environment
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class EnvironmentDeserialzier : Deserializer<Environment> {
-  override fun deserialize(data: JSONObject): Environment? {
+class EnvironmentDeserialzier : Deserializer<Environment>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): Environment? {
     try {
       return Environment(
         data.getString("rest"),

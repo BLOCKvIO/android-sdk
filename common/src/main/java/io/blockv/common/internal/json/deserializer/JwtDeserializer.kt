@@ -11,9 +11,15 @@
 package io.blockv.common.internal.json.deserializer
 
 import io.blockv.common.model.Jwt
+import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class JwtDeserializer : Deserializer<Jwt> {
-  override fun deserialize(data: org.json.JSONObject): Jwt? {
+class JwtDeserializer : Deserializer<Jwt>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): Jwt? {
     try {
       val token: String = data.getString("token")
       val tokenType: String = data.getString("token_type")

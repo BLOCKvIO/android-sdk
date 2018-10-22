@@ -12,9 +12,15 @@ package io.blockv.common.internal.json.deserializer.user
 
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.Token
+import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class TokenDeserializer : Deserializer<Token> {
-  override fun deserialize(data: org.json.JSONObject): Token? {
+class TokenDeserializer : Deserializer<Token>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): Token? {
     try {
       val id: String = data.getString("id")
       val meta: org.json.JSONObject = data.getJSONObject("meta")

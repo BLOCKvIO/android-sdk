@@ -14,10 +14,15 @@ import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.ActivityThread
 import io.blockv.common.model.ActivityThreadList
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class ActivityThreadListDeserializer(val threadDeserializer: Deserializer<ActivityThread>) :
-  Deserializer<ActivityThreadList> {
-  override fun deserialize(data: JSONObject): ActivityThreadList? {
+class ActivityThreadListDeserializer :
+  Deserializer<ActivityThreadList>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): ActivityThreadList? {
     try {
       val cursor: String = data.getString("cursor")
       val threads = data.getJSONArray("threads")
@@ -25,9 +30,9 @@ class ActivityThreadListDeserializer(val threadDeserializer: Deserializer<Activi
       (0 until threads.length()).forEach {
         val thread = threads.getJSONObject(it)
         if (thread != null) {
-          val out = threadDeserializer.deserialize(thread)
+          val out = deserializers[ActivityThread::class]?.deserialize(ActivityThread::class, thread, deserializers)
           if (out != null) {
-            threadArray.add(out)
+            threadArray.add(out as ActivityThread)
           }
         }
       }

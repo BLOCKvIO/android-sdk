@@ -14,18 +14,28 @@ import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.ActivityMessage
 import io.blockv.common.model.ActivityThread
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class ActivityThreadDeserializer(private val messageDeserializer: Deserializer<ActivityMessage?>) :
-  Deserializer<ActivityThread> {
+class ActivityThreadDeserializer :
+  Deserializer<ActivityThread>() {
 
-  override fun deserialize(data: JSONObject): ActivityThread? {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): ActivityThread? {
     try {
       val id: String = data.getString("name")
       val whenModified = data.getLong("when_modified")
-      val lastMessage = messageDeserializer.deserialize(data.getJSONObject("last_message"))
+      val lastMessage =
+        deserializers[ActivityMessage::class]?.deserialize(
+          ActivityMessage::class,
+          data.getJSONObject("last_message"),
+          deserializers
+        )
       val user = data.getJSONObject("last_message_user_info")
       val userInfo = ActivityThread.UserInfo(user.optString("name", ""), user.optString("avatar_uri", ""))
-      return ActivityThread(id, whenModified, lastMessage!!, userInfo)
+      return ActivityThread(id, whenModified, lastMessage!! as ActivityMessage, userInfo)
     } catch (e: Exception) {
       android.util.Log.w("Deserializer", "ActivityThreadDeserializer - " + e.message)
     }

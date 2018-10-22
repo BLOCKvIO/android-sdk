@@ -13,9 +13,10 @@ package io.blockv.common.internal.json.serializer.user
 import io.blockv.common.internal.json.serializer.Serializer
 import io.blockv.common.model.Environment
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
 class EnviromentSerializer : Serializer<Environment?> {
-  override fun serialize(data: Environment?): JSONObject {
+  override fun serialize(data: Environment?,serializers: Map<KClass<*>, Serializer<Any>>): JSONObject {
     val out: JSONObject = JSONObject()
     if (data != null) {
       out.put("app_id", data.appId)

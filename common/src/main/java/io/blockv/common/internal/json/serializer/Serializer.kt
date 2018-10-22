@@ -11,8 +11,9 @@
 package io.blockv.common.internal.json.serializer
 
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
 interface Serializer<in T> {
 
-  fun serialize(data: T): JSONObject
+  fun serialize(data: T, serializers: Map<KClass<*>, Serializer<Any>>): JSONObject?
 }

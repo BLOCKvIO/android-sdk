@@ -13,9 +13,14 @@ package io.blockv.common.internal.json.deserializer.event
 import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.InventoryEvent
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class InventoryEventDeserializer : Deserializer<InventoryEvent> {
-  override fun deserialize(data: JSONObject): InventoryEvent? {
+class InventoryEventDeserializer : Deserializer<InventoryEvent>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): InventoryEvent? {
     try {
       val eventId = data.getString("event_id")
       val operation = data.getString("op")

@@ -14,10 +14,14 @@ import io.blockv.common.internal.json.deserializer.Deserializer
 import io.blockv.common.model.*
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class VatomDeserializer(val faceDeserializer: Deserializer<Face?>,
-                        val actionDeserializer: Deserializer<Action?>) : Deserializer<Vatom> {
-  override fun deserialize(data: JSONObject): Vatom? {
+class VatomDeserializer : Deserializer<Vatom>() {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): Vatom? {
 
     try {
       val prop: JSONObject = data.getJSONObject("vAtom::vAtomType")
@@ -141,18 +145,20 @@ class VatomDeserializer(val faceDeserializer: Deserializer<Face?>,
       if (faces != null) {
         (0 until faces.length())
           .forEach {
-            val face: Face? = faceDeserializer.deserialize(faces.optJSONObject(it))
+            val face =
+              deserializers[Face::class]?.deserialize(Face::class, faces.optJSONObject(it), deserializers)
             if (face != null) {
-              facesArray.add(face)
+              facesArray.add(face as Face)
             }
           }
       }
       if (actions != null) {
         (0 until actions.length())
           .forEach {
-            val action: Action? = actionDeserializer.deserialize(actions.optJSONObject(it))
+            val action =
+              deserializers[Action::class]?.deserialize(Action::class, actions.optJSONObject(it), deserializers)
             if (action != null) {
-              actionsArray.add(action)
+              actionsArray.add(action as Action)
             }
           }
       }

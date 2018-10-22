@@ -15,11 +15,16 @@ import io.blockv.common.model.ActivityMessage
 import io.blockv.common.model.ActivityMessageList
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class ActivityMessageListDeserializer(private val messageDeserializer: Deserializer<ActivityMessage?>) :
-  Deserializer<ActivityMessageList> {
+class ActivityMessageListDeserializer :
+  Deserializer<ActivityMessageList>() {
 
-  override fun deserialize(data: JSONObject): ActivityMessageList? {
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    deserializers: Map<KClass<*>, Deserializer<*>>
+  ): ActivityMessageList? {
     try {
       val cursor = data.getString("cursor")
       val messages = data.optJSONArray("messages") ?: JSONArray()
@@ -27,9 +32,13 @@ class ActivityMessageListDeserializer(private val messageDeserializer: Deseriali
       (0 until messages.length()).forEach {
         val message = messages.getJSONObject(it)
         if (message != null) {
-          val out = messageDeserializer.deserialize(message.optJSONObject("message") ?: JSONObject())
+          val out = deserializers[ActivityMessage::class]?.deserialize(
+            ActivityMessage::class,
+            message.optJSONObject("message") ?: JSONObject(),
+            deserializers
+          )
           if (out != null) {
-            messageArray.add(out)
+            messageArray.add(out as ActivityMessage)
           }
         }
       }

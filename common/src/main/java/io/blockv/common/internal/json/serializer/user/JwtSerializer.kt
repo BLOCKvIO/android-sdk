@@ -13,9 +13,10 @@ package io.blockv.common.internal.json.serializer.user
 import io.blockv.common.internal.json.serializer.Serializer
 import io.blockv.common.model.Jwt
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
 class JwtSerializer : Serializer<Jwt?> {
-  override fun serialize(data: Jwt?): JSONObject {
+  override fun serialize(data: Jwt?, serializers: Map<KClass<*>, Serializer<Any>>): JSONObject {
     val out = JSONObject()
     if (data != null) {
       out.put("token", data.token)
