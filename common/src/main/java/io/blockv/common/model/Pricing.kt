@@ -19,6 +19,15 @@ class Pricing(
   var isVatIncluded: Boolean
 ) {
 
+  constructor(pricing: Pricing) : this(
+    pricing.priceType,
+    pricing.currency,
+    pricing.price,
+    pricing.validFrom,
+    pricing.validThrough,
+    pricing.isVatIncluded
+  )
+
   override fun toString(): String {
     return "Pricing{" +
       "priceType='" + priceType + '\'' +
