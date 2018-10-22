@@ -208,6 +208,7 @@ interface VatomManager {
    */
   fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Callable<Vatom>
 
+
   enum class TokenType {
     EMAIL,
     PHONE_NUMBER,
