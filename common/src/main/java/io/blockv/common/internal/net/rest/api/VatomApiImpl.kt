@@ -38,7 +38,7 @@ class VatomApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.inventoryDeserializer.deserialize(payload) else null)
+      (if (payload != null) jsonModule.deserialize(payload, Inventory::class) else null)
         ?: ArrayList()
     )
   }
@@ -51,7 +51,7 @@ class VatomApiImpl(
     if (payload != null) {
       var count = 0
       while (count < group.length()) {
-        val geoGroup: GeoGroup? = jsonModule.geoDiscoverGroupDeserializer.deserialize(group.getJSONObject(count))
+        val geoGroup: GeoGroup? = jsonModule.deserialize(group.getJSONObject(count), GeoGroup::class)
         if (geoGroup != null) {
           list.add(geoGroup)
         }
@@ -73,7 +73,7 @@ class VatomApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.inventoryDeserializer.deserialize(payload) else null)
+      (if (payload != null) jsonModule.deserialize(payload, Inventory::class) else null)
         ?: ArrayList()
     )
   }
@@ -85,7 +85,7 @@ class VatomApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.discoverDeserializer.deserialize(payload) else null)
+      (if (payload != null) jsonModule.deserialize(payload, DiscoverPack::class) else null)
         ?: DiscoverPack(0, ArrayList())
     )
   }
@@ -98,7 +98,7 @@ class VatomApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.inventoryDeserializer.deserialize(payload) else null)
+      (if (payload != null) jsonModule.deserialize(payload, Inventory::class) else null)
         ?: ArrayList()
     )
 
@@ -111,7 +111,7 @@ class VatomApiImpl(
     if (payload != null) {
       var count = 0
       while (count < payload.length()) {
-        val action: Action? = jsonModule.actionDeserializer.deserialize(payload.getJSONObject(count))
+        val action: Action? = jsonModule.deserialize(payload.getJSONObject(count), Action::class)
         if (action != null) {
           list.add(action)
         }

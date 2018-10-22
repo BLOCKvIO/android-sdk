@@ -33,7 +33,7 @@ class ActivityApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.activityThreadListDeserializer.deserialize(payload) ?: ActivityThreadList("", ArrayList())
+      jsonModule.deserialize(payload, ActivityThreadList::class) ?: ActivityThreadList("", ArrayList())
     )
   }
 
@@ -44,7 +44,7 @@ class ActivityApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.activityMessageListDeserializer.deserialize(payload) ?: ActivityMessageList("", ArrayList())
+      jsonModule.deserialize(payload, ActivityMessageList::class) ?: ActivityMessageList("", ArrayList())
     )
   }
 

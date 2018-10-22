@@ -51,7 +51,7 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
             if (response.has("payload") && (response.get("payload") is JSONObject)) {
               val pay: JSONObject = response.getJSONObject("payload")
               if (pay.has("access_token")) {
-                accessToken = jsonModule.jctDeserializer.deserialize(pay.getJSONObject("access_token"))
+                accessToken = jsonModule.deserialize(pay.getJSONObject("access_token"), Jwt::class)
 
               }
             }

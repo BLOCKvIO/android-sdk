@@ -95,34 +95,7 @@ class Blockv {
   constructor(context: Context, appId: String) {
 
     this.cacheDir = context.cacheDir
-    val faceDeserializer = FaceDeserializer()
-    val actionDeserializer = ActionDeserializer()
-    val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
-    val inventoryDeserializer = InventoryDeserializer(vatomDeserializer, faceDeserializer, actionDeserializer)
-    val messageDeserializer = ActivityMessageDeserializer()
-    this.jsonModule = JsonModule(
-      UserDeserializer(),
-      TokenDeserializer(),
-      vatomDeserializer,
-      faceDeserializer,
-      actionDeserializer,
-      AssetProviderDeserialzier(),
-      AssetProviderSerializer(),
-      EnvironmentDeserialzier(),
-      EnviromentSerializer(),
-      inventoryDeserializer,
-      JwtDeserializer(),
-      JwtSerializer(),
-      DiscoverDeserializer(inventoryDeserializer),
-      PublicUserDeserializer(),
-      GeoGroupDeserializer(),
-      InventoryEventDeserializer(),
-      StateEventDeserializer(),
-      ActivityEventDeserializer(),
-      WebsocketEventDeserializer(),
-      ActivityThreadListDeserializer(ActivityThreadDeserializer(messageDeserializer)),
-      ActivityMessageListDeserializer(messageDeserializer)
-    )
+    this.jsonModule = JsonModule()
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = Environment(
@@ -149,34 +122,7 @@ class Blockv {
 
   constructor(context: Context, environment: Environment) {
     this.cacheDir = context.cacheDir
-    val faceDeserializer = FaceDeserializer()
-    val actionDeserializer = ActionDeserializer()
-    val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
-    val inventoryDeserializer = InventoryDeserializer(vatomDeserializer, faceDeserializer, actionDeserializer)
-    val messageDeserializer = ActivityMessageDeserializer()
-    this.jsonModule = JsonModule(
-      UserDeserializer(),
-      TokenDeserializer(),
-      vatomDeserializer,
-      faceDeserializer,
-      actionDeserializer,
-      AssetProviderDeserialzier(),
-      AssetProviderSerializer(),
-      EnvironmentDeserialzier(),
-      EnviromentSerializer(),
-      inventoryDeserializer,
-      JwtDeserializer(),
-      JwtSerializer(),
-      DiscoverDeserializer(inventoryDeserializer),
-      PublicUserDeserializer(),
-      GeoGroupDeserializer(),
-      InventoryEventDeserializer(),
-      StateEventDeserializer(),
-      ActivityEventDeserializer(),
-      WebsocketEventDeserializer(),
-      ActivityThreadListDeserializer(ActivityThreadDeserializer(messageDeserializer)),
-      ActivityMessageListDeserializer(messageDeserializer)
-    )
+    this.jsonModule = JsonModule()
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment

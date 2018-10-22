@@ -41,7 +41,7 @@ class Preferences(
       if (json != null) {
         try {
           val data = JSONObject(json)
-          return jsonModule.environmentDeserializer.deserialize(data)
+          return jsonModule.deserialize(data, Environment::class)
         } catch (e: JSONException) {
           e.printStackTrace()
         }
@@ -50,7 +50,7 @@ class Preferences(
     }
     set(environment) {
       if (environment != null) {
-        set(Key.ENVIRONMENT, jsonModule.environmentSerializer.serialize(environment).toString())
+        set(Key.ENVIRONMENT, jsonModule.serialize(environment).toString())
       }
     }
 
@@ -58,11 +58,11 @@ class Preferences(
     get() {
       val token: String? = getString(Key.REFRESH_TOKEN)
       if (token != null) {
-        return jsonModule.jctDeserializer.deserialize(JSONObject(token))
+        return jsonModule.deserialize(JSONObject(token), Jwt::class)
       }
       return null
     }
-    set(token) = set(Key.REFRESH_TOKEN, jsonModule.jwtSerializer.serialize(token).toString())
+    set(token) = set(Key.REFRESH_TOKEN, if (token != null) jsonModule.serialize(token).toString() else "")
 
   var assetProviders: List<AssetProvider>
     get() {
@@ -73,7 +73,7 @@ class Preferences(
           val array = JSONArray(json)
 
           for (i in 0..array.length() - 1) {
-            val provider = jsonModule.assetProviderDeserializer.deserialize(array.getJSONObject(i))
+            val provider = jsonModule.deserialize<AssetProvider>(array.getJSONObject(i), AssetProvider::class)
             if (provider != null) {
               providers.add(provider)
             }
@@ -89,7 +89,7 @@ class Preferences(
     set(assetProviders) {
       val array = JSONArray()
       for (provider in assetProviders) {
-        array.put(jsonModule.assetProviderSerializer.serialize(provider))
+        array.put(jsonModule.serialize(provider))
       }
       set(Key.ASSET_PROVIDER, array.toString())
     }
