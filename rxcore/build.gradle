@@ -32,6 +32,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation 'com.neovisionaries:nv-websocket-client:2.5'
   implementation ("io.blockv.faces:image-face:1.0.4")
+  implementation ("io.blockv.faces:progress-image-face:1.0.0")
   implementation project(':common')
   implementation project(':face')
   implementation project(':rxface')

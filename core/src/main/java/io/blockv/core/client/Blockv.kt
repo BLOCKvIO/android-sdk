@@ -42,6 +42,7 @@ import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
 import io.blockv.faces.NativeImageFace
+import io.blockv.faces.ProgressImageFace
 import java.io.File
 
 class Blockv {
@@ -82,6 +83,7 @@ class Blockv {
           val encoder = ResourceEncoderImpl(preferences)
           internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
           internalFaceManager!!.registerFace(NativeImageFace.factory)
+          internalFaceManager!!.registerFace(ProgressImageFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {

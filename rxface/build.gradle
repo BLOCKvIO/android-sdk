@@ -35,6 +35,7 @@ dependencies {
   implementation project(':faceview')
   implementation project(':face')
   implementation ("io.blockv.faces:image-face:1.0.4")
+  implementation ("io.blockv.faces:progress-image-face:1.0.0")
 
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -75,6 +76,10 @@ publishing {
         imageFaceDependency.appendNode('groupId', 'io.blockv.faces')
         imageFaceDependency.appendNode('artifactId', 'image-face')
         imageFaceDependency.appendNode('version', '[1.0.4,2.0.0)')
+        def progressFaceDependency = dependenciesNode.appendNode('dependency')
+        progressFaceDependency.appendNode('groupId', 'io.blockv.faces')
+        progressFaceDependency.appendNode('artifactId', 'progress-image-face')
+        progressFaceDependency.appendNode('version', '[1.0.0,2.0.0)')
       }
     }
   }
