@@ -64,7 +64,7 @@ publishing {
         def dependencyNode = dependenciesNode.appendNode('dependency')
         dependencyNode.appendNode('groupId', 'io.blockv.sdk')
         dependencyNode.appendNode('artifactId', 'common')
-        dependencyNode.appendNode('version', '[1.0.0,2.0.0)')
+        dependencyNode.appendNode('version', '[1.1.0,2.0.0)')
       }
     }
   }

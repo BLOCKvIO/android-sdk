@@ -67,7 +67,7 @@ publishing {
         def commonDependency = dependenciesNode.appendNode('dependency')
         commonDependency.appendNode('groupId', 'io.blockv.sdk')
         commonDependency.appendNode('artifactId', 'common')
-        commonDependency.appendNode('version', '[1.0.0,2.0.0)')
+        commonDependency.appendNode('version', '[1.1.0,2.0.0)')
         def faceviewDependency = dependenciesNode.appendNode('dependency')
         faceviewDependency.appendNode('groupId', 'io.blockv.sdk')
         faceviewDependency.appendNode('artifactId', 'faceview')
