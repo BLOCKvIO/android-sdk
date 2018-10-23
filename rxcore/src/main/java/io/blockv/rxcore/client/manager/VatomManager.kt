@@ -206,6 +206,16 @@ interface VatomManager {
    */
   fun trashVatom(id: String): Completable
 
+  /**
+   * Creates a new updated vAtom by merging properties from the state update
+   * into the provided vAtom model.
+   *
+   * @param vatom is the vAtom model to be updated.
+   * @param update is the state update to be merged into the vAtom.
+   * @return new Single<Vatom>.
+   */
+  fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Single<Vatom>
+
 
   enum class TokenType {
     EMAIL,
