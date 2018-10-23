@@ -2,12 +2,24 @@
 All notable changes to the core module will be documented in this file.
 
 #### 2.x Releases
+- `2.1.x` Releases - [2.1.0](#210)
 - `2.0.x` Releases - [2.0.0](#200)
 ---
 
 #### 1.x Releases
 - `1.1.x` Releases - [1.1.0](#110)
 ---
+
+## [2.1.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/core/2.1.0)
+Released on 2018-10-23
+
+#### Added
+
+- Method to update a vAtom model using a StateUpdateEvent. 
+  - Pull Request [#83](https://github.com/BLOCKvIO/android-sdk/pull/83)
+- Image Progress Face when using the Face module. 
+ - Pull Request [#85](https://github.com/BLOCKvIO/android-sdk/pull/85)
+  
 ## [2.0.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/core/2.0.0)
 Released on 2018-09-28
 
@@ -32,6 +44,7 @@ This release has breaking changes.
 Released on 2018-07-10
 
 #### Added
+
 - Allow a vAtom to be sent to the trash.
   - Pull Request [#27](https://github.com/BLOCKvIO/android-sdk/pull/27) , [#32](https://github.com/BLOCKvIO/android-sdk/pull/32)
   
