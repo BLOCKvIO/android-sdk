@@ -109,10 +109,10 @@ class FaceManagerImpl(var resourceManager: ResourceManager) :
   override fun load(vatom: Vatom): FaceManager.Builder {
     return object : FaceManager.Builder {
 
-      var faceProcedure: FaceSelectionProcedure = EmbeddedProcedure.ICON.procedure
-      var errorView: View? = null
-      var loaderView: View? = null
-      var loaderDelay: Long = 0
+      override var faceProcedure: FaceSelectionProcedure = EmbeddedProcedure.ICON.procedure
+      override var errorView: View? = null
+      override var loaderView: View? = null
+      override var loaderDelay: Long = 0
 
       fun load(vatomView: VatomView): Single<FaceView> {
         return Single.fromCallable {
@@ -133,11 +133,13 @@ class FaceManagerImpl(var resourceManager: ResourceManager) :
           .subscribeOn(Schedulers.computation())
           .observeOn(AndroidSchedulers.mainThread())
           .map {
-            val view = it.second.emit(vatom, it.first, FaceBridge(
-              ResourceManagerWrapper(
-                resourceManager
+            val view = it.second.emit(
+              vatom, it.first, FaceBridge(
+                ResourceManagerWrapper(
+                  resourceManager
+                )
               )
-            ))
+            )
             vatomView.faceView = view
             view
           }
@@ -262,12 +264,12 @@ class FaceManagerImpl(var resourceManager: ResourceManager) :
         return this
       }
 
-      override fun setErrorView(view: View): FaceManager.Builder {
+      override fun setErrorView(view: View?): FaceManager.Builder {
         errorView = view
         return this
       }
 
-      override fun setLoaderView(view: View): FaceManager.Builder {
+      override fun setLoaderView(view: View?): FaceManager.Builder {
         loaderView = view
         return this
       }

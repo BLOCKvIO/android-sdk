@@ -68,6 +68,11 @@ interface FaceManager {
    */
   interface Builder {
 
+    val errorView: View?
+    val loaderView: View?
+    val loaderDelay: Long
+    val faceProcedure: FaceSelectionProcedure
+
     /**
      * Builds a Callable to load a FaceView into the provided VatomView.
      *
@@ -109,7 +114,7 @@ interface FaceManager {
      * @see VatomView
      * @see defaultError
      */
-    fun setErrorView(view: View): Builder
+    fun setErrorView(view: View?): Builder
 
     /**
      * Sets the loader view to be used by the VatomView. If this is not set
@@ -121,7 +126,7 @@ interface FaceManager {
      * @see VatomView
      * @see defaultLoader
      */
-    fun setLoaderView(view: View): Builder
+    fun setLoaderView(view: View?): Builder
 
     /**
      * Sets a delay before the loader be will shown. If the VatomView finishes loading before

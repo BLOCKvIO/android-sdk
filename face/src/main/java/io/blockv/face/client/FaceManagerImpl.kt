@@ -97,10 +97,10 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
   override fun load(vatom: Vatom): FaceManager.Builder {
     return object : FaceManager.Builder {
 
-      var faceProcedure: FaceManager.FaceSelectionProcedure = FaceManager.EmbeddedProcedure.ICON.procedure
-      var errorView: View? = null
-      var loaderView: View? = null
-      var loaderDelay: Long = 0
+      override var faceProcedure: FaceManager.FaceSelectionProcedure = FaceManager.EmbeddedProcedure.ICON.procedure
+      override var errorView: View? = null
+      override var loaderView: View? = null
+      override var loaderDelay: Long = 0
 
       fun load(vatomView: VatomView): Callable<FaceView> {
         return Callable.single {
@@ -247,12 +247,12 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
         return this
       }
 
-      override fun setErrorView(view: View): FaceManager.Builder {
+      override fun setErrorView(view: View?): FaceManager.Builder {
         errorView = view
         return this
       }
 
-      override fun setLoaderView(view: View): FaceManager.Builder {
+      override fun setLoaderView(view: View?): FaceManager.Builder {
         loaderView = view
         return this
       }
