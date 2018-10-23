@@ -197,7 +197,6 @@ class Blockv {
   }
 
   constructor(
-    context: Context,
     appId: String,
     preferences: Preferences,
     jsonModule: JsonModule,
@@ -208,7 +207,7 @@ class Blockv {
     eventManager: EventManager,
     resourceManager: ResourceManager
   ) {
-    this.cacheDir = context.cacheDir
+    this.cacheDir = preferences.context.cacheDir
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
