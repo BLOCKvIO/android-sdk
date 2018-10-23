@@ -8,22 +8,33 @@
  *  under the License.
  *
  */
-package io.blockv.face.client
+package io.blockv.rxface.client
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import io.blockv.common.model.Vatom
-import io.blockv.common.util.Callable
 import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
+import io.blockv.face.client.FaceBridge
+import io.blockv.face.client.FaceManager.EmbeddedProcedure
+import io.blockv.face.client.FaceManager.FaceSelectionProcedure
+import io.blockv.face.client.FaceView
+import io.blockv.face.client.VatomView
+import io.blockv.face.client.ViewFactory
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
-class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
+class FaceManagerImpl(var resourceManager: ResourceManager) :
+  FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
-  private var loader: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {
+  private var loader: FaceManager.ViewEmitter? = object :
+    FaceManager.ViewEmitter {
     override fun emit(
       inflater: LayoutInflater,
       parent: ViewGroup,
@@ -33,7 +44,8 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
       return inflater.inflate(R.layout.view_basic_loader, parent, false)
     }
   }
-  private var error: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {
+  private var error: FaceManager.ViewEmitter? = object :
+    FaceManager.ViewEmitter {
     override fun emit(
       inflater: LayoutInflater,
       parent: ViewGroup,
@@ -43,24 +55,24 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
       val layout = inflater.inflate(R.layout.view_vatom_error, parent, false) as ViewGroup
       val activated: ImageView = layout.findViewById(R.id.activated)
       val loader: View = layout.findViewById(R.id.loader)
-      var cancellable = CompositeCancellable()
+      var disposable = CompositeDisposable()
       val resource = vatom.property.getResource("ActivatedImage")
 
       layout.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
 
         override fun onViewDetachedFromWindow(v: View?) {
-          cancellable.cancel()
+          disposable.dispose()
           layout.removeOnAttachStateChangeListener(this)
         }
 
         override fun onViewAttachedToWindow(v: View?) {
-          cancellable = CompositeCancellable()
+          disposable = CompositeDisposable()
           if (resource != null) {
             loader.visibility = View.VISIBLE
-            cancellable.add(
+            disposable.add(
               resourceManager.getBitmap(resource, parent.width, parent.height)
-                .returnOn(Callable.Scheduler.MAIN)
-                .call({
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
                   activated.setImageBitmap(it)
                   loader.visibility = View.GONE
                 }, {
@@ -97,20 +109,20 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
   override fun load(vatom: Vatom): FaceManager.Builder {
     return object : FaceManager.Builder {
 
-      override var faceProcedure: FaceManager.FaceSelectionProcedure = FaceManager.EmbeddedProcedure.ICON.procedure
+      override var faceProcedure: FaceSelectionProcedure = EmbeddedProcedure.ICON.procedure
       override var errorView: View? = null
       override var loaderView: View? = null
       override var loaderDelay: Long = 0
 
-      fun load(vatomView: VatomView): Callable<FaceView> {
-        return Callable.single {
+      fun load(vatomView: VatomView): Single<FaceView> {
+        return Single.fromCallable {
           //unload previous face view
           vatomView.faceView?.onUnload()
           vatomView.faceView = null
           vatomView.showLoader(true, loaderDelay)
         }
-          .runOn(Callable.Scheduler.MAIN)
-          .returnOn(Callable.Scheduler.COMP)
+          .subscribeOn(AndroidSchedulers.mainThread())
+          .observeOn(Schedulers.computation())
           .map {
             val face = faceProcedure.select(vatom, faceRoster.keys)
               ?: throw FaceManager.Builder.Error.FACE_MODEL_IS_NULL.exception
@@ -118,25 +130,31 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
               ?: throw FaceManager.Builder.Error.FACTORY_NOT_FOUND.exception
             Pair(face, factory)
           }
-          .runOn(Callable.Scheduler.COMP)
-          .returnOn(Callable.Scheduler.MAIN)
+          .subscribeOn(Schedulers.computation())
+          .observeOn(AndroidSchedulers.mainThread())
           .map {
-            val view = it.second.emit(vatom, it.first, FaceBridge(resourceManager))
+            val view = it.second.emit(
+              vatom, it.first, FaceBridge(
+                ResourceManagerWrapper(
+                  resourceManager
+                )
+              )
+            )
             vatomView.faceView = view
             view
           }
-          .runOn(Callable.Scheduler.MAIN)
+          .subscribeOn(AndroidSchedulers.mainThread())
+          .observeOn(AndroidSchedulers.mainThread())
           .flatMap { faceView ->
-            Callable.create<FaceView> { emitter ->
-              val cancel = CompositeCancellable()
+            val cancel = CompositeCancellable()
+            Single.create<FaceView> { emitter ->
               faceView.onLoad(object : FaceView.LoadHandler {
                 override fun collect(cancellable: Cancellable) {
                   cancel.add(cancellable)
                 }
 
                 override fun onComplete() {
-                  emitter.onResult(faceView)
-                  emitter.onComplete()
+                  emitter.onSuccess(faceView)
                   faceView.isLoaded = true
                 }
 
@@ -144,57 +162,55 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
                   emitter.onError(error)
                 }
               })
-
-              emitter.doOnCompletion {
+            }
+              .doFinally {
                 cancel.cancel()
               }
-            }
           }
-          .runOn(Callable.Scheduler.MAIN)
+          .observeOn(AndroidSchedulers.mainThread())
 
       }
 
-      override fun into(vatomView: VatomView): Callable<FaceView> {
+      override fun into(vatomView: VatomView): Single<FaceView> {
 
         val errorView: View? = this.errorView
         val loaderView: View? = this.loaderView
-        val faceProcedure: FaceManager.FaceSelectionProcedure = this.faceProcedure
+        val faceProcedure: FaceSelectionProcedure = this.faceProcedure
 
         synchronized(vatomView)
         {
           val faceView = vatomView.faceView
 
-          return Callable.single {
+          return Single.fromCallable {
             //setup
             val inflater = LayoutInflater.from(vatomView.context)
             vatomView.loaderView = loaderView ?: defaultLoader?.emit(inflater, vatomView, vatom, resourceManager)
             vatomView.errorView = errorView ?: defaultError?.emit(inflater, vatomView, vatom, resourceManager)
 
           }
-            .runOn(Callable.Scheduler.MAIN)
+            .subscribeOn(AndroidSchedulers.mainThread())
             .flatMap {
               if (faceView?.isLoaded == true //only try update face view if its loaded
                 && faceView.vatom.property.templateVariationId == vatom.property.templateVariationId
               ) {
                 //update
                 faceView.isLoaded = false
-                Callable.single {
-                  faceProcedure.select(vatom, faceRoster.keys)
+                Single.fromCallable {
+                  Optional(faceProcedure.select(vatom, faceRoster.keys))
                 }
-                  .runOn(Callable.Scheduler.COMP)
-                  .returnOn(Callable.Scheduler.MAIN)
+                  .subscribeOn(Schedulers.computation())
+                  .observeOn(AndroidSchedulers.mainThread())
                   .flatMap { face ->
-                    if (face != null && face.id == faceView.face.id) {
-                      Callable.create { emitter ->
-                        val cancel = CompositeCancellable()
+                    if (!face.isEmpty() && face.value?.id == faceView.face.id) {
+                      val cancel = CompositeCancellable()
+                      Single.create<FaceView> { emitter ->
                         faceView.update(vatom, object : FaceView.LoadHandler {
                           override fun collect(cancellable: Cancellable) {
                             cancel.add(cancellable)
                           }
 
                           override fun onComplete() {
-                            emitter.onResult(faceView)
-                            emitter.onComplete()
+                            emitter.onSuccess(faceView)
                             faceView.isLoaded = true
                           }
 
@@ -202,16 +218,17 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
                             emitter.onError(error)
                           }
                         })
-                        emitter.doOnCompletion {
-                          cancel.cancel()
-                        }
+
+                      }.doFinally {
+                        cancel.cancel()
                       }
+
                     } else {
                       load(vatomView)
                     }
                   }
-                  .runOn(Callable.Scheduler.MAIN)
-                  .returnOn(Callable.Scheduler.MAIN)
+                  .subscribeOn(AndroidSchedulers.mainThread())
+                  .observeOn(AndroidSchedulers.mainThread())
               } else
                 load(vatomView)
             }
@@ -222,7 +239,7 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
                 throw FaceManager.Builder.Error.FACE_VIEW_CHANGED.exception//face view being displayed has changed
               it
             }
-            .runOn(Callable.Scheduler.MAIN)
+            .subscribeOn(AndroidSchedulers.mainThread())
             .doOnError {
               if (it !is FaceManager.Builder.VatomViewException || it.error != FaceManager.Builder.Error.FACE_VIEW_CHANGED) {
                 vatomView.showError(true)
@@ -237,12 +254,12 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
       }
 
 
-      override fun setEmbeddedProcedure(embeddedProcedure: FaceManager.EmbeddedProcedure): FaceManager.Builder {
+      override fun setEmbeddedProcedure(embeddedProcedure: EmbeddedProcedure): FaceManager.Builder {
         this.faceProcedure = embeddedProcedure.procedure
         return this
       }
 
-      override fun setFaceSelectionProcedure(procedure: FaceManager.FaceSelectionProcedure): FaceManager.Builder {
+      override fun setFaceSelectionProcedure(procedure: FaceSelectionProcedure): FaceManager.Builder {
         this.faceProcedure = procedure
         return this
       }

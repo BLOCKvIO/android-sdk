@@ -10,7 +10,7 @@
  */
 package io.blockv.common.model
 
-class VatomProperty {
+class VatomProperty() {
 
   var commerce: Commerce? = null
 
@@ -66,7 +66,6 @@ class VatomProperty {
 
   var isRedeemable: Boolean = false
 
-
   var resources: List<Resource> = ArrayList()
     set(value) {
       field = value
@@ -82,6 +81,39 @@ class VatomProperty {
 
   var isTradeable: Boolean = false
 
+  constructor(property: VatomProperty) : this() {
+    this.isAcquireable = property.isAcquireable
+    this.author = property.author
+    this.commerce = if (property.commerce != null) Commerce(property.commerce!!) else null
+    this.category = property.category
+    this.clonedFrom = property.clonedFrom
+    this.cloningScore = property.cloningScore
+    this.description = property.description
+    this.isDropped = property.isDropped
+    this.geoPos = if (property.geoPos != null) GeoPosition(property.geoPos!!) else null
+    this.isInContract = property.isInContract
+    this.inContractWith = property.inContractWith
+    this.isInReaction = property.isInReaction
+    this.notifyMsg = property.notifyMsg
+    this.numDirectClones = property.numDirectClones
+    this.owner = property.owner
+    this.parentId = property.parentId
+    this.publisherFqdn = property.publisherFqdn
+    this.reactedBy = property.reactedBy
+    this.reactionExpires = property.reactionExpires
+    this.rootType = property.rootType
+    this.tags = property.tags
+    this.templateId = property.templateId
+    this.templateVariationId = property.templateVariationId
+    this.title = property.title
+    this.isTransferable = property.isTransferable
+    this.transferredBy = property.transferredBy
+    this.isRedeemable = property.isRedeemable
+    this.resources = ArrayList(property.resources)
+    this.childPolicy = if (property.childPolicy == null) null else ArrayList(property.childPolicy)
+    this.isTradeable = property.isTradeable
+    this.visibility = if (property.visibility != null) VatomVisibility(property.visibility!!) else null
+  }
 
   fun getResource(name: String): Resource? {
     val resources = _resources

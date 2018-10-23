@@ -10,7 +10,9 @@
  */
 package io.blockv.common.model
 
-class Commerce(var pricing: Pricing?) {
+class Commerce(val pricing: Pricing?) {
+
+  constructor(commerce: Commerce) : this(if (commerce.pricing != null) Pricing(commerce.pricing) else null)
 
   override fun toString(): String {
     return "Commerce{" +

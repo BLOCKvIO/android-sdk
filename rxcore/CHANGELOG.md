@@ -2,8 +2,19 @@
 All notable changes to the rxcore module will be documented in this file.
 
 #### 2.x Releases
-- `2.0.x` Releases - [2.0.0](#110)
+- `2.1.x` Releases - [2.1.0](#210)
+- `2.0.x` Releases - [2.0.0](#200)
 ---
+## [2.0.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/rxcore/2.1.0)
+Released on 2018-10-23
+
+#### Added
+
+- Face Module
+  - Pull Request [#81](https://github.com/BLOCKvIO/android-sdk/pull/81)
+- Method to update a vAtom model using a StateUpdateEvent. 
+  - Pull Request [#86](https://github.com/BLOCKvIO/android-sdk/pull/86)
+  
 
 ## [2.0.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/rxcore/2.0.0)
 Released on 2018-09-28

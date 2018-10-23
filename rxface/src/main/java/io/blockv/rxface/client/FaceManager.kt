@@ -8,102 +8,19 @@
  *  under the License.
  *
  */
-package io.blockv.face.client
+package io.blockv.rxface.client
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
-import io.blockv.common.util.Callable
-import io.blockv.face.client.FaceManager.EmbeddedProcedure.*
+import io.blockv.face.client.FaceManager.*
+import io.blockv.face.client.FaceView
+import io.blockv.face.client.VatomView
+import io.blockv.face.client.ViewFactory
+import io.reactivex.Single
 
 interface FaceManager {
-
-  /**
-   * EmbeddedProcedure enum contains a set of default face selection procedures.
-   *
-   * By default these procedures will only consider native faces that have a platform value 'Generic'
-   * or 'Android'.
-   *
-   * Faces with a platform value of 'Android' will be selected over 'Generic' in the case where there are
-   * multiple faces per view mode.
-   *
-   * @see ICON - Selects a Face model in icon mode, returns null if none are available.
-   * @see ENGAGED - Selects a Face model in engaged mode, falls back on the ICON procedure if none are available.
-   * @see FULLSCREEN - Selects a Face model in fullscreen mode, returns null if none are available.
-   * @see CARD - Selects a Face model in card mode, returns null if none are available.
-   *
-   * @see FaceSelectionProcedure
-   */
-  enum class EmbeddedProcedure(val viewMode: String, val fallback: EmbeddedProcedure?) {
-
-    ICON("icon", null),
-    ENGAGED("engaged", ICON),
-    FULLSCREEN("fullscreen", null),
-    CARD("card", null);
-
-    val procedure: FaceSelectionProcedure
-      get() {
-        val procedure = this
-        return object : FaceManager.FaceSelectionProcedure {
-          override fun select(
-            vatom: Vatom,
-            displayUrls: Set<String>
-          ): Face? {
-            var context: EmbeddedProcedure? = procedure
-            do {
-              val face = defaultRoutine(vatom.faces, displayUrls, context!!.viewMode)
-              if (face != null)
-                return face
-              context = context.fallback
-            } while (context != null)
-            return null
-          }
-        }
-      }
-
-    companion object {
-      val defaultRoutine: (faces: List<Face>, faceRegistry: Set<String>, viewMode: String) -> Face? =
-        { faces, faceRegistry, viewMode ->
-          var selectedFace: Face? = null
-          var rating = 0
-          for (face in faces) {
-
-            if (face.property.viewMode != viewMode) {
-              continue
-            }
-            //possibly turn into helper function isAndroid, isGeneric, isSupported
-            var rate = when (face.property.platform.toLowerCase()) {
-              "android" -> {
-                2
-              }
-              "generic" -> {
-                1
-              }
-              else -> {
-                -1
-              }
-            }
-            if (rate == -1) continue
-
-            if (face.isNative()) {
-              //check that the face is registered
-              if (faceRegistry.indexOf(face.property.displayUrl) == -1) {
-                continue
-              }
-              rate += 1
-            }
-
-            if (rate > rating) {
-              rating = rate
-              selectedFace = face
-            }
-          }
-          selectedFace
-        }
-    }
-  }
 
   /**
    * Adds a FaceView factory to the roster. If a factory with the same display url exists it
@@ -137,27 +54,6 @@ interface FaceManager {
   var defaultError: ViewEmitter?
 
   /**
-   * FaceSelectionProcedure is used to select a Face for a vAtom.
-   *
-   * @see EmbeddedProcedure
-   */
-  interface FaceSelectionProcedure {
-
-    /**
-     * Selects a Face model for a vAtom base on some custom logic.
-     *
-     * @param vatom contains the list of Face models that should be used by the procedure.
-     * @param displayUrls is a set of all available FaceView factories.
-     * @return an optional Face model.
-     *
-     * @see Vatom
-     * @see Vatom.faces
-     * @see Face
-     */
-    fun select(vatom: Vatom, displayUrls: Set<String>): Face?
-  }
-
-  /**
    * Creates a builder to load a VatomView for the specified vAtom.
    *
    * @param vatom is the vAtom you want a VatomView to display.
@@ -181,12 +77,12 @@ interface FaceManager {
      * Builds a Callable to load a FaceView into the provided VatomView.
      *
      * @param vatomView to load a FaceView for.
-     * @return new Callable<FaceView>, calling this will begin the loading chain.
+     * @return new Single<FaceView>, subscribing to this will begin the loading chain.
      *
      * @see FaceView
      * @see VatomView
      */
-    fun into(vatomView: VatomView): Callable<FaceView>
+    fun into(vatomView: VatomView): Single<FaceView>
 
     /**
      * Sets an embedded procedure to be used to selected a Face model for the vAtom.
@@ -267,5 +163,4 @@ interface FaceManager {
      */
     fun emit(inflater: LayoutInflater, parent: ViewGroup, vatom: Vatom, resourceManager: ResourceManager): View
   }
-
 }

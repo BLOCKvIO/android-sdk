@@ -29,22 +29,25 @@ dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation 'com.android.support:appcompat-v7:27.1.1'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'io.reactivex.rxjava2:rxjava:2.2.1'
+  implementation project(':common')
+  implementation project(':faceview')
+  implementation project(':face')
+  implementation ("io.blockv.faces:image-face:1.0.4")
+  implementation ("io.blockv.faces:progress-image-face:1.0.0")
 
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-  implementation project(':common')
-  implementation project(':faceview')
-  implementation ("io.blockv.faces:image-face:1.0.4")
-  implementation ("io.blockv.faces:progress-image-face:1.0.0")
 }
+
 repositories {
   mavenCentral()
 }
 def libraryGroupId = 'io.blockv.sdk'
-def libraryArtifactId = 'face'
-def libraryVersion = '1.1.0'
+def libraryArtifactId = 'rxface'
+def libraryVersion = '1.0.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
