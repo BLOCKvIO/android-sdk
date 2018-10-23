@@ -34,6 +34,7 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation ("io.blockv.faces:image-face:1.0.4")
+  implementation ("io.blockv.faces:progress-image-face:1.0.0")
   implementation project(':common')
   implementation project(':face')
   implementation project(':faceview')

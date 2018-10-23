@@ -37,6 +37,7 @@ dependencies {
   implementation project(':common')
   implementation project(':faceview')
   implementation ("io.blockv.faces:image-face:1.0.4")
+  implementation ("io.blockv.faces:progress-image-face:1.0.0")
 }
 repositories {
   mavenCentral()
@@ -72,6 +73,10 @@ publishing {
         imageFaceDependency.appendNode('groupId', 'io.blockv.faces')
         imageFaceDependency.appendNode('artifactId', 'image-face')
         imageFaceDependency.appendNode('version', '[1.0.4,2.0.0)')
+        def progressFaceDependency = dependenciesNode.appendNode('dependency')
+        progressFaceDependency.appendNode('groupId', 'io.blockv.faces')
+        progressFaceDependency.appendNode('artifactId', 'progress-image-face')
+        progressFaceDependency.appendNode('version', '[1.0.0,2.0.0)')
       }
     }
   }
