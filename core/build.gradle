@@ -45,7 +45,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'core'
-def libraryVersion = '2.0.0'
+def libraryVersion = '2.1.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs

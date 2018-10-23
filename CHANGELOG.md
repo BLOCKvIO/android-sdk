@@ -7,5 +7,6 @@ All notable changes to this project will be documented in this file.
 - [core](./core)
 - [rxcore](./rxcore)
 - [face](./face)
+- [rxface](./rxface)
 - [faceview](./faceview)
 
