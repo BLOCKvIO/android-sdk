@@ -15,7 +15,7 @@ All notable changes to the core module will be documented in this file.
 Released on 2018-10-26
 
 #### Updated
-- Blockv to use version 1.2.0 of [Face](/face) module.
+- `Blockv` to use version 1.2.0 of [Face](/face) module.
   - Pull Request [#90](https://github.com/BLOCKvIO/android-sdk/pull/90)
 
 ## [2.1.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/core/2.1.0)
