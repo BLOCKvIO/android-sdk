@@ -20,7 +20,12 @@ import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
 
-class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
+class FaceManagerImpl(
+  var resourceManager: ResourceManager,
+  var userManager: UserManager,
+  var vatomManager: VatomManager,
+  var eventManager: EventManager
+) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
   private var loader: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {
@@ -121,7 +126,15 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
           .runOn(Callable.Scheduler.COMP)
           .returnOn(Callable.Scheduler.MAIN)
           .map {
-            val view = it.second.emit(vatom, it.first, FaceBridge(resourceManager))
+            val view =
+              it.second.emit(
+                vatom, it.first, FaceBridge(
+                  resourceManager,
+                  userManager,
+                  vatomManager,
+                  eventManager
+                )
+              )
             vatomView.faceView = view
             view
           }
