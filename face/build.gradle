@@ -44,7 +44,7 @@ repositories {
 }
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'face'
-def libraryVersion = '1.1.0'
+def libraryVersion = '1.2.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -68,7 +68,7 @@ publishing {
         def faceviewDependency = dependenciesNode.appendNode('dependency')
         faceviewDependency.appendNode('groupId', 'io.blockv.sdk')
         faceviewDependency.appendNode('artifactId', 'faceview')
-        faceviewDependency.appendNode('version', '[1.0.0,2.0.0)')
+        faceviewDependency.appendNode('version', '[1.1.0,2.0.0)')
         def imageFaceDependency = dependenciesNode.appendNode('dependency')
         imageFaceDependency.appendNode('groupId', 'io.blockv.faces')
         imageFaceDependency.appendNode('artifactId', 'image-face')
@@ -76,7 +76,7 @@ publishing {
         def progressFaceDependency = dependenciesNode.appendNode('dependency')
         progressFaceDependency.appendNode('groupId', 'io.blockv.faces')
         progressFaceDependency.appendNode('artifactId', 'progress-image-face')
-        progressFaceDependency.appendNode('version', '[1.0.0,2.0.0)')
+        progressFaceDependency.appendNode('version', '[1.0.2,2.0.0)')
       }
     }
   }
