@@ -20,7 +20,12 @@ import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
 
-class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
+class FaceManagerImpl(
+  var resourceManager: ResourceManager,
+  var userManager: UserManager,
+  var vatomManager: VatomManager,
+  var eventManager: EventManager
+) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
   private var loader: FaceManager.ViewEmitter? = object : FaceManager.ViewEmitter {
@@ -97,10 +102,10 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
   override fun load(vatom: Vatom): FaceManager.Builder {
     return object : FaceManager.Builder {
 
-      var faceProcedure: FaceManager.FaceSelectionProcedure = FaceManager.EmbeddedProcedure.ICON.procedure
-      var errorView: View? = null
-      var loaderView: View? = null
-      var loaderDelay: Long = 0
+      override var faceProcedure: FaceManager.FaceSelectionProcedure = FaceManager.EmbeddedProcedure.ICON.procedure
+      override var errorView: View? = null
+      override var loaderView: View? = null
+      override var loaderDelay: Long = 0
 
       fun load(vatomView: VatomView): Callable<FaceView> {
         return Callable.single {
@@ -121,7 +126,15 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
           .runOn(Callable.Scheduler.COMP)
           .returnOn(Callable.Scheduler.MAIN)
           .map {
-            val view = it.second.emit(vatom, it.first, FaceBridge(resourceManager))
+            val view =
+              it.second.emit(
+                vatom, it.first, FaceBridge(
+                  resourceManager,
+                  userManager,
+                  vatomManager,
+                  eventManager
+                )
+              )
             vatomView.faceView = view
             view
           }
@@ -247,12 +260,12 @@ class FaceManagerImpl(var resourceManager: ResourceManager) : FaceManager {
         return this
       }
 
-      override fun setErrorView(view: View): FaceManager.Builder {
+      override fun setErrorView(view: View?): FaceManager.Builder {
         errorView = view
         return this
       }
 
-      override fun setLoaderView(view: View): FaceManager.Builder {
+      override fun setLoaderView(view: View?): FaceManager.Builder {
         loaderView = view
         return this
       }

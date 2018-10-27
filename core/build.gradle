@@ -34,6 +34,7 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation ("io.blockv.faces:image-face:1.0.4")
+  implementation ("io.blockv.faces:progress-image-face:1.0.0")
   implementation project(':common')
   implementation project(':face')
   implementation project(':faceview')
@@ -44,7 +45,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'core'
-def libraryVersion = '2.0.0'
+def libraryVersion = '2.1.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -65,7 +66,7 @@ publishing {
         def common = dependenciesNode.appendNode('dependency')
         common.appendNode('groupId', 'io.blockv.sdk')
         common.appendNode('artifactId', 'common')
-        common.appendNode('version', '1.0.0')
+        common.appendNode('version', '[1.1.0,2.0.0)')
       }
 
     }

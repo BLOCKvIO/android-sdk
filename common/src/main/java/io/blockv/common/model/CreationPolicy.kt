@@ -48,6 +48,16 @@ class CreationPolicy {
     this.policyCountMin = policyCountMin
   }
 
+  constructor(policy: CreationPolicy) : this(
+    policy.autoCreate,
+    policy.autoCreateCount,
+    policy.isAutoCreateCountRandom,
+    policy.isEnforcePolicyCountMax,
+    policy.isEnforcePolicyCountMin,
+    policy.policyCountMax,
+    policy.policyCountMin
+  )
+
   override fun toString(): String {
     return "CreationPolicy{" +
       "autoCreate='" + autoCreate + '\'' +

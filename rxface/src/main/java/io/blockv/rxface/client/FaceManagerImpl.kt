@@ -18,19 +18,20 @@ import io.blockv.common.model.Vatom
 import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
-import io.blockv.face.client.FaceBridge
+import io.blockv.face.client.*
 import io.blockv.face.client.FaceManager.EmbeddedProcedure
 import io.blockv.face.client.FaceManager.FaceSelectionProcedure
-import io.blockv.face.client.FaceView
-import io.blockv.face.client.VatomView
-import io.blockv.face.client.ViewFactory
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-class FaceManagerImpl(var resourceManager: ResourceManager) :
-  FaceManager {
+class FaceManagerImpl(
+  var resourceManager: ResourceManager,
+  var userManager: UserManager,
+  var vatomManager: VatomManager,
+  var eventManager: EventManager
+) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
   private var loader: FaceManager.ViewEmitter? = object :
@@ -109,10 +110,10 @@ class FaceManagerImpl(var resourceManager: ResourceManager) :
   override fun load(vatom: Vatom): FaceManager.Builder {
     return object : FaceManager.Builder {
 
-      var faceProcedure: FaceSelectionProcedure = EmbeddedProcedure.ICON.procedure
-      var errorView: View? = null
-      var loaderView: View? = null
-      var loaderDelay: Long = 0
+      override var faceProcedure: FaceSelectionProcedure = EmbeddedProcedure.ICON.procedure
+      override var errorView: View? = null
+      override var loaderView: View? = null
+      override var loaderDelay: Long = 0
 
       fun load(vatomView: VatomView): Single<FaceView> {
         return Single.fromCallable {
@@ -133,11 +134,16 @@ class FaceManagerImpl(var resourceManager: ResourceManager) :
           .subscribeOn(Schedulers.computation())
           .observeOn(AndroidSchedulers.mainThread())
           .map {
-            val view = it.second.emit(vatom, it.first, FaceBridge(
-              ResourceManagerWrapper(
-                resourceManager
+            val view = it.second.emit(
+              vatom, it.first, FaceBridge(
+                ResourceManagerWrapper(
+                  resourceManager
+                ),
+                userManager,
+                vatomManager,
+                eventManager
               )
-            ))
+            )
             vatomView.faceView = view
             view
           }
@@ -262,12 +268,12 @@ class FaceManagerImpl(var resourceManager: ResourceManager) :
         return this
       }
 
-      override fun setErrorView(view: View): FaceManager.Builder {
+      override fun setErrorView(view: View?): FaceManager.Builder {
         errorView = view
         return this
       }
 
-      override fun setLoaderView(view: View): FaceManager.Builder {
+      override fun setLoaderView(view: View?): FaceManager.Builder {
         loaderView = view
         return this
       }

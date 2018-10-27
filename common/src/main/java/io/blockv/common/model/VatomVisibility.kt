@@ -28,6 +28,8 @@ class VatomVisibility {
     this.value = value
   }
 
+  constructor(visibility: VatomVisibility) : this(visibility.type, visibility.value)
+
   override fun toString(): String {
     return "VatomVisibility{" +
       "type='" + type + '\'' +

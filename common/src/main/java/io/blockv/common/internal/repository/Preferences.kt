@@ -22,7 +22,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class Preferences(
-  context: Context,
+  val context: Context,
   private val jsonModule: JsonModule
 ) {
 

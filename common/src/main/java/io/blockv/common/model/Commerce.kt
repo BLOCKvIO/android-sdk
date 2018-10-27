@@ -22,6 +22,8 @@ class Commerce {
     this.pricing = pricing
   }
 
+  constructor(commerce: Commerce) : this(if (commerce.pricing != null) Pricing(commerce.pricing!!) else null)
+
   override fun toString(): String {
     return "Commerce{" +
       "pricing='" + pricing + '\'' +

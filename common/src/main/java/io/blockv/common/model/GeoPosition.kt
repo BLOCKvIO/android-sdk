@@ -28,6 +28,12 @@ class GeoPosition {
     this.coordinates = coordinates
   }
 
+  constructor(geoPosition: GeoPosition) : this(
+    geoPosition.type,
+    geoPosition.reqType,
+    ArrayList(geoPosition.coordinates)
+  )
+
   override fun toString(): String {
     return "GeoPos{" +
       "type='" + type + '\'' +

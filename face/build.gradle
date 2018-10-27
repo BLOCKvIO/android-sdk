@@ -37,13 +37,14 @@ dependencies {
   implementation project(':common')
   implementation project(':faceview')
   implementation ("io.blockv.faces:image-face:1.0.4")
+  implementation ("io.blockv.faces:progress-image-face:1.0.0")
 }
 repositories {
   mavenCentral()
 }
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'face'
-def libraryVersion = '1.0.0'
+def libraryVersion = '1.1.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -63,7 +64,7 @@ publishing {
         def commonDependency = dependenciesNode.appendNode('dependency')
         commonDependency.appendNode('groupId', 'io.blockv.sdk')
         commonDependency.appendNode('artifactId', 'common')
-        commonDependency.appendNode('version', '[1.0.0,2.0.0)')
+        commonDependency.appendNode('version', '[1.1.0,2.0.0)')
         def faceviewDependency = dependenciesNode.appendNode('dependency')
         faceviewDependency.appendNode('groupId', 'io.blockv.sdk')
         faceviewDependency.appendNode('artifactId', 'faceview')
@@ -72,6 +73,10 @@ publishing {
         imageFaceDependency.appendNode('groupId', 'io.blockv.faces')
         imageFaceDependency.appendNode('artifactId', 'image-face')
         imageFaceDependency.appendNode('version', '[1.0.4,2.0.0)')
+        def progressFaceDependency = dependenciesNode.appendNode('dependency')
+        progressFaceDependency.appendNode('groupId', 'io.blockv.faces')
+        progressFaceDependency.appendNode('artifactId', 'progress-image-face')
+        progressFaceDependency.appendNode('version', '[1.0.0,2.0.0)')
       }
     }
   }

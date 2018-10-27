@@ -32,6 +32,12 @@ class ChildPolicy {
   }
 
 
+  constructor(policy: ChildPolicy) : this(
+    policy.count,
+    policy.templateVariation,
+    if (policy.creationPolicy != null) CreationPolicy(policy.creationPolicy!!) else null
+  )
+
   override fun toString(): String {
     return "ChildPolicy{" +
       "count='" + count + '\'' +

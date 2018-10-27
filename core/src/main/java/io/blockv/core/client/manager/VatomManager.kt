@@ -12,6 +12,7 @@ package io.blockv.core.client.manager
 
 import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
 import org.json.JSONObject
@@ -196,6 +197,17 @@ interface VatomManager {
    * @return new Callable<Void>.
    */
   fun trashVatom(id: String): Callable<Void?>
+
+  /**
+   * Creates a new updated vAtom by merging properties from the state update
+   * into the provided vAtom model.
+   *
+   * @param vatom is the vAtom model to be updated.
+   * @param update is the state update to be merged into the vAtom.
+   * @return new Callable<Vatom>.
+   */
+  fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Callable<Vatom>
+
 
   enum class TokenType {
     EMAIL,
