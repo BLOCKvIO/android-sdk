@@ -34,8 +34,8 @@ dependencies {
   implementation project(':faceview')
   implementation project(':face')
   implementation ("io.blockv.faces:image-face:2.0.0")
-  implementation ("io.blockv.faces:image-progress-face:2.0.0")
-  implementation ("io.blockv.faces:image-policy-face:1.0.0")
+  implementation ("io.blockv.faces:image-progress-face:2.0.1")
+  implementation ("io.blockv.faces:image-policy-face:1.0.1")
 
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -47,7 +47,7 @@ repositories {
 }
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'rxface'
-def libraryVersion = '2.1.1'
+def libraryVersion = '2.1.2'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -83,11 +83,11 @@ publishing {
         def progressFaceDependency = dependenciesNode.appendNode('dependency')
         progressFaceDependency.appendNode('groupId', 'io.blockv.faces')
         progressFaceDependency.appendNode('artifactId', 'image-progress-face')
-        progressFaceDependency.appendNode('version', '[2.0.0,3.0.0)')
+        progressFaceDependency.appendNode('version', '[2.0.1,3.0.0)')
         def policyFaceDependency = dependenciesNode.appendNode('dependency')
         policyFaceDependency.appendNode('groupId', 'io.blockv.faces')
         policyFaceDependency.appendNode('artifactId', 'image-policy-face')
-        policyFaceDependency.appendNode('version', '[1.0.0,2.0.0)')
+        policyFaceDependency.appendNode('version', '[1.0.1,2.0.0)')
       }
     }
   }
