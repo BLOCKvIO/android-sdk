@@ -10,8 +10,8 @@ All notable changes to the rxcore module will be documented in this file.
 Released on 2018-10-26
 
 #### Updated
-- `Blockv` to use version 1.1.0 of [RxFace](/rxface) module.
-  - Pull Request [#90](https://github.com/BLOCKvIO/android-sdk/pull/90)
+- `Blockv` to use version 2.1.2 of [RxFace](/rxface) module.
+  - Pull Request [#94](https://github.com/BLOCKvIO/android-sdk/pull/94)
 
 ## [2.1.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/rxcore/2.1.0)
 Released on 2018-10-23
