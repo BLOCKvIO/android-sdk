@@ -283,6 +283,7 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
               synchronized(resultEmitters) {
                 resultEmitters.forEach {
                   it.onResult(file)
+                  it.onComplete()
                 }
               }
             }) {

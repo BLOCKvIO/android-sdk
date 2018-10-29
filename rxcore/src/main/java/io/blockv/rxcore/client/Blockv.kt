@@ -39,8 +39,7 @@ import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
 import io.blockv.common.util.Callable
-import io.blockv.faces.NativeImageFace
-import io.blockv.faces.ProgressImageFace
+import io.blockv.faces.*
 import io.blockv.rxcore.client.manager.*
 import io.blockv.rxface.client.FaceManager
 import io.blockv.rxface.client.FaceManagerImpl
@@ -84,126 +83,133 @@ class Blockv {
       if (internalFaceManager == null) {
         try {
           val encoder = ResourceEncoderImpl(preferences)
-          internalFaceManager =
-            FaceManagerImpl(io.blockv.rxface.client.ResourceManagerImpl(cacheDir, encoder),
-              object : io.blockv.face.client.UserManager {
-                override fun getPublicUser(userId: String): Callable<PublicUser?> {
-                  return Callable.create<PublicUser?> { emitter ->
-                    val disposable = userManager.getPublicUser(userId)
-                      .subscribe({
-                        emitter.onResult(it)
-                        emitter.onComplete()
-                      }, {
-                        emitter.onError(it)
-                      })
+          for (it in FaceManagerImpl::class.constructors) {
+            if (it.parameters.size == 1) {
+              internalFaceManager = it.call(io.blockv.rxface.client.ResourceManagerImpl(cacheDir, encoder))
+            } else
+              if (it.parameters.size == 4) {
+                internalFaceManager = it.call(io.blockv.rxface.client.ResourceManagerImpl(cacheDir, encoder),
+                  object : io.blockv.face.client.UserManager {
+                    override fun getPublicUser(userId: String): Callable<PublicUser?> {
+                      return Callable.create<PublicUser?> { emitter ->
+                        val disposable = userManager.getPublicUser(userId)
+                          .subscribe({
+                            emitter.onResult(it)
+                            emitter.onComplete()
+                          }, {
+                            emitter.onError(it)
+                          })
 
-                    emitter.doOnCompletion {
-                      disposable.dispose()
+                        emitter.doOnCompletion {
+                          disposable.dispose()
+                        }
+                      }
+                        .runOn(Callable.Scheduler.IO)
+                        .returnOn(Callable.Scheduler.MAIN)
                     }
-                  }
-                    .runOn(Callable.Scheduler.IO)
-                    .returnOn(Callable.Scheduler.MAIN)
-                }
 
-                override fun getCurrentUser(): Callable<PublicUser?> {
-                  return Callable.create<PublicUser?> { emitter ->
-                    val disposable = userManager.getCurrentUser()
-                      .subscribe({
-                        if (it == UserManager.NULL_USER) {
-                          emitter.onResult(null)
-                        } else
-                          emitter.onResult(
-                            PublicUser(
-                              it.id,
-                              if (it.isNamePublic) it.firstName else "",
-                              if (it.isNamePublic) it.lastName else "",
-                              if (it.isAvatarPublic) it.avatarUri else ""
-                            )
-                          )
-                        emitter.onComplete()
-                      }, {
-                        emitter.onError(it)
-                      })
+                    override fun getCurrentUser(): Callable<PublicUser?> {
+                      return Callable.create<PublicUser?> { emitter ->
+                        val disposable = userManager.getCurrentUser()
+                          .subscribe({
+                            if (it == UserManager.NULL_USER) {
+                              emitter.onResult(null)
+                            } else
+                              emitter.onResult(
+                                PublicUser(
+                                  it.id,
+                                  if (it.isNamePublic) it.firstName else "",
+                                  if (it.isNamePublic) it.lastName else "",
+                                  if (it.isAvatarPublic) it.avatarUri else ""
+                                )
+                              )
+                            emitter.onComplete()
+                          }, {
+                            emitter.onError(it)
+                          })
 
-                    emitter.doOnCompletion {
-                      disposable.dispose()
+                        emitter.doOnCompletion {
+                          disposable.dispose()
+                        }
+                      }
+                        .runOn(Callable.Scheduler.IO)
+                        .returnOn(Callable.Scheduler.MAIN)
                     }
-                  }
-                    .runOn(Callable.Scheduler.IO)
-                    .returnOn(Callable.Scheduler.MAIN)
-                }
 
-              },
-              object : io.blockv.face.client.VatomManager {
-                override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
-                  return Callable.create<List<Vatom>> { emitter ->
-                    val disposable = vatomManager.getVatoms(*ids)
-                      .subscribe({
-                        emitter.onResult(it)
-                        emitter.onComplete()
-                      }, {
-                        emitter.onError(it)
-                      })
-                    emitter.doOnCompletion { disposable.dispose() }
-                  }
-                    .runOn(Callable.Scheduler.IO)
-                    .returnOn(Callable.Scheduler.MAIN)
-                }
+                  },
+                  object : io.blockv.face.client.VatomManager {
+                    override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
+                      return Callable.create<List<Vatom>> { emitter ->
+                        val disposable = vatomManager.getVatoms(*ids)
+                          .subscribe({
+                            emitter.onResult(it)
+                            emitter.onComplete()
+                          }, {
+                            emitter.onError(it)
+                          })
+                        emitter.doOnCompletion { disposable.dispose() }
+                      }
+                        .runOn(Callable.Scheduler.IO)
+                        .returnOn(Callable.Scheduler.MAIN)
+                    }
 
-                override fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>> {
-                  return Callable.create<List<Vatom>> { emitter ->
-                    val disposable = vatomManager.getInventory(id, page, limit)
-                      .subscribe({
-                        emitter.onResult(it)
-                        emitter.onComplete()
-                      }, {
-                        emitter.onError(it)
-                      })
-                    emitter.doOnCompletion { disposable.dispose() }
-                  }
-                    .runOn(Callable.Scheduler.IO)
-                    .returnOn(Callable.Scheduler.MAIN)
-                }
+                    override fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>> {
+                      return Callable.create<List<Vatom>> { emitter ->
+                        val disposable = vatomManager.getInventory(id, page, limit)
+                          .subscribe({
+                            emitter.onResult(it)
+                            emitter.onComplete()
+                          }, {
+                            emitter.onError(it)
+                          })
+                        emitter.doOnCompletion { disposable.dispose() }
+                      }
+                        .runOn(Callable.Scheduler.IO)
+                        .returnOn(Callable.Scheduler.MAIN)
+                    }
 
-              },
-              object : io.blockv.face.client.EventManager {
-                override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
-                  return Callable.create<WebSocketEvent<StateUpdateEvent>> { emitter ->
-                    val disposable =
-                      eventManager.getVatomStateEvents()
-                        .subscribe({
-                          emitter.onResult(it)
-                          emitter.onComplete()
-                        }, {
-                          emitter.onError(it)
-                        })
-                    emitter.doOnCompletion { disposable.dispose() }
-                  }
-                    .runOn(Callable.Scheduler.IO)
-                    .returnOn(Callable.Scheduler.MAIN)
-                }
+                  },
+                  object : io.blockv.face.client.EventManager {
+                    override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
+                      return Callable.create<WebSocketEvent<StateUpdateEvent>> { emitter ->
+                        val disposable =
+                          eventManager.getVatomStateEvents()
+                            .subscribe({
+                              emitter.onResult(it)
+                              emitter.onComplete()
+                            }, {
+                              emitter.onError(it)
+                            })
+                        emitter.doOnCompletion { disposable.dispose() }
+                      }
+                        .runOn(Callable.Scheduler.IO)
+                        .returnOn(Callable.Scheduler.MAIN)
+                    }
 
-                override fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>> {
-                  return Callable.create<WebSocketEvent<InventoryEvent>> { emitter ->
-                    val disposable =
-                      eventManager.getInventoryEvents()
-                        .subscribe({
-                          emitter.onResult(it)
-                          emitter.onComplete()
-                        }, {
-                          emitter.onError(it)
-                        })
-                    emitter.doOnCompletion { disposable.dispose() }
-                  }
-                    .runOn(Callable.Scheduler.IO)
-                    .returnOn(Callable.Scheduler.MAIN)
-                }
+                    override fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>> {
+                      return Callable.create<WebSocketEvent<InventoryEvent>> { emitter ->
+                        val disposable =
+                          eventManager.getInventoryEvents()
+                            .subscribe({
+                              emitter.onResult(it)
+                              emitter.onComplete()
+                            }, {
+                              emitter.onError(it)
+                            })
+                        emitter.doOnCompletion { disposable.dispose() }
+                      }
+                        .runOn(Callable.Scheduler.IO)
+                        .returnOn(Callable.Scheduler.MAIN)
+                    }
 
+                  }
+
+                )
               }
-
-            )
-          internalFaceManager!!.registerFace(NativeImageFace.factory)
-          internalFaceManager!!.registerFace(ProgressImageFace.factory)
+          }
+          internalFaceManager!!.registerFace(ImageFace.factory)
+          internalFaceManager!!.registerFace(ImageProgressFace.factory)
+          internalFaceManager!!.registerFace(ImagePolicyFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {
