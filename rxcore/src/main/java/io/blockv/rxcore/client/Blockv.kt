@@ -39,8 +39,7 @@ import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
 import io.blockv.common.util.Callable
-import io.blockv.faces.NativeImageFace
-import io.blockv.faces.ProgressImageFace
+import io.blockv.faces.*
 import io.blockv.rxcore.client.manager.*
 import io.blockv.rxface.client.FaceManager
 import io.blockv.rxface.client.FaceManagerImpl
@@ -208,8 +207,9 @@ class Blockv {
                 )
               }
           }
-          internalFaceManager!!.registerFace(NativeImageFace.factory)
-          internalFaceManager!!.registerFace(ProgressImageFace.factory)
+          internalFaceManager!!.registerFace(ImageFace.factory)
+          internalFaceManager!!.registerFace(ImageProgressFace.factory)
+          internalFaceManager!!.registerFace(ImagePolicyFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {

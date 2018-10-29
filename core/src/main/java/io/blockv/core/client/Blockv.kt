@@ -43,8 +43,9 @@ import io.blockv.common.util.Callable
 import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
-import io.blockv.faces.NativeImageFace
-import io.blockv.faces.ProgressImageFace
+import io.blockv.faces.ImageFace
+import io.blockv.faces.ImagePolicyFace
+import io.blockv.faces.ImageProgressFace
 import java.io.File
 
 class Blockv {
@@ -137,8 +138,9 @@ class Blockv {
                   })
               }
           }
-          internalFaceManager!!.registerFace(NativeImageFace.factory)
-          internalFaceManager!!.registerFace(ProgressImageFace.factory)
+          internalFaceManager!!.registerFace(ImageFace.factory)
+          internalFaceManager!!.registerFace(ImageProgressFace.factory)
+          internalFaceManager!!.registerFace(ImagePolicyFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {
