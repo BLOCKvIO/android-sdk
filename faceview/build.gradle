@@ -26,19 +26,18 @@ android {
 }
 
 dependencies {
-  implementation fileTree(dir: 'libs', include: ['*.jar'])
-
   implementation 'com.android.support:appcompat-v7:27.1.1'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation project(':common')
+
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-  implementation project(':common')
 }
 
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'faceview'
-def libraryVersion = '1.0.0'
+def libraryVersion = '2.0.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -58,7 +57,7 @@ publishing {
         def dependencyNode = dependenciesNode.appendNode('dependency')
         dependencyNode.appendNode('groupId', 'io.blockv.sdk')
         dependencyNode.appendNode('artifactId', 'common')
-        dependencyNode.appendNode('version', '[1.0.0,2.0.0)')
+        dependencyNode.appendNode('version', '[1.1.1,2.0.0)')
       }
     }
   }

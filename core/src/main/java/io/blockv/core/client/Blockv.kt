@@ -11,6 +11,7 @@
 package io.blockv.core.client
 
 import android.content.Context
+import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.json.deserializer.EnvironmentDeserialzier
 import io.blockv.common.internal.json.deserializer.JwtDeserializer
@@ -37,7 +38,8 @@ import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.Environment
+import io.blockv.common.model.*
+import io.blockv.common.util.Callable
 import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
@@ -81,7 +83,60 @@ class Blockv {
       if (internalFaceManager == null) {
         try {
           val encoder = ResourceEncoderImpl(preferences)
-          internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
+          for (it in FaceManagerImpl::class.constructors) {
+            if (it.parameters.size == 1) {
+              internalFaceManager = it.call(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
+            } else
+              if (it.parameters.size == 4) {
+                internalFaceManager = it.call(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder),
+                  object : io.blockv.face.client.UserManager {
+                    override fun getCurrentUser(): Callable<PublicUser?> {
+                      return userManager.getCurrentUser()
+                        .map {
+                          if (it != null) {
+                            PublicUser(
+                              it.id,
+                              if (it.isNamePublic) it.firstName else "",
+                              if (it.isNamePublic) it.lastName else "",
+                              if (it.isAvatarPublic) it.avatarUri else ""
+                            )
+                          } else
+                            null
+                        }
+                    }
+
+                    override fun getPublicUser(userId: String): Callable<PublicUser?> {
+                      return userManager.getPublicUser(userId)
+                    }
+
+                  },
+                  object : io.blockv.face.client.VatomManager {
+                    override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
+                      return vatomManager.getVatoms(*ids)
+                    }
+
+                    override fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>> {
+                      return vatomManager.getInventory(id, page, limit)
+                    }
+
+                  },
+                  object : io.blockv.face.client.EventManager {
+                    override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
+                      return Callable.single {
+                        eventManager
+                      }
+                        .flatMap { eventManager.getVatomStateEvents() }
+                    }
+
+                    override fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>> {
+                      return Callable.single {
+                        eventManager
+                      }
+                        .flatMap { eventManager.getInventoryEvents() }
+                    }
+                  })
+              }
+          }
           internalFaceManager!!.registerFace(NativeImageFace.factory)
           internalFaceManager!!.registerFace(ProgressImageFace.factory)
         } catch (e: NoClassDefFoundError) {
