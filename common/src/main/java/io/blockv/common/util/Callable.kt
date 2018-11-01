@@ -12,10 +12,6 @@ package io.blockv.common.util
 
 import android.os.Handler
 import android.os.Looper
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.*
 
 
@@ -50,6 +46,19 @@ interface Callable<T> {
   fun doOnError(onError: ((Throwable) -> Unit)?): Callable<T>
 
   fun doOnError(onError: OnError?): Callable<T>
+
+  fun doOnSuccess(onSuccess: (() -> Unit)?): Callable<T>
+
+  fun doOnSuccess(onSuccess: OnSuccessful?): Callable<T>
+
+  fun doOnCancel(onCancel: (() -> Unit)?): Callable<T>
+
+  fun doOnCancel(onCancel: OnCancel?): Callable<T>
+
+  fun doOnResult(onResult: ((T) -> Unit)?): Callable<T>
+
+  fun doOnResult(onResult: OnResult<T>?): Callable<T>
+
 
   enum class Scheduler {
     IO {
@@ -144,6 +153,12 @@ interface Callable<T> {
 
         private var doOnError: ((Throwable) -> Unit)? = null
 
+        private var doOnCancel: (() -> Unit)? = null
+
+        private var doOnResult: ((T) -> Unit)? = null
+
+        private var doOnSuccess: (() -> Unit)? = null
+
         var flter: ((T) -> Boolean)? = null
 
         override fun filter(filter: ((T) -> Boolean)?): Callable<T> {
@@ -169,6 +184,7 @@ interface Callable<T> {
             }
 
             val oldDoFinally = doFinally
+
             doFinally {
               oldDoFinally?.invoke()
               emitter.onComplete()
@@ -277,6 +293,39 @@ interface Callable<T> {
           return this
         }
 
+        override fun doOnSuccess(onSuccess: (() -> Unit)?): Callable<T> {
+          this.doOnSuccess = onSuccess
+          return this
+        }
+
+        override fun doOnSuccess(onSuccess: OnSuccessful?): Callable<T> {
+          return doOnSuccess {
+            onSuccess?.onSuccess()
+          }
+        }
+
+        override fun doOnCancel(onCancel: (() -> Unit)?): Callable<T> {
+          this.doOnCancel = onCancel
+          return this
+        }
+
+        override fun doOnCancel(onCancel: OnCancel?): Callable<T> {
+          return doOnCancel {
+            onCancel?.onCancel()
+          }
+        }
+
+        override fun doOnResult(onResult: ((T) -> Unit)?): Callable<T> {
+          this.doOnResult = onResult
+          return this
+        }
+
+        override fun doOnResult(onResult: OnResult<T>?): Callable<T> {
+          return doOnResult {
+            onResult?.onResult(it)
+          }
+        }
+
         override fun runOn(scheduler: Scheduler): Callable<T> {
           this.execScheduler = scheduler
           return this
@@ -304,19 +353,37 @@ interface Callable<T> {
             private var onSuccess = success
             private var onError = error
             private val cancelable = CompositeCancellable()
+            @set:Synchronized
+            @get:Synchronized
             private var complete: Boolean = false
+            @set:Synchronized
+            @get:Synchronized
             private var canceled: Boolean = false
-            private var completion: (() -> Unit)? = null
+            @set:Synchronized
+            @get:Synchronized
+            private var errored: Boolean = false
+
+            private var completionHandler: ResultEmitter.Completion? = null
             private var filter: ((T) -> Boolean)? = flter
+
+            override var completion: ResultEmitter.Completion?
+              get() = completionHandler
+              set(value) {
+                completionHandler = value
+              }
 
             override val executionScheduler: Scheduler
               get() = resp
             override val responseScheduler: Scheduler
               get() = exec
 
-
             override fun doOnCompletion(onComplete: (() -> Unit)?) {
-              completion = onComplete
+              completion = if (onComplete != null) object : ResultEmitter.Completion {
+                override fun onComplete() {
+                  onComplete.invoke()
+                }
+              }
+              else null
             }
 
             @Synchronized
@@ -332,7 +399,13 @@ interface Callable<T> {
             @Synchronized
             override fun cancel() {
               canceled = true
-              onComplete()
+              if (!isComplete()) {
+                val internalCancel = doOnCancel
+                resp.execute(Runnable {
+                  internalCancel?.invoke()
+                })
+              }
+              finalize()
             }
 
             @Synchronized
@@ -340,9 +413,11 @@ interface Callable<T> {
               if (onSuccess != null && !isComplete() && !isCanceled()) {
                 if (filter == null || filter!!.invoke(result)) {
                   val internalSuccess = onSuccess
+                  val internalResult = doOnResult
                   lock.acquire()
                   resp.execute(Runnable {
                     if (!isCanceled()) {
+                      internalResult?.invoke(result)
                       internalSuccess?.invoke(result)
                     }
                     lock.release()
@@ -352,41 +427,58 @@ interface Callable<T> {
             }
 
             override fun onError(error: Throwable) {
+              this.errored = true
+              val internalError = doOnError
+
               if (onError != null && !isCanceled() && !isComplete()) {
                 val internalOnError = onError
                 val internalDoOnError = doOnError
                 resp.execute(Runnable {
                   if (!isCanceled()) {
+                    internalError?.invoke(error)
                     internalOnError?.invoke(error)
                     internalDoOnError?.invoke(error)
                   }
-                  onComplete()
+                  finalize()
                 })
 
               } else
                 if (!isCanceled() && !isComplete()) {
+                  internalError?.invoke(error)
+                  finalize()
                   throw error
                 }
             }
 
-            @Synchronized
-            override fun onComplete() {
-
+            fun finalize() {
               resp.execute(Runnable {
                 lock.acquire(concurrent)
                 complete = true
                 doFinally?.invoke()
-                completion?.invoke()
+                completion?.onComplete()
                 onSuccess = null
                 onError = null
                 cancelable.cancel()
                 cancelable.clear()
                 doFinally = null
+                doOnResult = null
+                doOnSuccess = null
+                doOnCancel = null
                 completion = null
                 filter = null
                 lock.release(concurrent)
               })
+            }
 
+            @Synchronized
+            override fun onComplete() {
+              if (!isCanceled() && !errored && !isComplete()) {
+                val temp = doOnSuccess
+                resp.execute(Runnable {
+                  temp?.invoke()
+                })
+              }
+              finalize()
             }
           }
           val cancel = CompositeCancellable()
@@ -437,7 +529,25 @@ interface Callable<T> {
     fun doFinally()
   }
 
+  @FunctionalInterface
+  interface OnSuccessful {
+    fun onSuccess()
+  }
+
+  @FunctionalInterface
+  interface OnCancel {
+    fun onCancel()
+  }
+
+  @FunctionalInterface
+  interface OnResult<T> {
+    fun onResult(result: T)
+  }
+
+
   interface ResultEmitter<T> {
+
+    var completion: Completion?
 
     val executionScheduler: Scheduler
 
@@ -453,6 +563,12 @@ interface Callable<T> {
 
     fun isCanceled(): Boolean
 
+    @Deprecated("Set completion instead")
     fun doOnCompletion(onComplete: (() -> Unit)?)
+
+    interface Completion {
+      fun onComplete()
+    }
   }
+
 }
