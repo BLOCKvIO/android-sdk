@@ -55,6 +55,60 @@ class CallableUtil {
         .returnOn(Callable.Scheduler.COMP)
     }
 
+    fun <T> retryWithDelay(
+      callable: Callable<T>,
+      retry: (retryCount: Int, throwable: Throwable) -> Long
+    ): Callable<Value<T>> {
+
+      return Callable.create<Value<T>> { emitter ->
+
+        val cancellable = CompositeCancellable()
+
+        var retryEmitter: Callable.ResultEmitter<Int>? = null
+
+        cancellable.add(Callable.create<Int> {
+          retryEmitter = it
+          it.onResult(0)
+        }
+          .runOn(Callable.Scheduler.COMP)
+          .returnOn(Callable.Scheduler.COMP)
+          .call({ count ->
+
+            cancellable.add(
+              callable
+                .doOnSuccess {
+                  emitter.onComplete()
+                }
+                .call({ value ->
+                  emitter.onResult(Value(value, null))
+                }, { throwable ->
+                  val delay = retry.invoke(count, throwable)
+                  if (delay >= 0) {
+                    timer(delay).call({ _ ->
+                      retryEmitter?.onResult(1 + count)
+                    }, {
+                      retryEmitter?.onResult(1 + count)
+                    })
+                  } else {
+                    retryEmitter?.onError(throwable)
+                  }
+                })
+            )
+
+          }, {
+            emitter.onError(it)
+          }))
+
+        emitter.completion = object : Callable.ResultEmitter.Completion {
+          override fun onComplete() {
+            cancellable.cancel()
+          }
+        }
+      }
+        .runOn(Callable.Scheduler.COMP)
+        .returnOn(Callable.Scheduler.COMP)
+    }
+
     fun <T, R> zipFirst(callables: List<Callable<T>>, combine: (values: List<T?>) -> R): Callable<R> {
 
       return Callable.create { emitter ->
@@ -98,7 +152,7 @@ class CallableUtil {
 
     fun timer(time: Long): Callable<Void?> {
 
-      return Callable.create { emitter ->
+      return Callable.create<Void?> { emitter ->
         val timer = Timer()
         timer.schedule(object : TimerTask() {
           override fun run() {
@@ -108,6 +162,9 @@ class CallableUtil {
         }, time)
         emitter.doOnCompletion { timer.cancel() }
       }
+        .runOn(Callable.Scheduler.COMP)
+        .returnOn(Callable.Scheduler.COMP)
+
     }
   }
 
