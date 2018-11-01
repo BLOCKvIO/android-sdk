@@ -1,6 +1,7 @@
 package io.blockv.common
 
 import io.blockv.common.util.Callable
+import io.blockv.common.util.CallableUtil
 import org.awaitility.Awaitility
 import org.junit.Assert
 import org.junit.Rule
@@ -162,7 +163,7 @@ class CallableUnitTest {
   }
 
   @Test
-  @Repeat(times = 1000, threads = 16)
+  //@Repeat(times = 1000, threads = 16)
   fun streamFlatMapTest() {
     var complete = false
     var result = ""
@@ -236,6 +237,124 @@ class CallableUnitTest {
       .until { complete }
 
     Assert.assertEquals(complete, true)
+
+  }
+
+  @Test
+  fun retryTest() {
+
+    val data = listOf("hello,", "how", "are", "you?", "I", "am", "good,", "thanks")
+
+    val test = Callable.create<String> {
+      val timer = Timer()
+      timer.scheduleAtFixedRate(object : TimerTask() {
+        var index = 0
+        override fun run() {
+          it.onResult(data[index])
+          index++
+          if (index >= data.size) {
+            it.onError(Throwable("Example error"))
+            timer.cancel()
+          }
+        }
+      }, 0, 100)
+    }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.IO)
+
+    var complete = false
+    var result = ""
+
+    CallableUtil.retry(test) { retryCount: Int, throwable: Throwable ->
+      retryCount == 0
+    }
+      .doFinally { complete = true }
+      .call({
+        if (it.value != null) {
+          result += " " + it.value
+        }
+      }, {})
+
+    Awaitility
+      .await()
+      .atMost(4000, TimeUnit.MILLISECONDS)
+      .until { complete }
+
+    Assert.assertEquals(" hello, how are you? I am good, thanks hello, how are you? I am good, thanks", result)
+
+  }
+
+  @Test
+  fun zipTest() {
+    var complete = false
+    var result = ""
+    CallableUtil
+      .zipFirst(
+        arrayListOf(Callable.single { "hello," }
+          .runOn(Callable.Scheduler.COMP)
+          .returnOn(Callable.Scheduler.COMP),
+          Callable.single { "how" }
+            .runOn(Callable.Scheduler.COMP)
+            .returnOn(Callable.Scheduler.COMP),
+          Callable.single { "are" }
+            .runOn(Callable.Scheduler.COMP)
+            .returnOn(Callable.Scheduler.COMP),
+          Callable.single { "you?" }
+            .runOn(Callable.Scheduler.COMP)
+            .returnOn(Callable.Scheduler.COMP)
+        )
+      ) {
+        var out = ""
+        it.forEach { value ->
+          out += value
+        }
+        out
+      }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .call({
+        result = it
+        complete = true
+      }, {
+
+      })
+
+    Awaitility
+      .await()
+      .atMost(1000, TimeUnit.MILLISECONDS)
+      .until { complete }
+
+    if (result.contains("hello,") &&
+      result.contains("how") &&
+      result.contains("are") &&
+      result.contains("you?")
+    ) {
+
+    } else
+      Assert.fail(result)
+
+  }
+
+
+  @Test
+  fun timerTest() {
+    var complete = false
+
+    CallableUtil
+      .timer(1000)
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .call({
+        complete = true
+      }, {
+
+      })
+
+    Awaitility
+      .await()
+      .atMost(1100, TimeUnit.MILLISECONDS)
+      .until { complete }
+
 
   }
 
