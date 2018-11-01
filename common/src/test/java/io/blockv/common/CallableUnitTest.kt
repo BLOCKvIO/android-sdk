@@ -284,6 +284,54 @@ class CallableUnitTest {
 
   }
 
+
+  @Test
+  fun retryWithDelayTest() {
+
+    val data = listOf("hello,", "how", "are", "you?", "I", "am", "good,", "thanks")
+
+    val test = Callable.create<String> {
+      val timer = Timer()
+      timer.scheduleAtFixedRate(object : TimerTask() {
+        var index = 0
+        override fun run() {
+          it.onResult(data[index])
+          index++
+          if (index >= data.size) {
+            it.onError(Throwable("Example error"))
+            timer.cancel()
+          }
+        }
+      }, 0, 100)
+    }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.IO)
+
+    var complete = false
+    var result = ""
+
+    CallableUtil.retryWithDelay(test) { retryCount: Int, throwable: Throwable ->
+      if (retryCount == 0)
+        2000
+      else -1
+    }
+      .doFinally { complete = true }
+      .call({
+        if (it.value != null) {
+          result += " " + it.value
+        }
+      }, {})
+
+    Awaitility
+      .await()
+      .atMost(4000, TimeUnit.MILLISECONDS)
+      .until { complete }
+
+    Assert.assertEquals(" hello, how are you? I am good, thanks hello, how are you? I am good, thanks", result)
+
+  }
+
+
   @Test
   fun zipTest() {
     var complete = false
@@ -354,7 +402,6 @@ class CallableUnitTest {
       .await()
       .atMost(1100, TimeUnit.MILLISECONDS)
       .until { complete }
-
 
   }
 
