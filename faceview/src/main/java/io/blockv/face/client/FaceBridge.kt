@@ -15,11 +15,7 @@ package io.blockv.face.client
  */
 class FaceBridge(
   val resourceManager: ResourceManager,
-  val userManager: UserManager?,
-  val vatomManager: VatomManager?,
-  val eventManager: EventManager?
-) {
-
-  constructor(resourceManager: ResourceManager) : this(resourceManager, null, null, null)
-
-}
+  val userManager: UserManager,
+  val vatomManager: VatomManager,
+  val eventManager: EventManager
+)
