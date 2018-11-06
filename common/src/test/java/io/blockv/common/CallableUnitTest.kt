@@ -38,6 +38,116 @@ class CallableUnitTest {
   }
 
   @Test
+  fun doOnSuccessTest() {
+    var success = false
+    Callable.single { "Test" }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .doOnSuccess {
+        success = true
+      }
+      .call({}, {})
+
+    Awaitility
+      .await()
+      .atMost(1000, TimeUnit.MILLISECONDS)
+      .until { success }
+  }
+
+  @Test
+  fun doOnErrorTest() {
+
+    var error = false
+    Callable.single { "Test" }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .map {
+        throw Exception("test")
+      }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .doOnError {
+        error = true
+      }
+      .call({}, {})
+
+    Awaitility
+      .await()
+      .atMost(1000, TimeUnit.MILLISECONDS)
+      .until { error }
+  }
+
+  @Test
+  fun doOnCancelTest() {
+
+    var canceled = false
+    val data = listOf("hello,", "how", "are", "you?", "I", "am", "good,", "thanks")
+    val cancel = createStringStream(data)
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .doOnCancel {
+        canceled = true
+      }
+      .call({}, {})
+
+    cancel.cancel()
+
+    Awaitility
+      .await()
+      .atMost(1000, TimeUnit.MILLISECONDS)
+      .until { canceled }
+  }
+
+  @Test
+  fun doFinallyTest() {
+
+    var canceled = false
+
+
+    val data = listOf("hello,", "how", "are", "you?", "I", "am", "good,", "thanks")
+    val cancel = createStringStream(data)
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .doFinally {
+        canceled = true
+      }
+      .call({}, {})
+
+    var error = false
+    Callable.single { "Test" }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .map {
+        throw Exception("test")
+      }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .doFinally {
+        error = true
+      }
+      .call({}, {})
+
+    var success = false
+    Callable.single { "Test" }
+      .runOn(Callable.Scheduler.COMP)
+      .returnOn(Callable.Scheduler.COMP)
+      .doFinally {
+        success = true
+      }
+      .call({}, {})
+
+
+    cancel.cancel()
+
+
+    Awaitility
+      .await()
+      .atMost(1000, TimeUnit.MILLISECONDS)
+      .until { canceled && error && success }
+
+  }
+
+  @Test
   fun basicTest() {
 
     var result: String? = null
@@ -136,7 +246,7 @@ class CallableUnitTest {
   }
 
   @Test
-  @Repeat(times = 100, threads = 16)
+  @Repeat(times = 1000, threads = 16)
   fun streamMapTest() {
     var complete = false
     var result = ""
@@ -163,14 +273,14 @@ class CallableUnitTest {
   }
 
   @Test
-  //@Repeat(times = 1000, threads = 16)
+  @Repeat(times = 1000, threads = 16)
   fun streamFlatMapTest() {
     var complete = false
     var result = ""
 
     createStringStream(listOf("hello,", "how", "are", "you?", "I", "am", "good,", "thanks"))
       .flatMap { Callable.single { " $it" } }
-      .doFinally { complete = true }
+      .doOnSuccess { complete = true }
       .runOn(Callable.Scheduler.IO)
       .returnOn(Callable.Scheduler.COMP)
       .call({
@@ -181,7 +291,7 @@ class CallableUnitTest {
 
     Awaitility
       .await()
-      .atMost(1500, TimeUnit.MILLISECONDS)
+      .atMost(2000, TimeUnit.MILLISECONDS)
       .until { complete }
 
     Assert.assertEquals(" hello, how are you? I am good, thanks", result)
