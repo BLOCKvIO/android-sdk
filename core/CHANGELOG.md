@@ -2,6 +2,7 @@
 All notable changes to the core module will be documented in this file.
 
 #### 2.x Releases
+- `2.3.x` Releases - [2.3.0](#230)
 - `2.2.x` Releases - [2.2.0](#220)
 - `2.1.x` Releases - [2.1.0](#210)
 - `2.0.x` Releases - [2.0.0](#200)
@@ -11,6 +12,13 @@ All notable changes to the core module will be documented in this file.
 - `1.1.x` Releases - [1.1.0](#110)
 ---
 
+## [2.3.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/core/2.3.0)
+Released on 2018-11-06
+
+#### Added
+- Included Layered Image Face
+  - Pull Request [#107](https://github.com/BLOCKvIO/android-sdk/pull/107)
+  
 ## [2.2.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/core/2.2.0)
 Released on 2018-10-26
 
