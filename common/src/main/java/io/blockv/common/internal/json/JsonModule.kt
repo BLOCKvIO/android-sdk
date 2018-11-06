@@ -102,7 +102,7 @@ class JsonModule {
 
   }
 
-  annotation class Serialize(val name: String = "", val path: String = "", val default: Boolean)
+  annotation class Serialize(val name: String = "", val path: String = "", val default: Boolean = true)
   annotation class Serializable
 
   open class JsonDeserializer<T> : Deserializer<T>() {
