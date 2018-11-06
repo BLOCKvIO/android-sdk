@@ -1,31 +1,16 @@
 package io.blockv.common.internal.json.deserializer
 
-import android.annotation.SuppressLint
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.util.JsonUtil
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
-import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.memberProperties
 
 class GenericDeserializer<T> : Deserializer<T>() {
-
-  companion object {
-    val booleanClass = Boolean::class
-    val stringClass = String::class
-    val intClass = Int::class
-    val floatClass = Float::class
-    val doubleClass = Double::class
-    val longClass = Long::class
-    val listClass = List::class
-    val mapClass = Map::class
-    val setClass = Set::class
-    val jsonObjectClass = JSONObject::class
-    val jsonArrayClass = JSONArray::class
-  }
 
   fun getConstructor(type: KClass<*>): KFunction<Any>? {
 
@@ -57,71 +42,184 @@ class GenericDeserializer<T> : Deserializer<T>() {
     data: JSONObject,
     deserializers: Map<KClass<*>, Deserializer<*>>
   ): Map<String, Any?> {
+
     val out = HashMap<String, Any?>()
     for (prop in type.memberProperties) {
-      val annotation: JsonModule.Serialize? = prop.annotations.find {
+      val annotation = prop.annotations.find {
         it is JsonModule.Serialize
-      } as JsonModule.Serialize
+      }
 
       if (annotation != null) {
+        annotation as JsonModule.Serialize
         val name = prop.name
         val fieldType: KClass<*> = prop.returnType.classifier as KClass<*>
         val json = getJsonObjectForPath(data, annotation.path)
         val jsonName = if (annotation.name.isNotEmpty()) annotation.name else name
+
         out[name] =
           if ((json == null || !json.has(jsonName) || json.isNull(jsonName))) {
+            //handle null/missing json
             when {
-              prop.returnType.isMarkedNullable -> null
-              annotation.default -> when {
-                booleanClass.isSubclassOf(fieldType) -> false
-                stringClass.isSubclassOf(fieldType) -> ""
-                intClass.isSubclassOf(fieldType) -> 0
-                floatClass.isSubclassOf(fieldType) -> 0f
-                doubleClass.isSubclassOf(fieldType) -> 0.0
-                longClass.isSubclassOf(fieldType) -> 0L
-                jsonObjectClass.isSubclassOf(fieldType) -> JSONObject()
-                jsonArrayClass.isSubclassOf(fieldType) -> JSONArray()
-                listClass.isSubclassOf(fieldType) -> ArrayList<Any>()
-                mapClass.isSubclassOf(fieldType) -> HashMap<Any, Any>()
-                setClass.isSubclassOf(fieldType) -> HashSet<Any>()
+              annotation.default -> when (fieldType) {
+                Boolean::class -> false
+                String::class -> ""
+                Int::class -> 0
+                Float::class -> 0f
+                Double::class -> 0.0
+                Long::class -> 0L
+                JSONObject::class -> JSONObject()
+                JSONArray::class -> JSONArray()
+                List::class -> ArrayList<Any>()
+                Map::class -> HashMap<Any, Any>()
+                Set::class -> HashSet<Any>()
                 else -> throw Exception("Deserialization Unknown type : " + type.simpleName + " - " + name)
               }
+              prop.returnType.isMarkedNullable -> null
               else -> throw Exception("Deserialization key not found : " + type.simpleName + " - " + name)
             }
           } else {
-            when {
-              deserializers.containsKey(fieldType) -> deserializers[fieldType]!!.deserialize(
+
+            if (deserializers.containsKey(fieldType)) {
+              deserializers[fieldType]!!.deserialize(
                 fieldType,
                 json.getJSONObject(jsonName),
                 deserializers
               )
-              booleanClass.isSubclassOf(fieldType) -> json.getBoolean(jsonName)
-              stringClass.isSubclassOf(fieldType) -> json.getString(jsonName)
-              intClass.isSubclassOf(fieldType) -> json.getInt(jsonName)
-              floatClass.isSubclassOf(fieldType) -> json.getDouble(jsonName).toFloat()
-              doubleClass.isSubclassOf(fieldType) -> json.getDouble(jsonName)
-              longClass.isSubclassOf(fieldType) -> json.getDouble(jsonName).toLong()
-              jsonObjectClass.isSubclassOf(fieldType) -> json.getJSONObject(jsonName)
-              jsonArrayClass.isSubclassOf(fieldType) -> json.getJSONArray(jsonName)
-              listClass.isSubclassOf(fieldType) -> {
-                val jsonArray = json.getJSONArray(jsonName)
-                val list = ArrayList<Any>()
-                (0 until jsonArray.length()).forEach {
-                  jsonArray.
+            } else
+              when (fieldType) {
+
+                Boolean::class -> json.getBoolean(jsonName)
+                String::class -> json.getString(jsonName)
+                Int::class -> json.getInt(jsonName)
+                Float::class -> json.getDouble(jsonName).toFloat()
+                Double::class -> json.getDouble(jsonName)
+                Long::class -> json.getDouble(jsonName).toLong()
+                JSONObject::class -> json.getJSONObject(jsonName)
+                JSONArray::class -> json.getJSONArray(jsonName)
+                List::class -> {
+                  val jsonArray = json.getJSONArray(jsonName)
+                  val list = ArrayList<Any>()
+                  if (prop.returnType.arguments[0].type != null) {
+                    val innerType = (prop.returnType.arguments[0].type)?.classifier as KClass<*>
+
+                    val add = java.util.ArrayList::class.declaredFunctions.find {
+                      it.name == "add"
+                    }
+                    (0 until jsonArray.length()).forEach {
+
+                      add?.call(
+                        list, when (innerType) {
+                          Boolean::class -> jsonArray.getBoolean(it)
+                          String::class -> jsonArray.getString(it)
+                          Int::class -> jsonArray.getInt(it)
+                          Float::class -> jsonArray.getDouble(it).toFloat()
+                          Double::class -> jsonArray.getDouble(it)
+                          Long::class -> jsonArray.getDouble(it).toLong()
+                          JSONObject::class -> jsonArray.getJSONObject(it)
+                          JSONArray::class -> jsonArray.getJSONArray(it)
+                          else -> if (
+                            jsonArray.optJSONObject(it) != null) {
+                            deserialize(
+                              innerType,
+                              jsonArray.getJSONObject(it),
+                              deserializers
+                            )
+                          } else
+                            null
+                        }
+                      )
+                    }
+                  }
+                  list
+                }
+                Map::class -> {
+                  val jsonObject = json.getJSONObject(jsonName)
+
+                  val map = HashMap<String, Any>()
+
+                  if (prop.returnType.arguments[0].type != null && prop.returnType.arguments[1].type != null) {
+                    val keyType = (prop.returnType.arguments[0].type)?.classifier as KClass<*>
+                    val valueType = (prop.returnType.arguments[1].type) as KClass<*>
+
+                    if (keyType != String::class) {
+                      throw Exception("Map key type must be string ${keyType.simpleName} - $name")
+                    }
+
+                    val put = java.util.HashMap::class.declaredFunctions.find {
+                      it.name == "put"
+                    }
+
+                    jsonObject.keys().forEach {
+                      put?.call(
+                        map, it, when (valueType) {
+                          Boolean::class -> json.getBoolean(jsonName)
+                          String::class -> json.getString(jsonName)
+                          Int::class -> json.getInt(jsonName)
+                          Float::class -> json.getDouble(jsonName).toFloat()
+                          Double::class -> json.getDouble(jsonName)
+                          Long::class -> json.getDouble(jsonName).toLong()
+                          JSONObject::class -> json.getJSONObject(jsonName)
+                          JSONArray::class -> json.getJSONArray(jsonName)
+                          else -> if (
+                            JsonUtil.isJsonObject(json, jsonName)) {
+                            deserialize(
+                              valueType,
+                              json.getJSONObject(jsonName),
+                              deserializers
+                            )
+                          } else
+                            null
+                        }
+                      )
+                    }
+
+                  }
+                  map
+                }
+                Set::class -> {
+                  val jsonArray = json.getJSONArray(jsonName)
+
+                  val list = HashSet<Any>()
+
+                  if (list != null && prop.returnType.arguments[0].type != null) {
+                    val innerType = (prop.returnType.arguments[0].type)?.classifier as KClass<*>
+
+                    val add = java.util.HashSet::class.declaredFunctions.find {
+                      it.name == "add"
+                    }
+                    (0 until jsonArray.length()).forEach {
+
+                      add?.call(
+                        list, when (innerType) {
+                          Boolean::class -> jsonArray.getBoolean(it)
+                          String::class -> jsonArray.getString(it)
+                          Int::class -> jsonArray.getInt(it)
+                          Float::class -> jsonArray.getDouble(it).toFloat()
+                          Double::class -> jsonArray.getDouble(it)
+                          Long::class -> jsonArray.getDouble(it).toLong()
+                          JSONObject::class -> jsonArray.getJSONObject(it)
+                          JSONArray::class -> jsonArray.getJSONArray(it)
+                          else -> if (
+                            jsonArray.optJSONObject(it) != null) {
+                            deserialize(
+                              innerType,
+                              jsonArray.getJSONObject(it),
+                              deserializers
+                            )
+                          } else
+                            null
+                        }
+                      )
+                    }
+                  }
+                  list
+                }
+                else -> {
+                  deserialize(fieldType, json.getJSONObject(jsonName), deserializers)
                 }
 
               }
-              mapClass.isSubclassOf(fieldType) -> {
-
-              }
-              setClass.isSubclassOf(fieldType) -> {
-
-              }
-              else -> throw Exception("Deserialization Unknown type : " + type.simpleName + " - " + name)
-            }
           }
-
-        Log.e("deserilizer", name + " - " + prop.returnType)
       }
 
     }
@@ -135,8 +233,33 @@ class GenericDeserializer<T> : Deserializer<T>() {
     deserializers: Map<KClass<*>, Deserializer<*>>
   ): T? {
 
-    getValues(type, data, deserializers)
-    return null
+    val values = getValues(type, data, deserializers)
+
+    val constructor = type.constructors.find { constructor ->
+      constructor.annotations.find {
+        it is JsonModule.Serializable
+      } != null
+    }
+
+    val instance = constructor?.call(
+      *(constructor.parameters.map { values[it.name] }.toTypedArray())
+    ) ?: type.constructors.find {
+      it.parameters.isEmpty()
+    }?.call() ?: throw Exception("No serializable constructor found -" + type.simpleName)
+
+    type.memberProperties.forEach { prop ->
+
+      val annotation = prop.annotations.find {
+        it is JsonModule.Serialize
+      }
+
+      if (annotation != null && !prop.isConst && prop is KMutableProperty<*>) {
+
+        prop.setter.call(instance, values[prop.name])
+      }
+    }
+
+    return instance as T
   }
 
 }
