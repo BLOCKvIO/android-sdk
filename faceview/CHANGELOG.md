@@ -2,7 +2,10 @@
 All notable changes to the faceview module will be documented in this file.
 
 #### 2.x Releases
-- `2.0.x` Releases - [2.0.0](#200)|[2.0.1](#200)
+- `2.0.x` Releases - [2.0.0](#200)|[2.0.1](#201)
+---
+#### 1.x Releases
+- `1.0.x` Releases - [1.0.0](#100)
 ---
 
 ## [2.0.1](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/faceview/2.0.1)
@@ -12,9 +15,6 @@ Released on 2018-11-06
 - Bundled common module version.
  - Pull Request [#106](https://github.com/BLOCKvIO/android-sdk/pull/106)
 
-#### 1.x Releases
-- `1.0.x` Releases - [1.0.0](#100)
----
 ## [2.0.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/faceview/2.0.0)
 Released on 2018-10-26
 
