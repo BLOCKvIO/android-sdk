@@ -105,7 +105,7 @@ class VatomProperty() {
 
   private val _resources: HashMap<String, Resource> = HashMap<String, Resource>()
 
-  @JsonModule.Serialize(name = "child_policy")
+  @JsonModule.Serialize(name = "child_policy", default = false)
   var childPolicy: List<ChildPolicy>? = null
 
   @JsonModule.Serialize
