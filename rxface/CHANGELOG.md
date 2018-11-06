@@ -10,7 +10,7 @@ All notable changes to the face module will be documented in this file.
 - `1.0.x` Releases - [1.0.0](#100)
 ---
 ## [2.2.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/face/2.2.0)
-Released on 2018-11-08
+Released on 2018-11-06
 
 #### Added
 - Image Layered Face dependency.
