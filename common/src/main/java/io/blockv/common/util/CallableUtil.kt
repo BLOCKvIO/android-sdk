@@ -131,7 +131,7 @@ class CallableUtil {
                     count++
                     if (count >= callables.size) {
                       val list = ArrayList<T?>()
-                      out.keys.forEach { key ->
+                      callables.forEach { key ->
                         list.add(out[key])
                       }
                       emitter.onResult(combine.invoke(list))
