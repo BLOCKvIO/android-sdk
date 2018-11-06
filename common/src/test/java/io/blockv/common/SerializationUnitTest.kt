@@ -1,5 +1,6 @@
 package io.blockv.common
 
+import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.json.deserializer.GenericDeserializer
 import io.blockv.common.model.Vatom
@@ -278,18 +279,18 @@ class SerializationUnitTest {
   @Test
   fun basicTest() {
 
-    val temp = GenericDeserializer<Any>()
+    val generic = GenericDeserializer<Any>()
+
+    val jsonModule = JsonModule()
 
     val data = JSONObject(vatom)
 
-    try {
 
-      val vatom = temp.deserialize(Vatom::class, data, HashMap())
+    val vatom = generic.deserialize(Vatom::class, data, HashMap())
 
-    } catch (e: Exception) {
-      System.err.println(e)
-    }
-    Assert.assertTrue(true)
+    val vatom1 = jsonModule.deserialize<Vatom>(data, Vatom::class)
+
+    Assert.assertEquals(vatom1.toString(), vatom.toString())
   }
 
 }
