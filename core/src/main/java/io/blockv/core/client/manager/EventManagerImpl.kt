@@ -79,7 +79,7 @@ class EventManagerImpl(
       .map {
         var updateEvent: WebSocketEvent<StateUpdateEvent> = NULL_STATE_EVENT
         if (it.payload != null) {
-          val stateEvent = jsonModule.deserialize<StateUpdateEvent>(it.payload!!, StateUpdateEvent::class)
+          val stateEvent = jsonModule.deserialize<StateUpdateEvent>(it.payload!!)
           if (stateEvent != null) {
             updateEvent = WebSocketEvent(
               it.messageType,
@@ -102,7 +102,7 @@ class EventManagerImpl(
       .map {
         var event: WebSocketEvent<InventoryEvent> = NULL_INVENTORY_EVENT
         if (it.payload != null) {
-          val inventoryEvent = jsonModule.deserialize<InventoryEvent>(it.payload!!, InventoryEvent::class)
+          val inventoryEvent = jsonModule.deserialize<InventoryEvent>(it.payload!!)
           if (inventoryEvent != null) {
             event = WebSocketEvent(
               it.messageType,
@@ -125,7 +125,7 @@ class EventManagerImpl(
       .map {
         var event: WebSocketEvent<ActivityEvent> = NULL_ACTIVITY_EVENT
         if (it.payload != null) {
-          val activityEvent = jsonModule.deserialize<ActivityEvent>(it.payload!!, ActivityEvent::class)
+          val activityEvent = jsonModule.deserialize<ActivityEvent>(it.payload!!)
           if (activityEvent != null) {
             event = WebSocketEvent(
               it.messageType,
