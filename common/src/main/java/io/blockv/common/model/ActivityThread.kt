@@ -13,7 +13,7 @@ package io.blockv.common.model
 import io.blockv.common.internal.json.serializer.Serializer
 
 class ActivityThread {
-  @Serializer.Serialize
+  @Serializer.Serialize(name = "name")
   val id: String
   @Serializer.Serialize(name = "when_modified")
   val whenModified: Long

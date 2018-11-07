@@ -15,7 +15,7 @@ import io.blockv.common.internal.json.serializer.Serializer
 class Pricing {
 
   @Serializer.Serialize
-  var priceType: String?
+  var pricingType: String?
   @Serializer.Serialize(path = "value")
   var currency: String?
   @Serializer.Serialize(path = "value")
@@ -29,14 +29,14 @@ class Pricing {
 
   @Serializer.Serializable
   constructor(
-    priceType: String?,
+    pricingType: String?,
     currency: String?,
     price: String?,
     validFrom: String?,
     validThrough: String?,
     isVatIncluded: Boolean
   ) {
-    this.priceType = priceType
+    this.pricingType = pricingType
     this.currency = currency
     this.price = price
     this.validFrom = validFrom
@@ -45,7 +45,7 @@ class Pricing {
   }
 
   constructor(pricing: Pricing) : this(
-    pricing.priceType,
+    pricing.pricingType,
     pricing.currency,
     pricing.price,
     pricing.validFrom,
@@ -55,7 +55,7 @@ class Pricing {
 
   override fun toString(): String {
     return "Pricing{" +
-      "priceType='" + priceType + '\'' +
+      "pricingType='" + pricingType + '\'' +
       ", currency='" + currency + '\'' +
       ", price='" + price + '\'' +
       ", validFrom='" + validFrom + '\'' +

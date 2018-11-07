@@ -47,9 +47,6 @@ class VatomProperty() {
   @Serializer.Serialize(name = "in_contract_with")
   var inContractWith: String? = null
 
-  @Serializer.Serialize(name = "in_reaction")
-  var isInReaction: Boolean = false
-
   @Serializer.Serialize(name = "notify_msg")
   var notifyMsg: String? = null
 
@@ -64,12 +61,6 @@ class VatomProperty() {
 
   @Serializer.Serialize(name = "publisher_fqdn")
   var publisherFqdn: String? = null
-
-  @Serializer.Serialize(name = "reacted_by")
-  var reactedBy: String? = null
-
-  @Serializer.Serialize(name = "reaction_expires")
-  var reactionExpires: String? = null
 
   @Serializer.Serialize(name = "root_type")
   var rootType: String? = null
@@ -126,14 +117,11 @@ class VatomProperty() {
     this.geoPos = if (property.geoPos != null) GeoPosition(property.geoPos!!) else null
     this.isInContract = property.isInContract
     this.inContractWith = property.inContractWith
-    this.isInReaction = property.isInReaction
     this.notifyMsg = property.notifyMsg
     this.numDirectClones = property.numDirectClones
     this.owner = property.owner
     this.parentId = property.parentId
     this.publisherFqdn = property.publisherFqdn
-    this.reactedBy = property.reactedBy
-    this.reactionExpires = property.reactionExpires
     this.rootType = property.rootType
     this.tags = property.tags
     this.templateId = property.templateId
@@ -166,14 +154,11 @@ class VatomProperty() {
       ", geoPos=" + geoPos +
       ", inContract=" + isInContract +
       ", inContractWith='" + inContractWith + '\'' +
-      ", inReaction=" + isInReaction +
       ", notifyMsg='" + notifyMsg + '\'' +
       ", numDirectClones=" + numDirectClones +
       ", owner='" + owner + '\'' +
       ", parentId='" + parentId + '\'' +
       ", publisherFqdn='" + publisherFqdn + '\'' +
-      ", reactedBy='" + reactedBy + '\'' +
-      ", reactionExpires='" + reactionExpires + '\'' +
       ", rootType='" + rootType + '\'' +
       ", tags=" + tags +
       ", templateId='" + templateId + '\'' +
