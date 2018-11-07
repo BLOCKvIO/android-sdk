@@ -19,6 +19,7 @@ import com.neovisionaries.ws.client.WebSocketFrame
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.repository.Preferences
+import io.blockv.common.model.GenericSocketEvent
 import io.blockv.common.model.WebSocketEvent
 import org.json.JSONObject
 
@@ -39,7 +40,7 @@ class WebsocketImpl(
       override fun onTextMessage(websocket: WebSocket?, message: String?) {
         if (message != null) {
           try {
-            val event: WebSocketEvent<JSONObject>? =
+            val event: GenericSocketEvent? =
               jsonModule.deserialize(JSONObject(message))
             if (event != null) {
               listener.onEvent(event)
