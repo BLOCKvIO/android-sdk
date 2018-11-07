@@ -19,11 +19,13 @@ class GenericSerializer : Serializer<Any> {
     for (it in clss.memberProperties) {
       val fieldType = it.returnType.classifier as KClass<*>
 
-      val annotation: Serializer.Serialize? = it.annotations.find { annotation ->
+      val annotation: Annotation? = it.annotations.find { annotation ->
         annotation is Serializer.Serialize
-      } as Serializer.Serialize
+      }
 
       if (annotation != null) {
+        annotation as Serializer.Serialize
+
         val name = if (annotation.name.isEmpty()) it.name else annotation.name
 
         val outPath = if (annotation.path.isNotEmpty()) {
