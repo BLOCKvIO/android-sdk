@@ -10,12 +10,26 @@
  */
 package io.blockv.common.model
 
-class GeoGroup(
-  val geoHash: String,
-  val longitude: Double,
-  val latitude: Double,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class GeoGroup {
+
+  @Serializer.Serialize(name = "key")
+  val geoHash: String
+  @Serializer.Serialize(name = "lon")
+  val longitude: Double
+  @Serializer.Serialize(name = "lat")
+  val latitude: Double
+  @Serializer.Serialize(name = "count")
   val count: Int
-) {
+
+  @Serializer.Serializable
+  constructor(geoHash: String, longitude: Double, latitude: Double, count: Int) {
+    this.geoHash = geoHash
+    this.longitude = longitude
+    this.latitude = latitude
+    this.count = count
+  }
 
   override fun toString(): String {
     return "GeoGroup{" +

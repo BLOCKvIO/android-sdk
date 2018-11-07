@@ -10,15 +10,44 @@
  */
 package io.blockv.common.model
 
-class InventoryEvent(
-  val eventId: String,
-  val operation: String,
-  val vatomId: String,
-  val newOwnerId: String,
-  val oldOwnerId: String,
-  val templateVariationId: String,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class InventoryEvent {
+
+  @Serializer.Serialize(name = "event_id")
+  val eventId: String
+  @Serializer.Serialize(name = "op")
+  val operation: String
+  @Serializer.Serialize(name = "id")
+  val vatomId: String
+  @Serializer.Serialize(name = "new_owner")
+  val newOwnerId: String
+  @Serializer.Serialize(name = "old_owner")
+  val oldOwnerId: String
+  @Serializer.Serialize(name = "template_variation")
+  val templateVariationId: String
+  @Serializer.Serialize(name = "parent_id")
   val parentId: String
-) {
+
+  @Serializer.Serializable
+  constructor(
+    eventId: String,
+    operation: String,
+    vatomId: String,
+    newOwnerId: String,
+    oldOwnerId: String,
+    templateVariationId: String,
+    parentId: String
+  ) {
+    this.eventId = eventId
+    this.operation = operation
+    this.vatomId = vatomId
+    this.newOwnerId = newOwnerId
+    this.oldOwnerId = oldOwnerId
+    this.templateVariationId = templateVariationId
+    this.parentId = parentId
+  }
+
 
   override fun toString(): String {
     return "InventoryEvent{" +

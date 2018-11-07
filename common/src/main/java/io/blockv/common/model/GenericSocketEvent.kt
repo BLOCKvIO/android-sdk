@@ -11,22 +11,27 @@
 package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
+import org.json.JSONObject
 
-class Commerce {
+class GenericSocketEvent : WebSocketEvent<JSONObject> {
 
-  @Serializer.Serialize
-  var pricing: Pricing?
+  @Serializer.Serialize(name = "msg_type")
+  override val messageType: String
+  @Serializer.Serialize(name = "user_id")
+  override val userId: String
+  @Serializer.Serialize(name = "payload")
+  override val payload: JSONObject
 
   @Serializer.Serializable
-  constructor(pricing: Pricing?) {
-    this.pricing = pricing
+  constructor(
+    messageType: String,
+    userId: String,
+    payload: JSONObject
+  ) : super(messageType, userId, payload) {
+
+    this.messageType = messageType
+    this.userId = userId
+    this.payload = payload
   }
 
-  constructor(commerce: Commerce) : this(if (commerce.pricing != null) Pricing(commerce.pricing!!) else null)
-
-  override fun toString(): String {
-    return "Commerce{" +
-      "pricing='" + pricing + '\'' +
-      "}"
-  }
 }

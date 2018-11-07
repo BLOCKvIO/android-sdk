@@ -40,7 +40,7 @@ class WebsocketImpl(
         if (message != null) {
           try {
             val event: WebSocketEvent<JSONObject>? =
-              jsonModule.deserialize(JSONObject(message), WebSocketEvent::class)
+              jsonModule.deserialize(JSONObject(message))
             if (event != null) {
               listener.onEvent(event)
             }

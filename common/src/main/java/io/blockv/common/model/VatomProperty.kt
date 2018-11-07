@@ -10,92 +10,92 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 
 class VatomProperty() {
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var commerce: Commerce? = null
 
-  @JsonModule.Serialize(name = "acquirable")
+  @Serializer.Serialize(name = "acquirable")
   var isAcquireable: Boolean = false
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var author: String? = null
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var category: String? = null
 
-  @JsonModule.Serialize(name = "cloned_from")
+  @Serializer.Serialize(name = "cloned_from")
   var clonedFrom: String? = null
 
-  @JsonModule.Serialize(name = "cloning_score")
+  @Serializer.Serialize(name = "cloning_score")
   var cloningScore: Float? = 0f
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var description: String? = null
 
-  @JsonModule.Serialize(name = "dropped")
+  @Serializer.Serialize(name = "dropped")
   var isDropped: Boolean = false
 
-  @JsonModule.Serialize(name = "geo_pos")
+  @Serializer.Serialize(name = "geo_pos")
   var geoPos: GeoPosition? = null
 
-  @JsonModule.Serialize(name = "in_contract")
+  @Serializer.Serialize(name = "in_contract")
   var isInContract: Boolean = false
 
-  @JsonModule.Serialize(name = "in_contract_with")
+  @Serializer.Serialize(name = "in_contract_with")
   var inContractWith: String? = null
 
-  @JsonModule.Serialize(name = "in_reaction")
+  @Serializer.Serialize(name = "in_reaction")
   var isInReaction: Boolean = false
 
-  @JsonModule.Serialize(name = "notify_msg")
+  @Serializer.Serialize(name = "notify_msg")
   var notifyMsg: String? = null
 
-  @JsonModule.Serialize(name = "num_direct_clones")
+  @Serializer.Serialize(name = "num_direct_clones")
   var numDirectClones: Int? = 0
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var owner: String? = null
 
-  @JsonModule.Serialize(name = "parent_id")
+  @Serializer.Serialize(name = "parent_id")
   var parentId: String? = null
 
-  @JsonModule.Serialize(name = "publisher_fqdn")
+  @Serializer.Serialize(name = "publisher_fqdn")
   var publisherFqdn: String? = null
 
-  @JsonModule.Serialize(name = "reacted_by")
+  @Serializer.Serialize(name = "reacted_by")
   var reactedBy: String? = null
 
-  @JsonModule.Serialize(name = "reaction_expires")
+  @Serializer.Serialize(name = "reaction_expires")
   var reactionExpires: String? = null
 
-  @JsonModule.Serialize(name = "root_type")
+  @Serializer.Serialize(name = "root_type")
   var rootType: String? = null
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var tags: List<String>? = null
 
-  @JsonModule.Serialize(name = "template")
+  @Serializer.Serialize(name = "template")
   var templateId: String = ""
 
-  @JsonModule.Serialize(name = "template_variation")
+  @Serializer.Serialize(name = "template_variation")
   var templateVariationId: String = ""
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var title: String? = null
 
-  @JsonModule.Serialize(name = "transferable")
+  @Serializer.Serialize(name = "transferable")
   var isTransferable: Boolean = false
 
-  @JsonModule.Serialize(name = "transferred_by")
+  @Serializer.Serialize(name = "transferred_by")
   var transferredBy: String? = null
 
-  @JsonModule.Serialize(name = "redeemable")
+  @Serializer.Serialize(name = "redeemable")
   var isRedeemable: Boolean = false
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var resources: List<Resource> = ArrayList()
     set(value) {
       field = value
@@ -105,13 +105,13 @@ class VatomProperty() {
 
   private val _resources: HashMap<String, Resource> = HashMap<String, Resource>()
 
-  @JsonModule.Serialize(name = "child_policy", default = false)
+  @Serializer.Serialize(name = "child_policy", default = false)
   var childPolicy: List<ChildPolicy>? = null
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var visibility: VatomVisibility? = null
 
-  @JsonModule.Serialize(name = "tradeable")
+  @Serializer.Serialize(name = "tradeable")
   var isTradeable: Boolean = false
 
   constructor(property: VatomProperty) : this() {

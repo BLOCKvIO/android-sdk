@@ -10,17 +10,17 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 
 class Resource {
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var name: String
-  @JsonModule.Serialize(name = "resourceType")
+  @Serializer.Serialize(name = "resourceType")
   var type: String
-  @JsonModule.Serialize(name = "value", path = "value")
+  @Serializer.Serialize(name = "value", path = "value")
   var url: String
 
-  @JsonModule.Serializable
+  @Serializer.Serializable
   constructor(
     name: String,
     type: String,

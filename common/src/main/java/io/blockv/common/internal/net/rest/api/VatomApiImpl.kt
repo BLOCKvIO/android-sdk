@@ -35,11 +35,18 @@ class VatomApiImpl(
     val response: JSONObject = client.post("v1/vatom/geodiscover", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
 
+    val pack =
+      if (payload != null)
+        jsonModule.deserialize<Pack>(payload)
+      else
+        null
+
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.deserialize(payload, Inventory::class) else null)
-        ?: ArrayList()
+      if (pack != null) combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
+      else
+        ArrayList()
     )
   }
 
@@ -51,7 +58,7 @@ class VatomApiImpl(
     if (payload != null) {
       var count = 0
       while (count < group.length()) {
-        val geoGroup: GeoGroup? = jsonModule.deserialize(group.getJSONObject(count), GeoGroup::class)
+        val geoGroup: GeoGroup? = jsonModule.deserialize(group.getJSONObject(count))
         if (geoGroup != null) {
           list.add(geoGroup)
         }
@@ -69,12 +76,18 @@ class VatomApiImpl(
     val response: JSONObject = client.post("v1/user/vatom/get", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
 
+    val pack =
+      if (payload != null)
+        jsonModule.deserialize<Pack>(payload)
+      else
+        null
 
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.deserialize(payload, Inventory::class) else null)
-        ?: ArrayList()
+      if (pack != null) combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
+      else
+        ArrayList()
     )
   }
 
@@ -82,11 +95,18 @@ class VatomApiImpl(
     val response: JSONObject = client.post("v1/vatom/discover", request)
     val payload: JSONObject? = response.optJSONObject("payload")
 
+    val discoverPack = if (payload != null) {
+      jsonModule.deserialize<DiscoverPack>(payload)
+    } else
+      null
+
+    if (discoverPack != null) {
+      combineVatomProperties(discoverPack.vatoms, discoverPack.faces, discoverPack.actions)
+    }
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.deserialize(payload, DiscoverPack::class) else null)
-        ?: DiscoverPack(0, ArrayList())
+      discoverPack ?: DiscoverPack(0, ArrayList())
     )
   }
 
@@ -95,11 +115,18 @@ class VatomApiImpl(
     val response: JSONObject = client.post("/v1/user/vatom/inventory", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
 
+    val pack =
+      if (payload != null)
+        jsonModule.deserialize<Pack>(payload)
+      else
+        null
+
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      (if (payload != null) jsonModule.deserialize(payload, Inventory::class) else null)
-        ?: ArrayList()
+      if (pack != null) combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
+      else
+        ArrayList()
     )
 
   }
@@ -111,7 +138,7 @@ class VatomApiImpl(
     if (payload != null) {
       var count = 0
       while (count < payload.length()) {
-        val action: Action? = jsonModule.deserialize(payload.getJSONObject(count), Action::class)
+        val action: Action? = jsonModule.deserialize(payload.getJSONObject(count))
         if (action != null) {
           list.add(action)
         }
@@ -144,4 +171,30 @@ class VatomApiImpl(
     )
   }
 
+  private fun combineVatomProperties(vatoms: List<Vatom>, faces: List<Face>, actions: List<Action>): List<Vatom> {
+
+    val faceMap: HashMap<String, ArrayList<Face>> = HashMap()
+    val actionMap: HashMap<String, ArrayList<Action>> = HashMap()
+
+    faces.forEach { face ->
+      if (!faceMap.containsKey(face.templateId)) {
+        faceMap[face.templateId] = ArrayList()
+      }
+      faceMap[face.templateId]?.add(face)
+    }
+
+    actions.forEach { action ->
+      if (!actionMap.containsKey(action.templateId)) {
+        actionMap[action.templateId] = ArrayList()
+      }
+      actionMap[action.templateId]?.add(action)
+    }
+
+    vatoms.forEach { vatom ->
+      vatom.faces = faceMap[vatom.property.templateId] ?: vatom.faces
+      vatom.actions = actionMap[vatom.property.templateId] ?: vatom.actions
+    }
+
+    return vatoms
+  }
 }

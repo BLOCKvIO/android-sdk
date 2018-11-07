@@ -10,16 +10,16 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 
 class VatomVisibility {
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var type: String
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var value: String
 
-  @JsonModule.Serializable
+  @Serializer.Serializable
   constructor(
     type: String,
     value: String

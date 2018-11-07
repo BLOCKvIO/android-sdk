@@ -95,11 +95,11 @@ class HttpClient(
         if (response.has("payload") && (response.get("payload") is JSONObject)) {
           val pay: JSONObject = response.getJSONObject("payload")
           if (pay.has("refresh_token")) {
-            preferences.refreshToken = jsonModule.deserialize(pay.getJSONObject("refresh_token"), Jwt::class)
+            preferences.refreshToken = jsonModule.deserialize(pay.getJSONObject("refresh_token"))
           }
 
           if (pay.has("access_token")) {
-            authenticator.setToken(jsonModule.deserialize(pay.getJSONObject("access_token"), Jwt::class))
+            authenticator.setToken(jsonModule.deserialize(pay.getJSONObject("access_token")))
 
           }
           if (pay.has("asset_provider")) {
@@ -107,7 +107,7 @@ class HttpClient(
             val assetProviderArray = ArrayList<AssetProvider>()
             (0 until assetProviders.length()).forEach {
               val assetProvider =
-                jsonModule.deserialize<AssetProvider>(assetProviders.getJSONObject(it), AssetProvider::class)
+                jsonModule.deserialize<AssetProvider>(assetProviders.getJSONObject(it))
               if (assetProvider != null) {
                 assetProviderArray.add(assetProvider)
               }
@@ -274,11 +274,11 @@ class HttpClient(
         try {
           val pay: JSONObject = response.getJSONObject("payload")
           if (pay.has("refresh_token")) {
-            preferences.refreshToken = jsonModule.deserialize(pay.getJSONObject("refresh_token"), Jwt::class)
+            preferences.refreshToken = jsonModule.deserialize(pay.getJSONObject("refresh_token"))
 
           }
           if (pay.has("access_token")) {
-            authenticator.setToken(jsonModule.deserialize(pay.getJSONObject("access_token"), Jwt::class))
+            authenticator.setToken(jsonModule.deserialize(pay.getJSONObject("access_token")))
           }
 
         } catch (e: Exception) {

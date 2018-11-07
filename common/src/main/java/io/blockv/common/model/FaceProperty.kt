@@ -10,22 +10,22 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
 class FaceProperty {
-  @JsonModule.Serialize(name = "display_url")
+  @Serializer.Serialize(name = "display_url")
   val displayUrl: String
-  @JsonModule.Serialize(name = "view_mode", path = "constraints")
+  @Serializer.Serialize(name = "view_mode", path = "constraints")
   val viewMode: String
-  @JsonModule.Serialize(path = "constraints")
+  @Serializer.Serialize(path = "constraints")
   val platform: String
-  @JsonModule.Serialize
+  @Serializer.Serialize
   val config: JSONObject
-  @JsonModule.Serialize
+  @Serializer.Serialize
   val resources: List<String>
 
-  @JsonModule.Serializable
+  @Serializer.Serializable
   constructor(
     displayUrl: String,
     viewMode: String,

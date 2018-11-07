@@ -10,23 +10,23 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 
 class Face {
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var id: String
-  @JsonModule.Serialize(name = "template")
+  @Serializer.Serialize(name = "template")
   var templateId: String
-  @JsonModule.Serialize(name = "created_by", path = "meta")
+  @Serializer.Serialize(name = "created_by", path = "meta")
   var createdBy: String?
-  @JsonModule.Serialize(name = "when_created", path = "meta")
+  @Serializer.Serialize(name = "when_created", path = "meta")
   var whenCreated: String?
-  @JsonModule.Serialize(name = "when_modified", path = "meta")
+  @Serializer.Serialize(name = "when_modified", path = "meta")
   var whenModified: String?
-  @JsonModule.Serialize(name = "properties")
+  @Serializer.Serialize(name = "properties")
   var property: FaceProperty
 
-  @JsonModule.Serializable
+  @Serializer.Serializable
   constructor(
     id: String,
     templateId: String,

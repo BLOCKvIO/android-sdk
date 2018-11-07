@@ -10,24 +10,24 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 
 class Pricing {
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var priceType: String?
-  @JsonModule.Serialize(path = "value")
+  @Serializer.Serialize(path = "value")
   var currency: String?
-  @JsonModule.Serialize(path = "value")
+  @Serializer.Serialize(path = "value")
   var price: String?
-  @JsonModule.Serialize(name = "valid_from", path = "value")
+  @Serializer.Serialize(name = "valid_from", path = "value")
   var validFrom: String?
-  @JsonModule.Serialize(name = "valid_through", path = "value")
+  @Serializer.Serialize(name = "valid_through", path = "value")
   var validThrough: String?
-  @JsonModule.Serialize(name = "vat_included", path = "value")
+  @Serializer.Serialize(name = "vat_included", path = "value")
   var isVatIncluded: Boolean
 
-  @JsonModule.Serializable
+  @Serializer.Serializable
   constructor(
     priceType: String?,
     currency: String?,

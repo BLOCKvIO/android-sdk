@@ -10,12 +10,10 @@
  */
 package io.blockv.common.model
 
-import org.json.JSONObject
-
-class WebSocketEvent<T>(
-  val messageType: String,
-  val userId: String,
-  val payload: T?
+open class WebSocketEvent<T>(
+  open val messageType: String,
+  open val userId: String,
+  open val payload: T?
 ) {
 
   val type: MessageType

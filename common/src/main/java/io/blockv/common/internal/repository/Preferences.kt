@@ -13,6 +13,7 @@ package io.blockv.common.internal.repository
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.model.AssetProvider
 import io.blockv.common.model.Environment
@@ -41,7 +42,7 @@ class Preferences(
       if (json != null) {
         try {
           val data = JSONObject(json)
-          return jsonModule.deserialize(data, Environment::class)
+          return jsonModule.deserialize(data)
         } catch (e: JSONException) {
           e.printStackTrace()
         }
@@ -57,8 +58,12 @@ class Preferences(
   var refreshToken: Jwt?
     get() {
       val token: String? = getString(Key.REFRESH_TOKEN)
-      if (token != null) {
-        return jsonModule.deserialize(JSONObject(token), Jwt::class)
+      try {
+        if (token != null && token.isNotEmpty()) {
+          return jsonModule.deserialize(JSONObject(token))
+        }
+      } catch (error: Exception) {
+        Log.e("preferences", error.toString())
       }
       return null
     }
@@ -72,8 +77,8 @@ class Preferences(
         try {
           val array = JSONArray(json)
 
-          for (i in 0..array.length() - 1) {
-            val provider = jsonModule.deserialize<AssetProvider>(array.getJSONObject(i), AssetProvider::class)
+          for (i in 0 until array.length()) {
+            val provider = jsonModule.deserialize<AssetProvider>(array.getJSONObject(i))
             if (provider != null) {
               providers.add(provider)
             }

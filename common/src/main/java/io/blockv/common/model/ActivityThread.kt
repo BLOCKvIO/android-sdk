@@ -10,14 +10,45 @@
  */
 package io.blockv.common.model
 
-class ActivityThread(
-  val id: String,
-  val whenModified: Long,
-  val lastMessage: ActivityMessage,
-  val lastMessageUser: UserInfo
-) {
+import io.blockv.common.internal.json.serializer.Serializer
 
-  class UserInfo(val name: String, val avatarUri: String) {
+class ActivityThread {
+  @Serializer.Serialize
+  val id: String
+  @Serializer.Serialize(name = "when_modified")
+  val whenModified: Long
+  @Serializer.Serialize(name = "last_message")
+  val lastMessage: ActivityMessage
+  @Serializer.Serialize(name = "last_message_user_info")
+  val lastMessageUser: UserInfo
+
+  @Serializer.Serializable
+  constructor(
+    id: String,
+    whenModified: Long,
+    lastMessage: ActivityMessage,
+    lastMessageUser: UserInfo
+  ) {
+    this.id = id
+    this.whenModified = whenModified
+    this.lastMessage = lastMessage
+    this.lastMessageUser = lastMessageUser
+  }
+
+
+  class UserInfo {
+
+    @Serializer.Serialize
+    val name: String
+    @Serializer.Serialize(name = "avatar_uri")
+    val avatarUri: String
+
+    @Serializer.Serializable
+    constructor(name: String, avatarUri: String) {
+      this.name = name
+      this.avatarUri = avatarUri
+    }
+
     override fun toString(): String {
       return "UserInfo{" +
         "name='" + name + '\'' +

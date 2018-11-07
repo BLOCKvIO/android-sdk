@@ -10,18 +10,18 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 
 class GeoPosition {
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var type: String?
-  @JsonModule.Serialize(name = "\$reql_type\$")
+  @Serializer.Serialize(name = "\$reql_type\$")
   var reqType: String?
-  @JsonModule.Serialize
+  @Serializer.Serialize
   var coordinates: List<Float>?
 
-  @JsonModule.Serializable
+  @Serializer.Serializable
   constructor(type: String?, reqType: String?, coordinates: List<Float>?) {
     this.type = type
     this.reqType = reqType

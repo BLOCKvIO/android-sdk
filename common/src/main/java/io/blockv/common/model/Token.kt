@@ -10,18 +10,56 @@
  */
 package io.blockv.common.model
 
-class Token(
-  var id: String,
-  var userId: String,
-  var appId: String,
-  var whenCreated: String,
-  var whenModified: String,
-  var tokenType: String,
-  var token: String,
-  var isConfirmed: Boolean,
-  var isPrimary: Boolean,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class Token {
+
+  @Serializer.Serialize
+  var id: String
+  @Serializer.Serialize(name = "user_id", path = "properties")
+  var userId: String
+  @Serializer.Serialize(name = "app_id", path = "properties")
+  var appId: String
+  @Serializer.Serialize(name = "when_created", path = "meta")
+  var whenCreated: String
+  @Serializer.Serialize(name = "when_modified", path = "meta")
+  var whenModified: String
+  @Serializer.Serialize(name = "token_type", path = "properties")
+  var tokenType: String
+  @Serializer.Serialize(path = "properties")
+  var token: String
+  @Serializer.Serialize(name = "confirmed", path = "properties")
+  var isConfirmed: Boolean
+  @Serializer.Serialize(name = "is_default", path = "properties")
+  var isPrimary: Boolean
+  @Serializer.Serialize(name = "verify_code_expires", path = "properties")
   var verifyCodeExpires: String
-) {
+
+  @Serializer.Serializable
+  constructor(
+    id: String,
+    userId: String,
+    appId: String,
+    whenCreated: String,
+    whenModified: String,
+    tokenType: String,
+    token: String,
+    isConfirmed: Boolean,
+    isPrimary: Boolean,
+    verifyCodeExpires: String
+  ) {
+    this.id = id
+    this.userId = userId
+    this.appId = appId
+    this.whenCreated = whenCreated
+    this.whenModified = whenModified
+    this.tokenType = tokenType
+    this.token = token
+    this.isConfirmed = isConfirmed
+    this.isPrimary = isPrimary
+    this.verifyCodeExpires = verifyCodeExpires
+  }
+
   override fun toString(): String {
     return "Token{" +
       " id='" + id + '\'' +

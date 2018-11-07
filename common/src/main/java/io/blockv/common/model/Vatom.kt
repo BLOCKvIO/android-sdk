@@ -10,27 +10,27 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
 open class Vatom {
 
-  @JsonModule.Serialize
+  @Serializer.Serialize
   val id: String
-  @JsonModule.Serialize(name = "when_created")
+  @Serializer.Serialize(name = "when_created")
   val whenCreated: String
-  @JsonModule.Serialize(name = "when_modified")
+  @Serializer.Serialize(name = "when_modified")
   val whenModified: String
-  @JsonModule.Serialize(name = "vAtom::vAtomType")
+  @Serializer.Serialize(name = "vAtom::vAtomType")
   val property: VatomProperty
-  @JsonModule.Serialize
+  @Serializer.Serialize
   val private: JSONObject?
-  @JsonModule.Serialize
-  val faces: List<Face>
-  @JsonModule.Serialize
-  val actions: List<Action>
+  @Serializer.Serialize
+  var faces: List<Face>
+  @Serializer.Serialize
+  var actions: List<Action>
 
-  @JsonModule.Serializable
+  @Serializer.Serializable
   constructor(
     id: String,
     whenCreated: String,

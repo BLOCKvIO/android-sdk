@@ -10,26 +10,26 @@
  */
 package io.blockv.common.model
 
-import io.blockv.common.internal.json.JsonModule
+import io.blockv.common.internal.json.serializer.Serializer
 
 class CreationPolicy {
 
-  @JsonModule.Serialize(name = "auto_create")
+  @Serializer.Serialize(name = "auto_create")
   var autoCreate: String
-  @JsonModule.Serialize(name = "auto_create_count")
+  @Serializer.Serialize(name = "auto_create_count")
   var autoCreateCount: Int
-  @JsonModule.Serialize(name = "auto_create_count_random")
+  @Serializer.Serialize(name = "auto_create_count_random")
   var isAutoCreateCountRandom: Boolean
-  @JsonModule.Serialize(name = "enforce_policy_count_max")
+  @Serializer.Serialize(name = "enforce_policy_count_max")
   var isEnforcePolicyCountMax: Boolean
-  @JsonModule.Serialize(name = "enforce_policy_count_min")
+  @Serializer.Serialize(name = "enforce_policy_count_min")
   var isEnforcePolicyCountMin: Boolean
-  @JsonModule.Serialize(name = "policy_count_max")
+  @Serializer.Serialize(name = "policy_count_max")
   var policyCountMax: Int
-  @JsonModule.Serialize(name = "policy_count_min")
+  @Serializer.Serialize(name = "policy_count_min")
   var policyCountMin: Int
 
-  @JsonModule.Serializable
+  @Serializer.Serializable
   constructor(
     autoCreate: String,
     autoCreateCount: Int,

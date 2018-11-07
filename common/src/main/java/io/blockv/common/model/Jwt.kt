@@ -10,10 +10,24 @@
  */
 package io.blockv.common.model
 
-class Jwt(
-  val token: String,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class Jwt {
+
+  @Serializer.Serialize
+  val token: String
+  @Serializer.Serialize(name = "token_type")
   val type: String
-) {
+
+  @Serializer.Serializable
+  constructor(
+    token: String,
+    type: String
+  ) {
+    this.token = token
+    this.type = type
+  }
+
   override fun toString(): String {
     return "Jwt{" +
       " token='" + token + '\'' +
