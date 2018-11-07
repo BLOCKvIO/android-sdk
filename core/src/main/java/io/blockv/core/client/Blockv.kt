@@ -44,6 +44,7 @@ import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
 import io.blockv.faces.ImageFace
+import io.blockv.faces.ImageLayeredFace
 import io.blockv.faces.ImagePolicyFace
 import io.blockv.faces.ImageProgressFace
 import java.io.File
@@ -141,6 +142,7 @@ class Blockv {
           internalFaceManager!!.registerFace(ImageFace.factory)
           internalFaceManager!!.registerFace(ImageProgressFace.factory)
           internalFaceManager!!.registerFace(ImagePolicyFace.factory)
+          internalFaceManager!!.registerFace(ImageLayeredFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {

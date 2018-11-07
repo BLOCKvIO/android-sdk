@@ -210,6 +210,7 @@ class Blockv {
           internalFaceManager!!.registerFace(ImageFace.factory)
           internalFaceManager!!.registerFace(ImageProgressFace.factory)
           internalFaceManager!!.registerFace(ImagePolicyFace.factory)
+          internalFaceManager!!.registerFace(ImageLayeredFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {

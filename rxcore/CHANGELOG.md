@@ -2,10 +2,18 @@
 All notable changes to the rxcore module will be documented in this file.
 
 #### 2.x Releases
+- `2.3.x` Releases - [2.3.0](#230)
 - `2.2.x` Releases - [2.2.0](#220)
 - `2.1.x` Releases - [2.1.0](#210)
 - `2.0.x` Releases - [2.0.0](#200)
 ---
+## [2.3.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/rxcore/2.3.0)
+Released on 2018-11-06
+
+#### Added
+- Included Layered Image Face.
+   - Pull Request [#109](https://github.com/BLOCKvIO/android-sdk/pull/109)
+
 ## [2.2.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/rxcore/2.2.0)
 Released on 2018-10-26
 
