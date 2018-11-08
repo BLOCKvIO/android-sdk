@@ -9,10 +9,11 @@
  *
  */
 package io.blockv.common.internal.json
-import io.blockv.common.internal.json.serializer.custom.ActionSerializer
+
 import io.blockv.common.internal.json.serializer.GenericSerializer
 import io.blockv.common.internal.json.serializer.Serializer
-import io.blockv.common.model.*
+import io.blockv.common.internal.json.serializer.custom.ActionSerializer
+import io.blockv.common.model.Action
 import org.json.JSONObject
 import kotlin.reflect.KClass
 
@@ -38,6 +39,11 @@ class JsonModule {
     val key = T::class
     val serializer = serializers[key]
     return (serializer ?: genericSerializer).deserialize(key, json, serializers) as T
+  }
+
+  fun <T : Any> deserialize(kclass: KClass<T>, json: JSONObject): T? {
+    val serializer = serializers[kclass]
+    return (serializer ?: genericSerializer).deserialize(kclass, json, serializers) as T
   }
 
   fun <T : Any> serialize(data: T): JSONObject? {
