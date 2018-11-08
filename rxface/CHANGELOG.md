@@ -2,7 +2,7 @@
 All notable changes to the face module will be documented in this file.
 
 #### 2.x Releases
-- `2.2.x` Releases - [2.2.0](#220)|[2.2.1](#231)
+- `2.2.x` Releases - [2.2.0](#220)|[2.2.1](#221)
 - `2.1.x` Releases - [2.1.2](#212)
 - `2.0.x` Releases - [2.0.0](#200)
 ---
