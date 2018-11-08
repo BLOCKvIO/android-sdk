@@ -158,7 +158,6 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
       connection.readTimeout = readTimeout
       connection.connectTimeout = connectTimeout
 
-      connection.setRequestProperty("Content-Type", "application/*")
       connection.requestMethod = method
       connection.useCaches = true
       connection.doInput = true
