@@ -190,7 +190,6 @@ class FaceManagerImpl(
                 && faceView.vatom.property.templateVariationId == vatom.property.templateVariationId
               ) {
                 //update
-                faceView.isLoaded = false
                 Callable.single {
                   faceProcedure.select(vatom, faceRoster.keys)
                 }
@@ -220,6 +219,7 @@ class FaceManagerImpl(
                         }
                       }
                     } else {
+                      faceView.isLoaded = false
                       load(vatomView)
                     }
                   }
