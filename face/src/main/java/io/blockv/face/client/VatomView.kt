@@ -75,6 +75,8 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   @Volatile
   private var loaderDelayTimer: Timer? = null
 
+  @set:Synchronized
+  @get:Synchronized
   var faceView: FaceView?
     set(value) {
       if (view != null) {
