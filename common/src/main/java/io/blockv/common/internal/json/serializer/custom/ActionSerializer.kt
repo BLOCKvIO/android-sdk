@@ -8,20 +8,34 @@
  *  under the License.
  *
  */
-package io.blockv.common.internal.json.deserializer.vatom
+package io.blockv.common.internal.json.serializer.custom
 
-import io.blockv.common.internal.json.deserializer.Deserializer
+import io.blockv.common.internal.json.serializer.Serializer
 import io.blockv.common.model.Action
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class ActionDeserializer : Deserializer<Action> {
-  override fun deserialize(data: JSONObject): Action? {
+class ActionSerializer : Serializer<Action> {
+
+  override fun serialize(
+    data: Action,
+    serializers: Map<KClass<*>,
+      Serializer<Any>>
+  ): JSONObject? {
+    return JSONObject().put("name", data.templateId + "::Action::" + data.name)
+  }
+
+  override fun deserialize(
+    type: KClass<*>,
+    data: JSONObject,
+    serializers: Map<KClass<*>, Serializer<Any>>
+  ): Action? {
     try {
       val name: String = data.getString("name")
       val parts: List<String> = name.split("::Action::")
       return Action(parts[0], parts[1])
     } catch (e: Exception) {
-      android.util.Log.w("ActionDeserializer", e.message)
+      android.util.Log.w("ActionSerializer", e.message)
     }
     return null
   }

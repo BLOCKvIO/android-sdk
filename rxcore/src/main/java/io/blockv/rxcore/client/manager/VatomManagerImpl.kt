@@ -248,7 +248,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
             .getJSONObject("pricing")
 
           if (pricing.has("pricingType")) {
-            props.commerce?.pricing?.priceType = pricing.getString("pricingType")
+            props.commerce?.pricing?.pricingType = pricing.getString("pricingType")
           }
 
           if (pricing.has("value")) {

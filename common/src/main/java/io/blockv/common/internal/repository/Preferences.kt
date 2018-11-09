@@ -13,6 +13,7 @@ package io.blockv.common.internal.repository
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.model.AssetProvider
 import io.blockv.common.model.Environment
@@ -41,7 +42,7 @@ class Preferences(
       if (json != null) {
         try {
           val data = JSONObject(json)
-          return jsonModule.environmentDeserializer.deserialize(data)
+          return jsonModule.deserialize(data)
         } catch (e: JSONException) {
           e.printStackTrace()
         }
@@ -50,19 +51,23 @@ class Preferences(
     }
     set(environment) {
       if (environment != null) {
-        set(Key.ENVIRONMENT, jsonModule.environmentSerializer.serialize(environment).toString())
+        set(Key.ENVIRONMENT, jsonModule.serialize(environment).toString())
       }
     }
 
   var refreshToken: Jwt?
     get() {
       val token: String? = getString(Key.REFRESH_TOKEN)
-      if (token != null) {
-        return jsonModule.jctDeserializer.deserialize(JSONObject(token))
+      try {
+        if (token != null && token.isNotEmpty()) {
+          return jsonModule.deserialize(JSONObject(token))
+        }
+      } catch (error: Exception) {
+        Log.e("preferences", error.toString())
       }
       return null
     }
-    set(token) = set(Key.REFRESH_TOKEN, jsonModule.jwtSerializer.serialize(token).toString())
+    set(token) = set(Key.REFRESH_TOKEN, if (token != null) jsonModule.serialize(token).toString() else "")
 
   var assetProviders: List<AssetProvider>
     get() {
@@ -72,8 +77,8 @@ class Preferences(
         try {
           val array = JSONArray(json)
 
-          for (i in 0..array.length() - 1) {
-            val provider = jsonModule.assetProviderDeserializer.deserialize(array.getJSONObject(i))
+          for (i in 0 until array.length()) {
+            val provider = jsonModule.deserialize<AssetProvider>(array.getJSONObject(i))
             if (provider != null) {
               providers.add(provider)
             }
@@ -89,7 +94,7 @@ class Preferences(
     set(assetProviders) {
       val array = JSONArray()
       for (provider in assetProviders) {
-        array.put(jsonModule.assetProviderSerializer.serialize(provider))
+        array.put(jsonModule.serialize(provider))
       }
       set(Key.ASSET_PROVIDER, array.toString())
     }

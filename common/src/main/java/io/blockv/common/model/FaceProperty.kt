@@ -10,16 +10,36 @@
  */
 package io.blockv.common.model
 
+import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
-class FaceProperty(
-  val displayUrl: String,
-  val viewMode: String,
-  val platform: String,
-  val config: JSONObject,
+class FaceProperty {
+  @Serializer.Serialize(name = "display_url")
+  val displayUrl: String
+  @Serializer.Serialize(name = "view_mode", path = "constraints")
+  val viewMode: String
+  @Serializer.Serialize(path = "constraints")
+  val platform: String
+  @Serializer.Serialize
+  val config: JSONObject
+  @Serializer.Serialize
   val resources: List<String>
-) {
 
+  @Serializer.Serializable
+  constructor(
+    displayUrl: String,
+    viewMode: String,
+    platform: String,
+    config: JSONObject,
+    resources: List<String>
+  ) {
+    this.displayUrl = displayUrl
+    this.viewMode = viewMode
+    this.platform = platform
+    this.config = config
+    this.resources = resources
+
+  }
 
   override fun toString(): String {
     return "FaceProperty{" +

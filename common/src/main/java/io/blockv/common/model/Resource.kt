@@ -10,11 +10,26 @@
  */
 package io.blockv.common.model
 
-class Resource(
-  var name: String,
-  var type: String,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class Resource {
+  @Serializer.Serialize
+  var name: String
+  @Serializer.Serialize(name = "resourceType")
+  var type: String
+  @Serializer.Serialize(name = "value", path = "value")
   var url: String
-) {
+
+  @Serializer.Serializable
+  constructor(
+    name: String,
+    type: String,
+    url: String
+  ) {
+    this.name = name
+    this.type = type
+    this.url = url
+  }
 
   override fun toString(): String {
     return "Resource{" +

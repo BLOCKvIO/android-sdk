@@ -10,9 +10,19 @@
  */
 package io.blockv.common.model
 
-class Commerce(val pricing: Pricing?) {
+import io.blockv.common.internal.json.serializer.Serializer
 
-  constructor(commerce: Commerce) : this(if (commerce.pricing != null) Pricing(commerce.pricing) else null)
+class Commerce {
+
+  @Serializer.Serialize
+  var pricing: Pricing?
+
+  @Serializer.Serializable
+  constructor(pricing: Pricing?) {
+    this.pricing = pricing
+  }
+
+  constructor(commerce: Commerce) : this(if (commerce.pricing != null) Pricing(commerce.pricing!!) else null)
 
   override fun toString(): String {
     return "Commerce{" +

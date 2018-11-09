@@ -8,19 +8,30 @@
  *  under the License.
  *
  */
-package io.blockv.common.internal.json.serializer.user
+package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
-import io.blockv.common.model.Jwt
 import org.json.JSONObject
 
-class JwtSerializer : Serializer<Jwt?> {
-  override fun serialize(data: Jwt?): JSONObject {
-    val out = JSONObject()
-    if (data != null) {
-      out.put("token", data.token)
-      out.put("token_type", data.type)
-    }
-    return out
+class GenericSocketEvent : WebSocketEvent<JSONObject> {
+
+  @Serializer.Serialize(name = "msg_type")
+  override val messageType: String
+  @Serializer.Serialize(name = "user_id")
+  override val userId: String
+  @Serializer.Serialize(name = "payload")
+  override val payload: JSONObject
+
+  @Serializer.Serializable
+  constructor(
+    messageType: String,
+    userId: String,
+    payload: JSONObject
+  ) : super(messageType, userId, payload) {
+
+    this.messageType = messageType
+    this.userId = userId
+    this.payload = payload
   }
+
 }

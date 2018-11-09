@@ -49,7 +49,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.publicUserDeserializer.deserialize(payload)
+      jsonModule.deserialize(payload)
     )
   }
 
@@ -59,7 +59,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.tokenDeserializer.deserialize(payload)
+      jsonModule.deserialize(payload)
     )
   }
 
@@ -69,7 +69,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.tokenDeserializer.deserialize(payload)
+      jsonModule.deserialize(payload)
     )
   }
 
@@ -95,7 +95,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(user)
+      jsonModule.deserialize(user)
     )
   }
 
@@ -105,7 +105,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(payload)
+      jsonModule.deserialize(payload)
     )
   }
 
@@ -116,7 +116,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(payload.optJSONObject("user"))
+      jsonModule.deserialize(payload.optJSONObject("user"))
     )
   }
 
@@ -128,7 +128,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(user)
+      jsonModule.deserialize(user)
     )
   }
 
@@ -138,7 +138,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(payload)
+      jsonModule.deserialize(payload)
     )
   }
 
@@ -148,7 +148,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.userDeserializer.deserialize(payload)
+      jsonModule.deserialize(payload)
     )
   }
 
@@ -158,7 +158,7 @@ class UserApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.tokenDeserializer.deserialize(payload)
+      jsonModule.deserialize(payload)
     )
   }
 
@@ -187,7 +187,7 @@ class UserApiImpl(
     val list: ArrayList<Token> = ArrayList()
     var count = 0
     while (count < payload.length()) {
-      val token: Token? = jsonModule.tokenDeserializer.deserialize(payload.getJSONObject(count))
+      val token: Token? = jsonModule.deserialize(payload.getJSONObject(count))
       if (token != null) {
         list.add(token)
       }

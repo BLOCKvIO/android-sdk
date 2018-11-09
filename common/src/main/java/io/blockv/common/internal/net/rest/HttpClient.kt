@@ -95,18 +95,19 @@ class HttpClient(
         if (response.has("payload") && (response.get("payload") is JSONObject)) {
           val pay: JSONObject = response.getJSONObject("payload")
           if (pay.has("refresh_token")) {
-            preferences.refreshToken = jsonModule.jctDeserializer.deserialize(pay.getJSONObject("refresh_token"))
+            preferences.refreshToken = jsonModule.deserialize(pay.getJSONObject("refresh_token"))
           }
 
           if (pay.has("access_token")) {
-            authenticator.setToken(jsonModule.jctDeserializer.deserialize(pay.getJSONObject("access_token")))
+            authenticator.setToken(jsonModule.deserialize(pay.getJSONObject("access_token")))
 
           }
           if (pay.has("asset_provider")) {
             val assetProviders = pay.getJSONArray("asset_provider")
             val assetProviderArray = ArrayList<AssetProvider>()
             (0 until assetProviders.length()).forEach {
-              val assetProvider = jsonModule.assetProviderDeserializer.deserialize(assetProviders.getJSONObject(it))
+              val assetProvider =
+                jsonModule.deserialize<AssetProvider>(assetProviders.getJSONObject(it))
               if (assetProvider != null) {
                 assetProviderArray.add(assetProvider)
               }
@@ -273,11 +274,11 @@ class HttpClient(
         try {
           val pay: JSONObject = response.getJSONObject("payload")
           if (pay.has("refresh_token")) {
-            preferences.refreshToken = jsonModule.jctDeserializer.deserialize(pay.getJSONObject("refresh_token"))
+            preferences.refreshToken = jsonModule.deserialize(pay.getJSONObject("refresh_token"))
 
           }
           if (pay.has("access_token")) {
-            authenticator.setToken(jsonModule.jctDeserializer.deserialize(pay.getJSONObject("access_token")))
+            authenticator.setToken(jsonModule.deserialize(pay.getJSONObject("access_token")))
           }
 
         } catch (e: Exception) {

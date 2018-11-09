@@ -10,4 +10,28 @@
  */
 package io.blockv.common.model
 
-class DiscoverPack(val count: Int,val vatoms: List<Vatom>)
+import io.blockv.common.internal.json.serializer.Serializer
+
+class DiscoverPack {
+  @Serializer.Serialize
+  val count: Int
+  @Serializer.Serialize(name = "results")
+  val vatoms: List<Vatom>
+  @Serializer.Serialize(name = "faces")
+  internal val faces: List<Face>
+  @Serializer.Serialize(name = "actions")
+  internal val actions: List<Action>
+
+  @Serializer.Serializable
+  constructor(
+    count: Int,
+    vatoms: List<Vatom>,
+    faces: List<Face> = ArrayList(),
+    actions: List<Action> = ArrayList()
+  ) {
+    this.count = count
+    this.vatoms = vatoms
+    this.faces = faces
+    this.actions = actions
+  }
+}

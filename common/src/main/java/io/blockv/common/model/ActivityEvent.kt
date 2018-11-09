@@ -10,16 +10,48 @@
  */
 package io.blockv.common.model
 
-class ActivityEvent(
-  val eventId: Long,
-  val targetUserId: String,
-  val triggerUserId: String,
-  val vatomIds: List<String>,
-  val resources: List<Resource>,
-  val message: String,
-  val actionName: String,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class ActivityEvent {
+
+  @Serializer.Serialize(name = "msg_id")
+  val eventId: Long
+  @Serializer.Serialize(name = "user_id")
+  val targetUserId: String
+  @Serializer.Serialize(name = "triggered_by")
+  val triggerUserId: String
+  @Serializer.Serialize(name = "vatoms")
+  val vatomIds: List<String>
+  @Serializer.Serialize(name = "generic")
+  val resources: List<Resource>
+  @Serializer.Serialize(name = "msg")
+  val message: String
+  @Serializer.Serialize(name = "action_name")
+  val actionName: String
+  @Serializer.Serialize(name = "when_created")
   val whenCreated: String
-) {
+
+  @Serializer.Serializable
+  constructor(
+    eventId: Long,
+    targetUserId: String,
+    triggerUserId: String,
+    vatomIds: List<String>,
+    resources: List<Resource>,
+    message: String,
+    actionName: String,
+    whenCreated: String
+  ) {
+    this.eventId = eventId
+    this.targetUserId = targetUserId
+    this.triggerUserId = triggerUserId
+    this.vatomIds = vatomIds
+    this.resources = resources
+    this.message = message
+    this.actionName = actionName
+    this.whenCreated = whenCreated
+  }
+
 
   override fun toString(): String {
     return "ActivityEvent{" +

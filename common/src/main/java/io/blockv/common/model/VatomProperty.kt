@@ -10,62 +10,83 @@
  */
 package io.blockv.common.model
 
+import io.blockv.common.internal.json.serializer.Serializer
+
 class VatomProperty() {
 
+  @Serializer.Serialize
   var commerce: Commerce? = null
 
+  @Serializer.Serialize(name = "acquirable")
   var isAcquireable: Boolean = false
 
+  @Serializer.Serialize
   var author: String? = null
 
+  @Serializer.Serialize
   var category: String? = null
 
+  @Serializer.Serialize(name = "cloned_from")
   var clonedFrom: String? = null
 
+  @Serializer.Serialize(name = "cloning_score")
   var cloningScore: Float? = 0f
 
+  @Serializer.Serialize
   var description: String? = null
 
+  @Serializer.Serialize(name = "dropped")
   var isDropped: Boolean = false
 
+  @Serializer.Serialize(name = "geo_pos")
   var geoPos: GeoPosition? = null
 
+  @Serializer.Serialize(name = "in_contract")
   var isInContract: Boolean = false
 
+  @Serializer.Serialize(name = "in_contract_with")
   var inContractWith: String? = null
 
-  var isInReaction: Boolean = false
-
+  @Serializer.Serialize(name = "notify_msg")
   var notifyMsg: String? = null
 
+  @Serializer.Serialize(name = "num_direct_clones")
   var numDirectClones: Int? = 0
 
+  @Serializer.Serialize
   var owner: String? = null
 
+  @Serializer.Serialize(name = "parent_id")
   var parentId: String? = null
 
+  @Serializer.Serialize(name = "publisher_fqdn")
   var publisherFqdn: String? = null
 
-  var reactedBy: String? = null
-
-  var reactionExpires: String? = null
-
+  @Serializer.Serialize(name = "root_type")
   var rootType: String? = null
 
+  @Serializer.Serialize
   var tags: List<String>? = null
 
+  @Serializer.Serialize(name = "template")
   var templateId: String = ""
 
+  @Serializer.Serialize(name = "template_variation")
   var templateVariationId: String = ""
 
+  @Serializer.Serialize
   var title: String? = null
 
+  @Serializer.Serialize(name = "transferable")
   var isTransferable: Boolean = false
 
+  @Serializer.Serialize(name = "transferred_by")
   var transferredBy: String? = null
 
+  @Serializer.Serialize(name = "redeemable")
   var isRedeemable: Boolean = false
 
+  @Serializer.Serialize
   var resources: List<Resource> = ArrayList()
     set(value) {
       field = value
@@ -75,10 +96,13 @@ class VatomProperty() {
 
   private val _resources: HashMap<String, Resource> = HashMap<String, Resource>()
 
+  @Serializer.Serialize(name = "child_policy", default = false)
   var childPolicy: List<ChildPolicy>? = null
 
+  @Serializer.Serialize
   var visibility: VatomVisibility? = null
 
+  @Serializer.Serialize(name = "tradeable")
   var isTradeable: Boolean = false
 
   constructor(property: VatomProperty) : this() {
@@ -93,14 +117,11 @@ class VatomProperty() {
     this.geoPos = if (property.geoPos != null) GeoPosition(property.geoPos!!) else null
     this.isInContract = property.isInContract
     this.inContractWith = property.inContractWith
-    this.isInReaction = property.isInReaction
     this.notifyMsg = property.notifyMsg
     this.numDirectClones = property.numDirectClones
     this.owner = property.owner
     this.parentId = property.parentId
     this.publisherFqdn = property.publisherFqdn
-    this.reactedBy = property.reactedBy
-    this.reactionExpires = property.reactionExpires
     this.rootType = property.rootType
     this.tags = property.tags
     this.templateId = property.templateId
@@ -133,14 +154,11 @@ class VatomProperty() {
       ", geoPos=" + geoPos +
       ", inContract=" + isInContract +
       ", inContractWith='" + inContractWith + '\'' +
-      ", inReaction=" + isInReaction +
       ", notifyMsg='" + notifyMsg + '\'' +
       ", numDirectClones=" + numDirectClones +
       ", owner='" + owner + '\'' +
       ", parentId='" + parentId + '\'' +
       ", publisherFqdn='" + publisherFqdn + '\'' +
-      ", reactedBy='" + reactedBy + '\'' +
-      ", reactionExpires='" + reactionExpires + '\'' +
       ", rootType='" + rootType + '\'' +
       ", tags=" + tags +
       ", templateId='" + templateId + '\'' +

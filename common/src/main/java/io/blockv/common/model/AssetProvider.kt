@@ -10,12 +10,31 @@
  */
 package io.blockv.common.model
 
-class AssetProvider(
-  var name: String,
-  var uri: String,
-  var type: String,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class AssetProvider {
+  @Serializer.Serialize
+  var name: String
+  @Serializer.Serialize
+  var uri: String
+  @Serializer.Serialize
+  var type: String
+  @Serializer.Serialize
   var descriptor: Map<String, String?>
-) {
+
+  @Serializer.Serializable
+  constructor(
+    name: String,
+    uri: String,
+    type: String,
+    descriptor: Map<String, String?>
+  ) {
+    this.name = name
+    this.uri = uri
+    this.type = type
+    this.descriptor = descriptor
+  }
+
   override fun toString(): String {
     return "AssetProvider{" +
       " name='" + name + '\'' +
