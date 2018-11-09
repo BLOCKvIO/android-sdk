@@ -13,7 +13,6 @@ package io.blockv.face.client
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Resource
@@ -288,7 +287,6 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
 
             }.call({ file ->
               synchronized(resultEmitters) {
-                Log.e("download", "cache ${file.name}")
                 cache.put(file.name, file)
                 resultEmitters.forEach {
                   it.onResult(file)
