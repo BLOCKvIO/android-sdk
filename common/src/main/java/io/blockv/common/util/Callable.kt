@@ -12,7 +12,7 @@ package io.blockv.common.util
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
+import io.blockv.common.util.Callable.Scheduler.Companion.INTERNAL_POOL
 import java.util.concurrent.*
 
 
@@ -93,6 +93,9 @@ interface Callable<T> {
         ThreadPoolExecutor(10, 100, Long.MAX_VALUE, TimeUnit.NANOSECONDS, LinkedBlockingQueue())
       val COMP_POOL: ThreadPoolExecutor =
         ThreadPoolExecutor(cores * 2, 100, Long.MAX_VALUE, TimeUnit.NANOSECONDS, LinkedBlockingQueue())
+      val INTERNAL_POOL: ThreadPoolExecutor =
+        ThreadPoolExecutor(10, 100, Long.MAX_VALUE, TimeUnit.NANOSECONDS, LinkedBlockingQueue())
+
 
       fun wrapRunnable(runnable: java.lang.Runnable, onCancel: (java.lang.Runnable) -> Unit): Runnable {
 
@@ -450,14 +453,16 @@ interface Callable<T> {
                 if (filter == null || filter!!.invoke(result)) {
                   val internalSuccess = onSuccess
                   val internalResult = doOnResult
-                  lock.acquire()
+
+                  val acquired = lock.tryAcquire()
                   resp.execute(Runnable {
                     if (!isCanceled()) {
                       internalResult?.invoke(result)
                       internalSuccess?.invoke(result)
                     }
-                    lock.release()
+                    if (acquired) lock.release()
                   })
+
                 }
               }
             }
@@ -490,14 +495,20 @@ interface Callable<T> {
             fun finalize() {
               if (!finalized) {
                 finalized = true
-                resp.execute(Runnable {
+                INTERNAL_POOL.execute {
                   synchronized(completeLock)
                   {
                     completeLock.acquire()
                     lock.acquire(concurrent)
                     complete = true
-                    doFinally?.invoke()
-                    completion?.onComplete()
+
+                    val tempDoFinal = doFinally
+                    val tempComplete = completion
+                    resp.execute(Runnable {
+                      tempDoFinal?.invoke()
+                      tempComplete?.onComplete()
+                    })
+
                     onSuccess = null
                     onError = null
                     cancelable.cancel()
@@ -511,7 +522,7 @@ interface Callable<T> {
                     lock.release(concurrent)
                     completeLock.release()
                   }
-                })
+                }
               }
             }
 
@@ -519,36 +530,40 @@ interface Callable<T> {
             override fun onComplete() {
               if (!isCanceled() && !errored && !isComplete()) {
                 val temp = doOnSuccess
-
-
-                synchronized(completeLock)
-                {
-                  completeLock.acquire()
-
-                  resp.execute(Runnable {
-
+                INTERNAL_POOL.execute {
+                  synchronized(completeLock)
+                  {
+                    completeLock.acquire()
                     lock.acquire(concurrent)
                     complete = true
-                    temp?.invoke()
 
-                    lock.release(concurrent)
-                    completeLock.release()
-                  })
+                    resp.execute(Runnable {
+                      temp?.invoke()
+                      lock.release(concurrent)
+                      completeLock.release()
+                    })
+
+                    finalize()
+                  }
                 }
+
               }
-              finalize()
             }
           }
+
           val cancel = CompositeCancellable()
           cancel.add(emitter)
-          cancel.add(execScheduler.execute(Runnable {
-            synchronized(cancel)
+          cancel.add(
+            execScheduler.execute(Runnable
             {
-              if (!cancel.isCanceled()) {
-                call(emitter)
+              synchronized(cancel)
+              {
+                if (!cancel.isCanceled()) {
+                  call(emitter)
+                }
               }
-            }
-          }))
+            })
+          )
 
           return cancel
         }
