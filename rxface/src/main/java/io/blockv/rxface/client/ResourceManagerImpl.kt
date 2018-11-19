@@ -84,7 +84,7 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
           {
             if (!downloads.containsKey(resource.url)) {
               downloads[resource.url] =
-                Download(resourceEncoder.encodeUrl(resource.url), disk)
+                Download(resource.url, resourceEncoder.encodeUrl(resource.url), disk, diskCache)
             }
             downloads[resource.url]!!.download()
               .doFinally {
@@ -147,7 +147,7 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
               bitmap
             }
         } else
-          Single.fromCallable{ it.value }
+          Single.fromCallable { it.value }
       }
       .subscribeOn(Schedulers.io())
       .observeOn(Schedulers.io())
@@ -167,7 +167,6 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
       connection.readTimeout = readTimeout
       connection.connectTimeout = connectTimeout
 
-      connection.setRequestProperty("Content-Type", "application/*")
       connection.requestMethod = method
       connection.useCaches = true
       connection.doInput = true
@@ -225,7 +224,12 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
   }
 
 
-  class Download(val resource: String, private val cacheDir: File) {
+  class Download(
+    val resId: String,
+    val resource: String,
+    private val cacheDir: File,
+    val cache: LruCache<String, File>
+  ) {
 
     @Volatile
     private var disposable: Disposable? = null
@@ -243,7 +247,7 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
                 val responseCode: Int = connection.responseCode
                 if (responseCode == 200) {
                   val input = DataInputStream(connection.inputStream)
-                  val file = File(cacheDir, hash(resource) + ".download")
+                  val file = File(cacheDir, hash(resId) + ".download")
                   file.createNewFile()
                   val out = FileOutputStream(file)
                   var read: Int
@@ -256,7 +260,7 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
                   } while (read != -1)
                   out.flush()
                   out.close()
-                  val outFile = File(cacheDir, hash(resource))
+                  val outFile = File(cacheDir, hash(resId))
                   file.renameTo(outFile)
                   outFile
                 } else {
@@ -291,6 +295,7 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
               }
               .subscribe({ file ->
                 synchronized(resultEmitters) {
+                  cache.put(file.name, file)
                   resultEmitters.forEach {
                     it.onSuccess(file)
                   }
