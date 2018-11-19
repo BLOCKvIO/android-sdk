@@ -9,7 +9,7 @@ All notable changes to the common module will be documented in this file.
 ---
 
 ## [1.3.2](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/common/1.3.2)
-Released on 2018-11-13
+Released on 2018-11-18
 
 #### Fixed
 - Callable cancel blocking execution thread.
