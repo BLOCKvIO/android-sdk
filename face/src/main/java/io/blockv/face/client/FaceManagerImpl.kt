@@ -19,16 +19,14 @@ import io.blockv.common.util.Callable
 import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
-import io.blockv.face.client.manager.EventManager
-import io.blockv.face.client.manager.ResourceManager
-import io.blockv.face.client.manager.UserManager
-import io.blockv.face.client.manager.VatomManager
+import io.blockv.face.client.manager.*
 
 class FaceManagerImpl(
   var resourceManager: ResourceManager,
   var userManager: UserManager,
   var vatomManager: VatomManager,
-  var eventManager: EventManager
+  var eventManager: EventManager,
+  var jsonSerializer: JsonSerializer
 ) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
@@ -136,7 +134,8 @@ class FaceManagerImpl(
                   resourceManager,
                   userManager,
                   vatomManager,
-                  eventManager
+                  eventManager,
+                  jsonSerializer
                 )
               )
             vatomView.faceView = view
