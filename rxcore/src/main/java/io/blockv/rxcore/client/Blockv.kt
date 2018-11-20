@@ -71,7 +71,7 @@ class Blockv {
             } else
               if (it.parameters.size == 4) {
                 internalFaceManager = it.call(io.blockv.rxface.client.ResourceManagerImpl(cacheDir, encoder),
-                  object : io.blockv.face.client.UserManager {
+                  object : io.blockv.face.client.manager.UserManager {
                     override fun getPublicUser(userId: String): Callable<PublicUser?> {
                       return Callable.create<PublicUser?> { emitter ->
                         val disposable = userManager.getPublicUser(userId)
@@ -119,7 +119,7 @@ class Blockv {
                     }
 
                   },
-                  object : io.blockv.face.client.VatomManager {
+                  object : io.blockv.face.client.manager.VatomManager {
                     override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
                       return Callable.create<List<Vatom>> { emitter ->
                         val disposable = vatomManager.getVatoms(*ids)
@@ -151,7 +151,7 @@ class Blockv {
                     }
 
                   },
-                  object : io.blockv.face.client.EventManager {
+                  object : io.blockv.face.client.manager.EventManager {
                     override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
                       return Callable.create<WebSocketEvent<StateUpdateEvent>> { emitter ->
                         val disposable =

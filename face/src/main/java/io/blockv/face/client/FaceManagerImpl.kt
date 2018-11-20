@@ -19,6 +19,10 @@ import io.blockv.common.util.Callable
 import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
+import io.blockv.face.client.manager.EventManager
+import io.blockv.face.client.manager.ResourceManager
+import io.blockv.face.client.manager.UserManager
+import io.blockv.face.client.manager.VatomManager
 
 class FaceManagerImpl(
   var resourceManager: ResourceManager,

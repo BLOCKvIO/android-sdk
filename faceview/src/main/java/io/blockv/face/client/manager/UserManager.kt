@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.face.client
+package io.blockv.face.client.manager
 
 import io.blockv.common.model.PublicUser
 import io.blockv.common.util.Callable

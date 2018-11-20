@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.face.client
+package io.blockv.face.client.manager
 
 import android.graphics.Bitmap
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder

@@ -8,7 +8,7 @@
  *  under the License.
  *
  */
-package io.blockv.face.client
+package io.blockv.face.client.manager
 
 import org.json.JSONObject
 import kotlin.reflect.KClass

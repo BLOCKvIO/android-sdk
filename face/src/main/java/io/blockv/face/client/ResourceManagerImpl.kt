@@ -18,6 +18,7 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Resource
 import io.blockv.common.util.Callable
 import io.blockv.common.util.Cancellable
+import io.blockv.face.client.manager.ResourceManager
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -25,7 +26,8 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 
-open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: ResourceEncoder) : ResourceManager {
+open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: ResourceEncoder) :
+  ResourceManager {
 
   val downloads = HashMap<String, Download>()
 

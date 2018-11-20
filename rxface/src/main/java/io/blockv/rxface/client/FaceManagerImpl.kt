@@ -21,6 +21,9 @@ import io.blockv.face.R
 import io.blockv.face.client.*
 import io.blockv.face.client.FaceManager.EmbeddedProcedure
 import io.blockv.face.client.FaceManager.FaceSelectionProcedure
+import io.blockv.face.client.manager.EventManager
+import io.blockv.face.client.manager.UserManager
+import io.blockv.face.client.manager.VatomManager
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

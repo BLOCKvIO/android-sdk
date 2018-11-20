@@ -11,7 +11,6 @@
 package io.blockv.core.client
 
 import android.content.Context
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.NetModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
@@ -73,7 +72,7 @@ class Blockv {
             } else
               if (it.parameters.size == 4) {
                 internalFaceManager = it.call(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder),
-                  object : io.blockv.face.client.UserManager {
+                  object : io.blockv.face.client.manager.UserManager {
                     override fun getCurrentUser(): Callable<PublicUser?> {
                       return userManager.getCurrentUser()
                         .map {
@@ -94,7 +93,7 @@ class Blockv {
                     }
 
                   },
-                  object : io.blockv.face.client.VatomManager {
+                  object : io.blockv.face.client.manager.VatomManager {
                     override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
                       return vatomManager.getVatoms(*ids)
                     }
@@ -104,7 +103,7 @@ class Blockv {
                     }
 
                   },
-                  object : io.blockv.face.client.EventManager {
+                  object : io.blockv.face.client.manager.EventManager {
                     override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
                       return Callable.single {
                         eventManager

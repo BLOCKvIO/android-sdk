@@ -10,6 +10,8 @@
  */
 package io.blockv.face.client
 
+import io.blockv.face.client.manager.*
+
 /**
  * Face bridge provides access to SDK functions.
  */

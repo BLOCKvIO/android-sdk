@@ -17,6 +17,7 @@ import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
 import io.blockv.face.client.FaceManager.EmbeddedProcedure.*
+import io.blockv.face.client.manager.ResourceManager
 
 interface FaceManager {
 
