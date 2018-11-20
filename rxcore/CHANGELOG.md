@@ -1,12 +1,26 @@
 # Change Log
 All notable changes to the rxcore module will be documented in this file.
 
+#### 3.x Releases
+- `3.0.x` Releases - [3.0.0](#300)
+---
+
 #### 2.x Releases
 - `2.3.x` Releases - [2.3.0](#230)
 - `2.2.x` Releases - [2.2.0](#220)
 - `2.1.x` Releases - [2.1.0](#210)
 - `2.0.x` Releases - [2.0.0](#200)
 ---
+
+## [3.0.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/rxcore/3.0.0)
+Released on 2018-xx-xx
+
+#### Updated
+- `Blockv` to use version 3.0.0 of [RxFace](/rxface) module and version 2.0.0 of [Common](/common) module.
+  - Pull Request [#115](https://github.com/BLOCKvIO/android-sdk/pull/115)
+- `Blockv`'s constructor to take extra param `Context` .
+  - Pull Request [#115](https://github.com/BLOCKvIO/android-sdk/pull/115)
+
 ## [2.3.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/rxcore/2.3.0)
 Released on 2018-11-06
 
