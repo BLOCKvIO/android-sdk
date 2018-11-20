@@ -17,5 +17,6 @@ class FaceBridge(
   val resourceManager: ResourceManager,
   val userManager: UserManager,
   val vatomManager: VatomManager,
-  val eventManager: EventManager
+  val eventManager: EventManager,
+  val jsonSerializer: JsonSerializer
 )
