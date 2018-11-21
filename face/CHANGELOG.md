@@ -26,7 +26,7 @@ Released on 2018-xx-xx
 ## [2.2.2](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/face/2.2.3)
 Released on 2018-11-12
 
-#### Fixed§
+#### Fixed
 - Resource file cache not caching.
   -Pull Request [#113](https://github.com/BLOCKvIO/android-sdk/pull/113)
   
