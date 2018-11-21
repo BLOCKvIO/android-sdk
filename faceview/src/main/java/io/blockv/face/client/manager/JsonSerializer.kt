@@ -8,17 +8,14 @@
  *  under the License.
  *
  */
-package io.blockv.face.client
+package io.blockv.face.client.manager
 
-import io.blockv.face.client.manager.*
+import org.json.JSONObject
+import kotlin.reflect.KClass
 
-/**
- * Face bridge provides access to SDK functions.
- */
-class FaceBridge(
-  val resourceManager: ResourceManager,
-  val userManager: UserManager,
-  val vatomManager: VatomManager,
-  val eventManager: EventManager,
-  val jsonSerializer: JsonSerializer
-)
+interface JsonSerializer {
+
+  fun <T : Any> deserialize(kclass: KClass<T>, json: JSONObject): T?
+
+  fun <T : Any> serialize(data: T): JSONObject?
+}

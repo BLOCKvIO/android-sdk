@@ -7,7 +7,8 @@ import io.blockv.common.util.Callable
 import java.io.File
 import java.io.InputStream
 
-class ResourceManagerWrapper(private val resourceManager: ResourceManager) : io.blockv.face.client.ResourceManager {
+class ResourceManagerWrapper(private val resourceManager: ResourceManager) :
+  io.blockv.face.client.manager.ResourceManager {
   override val resourceEncoder: ResourceEncoder
     get() = resourceManager.resourceEncoder
 

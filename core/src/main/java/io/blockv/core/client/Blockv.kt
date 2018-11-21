@@ -11,7 +11,6 @@
 package io.blockv.core.client
 
 import android.content.Context
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.NetModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
@@ -29,7 +28,9 @@ import io.blockv.faces.ImageFace
 import io.blockv.faces.ImageLayeredFace
 import io.blockv.faces.ImagePolicyFace
 import io.blockv.faces.ImageProgressFace
+import org.json.JSONObject
 import java.io.File
+import kotlin.reflect.KClass
 
 class Blockv {
   private val preferences: Preferences
@@ -67,60 +68,67 @@ class Blockv {
       if (internalFaceManager == null) {
         try {
           val encoder = ResourceEncoderImpl(preferences)
-          for (it in FaceManagerImpl::class.constructors) {
-            if (it.parameters.size == 1) {
-              internalFaceManager = it.call(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
-            } else
-              if (it.parameters.size == 4) {
-                internalFaceManager = it.call(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder),
-                  object : io.blockv.face.client.UserManager {
-                    override fun getCurrentUser(): Callable<PublicUser?> {
-                      return userManager.getCurrentUser()
-                        .map {
-                          if (it != null) {
-                            PublicUser(
-                              it.id,
-                              if (it.isNamePublic) it.firstName else "",
-                              if (it.isNamePublic) it.lastName else "",
-                              if (it.isAvatarPublic) it.avatarUri else ""
-                            )
-                          } else
-                            null
-                        }
-                    }
 
-                    override fun getPublicUser(userId: String): Callable<PublicUser?> {
-                      return userManager.getPublicUser(userId)
-                    }
-
-                  },
-                  object : io.blockv.face.client.VatomManager {
-                    override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
-                      return vatomManager.getVatoms(*ids)
-                    }
-
-                    override fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>> {
-                      return vatomManager.getInventory(id, page, limit)
-                    }
-
-                  },
-                  object : io.blockv.face.client.EventManager {
-                    override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
-                      return Callable.single {
-                        eventManager
-                      }
-                        .flatMap { eventManager.getVatomStateEvents() }
-                    }
-
-                    override fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>> {
-                      return Callable.single {
-                        eventManager
-                      }
-                        .flatMap { eventManager.getInventoryEvents() }
-                    }
-                  })
+          internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder),
+            object : io.blockv.face.client.manager.UserManager {
+              override fun getCurrentUser(): Callable<PublicUser?> {
+                return userManager.getCurrentUser()
+                  .map {
+                    if (it != null) {
+                      PublicUser(
+                        it.id,
+                        if (it.isNamePublic) it.firstName else "",
+                        if (it.isNamePublic) it.lastName else "",
+                        if (it.isAvatarPublic) it.avatarUri else ""
+                      )
+                    } else
+                      null
+                  }
               }
-          }
+
+              override fun getPublicUser(userId: String): Callable<PublicUser?> {
+                return userManager.getPublicUser(userId)
+              }
+
+            },
+            object : io.blockv.face.client.manager.VatomManager {
+              override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
+                return vatomManager.getVatoms(*ids)
+              }
+
+              override fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>> {
+                return vatomManager.getInventory(id, page, limit)
+              }
+
+            },
+            object : io.blockv.face.client.manager.EventManager {
+              override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
+                return Callable.single {
+                  eventManager
+                }
+                  .flatMap { eventManager.getVatomStateEvents() }
+              }
+
+              override fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>> {
+                return Callable.single {
+                  eventManager
+                }
+                  .flatMap { eventManager.getInventoryEvents() }
+              }
+            },
+            object : io.blockv.face.client.manager.JsonSerializer {
+              override fun <T : Any> deserialize(kclass: KClass<T>, json: JSONObject): T? {
+                return jsonModule.deserialize(kclass, json)
+              }
+
+              override fun <T : Any> serialize(data: T): JSONObject? {
+                return jsonModule.serialize(data)
+              }
+
+            }
+          )
+
+
           internalFaceManager!!.registerFace(ImageFace.factory)
           internalFaceManager!!.registerFace(ImageProgressFace.factory)
           internalFaceManager!!.registerFace(ImagePolicyFace.factory)

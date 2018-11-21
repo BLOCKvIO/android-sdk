@@ -18,9 +18,16 @@ import io.blockv.common.model.Vatom
 import io.blockv.common.util.Cancellable
 import io.blockv.common.util.CompositeCancellable
 import io.blockv.face.R
-import io.blockv.face.client.*
+import io.blockv.face.client.FaceBridge
 import io.blockv.face.client.FaceManager.EmbeddedProcedure
 import io.blockv.face.client.FaceManager.FaceSelectionProcedure
+import io.blockv.face.client.FaceView
+import io.blockv.face.client.VatomView
+import io.blockv.face.client.ViewFactory
+import io.blockv.face.client.manager.EventManager
+import io.blockv.face.client.manager.JsonSerializer
+import io.blockv.face.client.manager.UserManager
+import io.blockv.face.client.manager.VatomManager
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -30,7 +37,8 @@ class FaceManagerImpl(
   var resourceManager: ResourceManager,
   var userManager: UserManager,
   var vatomManager: VatomManager,
-  var eventManager: EventManager
+  var eventManager: EventManager,
+  var jsonSerializer: JsonSerializer
 ) : FaceManager {
 
   private val factories: HashMap<String, ViewFactory> = HashMap()
@@ -141,7 +149,8 @@ class FaceManagerImpl(
                 ),
                 userManager,
                 vatomManager,
-                eventManager
+                eventManager,
+                jsonSerializer
               )
             )
             vatomView.faceView = view

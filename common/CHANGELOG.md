@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to the common module will be documented in this file.
 
+#### 2.x Releases (API v1)
+- `2.0.x` Releases - [2.0.0](#200)
+---
 #### 1.x Releases (API v1)
 - `1.3.x` Releases - [1.3.0](#130)|[1.3.1](#131)|[1.3.2](#132)
 - `1.2.x` Releases - [1.2.0](#120)
@@ -8,6 +11,13 @@ All notable changes to the common module will be documented in this file.
 - `1.0.x` Releases - [1.0.0](#100)
 ---
 
+## [2.0.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/common/2.0.0)
+Released on 2018-xx-xx
+
+### Updated
+- `JsonModule` to use generic json serialization.
+ - Pull Request [#110](https://github.com/BLOCKvIO/android-sdk/pull/110)
+ 
 ## [1.3.2](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/common/1.3.2)
 Released on 2018-11-18
 
