@@ -20,6 +20,8 @@ Released on 2018-xx-xx
 #### Updated
 - `FaceManagerImpl` to use version 3.0.0 of [FaceView](/faceview) module.
   - Pull Request [#115](https://github.com/BLOCKvIO/android-sdk/pull/115)
+- Face builder to support web faces.
+  - Pull Request [#xxx](https://github.com/BLOCKvIO/android-sdk/pull/xxx)
   
 ## [2.2.2](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/face/2.2.3)
 Released on 2018-11-12

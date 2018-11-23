@@ -94,6 +94,11 @@ interface FaceManager {
                 continue
               }
               rate += 1
+            } else {
+              //check if a web face is registered
+              if (faceRegistry.indexOf("https://*") == -1) {
+                continue
+              }
             }
 
             if (rate > rating) {

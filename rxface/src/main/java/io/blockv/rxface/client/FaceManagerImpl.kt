@@ -135,7 +135,7 @@ class FaceManagerImpl(
           .map {
             val face = faceProcedure.select(vatom, faceRoster.keys)
               ?: throw FaceManager.Builder.Error.FACE_MODEL_IS_NULL.exception
-            val factory = faceRoster[face.property.displayUrl]
+            val factory = faceRoster[if (face.isNative()) face.property.displayUrl else "https://*"]
               ?: throw FaceManager.Builder.Error.FACTORY_NOT_FOUND.exception
             Pair(face, factory)
           }
