@@ -12,6 +12,7 @@ package io.blockv.face.client.manager
 
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Callable
+import org.json.JSONObject
 
 interface VatomManager {
 
@@ -38,5 +39,14 @@ interface VatomManager {
    */
   fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>>
 
+  /**
+   * Performs an action on the BLOCKv Platform.
+   *
+   * @param action is the name of the action to perform, e.g. "Drop".
+   * @param id is the id of the vAtom to preform the action on.
+   * @param payload contains the data required to do the action.
+   * @return new Callable<JSONObject>.
+   */
+  fun preformAction(action: String, id: String, payload: JSONObject?): Callable<JSONObject?>
 
 }
