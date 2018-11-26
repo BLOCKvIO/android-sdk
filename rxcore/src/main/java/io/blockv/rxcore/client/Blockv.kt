@@ -120,6 +120,22 @@ class Blockv {
 
             },
             object : io.blockv.face.client.manager.VatomManager {
+
+              override fun preformAction(action: String, id: String, payload: JSONObject?): Callable<JSONObject?> {
+                return Callable.create<JSONObject?> { emitter ->
+                  val disposable = vatomManager.preformAction(action, id, payload)
+                    .subscribe({
+                      emitter.onResult(it)
+                      emitter.onComplete()
+                    }, {
+                      emitter.onError(it)
+                    })
+                  emitter.doOnCompletion { disposable.dispose() }
+                }
+                  .runOn(Callable.Scheduler.IO)
+                  .returnOn(Callable.Scheduler.MAIN)
+              }
+
               override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
                 return Callable.create<List<Vatom>> { emitter ->
                   val disposable = vatomManager.getVatoms(*ids)
