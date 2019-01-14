@@ -14,7 +14,7 @@ import io.blockv.common.model.ActivityEvent
 import io.blockv.common.model.InventoryEvent
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.WebSocketEvent
-import io.blockv.common.util.Callable
+import io.reactivex.Flowable
 import org.json.JSONObject
 
 /**
@@ -25,30 +25,29 @@ interface EventManager {
   /**
    *  Provides a stream of raw web socket events.
    *
-   *  @return Callable<WebSocketEvent<JSONObject> instance.
+   *  @return Flowable<WebSocketEvent<JSONObject>> instance.
    */
-  fun getEvents(): Callable<WebSocketEvent<JSONObject>>
+  fun getEvents(): Flowable<WebSocketEvent<JSONObject>>
 
   /**
    *  Provides a stream of vAtom state update events.
    *
-   *  @return Callable<WebSocketEvent<StateUpdateEvent> instance.
+   *  @return Flowable<WebSocketEvent<StateUpdateEvent>> instance.
    */
-  fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>>
+  fun getVatomStateEvents(): Flowable<WebSocketEvent<StateUpdateEvent>>
 
   /**
-   *  Provides a stream of inventory update events. Receiving this event indicates
-   *  that a vAtom has been either added or removed from the user's inventory.
+   *  Provides a stream of inventory update events. This only indicates if a vAtom
+   *  has been added or removed from a specific inventory
    *
-   *  @return Callable<WebSocketEvent<InventoryEvent> instance
+   *  @return Flowable<WebSocketEvent<InventoryEvent>> instance
    */
-  fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>>
+  fun getInventoryEvents(): Flowable<WebSocketEvent<InventoryEvent>>
 
   /**
    * Provides a stream of activity events
    *
-   * @return Callable<WebSocketEvent<InventoryEvent> instance
+   * @return Flowable<WebSocketEvent<ActivityEvent>> instance
    */
-  fun getActivityEvents(): Callable<WebSocketEvent<ActivityEvent>>
-
- }
+  fun getActivityEvents(): Flowable<WebSocketEvent<ActivityEvent>>
+}
