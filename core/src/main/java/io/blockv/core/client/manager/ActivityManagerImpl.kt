@@ -16,40 +16,45 @@ import io.blockv.common.internal.net.rest.request.ActivityThreadListRequest
 import io.blockv.common.internal.net.rest.request.SendMessageRequest
 import io.blockv.common.model.ActivityMessageList
 import io.blockv.common.model.ActivityThreadList
-import io.blockv.common.util.Callable
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
 
-  override fun getThreads(cursor: String, count: Int): Callable<ActivityThreadList> = Callable.single {
+  override fun getThreads(cursor: String, count: Int): Single<ActivityThreadList> = Single.fromCallable {
     api.getThreadList(ActivityThreadListRequest(cursor, count)).payload
   }
-    .runOn(Callable.Scheduler.IO)
-    .returnOn(Callable.Scheduler.MAIN)
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getThreads(cursor: String): Callable<ActivityThreadList> {
+  override fun getThreads(cursor: String): Single<ActivityThreadList> {
     return getThreads(cursor, 0)
   }
 
-  override fun getThreads(): Callable<ActivityThreadList> {
+  override fun getThreads(): Single<ActivityThreadList> {
     return getThreads("")
   }
 
-  override fun getThreadMessages(id: String, cursor: String, count: Int): Callable<ActivityMessageList> =
-    Callable.single {
+  override fun getThreadMessages(id: String, cursor: String, count: Int): Single<ActivityMessageList> =
+    Single.fromCallable {
       api.getThreadMessages(ActivityMessageListRequest(id, cursor, count)).payload
     }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.MAIN)
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getThreadMessages(id: String, cursor: String): Callable<ActivityMessageList> {
+  override fun getThreadMessages(id: String, cursor: String): Single<ActivityMessageList> {
     return getThreadMessages(id, cursor, 0)
   }
 
-  override fun getThreadMessages(id: String): Callable<ActivityMessageList> {
+  override fun getThreadMessages(id: String): Single<ActivityMessageList> {
     return getThreadMessages(id, "")
   }
 
-  override fun sendMessage(userId: String, message: String): Callable<Void?> = Callable.single {
+  override fun sendMessage(userId: String, message: String): Completable = Completable.fromCallable {
     api.sendMessage(SendMessageRequest(userId, message)).payload
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 }
