@@ -28,6 +28,8 @@ android {
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation 'com.neovisionaries:nv-websocket-client:2.5'
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'io.reactivex.rxjava2:rxjava:2.2.5'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   implementation 'com.android.support:appcompat-v7:27.1.1'
@@ -77,6 +79,14 @@ publishing {
         websocket.appendNode('groupId', 'com.neovisionaries')
         websocket.appendNode('artifactId', 'nv-websocket-client')
         websocket.appendNode('version', '2.5')
+        def rxjava = dependenciesNode.appendNode('dependency')
+        rxjava.appendNode('groupId', 'io.reactivex.rxjava2')
+        rxjava.appendNode('artifactId', 'rxjava')
+        rxjava.appendNode('version', '[2.2.5,3.0.0)')
+        def rxandroid = dependenciesNode.appendNode('dependency')
+        rxandroid.appendNode('groupId', 'io.reactivex.rxjava2')
+        rxandroid.appendNode('artifactId', 'rxandroid')
+        rxandroid.appendNode('version', '[2.1.0,3.0.0)')
       }
     }
   }
