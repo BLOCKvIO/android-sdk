@@ -14,8 +14,11 @@ import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.model.*
-import io.blockv.common.util.Callable
 import io.blockv.common.util.JsonUtil
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -27,7 +30,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     filter: VatomManager.GeoFilter
-  ): Callable<List<Vatom>> = Callable.single {
+  ): Single<List<Vatom>> = Single.fromCallable {
     api.geoDiscover(
       GeoRequest(
         bottomLeftLon,
@@ -38,6 +41,8 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
       )
     ).payload
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
   override fun geoDiscoverGroups(
     bottomLeftLat: Double,
@@ -46,8 +51,7 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     topRightLon: Double,
     precision: Int,
     filter: VatomManager.GeoFilter
-  ): Callable<List<GeoGroup>> = Callable.single {
-    assert(precision in 1..12) { "Precision required to be in the range  1 - 12" }
+  ): Single<List<GeoGroup>> = Single.fromCallable {
     api.geoGroupDiscover(
       GeoGroupRequest(
         bottomLeftLon,
@@ -59,12 +63,81 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
       )
     ).payload
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-  override fun updateVatom(payload: JSONObject): Callable<Void?> = Callable.single {
-    api.updateVatom(payload).payload
+  override fun updateVatom(payload: JSONObject): Completable = Completable.fromCallable {
+    api.updateVatom(payload)
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getVatoms(vararg ids: String): Single<List<Vatom>> = Single.fromCallable {
+    api.getUserVatom(VatomRequest(ids.toList())).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>> = Single.fromCallable {
+    api.getUserInventory(
+      InventoryRequest(
+        (if (id == null || id.isEmpty()) "." else id),
+        page,
+        limit
+      )
+    ).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getVatomActions(templateId: String): Single<List<io.blockv.common.model.Action>> = Single.fromCallable {
+    api.getVatomActions(templateId).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun preformAction(
+    action: String,
+    id: String,
+    payload: JSONObject?
+  ): Single<JSONObject> = Single.fromCallable {
+    api.preformAction(PerformActionRequest(action, id, payload)).payload ?: JSONObject()
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun preformAction(
+    action: VatomManager.Action,
+    id: String,
+    payload: JSONObject?
+  ): Single<JSONObject> = preformAction(action.action(), id, payload)
+
+  override fun acquireVatom(id: String): Single<JSONObject> = preformAction(VatomManager.Action.ACQUIRE, id, null)
+
+  override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Completable {
+    val payload = JSONObject()
+    when (tokenType) {
+      VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
+      VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
+      VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
+    }
+    return preformAction(VatomManager.Action.TRANSFER, id, payload).toCompletable()
   }
 
-  override fun discover(query: JSONObject): Callable<List<Vatom>> = Callable.single {
+  override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {
+    val payload = JSONObject()
+    payload.put(
+      "geo.pos", JSONObject()
+        .put("lat", latitude)
+        .put("lon", longitude)
+    )
+    return preformAction(VatomManager.Action.DROP, id, payload).toCompletable()
+  }
+
+  override fun pickupVatom(id: String): Completable =
+    preformAction(VatomManager.Action.PICKUP, id, null).toCompletable()
+
+  override fun discover(query: JSONObject): Single<List<Vatom>> = Single.fromCallable {
     query.put(
       "return",
       JSONObject()
@@ -73,8 +146,10 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     )
     api.discover(query).payload.vatoms
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-  override fun discoverCount(query: JSONObject): Callable<Int> = Callable.single {
+  override fun discoverCount(query: JSONObject): Single<Int> = Single.fromCallable {
     query.put(
       "return",
       JSONObject()
@@ -84,80 +159,15 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     api.discover(query).payload.count
   }
 
-
-  override fun getVatoms(vararg ids: String): Callable<List<Vatom>> = Callable.single {
-    api.getUserVatom(VatomRequest(ids.toList())).payload
-  }
-
-  override fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>> = Callable.single {
-    api.getUserInventory(
-      InventoryRequest(
-        (if (id == null || id.isEmpty()) "." else id),
-        page,
-        limit
-      )
-    ).payload
-  }
-
-  override fun getVatomActions(templateId: String): Callable<List<Action>> = Callable.single {
-    api.getVatomActions(templateId).payload
-  }
-
-  override fun preformAction(
-    action: String,
-    id: String,
-    payload: JSONObject?
-  ): Callable<JSONObject?> = Callable.single {
-    api.preformAction(PerformActionRequest(action, id, payload)).payload ?: JSONObject()
-  }
-
-  override fun preformAction(
-    action: VatomManager.Action,
-    id: String,
-    payload: JSONObject?
-  ): Callable<JSONObject?> = preformAction(action.action(), id, payload)
-
-  override fun acquireVatom(id: String): Callable<JSONObject?> = preformAction(VatomManager.Action.ACQUIRE, id, null)
-
-
-  override fun transferVatom(
-    id: String,
-    tokenType: VatomManager.TokenType,
-    token: String
-  ): Callable<JSONObject?> {
-    val payload = JSONObject()
-    when (tokenType) {
-      VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
-      VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
-      VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
-    }
-    return preformAction(VatomManager.Action.TRANSFER, id, payload)
-  }
-
-  override fun dropVatom(
-    id: String,
-    latitude: Double,
-    longitude: Double
-  ): Callable<JSONObject?> {
-    val payload = JSONObject()
-    payload.put(
-      "geo.pos", JSONObject()
-        .put("lat", latitude)
-        .put("lon", longitude)
-    )
-    return preformAction(VatomManager.Action.DROP, id, payload)
-  }
-
-  override fun pickupVatom(id: String): Callable<JSONObject?> = preformAction(VatomManager.Action.PICKUP, id, null)
-
-  override fun trashVatom(id: String): Callable<Void?> = Callable.single {
+  override fun trashVatom(id: String): Completable = Completable.fromCallable {
     api.trashVatom(TrashVatomRequest(id))
-    null
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-  override fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Callable<Vatom> {
+  override fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Single<Vatom> {
 
-    return Callable.single {
+    return Single.fromCallable {
 
       if (vatom.id != update.vatomId)
         throw Exception("vAtom id does not match state event's vAtom id")
@@ -264,8 +274,8 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
       newVatom
     }
-      .runOn(Callable.Scheduler.COMP)
-      .returnOn(Callable.Scheduler.MAIN)
+      .subscribeOn(Schedulers.computation())
+      .observeOn(AndroidSchedulers.mainThread())
   }
 
 }
