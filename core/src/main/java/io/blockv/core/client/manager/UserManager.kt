@@ -8,15 +8,15 @@
  *  under the License.
  *
  */
-
 package io.blockv.core.client.manager
 
 import android.graphics.Bitmap
 import io.blockv.common.model.*
-import io.blockv.common.util.Callable
+import io.reactivex.Completable
+import io.reactivex.Single
 
 /**
- *  This interface contains the available BLOCKv user functions.
+ *  This interface contains the available Blockv user functions.
  */
 interface UserManager {
 
@@ -25,10 +25,9 @@ interface UserManager {
    * Registers a user on the BLOCKv platform.
    *
    * @param registration contains properties of the user. Only the properties to be registered should be set.
-   * @return new Callable<User> instance.
-   * @see Registration
+   * @return new Single<User> instance.
    */
-  fun register(registration: Registration): Callable<User?>
+  fun register(registration: Registration): Single<User>
 
 
   /**
@@ -37,26 +36,26 @@ interface UserManager {
    * @param token the user's phone(E.164) or email.
    * @param tokenType the type of the token (phone or email).
    * @param password the user's password.
-   * @return new Callable<User> instance.
+   * @return new Single<User> instance.
    */
-  fun login(token: String, tokenType: TokenType, password: String): Callable<User?>
+  fun login(token: String, tokenType: TokenType, password: String): Single<User>
 
   /**
    * Logs a user into the BLOCKv platform. Accepts an OAuth token.
    *
    * @param provider the OAuth provider, e.g. Facebook.
    * @param oauthToken the OAuth token issued by the OAuth provider.
-   * @return new Callable<User> instance.
+   * @return new Single<User> instance.
    */
-  fun loginOauth(provider: String, oauthToken: String): Callable<User?>
+  fun loginOauth(provider: String, oauthToken: String): Single<User>
 
   /**
    * Logs a user into the BLOCKv platform. Accepts a guest id.
    *
    * @param guestId the user's guest id.
-   * @return new Callable<User> instance.
+   * @return new Single<User> instance.
    */
-  fun loginGuest(guestId: String): Callable<User?>
+  fun loginGuest(guestId: String): Single<User>
 
   /**
    * Verifies ownership of a token by submitting the verification code to the BLOCKv platform.
@@ -64,9 +63,9 @@ interface UserManager {
    * @param token the user's phone(E.164) or email.
    * @param tokenType the type of the token (phone or email).
    * @param code the verification code send to the user's token (phone or email).
-   * @return new Callable<User> instance.
+   * @return new Completable instance.
    */
-  fun verifyUserToken(token: String, tokenType: TokenType, code: String): Callable<Void?>
+  fun verifyUserToken(token: String, tokenType: TokenType, code: String): Completable
 
   /**
    * Sends a One-Time-Pin (OTP) to the user's token (phone or email).
@@ -75,9 +74,9 @@ interface UserManager {
    *
    * @param token the user's phone(E.164) or email.
    * @param tokenType the type of the token (phone or email).
-   * @return new Callable<Void> instance.
+   * @return new Completable instance.
    */
-  fun resetToken(token: String, tokenType: TokenType): Callable<Void?>
+  fun resetToken(token: String, tokenType: TokenType): Completable
 
   /**
    * Sends a verification code to the user's token (phone or email).
@@ -86,33 +85,32 @@ interface UserManager {
    *
    * @param token the user's phone(E.164) or email.
    * @param tokenType the type of the token (phone or email).
-   * @return new Callable<Void> instance.
+   * @return new Completable instance.
    */
-  fun resendVerification(token: String, tokenType: TokenType): Callable<Void?>
+  fun resendVerification(token: String, tokenType: TokenType): Completable
 
   /**
    * Fetches the current user's profile information from the BLOCKv platform.
    *
-   * @return new Callable<User> instance.
+   * @return new Single<User> instance.
    */
-  fun getCurrentUser(): Callable<User?>
+  fun getCurrentUser(): Single<User>
 
   /**
    * Updates the current user's profile on the BLOCKv platform.
    *
    * @param update holds the properties of the user, e.g. their first name. Only the properties to be updated should be set.
-   * @return new Callable<User> instance.
-   * @see UserUpdate
+   * @return new Single<User> instance.
    */
-  fun updateCurrentUser(update: UserUpdate): Callable<User?>
+  fun updateCurrentUser(update: UserUpdate): Single<User>
 
   /**
    * Fetches a list of the current user's tokens.
    *
-   * @return new Callable<List<Token>>.
+   * @return new Single<List<Token>> instance.
    * @see Token
    */
-  fun getCurrentUserTokens(): Callable<List<Token>>
+  fun getCurrentUserTokens(): Single<List<Token>>
 
   /**
    * Adds a user token to the current user.
@@ -120,20 +118,20 @@ interface UserManager {
    * @param token the user token to be linked to the current user.
    * @param tokenType the type of the token (phone or email).
    * @param isDefault determines whether the token is the primary token on this account.
-   * @return new Callable<Void>.
+   * @return new Completable instance.
    */
-  fun addCurrentUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Callable<Token?>
+  fun addCurrentUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Single<Token>
 
   /**
    * Adds a OAuth user token to the current user.
    *
-   * @param token is the users id from the oAuth provider.
+   * @param token is the users id from the OAuth provider.
    * @param tokenType is the OAuth provider (e.g facebook).
    * @param code is the auth OAuth token from the provider.
    * @param isDefault determines whether the token is the primary token on this account.
-   * @return new Callable<Void>.
+   * @return new Completable instance.
    */
-  fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Callable<Token?>
+  fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Single<Token>
 
   /**
    * Updates the specified token to be the current user's default token on the BLOCKv Platform.
@@ -144,17 +142,17 @@ interface UserManager {
    * is_primary flag of an existing token to false , because only one token can be the primary token.
    *
    * @param tokenId is the unique identifier of the token to be deleted.
-   * @return new Callable<Void>.
+   * @return new Completable instance.
    */
-  fun setCurrentUserDefaultToken(tokenId: String): Callable<Void?>
+  fun setCurrentUserDefaultToken(tokenId: String): Completable
 
   /**
    * Removes the token from the current user's token list on the BLOCKv Platform.
    *
    * @param tokenId is the unique identifier of the token.
-   * @return new Callable<Void>
+   * @return new Completable instance.
    */
-  fun deleteCurrentUserToken(tokenId: String): Callable<Void?>
+  fun deleteCurrentUserToken(tokenId: String): Completable
 
   /**
    * Fetches the publicly available attributes of any user given their user id.
@@ -163,26 +161,26 @@ interface UserManager {
    * provision for receiving all, some, or none of their public attributes.
    *
    * @param userId is the unique identifier of the user.
-   * @return new Callable<PublicUser>.
+   * @return new Single<PublicUser>.
    * @see PublicUser
    */
-  fun getPublicUser(userId: String): Callable<PublicUser?>
+  fun getPublicUser(userId: String): Single<PublicUser>
 
   /**
    * Log out the current user.
    *
-   * The current user will not longer be authorized to perform user scoped requests on the BLOCKv platform.
+   * The current user will not longer be authorized to perform user scoped requests on the BLOCkv platform.
    *
-   * @return new Callable<Void> instance.
+   * @return new Completable instance.
    */
-  fun logout(): Callable<Void?>
+  fun logout(): Completable
 
   /**
    * Upload Bitmap to server to be used as the user's avatar.
    *
-   * @return new Callable<Void> instance.
+   * @return new Completable instance.
    */
-  fun uploadAvatar(avatar: Bitmap): Callable<Void?>
+  fun uploadAvatar(avatar: Bitmap): Completable
 
   /**
    * Determines whether a user is logged in.
@@ -191,22 +189,15 @@ interface UserManager {
    */
   fun isLoggedIn(): Boolean
 
-  /**
-   * Retrieves and refreshes the SDKs access token.
-   *
-   * This function should only be called if you have a well defined reason for obtaining an access token.
-   *
-   * @return new Callable<Jwt>.
-   * @see Jwt
-   */
-  fun getAccessToken(): Callable<Jwt?>
+  companion object {
+    val NULL_USER = User("", "", "", "", "", "", "", "", false, false, false, false)
+    val NULL_PUBLIC_USER = PublicUser()
+    val NULL_TOKEN = Token("", "", "", "", "", "", "", false, false, "")
+  }
 
   enum class TokenType {
     EMAIL,
     PHONE_NUMBER
   }
-
-
-
 
 }
