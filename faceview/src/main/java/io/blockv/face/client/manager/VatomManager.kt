@@ -11,7 +11,7 @@
 package io.blockv.face.client.manager
 
 import io.blockv.common.model.Vatom
-import io.blockv.common.util.Callable
+import io.reactivex.Single
 import org.json.JSONObject
 
 interface VatomManager {
@@ -20,10 +20,10 @@ interface VatomManager {
    * Fetches vAtoms by id.
    *
    * @param ids is a list of vAtom id's in the current users inventory.
-   * @return new Callable<List<Vatom>> instance.
+   * @return new Single<List<Vatom>> instance.
    * @see Vatom
    */
-  fun getVatoms(vararg ids: String): Callable<List<Vatom>>
+  fun getVatoms(vararg ids: String): Single<List<Vatom>>
 
   /**
    * Fetches the current user's inventory of vAtoms.
@@ -34,10 +34,10 @@ interface VatomManager {
    *             zero, the first page is returned.
    * @param limit defines the number of vAtoms per response page (up to 100). If omitted or set as
    *              zero, the max number is returned.
-   * @return new Callable<List<Vatom>> instance.
+   * @return new Single<List<Vatom>> instance.
    * @see Vatom
    */
-  fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>>
+  fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>>
 
   /**
    * Performs an action on the BLOCKv Platform.
@@ -45,8 +45,8 @@ interface VatomManager {
    * @param action is the name of the action to perform, e.g. "Drop".
    * @param id is the id of the vAtom to preform the action on.
    * @param payload contains the data required to do the action.
-   * @return new Callable<JSONObject>.
+   * @return new Single<JSONObject>.
    */
-  fun preformAction(action: String, id: String, payload: JSONObject?): Callable<JSONObject?>
+  fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject?>
 
 }

@@ -11,7 +11,7 @@
 package io.blockv.face.client.manager
 
 import io.blockv.common.model.PublicUser
-import io.blockv.common.util.Callable
+import io.reactivex.Single
 
 interface UserManager {
 
@@ -22,16 +22,16 @@ interface UserManager {
    * provision for receiving all, some, or none of their public attributes.
    *
    * @param userId is the unique identifier of the user.
-   * @return new Callable<PublicUser>.
+   * @return new Single<PublicUser>.
    * @see PublicUser
    */
-  fun getPublicUser(userId: String): Callable<PublicUser?>
+  fun getPublicUser(userId: String): Single<PublicUser?>
 
   /**
    * Fetches the current user's public information from the BLOCKv platform.
    *
-   * @return new Callable<PublicUser> instance.
+   * @return new Single<PublicUser> instance.
    */
-  fun getCurrentUser(): Callable<PublicUser?>
+  fun getCurrentUser(): Single<PublicUser?>
 
 }
