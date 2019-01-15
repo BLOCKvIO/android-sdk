@@ -1,0 +1,6 @@
+<ruleset comparisonMethod="maven">
+  <ignoreVersions>
+    <ignoreVersion type="regex">.*-alpha(.*)</ignoreVersion>
+    <ignoreVersion type="regex">.*-beta(.*)</ignoreVersion>
+  </ignoreVersions>
+</ruleset>
