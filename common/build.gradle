@@ -88,8 +88,8 @@ publishing {
         rxandroid.appendNode('artifactId', 'rxandroid')
         rxandroid.appendNode('version', '[2.1.0,3.0.0)')
         def ignoreVersions = asNode().appendNode('ignoreVersions')
-        ignoreVersions.appendNode('ignoreVersion', '.*-alpha(.*)',['type':'regex'])
-        ignoreVersions.appendNode('ignoreVersion', '.*-beta(.*)',['type':'regex'])
+        ignoreVersions.appendNode('ignoreVersion', ['type': 'regex'], '.*-alpha(.*)')
+        ignoreVersions.appendNode('ignoreVersion', ['type': 'regex'], '.*-beta(.*)')
       }
     }
   }
