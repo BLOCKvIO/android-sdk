@@ -87,10 +87,17 @@ publishing {
         rxandroid.appendNode('groupId', 'io.reactivex.rxjava2')
         rxandroid.appendNode('artifactId', 'rxandroid')
         rxandroid.appendNode('version', '[2.1.0,3.0.0)')
-        def ignoreVersions = asNode().appendNode('ignoreVersions')
-        ignoreVersions.appendNode('ignoreVersion', ['type': 'regex'], '.*-alpha(.*)')
-        ignoreVersions.appendNode('ignoreVersion', ['type': 'regex'], '.*-beta(.*)')
+        def versionPlugin = asNode()
+          .appendNode('build')
+          .appendNode('plugins')
+          .appendNode('plugin')
+        versionPlugin.appendNode('groupId', 'org.codehaus.mojo')
+        versionPlugin.appendNode('artifactId', 'versions-maven-plugin')
+        versionPlugin.appendNode('version', '2.1')
+        def configuration = versionPlugin.appendNode('configuration')
+        configuration.appendNode('rulesUri', 'https://raw.githubusercontent.com/BLOCKvIO/android-sdk/master/maven-rules.xml')
       }
+
     }
   }
   repositories {
