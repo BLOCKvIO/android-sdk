@@ -13,11 +13,13 @@ package io.blockv.core.client.manager
 import android.graphics.Bitmap
 import android.util.Log
 import io.blockv.common.internal.net.rest.api.UserApi
+import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.auth.JwtDecoder
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
+import io.blockv.common.util.Optional
 import io.blockv.core.client.manager.UserManager.Companion.NULL_PUBLIC_USER
 import io.blockv.core.client.manager.UserManager.Companion.NULL_TOKEN
 import io.blockv.core.client.manager.UserManager.Companion.NULL_USER
@@ -31,6 +33,7 @@ import java.io.ByteArrayOutputStream
 
 class UserManagerImpl(
   val api: UserApi,
+  val authenticator: Authenticator,
   val preferences: Preferences,
   val jwtDecoder: JwtDecoder
 ) : UserManager {
@@ -222,4 +225,10 @@ class UserManagerImpl(
     }
     return false
   }
+
+  override fun getAccessToken(): Single<Optional<Jwt>> = Single.fromCallable {
+    Optional(authenticator.refreshToken())
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 }

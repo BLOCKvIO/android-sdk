@@ -12,6 +12,7 @@ package io.blockv.core.client.manager
 
 import android.graphics.Bitmap
 import io.blockv.common.model.*
+import io.blockv.common.util.Optional
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -188,6 +189,16 @@ interface UserManager {
    * @return Boolean `true` if logged in. `false` otherwise.
    */
   fun isLoggedIn(): Boolean
+
+  /**
+   * Retrieves and refreshes the SDKs access token.
+   *
+   * This function should only be called if you have a well defined reason for obtaining an access token.
+   *
+   * @return new Single<Jwt>.
+   * @see Jwt
+   */
+  fun getAccessToken(): Single<Optional<Jwt>>
 
   companion object {
     val NULL_USER = User("", "", "", "", "", "", "", "", false, false, false, false)
