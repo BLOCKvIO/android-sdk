@@ -49,7 +49,7 @@ apply plugin: 'kotlin-android' //This should be at the top of the file.
 //
 dependencies {
   // ...
-  implementation 'io.blockv.sdk:face:2.1.2'
+  implementation 'io.blockv.sdk:face:3.0.0'
   // Make sure android Studio version is > 3.0 or include the Kotlin Plugin
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version'
 }
@@ -67,20 +67,6 @@ To access the BLOCKv SDK in your application code, import the class:
 
 ```java
 import io.blockv.core.Blockv;
-```
-
-There is also an [RxJava2](https://github.com/ReactiveX/RxJava) wrapped version, to use this you require to add the following dependency to your module Gradle file:
-
-```gradle
-dependencies {
-  // ...
-  implementation 'io.blockv.sdk:rxface:2.1.2'
-}
-```
-To access the RxJava2 wrapped SDK in your application code, import the class:
-
-```java
-import io.blockv.rxcore.Blockv;
 ```
 
 ### Configure your BLOCKv integration
@@ -107,6 +93,7 @@ Please see the [BLOCKv Android Sample](https://github.com/BLOCKvIO/android-sampl
 
 ### Dependencies
 1. [nv-websocket-client](https://github.com/TakahikoKawasaki/nv-websocket-client) is used for the web socket.
+2. [RxJava2](https://github.com/ReactiveX/RxJava)
 
 ### Recommendations
 
