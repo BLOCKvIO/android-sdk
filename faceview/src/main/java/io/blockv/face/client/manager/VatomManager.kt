@@ -47,6 +47,6 @@ interface VatomManager {
    * @param payload contains the data required to do the action.
    * @return new Single<JSONObject>.
    */
-  fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject?>
+  fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject>
 
 }

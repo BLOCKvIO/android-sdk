@@ -25,13 +25,13 @@ interface UserManager {
    * @return new Single<PublicUser>.
    * @see PublicUser
    */
-  fun getPublicUser(userId: String): Single<PublicUser?>
+  fun getPublicUser(userId: String): Single<PublicUser>
 
   /**
    * Fetches the current user's public information from the BLOCKv platform.
    *
    * @return new Single<PublicUser> instance.
    */
-  fun getCurrentUser(): Single<PublicUser?>
+  fun getCurrentUser(): Single<PublicUser>
 
 }
