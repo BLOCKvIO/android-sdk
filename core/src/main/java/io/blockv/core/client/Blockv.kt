@@ -20,7 +20,6 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
-import io.blockv.common.util.Callable
 import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
@@ -28,6 +27,9 @@ import io.blockv.faces.ImageFace
 import io.blockv.faces.ImageLayeredFace
 import io.blockv.faces.ImagePolicyFace
 import io.blockv.faces.ImageProgressFace
+import io.reactivex.Flowable
+import io.reactivex.Single
+import io.reactivex.plugins.RxJavaPlugins
 import org.json.JSONObject
 import java.io.File
 import kotlin.reflect.KClass
@@ -42,6 +44,12 @@ class Blockv {
   val vatomManager: VatomManager
   val resourceManager: ResourceManager
   val activityManager: ActivityManager
+
+  init {
+    RxJavaPlugins.setErrorHandler { throwable ->
+      throwable.printStackTrace()
+    }
+  }
 
   private val cacheDir: File
 
@@ -71,10 +79,10 @@ class Blockv {
 
           internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder),
             object : io.blockv.face.client.manager.UserManager {
-              override fun getCurrentUser(): Callable<PublicUser?> {
+              override fun getCurrentUser(): Single<PublicUser> {
                 return userManager.getCurrentUser()
                   .map {
-                    if (it != null) {
+                    if (it != UserManager.NULL_USER) {
                       PublicUser(
                         it.id,
                         if (it.isNamePublic) it.firstName else "",
@@ -82,42 +90,36 @@ class Blockv {
                         if (it.isAvatarPublic) it.avatarUri else ""
                       )
                     } else
-                      null
+                      UserManager.NULL_PUBLIC_USER
                   }
               }
 
-              override fun getPublicUser(userId: String): Callable<PublicUser?> {
+              override fun getPublicUser(userId: String): Single<PublicUser> {
                 return userManager.getPublicUser(userId)
               }
 
             },
             object : io.blockv.face.client.manager.VatomManager {
-              override fun preformAction(action: String, id: String, payload: JSONObject?): Callable<JSONObject?> {
+              override fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject> {
                 return vatomManager.preformAction(action, id, payload)
               }
 
-              override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
+              override fun getVatoms(vararg ids: String): Single<List<Vatom>> {
                 return vatomManager.getVatoms(*ids)
               }
 
-              override fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>> {
+              override fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>> {
                 return vatomManager.getInventory(id, page, limit)
               }
 
             },
             object : io.blockv.face.client.manager.EventManager {
-              override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
-                return Callable.single {
-                  eventManager
-                }
-                  .flatMap { eventManager.getVatomStateEvents() }
+              override fun getVatomStateEvents(): Flowable<WebSocketEvent<StateUpdateEvent>> {
+                return eventManager.getVatomStateEvents()
               }
 
-              override fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>> {
-                return Callable.single {
-                  eventManager
-                }
-                  .flatMap { eventManager.getInventoryEvents() }
+              override fun getInventoryEvents(): Flowable<WebSocketEvent<InventoryEvent>> {
+                return eventManager.getInventoryEvents()
               }
             },
             object : io.blockv.face.client.manager.JsonSerializer {
@@ -131,7 +133,6 @@ class Blockv {
 
             }
           )
-
 
           internalFaceManager!!.registerFace(ImageFace.factory)
           internalFaceManager!!.registerFace(ImageProgressFace.factory)
