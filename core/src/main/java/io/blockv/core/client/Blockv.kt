@@ -82,15 +82,12 @@ class Blockv {
               override fun getCurrentUser(): Single<PublicUser> {
                 return userManager.getCurrentUser()
                   .map {
-                    if (it != UserManager.NULL_USER) {
-                      PublicUser(
-                        it.id,
-                        if (it.isNamePublic) it.firstName else "",
-                        if (it.isNamePublic) it.lastName else "",
-                        if (it.isAvatarPublic) it.avatarUri else ""
-                      )
-                    } else
-                      UserManager.NULL_PUBLIC_USER
+                    PublicUser(
+                      it.id,
+                      if (it.isNamePublic) it.firstName else "",
+                      if (it.isNamePublic) it.lastName else "",
+                      if (it.isAvatarPublic) it.avatarUri else ""
+                    )
                   }
               }
 
