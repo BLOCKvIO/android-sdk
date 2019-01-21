@@ -22,12 +22,12 @@ class VatomApiImpl(
   val client: Client,
   val jsonModule: JsonModule
 ) : VatomApi {
-  override fun updateVatom(request: JSONObject): BaseResponse<Void?> {
+  override fun updateVatom(request: JSONObject): BaseResponse<Unit> {
     val response: JSONObject = client.patch("v1/vatoms", request)
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null
+      Unit
     )
   }
 
