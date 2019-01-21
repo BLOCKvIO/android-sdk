@@ -33,7 +33,7 @@ class ActivityApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.deserialize(payload) ?: ActivityThreadList("", ArrayList())
+      jsonModule.deserialize(payload)
     )
   }
 
@@ -44,18 +44,18 @@ class ActivityApiImpl(
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      jsonModule.deserialize(payload) ?: ActivityMessageList("", ArrayList())
+      jsonModule.deserialize(payload)
     )
   }
 
-  override fun sendMessage(request: SendMessageRequest): BaseResponse<Void?> {
+  override fun sendMessage(request: SendMessageRequest): BaseResponse<Unit> {
     val response: JSONObject = client.post("v1/user/message", request.toJson())
     val payload: JSONObject = response.optJSONObject("payload")
 
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      null
+      Unit
     )
 
   }

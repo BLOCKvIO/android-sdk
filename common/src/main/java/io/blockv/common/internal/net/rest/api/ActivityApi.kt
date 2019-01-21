@@ -23,5 +23,5 @@ interface ActivityApi {
 
   fun getThreadMessages(request: ActivityMessageListRequest): BaseResponse<ActivityMessageList>
 
-  fun sendMessage(request: SendMessageRequest): BaseResponse<Void?>
+  fun sendMessage(request: SendMessageRequest): BaseResponse<Unit>
 }

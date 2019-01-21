@@ -35,7 +35,7 @@ class JsonModule {
     serializers[key] = serializer as Serializer<Any>
   }
 
-  inline fun <reified T : Any> deserialize(json: JSONObject): T? {
+  inline fun <reified T : Any> deserialize(json: JSONObject): T {
     val key = T::class
     val serializer = serializers[key]
     return (serializer ?: genericSerializer).deserialize(key, json, serializers) as T

@@ -31,7 +31,7 @@ interface VatomApi {
 
   fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>>
 
-  fun updateVatom(request: JSONObject): BaseResponse<Void?>
+  fun updateVatom(request: JSONObject): BaseResponse<Unit>
 
   fun trashVatom(request: TrashVatomRequest): BaseResponse<JSONObject>
 }

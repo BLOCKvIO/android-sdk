@@ -200,12 +200,6 @@ interface UserManager {
    */
   fun getAccessToken(): Single<Optional<Jwt>>
 
-  companion object {
-    val NULL_USER = User("", "", "", "", "", "", "", "", false, false, false, false)
-    val NULL_PUBLIC_USER = PublicUser()
-    val NULL_TOKEN = Token("", "", "", "", "", "", "", false, false, "")
-  }
-
   enum class TokenType {
     EMAIL,
     PHONE_NUMBER

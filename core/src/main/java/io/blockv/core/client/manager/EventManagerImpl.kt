@@ -31,12 +31,6 @@ class EventManagerImpl(
   @Volatile
   private var eventFlowable: Flowable<WebSocketEvent<JSONObject>>? = null
 
-  companion object {
-    val NULL_STATE_EVENT = WebSocketEvent<StateUpdateEvent>("", "", null)
-    val NULL_INVENTORY_EVENT = WebSocketEvent<InventoryEvent>("", "", null)
-    val NULL_ACTIVITY_EVENT = WebSocketEvent<ActivityEvent>("", "", null)
-  }
-
   @Synchronized
   override fun getEvents(): Flowable<WebSocketEvent<JSONObject>> {
     if (eventFlowable == null) {
@@ -53,15 +47,17 @@ class EventManagerImpl(
         var stateEvent = NULL_STATE_EVENT
         if (event.payload != null) {
           val payload = jsonModule.deserialize<StateUpdateEvent>(event.payload!!)
-          if (payload != null) {
-            stateEvent = WebSocketEvent(
-              event.messageType,
-              event.userId,
-              payload
-            )
-          }
+          stateEvent = WebSocketEvent(
+            event.messageType,
+            event.userId,
+            payload
+          )
         }
         stateEvent
+      }
+      .onErrorReturn {
+        it.printStackTrace()
+        NULL_STATE_EVENT
       }
       .filter { event -> event !== NULL_STATE_EVENT }
       .observeOn(AndroidSchedulers.mainThread())
@@ -75,15 +71,17 @@ class EventManagerImpl(
         var stateEvent = NULL_INVENTORY_EVENT
         if (event.payload != null) {
           val payload = jsonModule.deserialize<InventoryEvent>(event.payload!!)
-          if (payload != null) {
-            stateEvent = WebSocketEvent(
-              event.messageType,
-              event.userId,
-              payload
-            )
-          }
+          stateEvent = WebSocketEvent(
+            event.messageType,
+            event.userId,
+            payload
+          )
         }
         stateEvent
+      }
+      .onErrorReturn {
+        it.printStackTrace()
+        NULL_INVENTORY_EVENT
       }
       .filter { event -> event !== NULL_INVENTORY_EVENT }
       .observeOn(AndroidSchedulers.mainThread())
@@ -97,15 +95,17 @@ class EventManagerImpl(
         var stateEvent = NULL_ACTIVITY_EVENT
         if (event.payload != null) {
           val payload = jsonModule.deserialize<ActivityEvent>(event.payload!!)
-          if (payload != null) {
-            stateEvent = WebSocketEvent(
-              event.messageType,
-              event.userId,
-              payload
-            )
-          }
+          stateEvent = WebSocketEvent(
+            event.messageType,
+            event.userId,
+            payload
+          )
         }
         stateEvent
+      }
+      .onErrorReturn {
+        it.printStackTrace()
+        NULL_ACTIVITY_EVENT
       }
       .filter { event -> event !== NULL_ACTIVITY_EVENT }
       .observeOn(AndroidSchedulers.mainThread())
@@ -134,6 +134,12 @@ class EventManagerImpl(
     }, BackpressureStrategy.BUFFER)
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
+  }
+
+  companion object {
+    val NULL_STATE_EVENT = WebSocketEvent<StateUpdateEvent>("", "", null)
+    val NULL_INVENTORY_EVENT = WebSocketEvent<InventoryEvent>("", "", null)
+    val NULL_ACTIVITY_EVENT = WebSocketEvent<ActivityEvent>("", "", null)
   }
 
 }

@@ -19,38 +19,38 @@ import org.json.JSONObject
 
 interface UserApi {
 
-  fun register(request: CreateUserRequest): BaseResponse<User?>
+  fun register(request: CreateUserRequest): BaseResponse<User>
 
-  fun login(request: LoginRequest): BaseResponse<User?>
+  fun login(request: LoginRequest): BaseResponse<User>
 
-  fun loginGuest(request: GuestLoginRequest): BaseResponse<User?>
+  fun loginGuest(request: GuestLoginRequest): BaseResponse<User>
 
-  fun oauthLogin(request: OauthLoginRequest): BaseResponse<User?>
+  fun oauthLogin(request: OauthLoginRequest): BaseResponse<User>
 
-  fun getCurrentUser(): BaseResponse<User?>
+  fun getCurrentUser(): BaseResponse<User>
 
-  fun updateCurrentUser(request: UpdateUserRequest): BaseResponse<User?>
+  fun updateCurrentUser(request: UpdateUserRequest): BaseResponse<User>
 
-  fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token?>
+  fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token>
 
-  fun resetToken(request: ResetTokenRequest): BaseResponse<Void?>
+  fun resetToken(request: ResetTokenRequest): BaseResponse<Unit>
 
-  fun verifyToken(request: VerifyTokenRequest): BaseResponse<Void?>
+  fun verifyToken(request: VerifyTokenRequest): BaseResponse<Unit>
 
   fun getUserTokens(): BaseResponse<List<Token>>
 
-  fun createUserToken(request: CreateTokenRequest): BaseResponse<Token?>
+  fun createUserToken(request: CreateTokenRequest): BaseResponse<Token>
 
-  fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Token?>
+  fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Token>
 
-  fun setDefaultUserToken(tokenId: String): BaseResponse<Void?>
+  fun setDefaultUserToken(tokenId: String): BaseResponse<Unit>
 
-  fun deleteUserToken(tokenId: String): BaseResponse<Void?>
+  fun deleteUserToken(tokenId: String): BaseResponse<Unit>
 
-  fun getPublicUser(userId: String): BaseResponse<PublicUser?>
+  fun getPublicUser(userId: String): BaseResponse<PublicUser>
 
   fun logout(): BaseResponse<JSONObject>
 
-  fun uploadAvatar(request: UploadAvatarRequest): BaseResponse<Void?>
+  fun uploadAvatar(request: UploadAvatarRequest): BaseResponse<Unit>
 
 }

@@ -20,9 +20,6 @@ import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
 import io.blockv.common.util.Optional
-import io.blockv.core.client.manager.UserManager.Companion.NULL_PUBLIC_USER
-import io.blockv.core.client.manager.UserManager.Companion.NULL_TOKEN
-import io.blockv.core.client.manager.UserManager.Companion.NULL_USER
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -43,7 +40,7 @@ class UserManagerImpl(
     tokenType: UserManager.TokenType,
     isDefault: Boolean
   ): Single<Token> = Single.fromCallable {
-    api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload ?: NULL_TOKEN
+    api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -53,7 +50,7 @@ class UserManagerImpl(
     tokenType: String,
     code: String, isDefault: Boolean
   ): Single<Token> = Single.fromCallable {
-    api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault)).payload ?: NULL_TOKEN
+    api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -71,7 +68,7 @@ class UserManagerImpl(
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun getPublicUser(userId: String): Single<PublicUser> = Single.fromCallable {
-    api.getPublicUser(userId).payload ?: NULL_PUBLIC_USER
+    api.getPublicUser(userId).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -97,7 +94,7 @@ class UserManagerImpl(
         registration.language,
         tokens
       )
-    ).payload ?: NULL_USER
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -113,7 +110,7 @@ class UserManagerImpl(
         token,
         password
       )
-    ).payload ?: NULL_USER
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -127,7 +124,7 @@ class UserManagerImpl(
         provider,
         oauthToken
       )
-    ).payload ?: NULL_USER
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -137,7 +134,7 @@ class UserManagerImpl(
       GuestLoginRequest(
         guestId
       )
-    ).payload ?: NULL_USER
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -171,7 +168,7 @@ class UserManagerImpl(
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun getCurrentUser(): Single<User> = Single.fromCallable {
-    api.getCurrentUser().payload ?: NULL_USER
+    api.getCurrentUser().payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -186,7 +183,7 @@ class UserManagerImpl(
         update.language,
         update.password
       )
-    ).payload ?: NULL_USER
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
