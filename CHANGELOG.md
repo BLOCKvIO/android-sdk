@@ -5,8 +5,6 @@ All notable changes to this project will be documented in this file.
 
 - [common](./common)
 - [core](./core)
-- [rxcore](./rxcore)
 - [face](./face)
-- [rxface](./rxface)
 - [faceview](./faceview)
 

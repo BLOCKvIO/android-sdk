@@ -15,9 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
-import io.blockv.common.util.Callable
-import io.blockv.common.util.Cancellable
-import io.blockv.common.util.CompositeCancellable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 
 /**
  * Base FaceView class that must be extended to create custom FaceViews.
@@ -27,15 +26,11 @@ abstract class FaceView(
   var face: Face,
   val bridge: FaceBridge
 ) {
-  private var cancellable: CompositeCancellable
+  private var disposable: CompositeDisposable = CompositeDisposable()
 
   @get:Synchronized
   @set:Synchronized
   var isLoaded: Boolean = false
-
-  init {
-    cancellable = CompositeCancellable()
-  }
 
   /**
    * Creates a view for this FaceView. The view must not be attached to the container.
@@ -116,15 +111,13 @@ abstract class FaceView(
    * Helper function that collects Cancellables to be canceled on unload.
    * This should be used to help clean up long running actions to prevent memory leaks.
    *
-   * @param cancellable to be canceled on unload.
+   * @param disposable to be disposed on unload.
    *
    * @see onUnload
-   * @see Cancellable
-   * @see Callable
    */
   @Synchronized
-  fun collect(cancellable: Cancellable) {
-    this.cancellable.add(cancellable)
+  fun collect(disposable: Disposable) {
+    this.disposable.add(disposable)
   }
 
   /**
@@ -134,8 +127,8 @@ abstract class FaceView(
    */
   @Synchronized
   fun cancel() {
-    cancellable.cancel()
-    cancellable = CompositeCancellable()
+    disposable.dispose()
+    disposable = CompositeDisposable()
   }
 
   /**
@@ -162,11 +155,11 @@ abstract class FaceView(
 
     /**
      * This should be used to collect all long running methods inside onLoad.
-     * The loading chain can be canceled, triggering the collected cancellables.
+     * The loading chain can be canceled, triggering the collected disposables to be disposed.
      *
-     * @param cancellable to be canceled if load is canceled.
+     * @param disposable to be disposed if load is canceled.
      */
-    fun collect(cancellable: Cancellable)
+    fun collect(disposable: Disposable)
   }
 
 }

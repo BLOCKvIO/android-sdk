@@ -26,33 +26,36 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-    exclude group: 'com.android.support', module: 'support-annotations'
-  })
   implementation 'com.neovisionaries:nv-websocket-client:2.5'
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'io.reactivex.rxjava2:rxjava:2.2.5'
   implementation 'com.android.support:appcompat-v7:27.1.1'
-  testImplementation 'junit:junit:4.12'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-  implementation("io.blockv.faces:image-face:3.0.0-alpha.1")
+  implementation("io.blockv.faces:image-face:3.0.0")
     {
       exclude group: 'io.blockv.sdk'
     }
-  implementation("io.blockv.faces:image-progress-face:3.0.0-alpha.1")
+  implementation("io.blockv.faces:image-progress-face:3.0.0")
     {
       exclude group: 'io.blockv.sdk'
     }
-  implementation("io.blockv.faces:image-policy-face:2.0.0-alpha.1")
+  implementation("io.blockv.faces:image-policy-face:2.0.0")
     {
       exclude group: 'io.blockv.sdk'
     }
-  implementation("io.blockv.faces:image-layered-face:2.0.0-alpha.1")
+  implementation("io.blockv.faces:image-layered-face:2.0.0")
     {
       exclude group: 'io.blockv.sdk'
     }
   implementation project(':common')
   implementation project(':face')
   implementation project(':faceview')
+
+  androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+    exclude group: 'com.android.support', module: 'support-annotations'
+  })
+  testImplementation 'junit:junit:4.12'
 }
 repositories {
   mavenCentral()
@@ -60,7 +63,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk'
 def libraryArtifactId = 'core'
-def libraryVersion = '3.0.0-alpha.3'
+def libraryVersion = '3.0.0'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -81,7 +84,17 @@ publishing {
         def common = dependenciesNode.appendNode('dependency')
         common.appendNode('groupId', 'io.blockv.sdk')
         common.appendNode('artifactId', 'common')
-        common.appendNode('version', '[2.0.0-alpha.3,3.0.0)')
+        common.appendNode('version', '[2.0.0,3.0.0)')
+        def versionPlugin = asNode()
+          .appendNode('build')
+          .appendNode('plugins')
+          .appendNode('plugin')
+        versionPlugin.appendNode('groupId', 'org.codehaus.mojo')
+        versionPlugin.appendNode('artifactId', 'versions-maven-plugin')
+        versionPlugin.appendNode('version', '2.1')
+        def configuration = versionPlugin.appendNode('configuration')
+        configuration.appendNode('rulesUri', 'https://raw.githubusercontent.com/BLOCKvIO/android-sdk/master/maven-rules.xml')
+
       }
 
     }

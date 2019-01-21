@@ -1,4 +1,4 @@
-package io.blockv.rxface.client
+package io.blockv.common.util
 
 class Optional<T>(val value: T?) {
 

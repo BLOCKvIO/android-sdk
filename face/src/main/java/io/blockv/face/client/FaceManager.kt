@@ -15,9 +15,9 @@ import android.view.View
 import android.view.ViewGroup
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
-import io.blockv.common.util.Callable
 import io.blockv.face.client.FaceManager.EmbeddedProcedure.*
 import io.blockv.face.client.manager.ResourceManager
+import io.reactivex.Single
 
 interface FaceManager {
 
@@ -187,12 +187,12 @@ interface FaceManager {
      * Builds a Callable to load a FaceView into the provided VatomView.
      *
      * @param vatomView to load a FaceView for.
-     * @return new Callable<FaceView>, calling this will begin the loading chain.
+     * @return new Single<FaceView>, subscribing to this will begin the loading chain.
      *
      * @see FaceView
      * @see VatomView
      */
-    fun into(vatomView: VatomView): Callable<FaceView>
+    fun into(vatomView: VatomView): Single<FaceView>
 
     /**
      * Sets an embedded procedure to be used to selected a Face model for the vAtom.
