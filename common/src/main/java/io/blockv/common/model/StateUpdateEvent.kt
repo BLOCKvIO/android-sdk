@@ -13,7 +13,7 @@ package io.blockv.common.model
 import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
-class StateUpdateEvent {
+class StateUpdateEvent : Model {
   @Serializer.Serialize(name = "event_id")
   val eventId: String
   @Serializer.Serialize(name = "op")

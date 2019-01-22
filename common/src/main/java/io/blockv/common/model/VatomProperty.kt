@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class VatomProperty() {
+class VatomProperty() : Model {
 
   @Serializer.Serialize
   var commerce: Commerce? = null

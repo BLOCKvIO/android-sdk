@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class CreationPolicy {
+class CreationPolicy : Model {
 
   @Serializer.Serialize(name = "auto_create")
   var autoCreate: String

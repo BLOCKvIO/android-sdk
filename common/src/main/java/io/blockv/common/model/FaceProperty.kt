@@ -13,7 +13,7 @@ package io.blockv.common.model
 import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
-class FaceProperty {
+class FaceProperty : Model {
   @Serializer.Serialize(name = "display_url")
   val displayUrl: String
   @Serializer.Serialize(name = "view_mode", path = "constraints")

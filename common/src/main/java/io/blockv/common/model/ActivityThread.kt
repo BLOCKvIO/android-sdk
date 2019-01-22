@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class ActivityThread {
+class ActivityThread : Model {
   @Serializer.Serialize(name = "name")
   val id: String
   @Serializer.Serialize(name = "when_modified")

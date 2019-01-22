@@ -18,7 +18,7 @@ class Registration(
   var password: String?,
   var language: String?,
   var tokens: List<Token>?
-) {
+) : Model {
   open class Token(val type: String, val value: String)
 
   class OauthToken(type: String, value: String, val auth: String) : Token(type, value)

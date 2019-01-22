@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class InventoryEvent {
+class InventoryEvent : Model {
 
   @Serializer.Serialize(name = "event_id")
   val eventId: String

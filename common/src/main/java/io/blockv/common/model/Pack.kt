@@ -2,7 +2,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class Pack {
+class Pack : Model {
 
   @Serializer.Serialize
   val vatoms: List<Vatom>

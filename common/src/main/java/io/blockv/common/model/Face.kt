@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class Face {
+class Face : Model {
   @Serializer.Serialize
   var id: String
   @Serializer.Serialize(name = "template")

@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class ActivityEvent {
+class ActivityEvent : Model {
 
   @Serializer.Serialize(name = "msg_id")
   val eventId: Long

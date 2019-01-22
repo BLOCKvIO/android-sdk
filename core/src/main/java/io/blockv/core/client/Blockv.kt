@@ -120,11 +120,11 @@ class Blockv {
               }
             },
             object : io.blockv.face.client.manager.JsonSerializer {
-              override fun <T : Any> deserialize(kclass: KClass<T>, json: JSONObject): T? {
+              override fun <T : Model> deserialize(kclass: KClass<T>, json: JSONObject): T? {
                 return jsonModule.deserialize(kclass, json)
               }
 
-              override fun <T : Any> serialize(data: T): JSONObject? {
+              override fun <T : Model> serialize(data: T): JSONObject? {
                 return jsonModule.serialize(data)
               }
 

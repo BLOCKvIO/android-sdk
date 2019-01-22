@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class DiscoverPack {
+class DiscoverPack : Model {
   @Serializer.Serialize
   val count: Int
   @Serializer.Serialize(name = "results")

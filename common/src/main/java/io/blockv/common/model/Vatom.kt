@@ -13,7 +13,7 @@ package io.blockv.common.model
 import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
-open class Vatom {
+open class Vatom : Model {
 
   @Serializer.Serialize
   val id: String

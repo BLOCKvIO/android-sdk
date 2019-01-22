@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class Pricing {
+class Pricing : Model {
 
   @Serializer.Serialize
   var pricingType: String?

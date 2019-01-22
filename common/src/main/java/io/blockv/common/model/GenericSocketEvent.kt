@@ -13,7 +13,7 @@ package io.blockv.common.model
 import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
-class GenericSocketEvent : WebSocketEvent<JSONObject> {
+class GenericSocketEvent : WebSocketEvent<JSONObject>, Model {
 
   @Serializer.Serialize(name = "msg_type")
   override val messageType: String

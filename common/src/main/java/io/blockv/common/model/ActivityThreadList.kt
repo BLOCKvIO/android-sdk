@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class ActivityThreadList {
+class ActivityThreadList : Model {
   @Serializer.Serialize
   val cursor: String
   @Serializer.Serialize

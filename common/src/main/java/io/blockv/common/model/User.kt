@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class User {
+class User : Model {
 
   @Serializer.Serialize
   val id: String

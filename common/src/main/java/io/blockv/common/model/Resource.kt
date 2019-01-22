@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class Resource {
+class Resource : Model {
   @Serializer.Serialize
   var name: String
   @Serializer.Serialize(name = "resourceType")
