@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class GeoGroup {
+class GeoGroup : Model {
 
   @Serializer.Serialize(name = "key")
   val geoHash: String

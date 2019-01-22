@@ -16,7 +16,7 @@ class DecodedJwt(
   val jwt: Jwt,
   val userId: String,
   val expiration: Date
-) {
+) : Model {
   fun checkIsExpired(): Boolean {
     return Date().after(expiration)
   }

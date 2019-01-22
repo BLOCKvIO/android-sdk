@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-open class Environment {
+open class Environment : Model {
   @Serializer.Serialize
   val rest: String
   @Serializer.Serialize

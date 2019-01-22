@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class ChildPolicy {
+class ChildPolicy : Model {
   @Serializer.Serialize
   var count: Int?
   @Serializer.Serialize(name = "template_variation")

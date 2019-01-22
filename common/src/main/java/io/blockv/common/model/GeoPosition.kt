@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class GeoPosition {
+class GeoPosition : Model {
 
   @Serializer.Serialize
   var type: String?

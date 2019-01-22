@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-open class PublicUser {
+open class PublicUser : Model {
 
   @Serializer.Serialize
   var id: String? = null

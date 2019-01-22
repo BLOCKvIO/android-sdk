@@ -13,7 +13,7 @@ package io.blockv.common.model
 class Action(
   val templateId: String,
   val name: String
-) {
+) : Model {
   override fun toString(): String {
     return "Action{" +
       " templateId='" + templateId + '\'' +
