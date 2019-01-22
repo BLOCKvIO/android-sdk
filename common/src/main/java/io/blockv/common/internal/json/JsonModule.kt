@@ -14,6 +14,7 @@ import io.blockv.common.internal.json.serializer.GenericSerializer
 import io.blockv.common.internal.json.serializer.Serializer
 import io.blockv.common.internal.json.serializer.custom.ActionSerializer
 import io.blockv.common.model.Action
+import io.blockv.common.model.Model
 import org.json.JSONObject
 import kotlin.reflect.KClass
 
@@ -30,23 +31,23 @@ class JsonModule {
   }
 
 
-  inline fun <reified T : Any> registerSerializer(serializer: Serializer<*>) {
+  inline fun <reified T : Model> registerSerializer(serializer: Serializer<*>) {
     val key = T::class
     serializers[key] = serializer as Serializer<Any>
   }
 
-  inline fun <reified T : Any> deserialize(json: JSONObject): T {
+  inline fun <reified T : Model> deserialize(json: JSONObject): T {
     val key = T::class
     val serializer = serializers[key]
     return (serializer ?: genericSerializer).deserialize(key, json, serializers) as T
   }
 
-  fun <T : Any> deserialize(kclass: KClass<T>, json: JSONObject): T? {
+  fun <T : Model> deserialize(kclass: KClass<T>, json: JSONObject): T? {
     val serializer = serializers[kclass]
     return (serializer ?: genericSerializer).deserialize(kclass, json, serializers) as T
   }
 
-  fun <T : Any> serialize(data: T): JSONObject? {
+  fun <T : Model> serialize(data: T): JSONObject? {
 
     val serializer = serializers[data::class]
 

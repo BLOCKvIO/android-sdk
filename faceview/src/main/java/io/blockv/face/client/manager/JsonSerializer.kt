@@ -10,12 +10,13 @@
  */
 package io.blockv.face.client.manager
 
+import io.blockv.common.model.Model
 import org.json.JSONObject
 import kotlin.reflect.KClass
 
 interface JsonSerializer {
 
-  fun <T : Any> deserialize(kclass: KClass<T>, json: JSONObject): T?
+  fun <T : Model> deserialize(kclass: KClass<T>, json: JSONObject): T?
 
-  fun <T : Any> serialize(data: T): JSONObject?
+  fun <T : Model> serialize(data: T): JSONObject?
 }
