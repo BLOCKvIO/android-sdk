@@ -97,8 +97,8 @@ class Blockv {
 
             },
             object : io.blockv.face.client.manager.VatomManager {
-              override fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject> {
-                return vatomManager.preformAction(action, id, payload)
+              override fun preformAction(action: String, payload: JSONObject): Single<JSONObject> {
+                return vatomManager.preformAction(action, payload)
               }
 
               override fun getVatoms(vararg ids: String): Single<List<Vatom>> {

@@ -114,24 +114,21 @@ interface VatomManager {
    * Performs an action on the BLOCKv Platform.
    *
    * @param action is the name of the action to perform, e.g. "Drop".
-   * @param id is the id of the vAtom to preform the action on.
    * @param payload contains the data required to do the action.
    * @return new Single<JSONObject> instance.
    */
-  fun preformAction(action: String, id: String, payload: JSONObject?): Single<JSONObject>
+  fun preformAction(action: String, payload: JSONObject): Single<JSONObject>
 
   /**
    * Performs an action on the BLOCKv Platform.
    *
    * @param action is the action to perform.
-   * @param id is the id of the vAtom to preform the action on.
    * @param payload contains the data required to do the action.
    * @return new Single<JSONObject> instance.
    */
   fun preformAction(
     action: Action,
-    id: String,
-    payload: JSONObject?
+    payload: JSONObject
   ): Single<JSONObject>
 
   /**
