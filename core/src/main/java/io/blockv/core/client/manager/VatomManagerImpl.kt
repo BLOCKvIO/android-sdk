@@ -98,44 +98,50 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
 
   override fun preformAction(
     action: String,
-    id: String,
-    payload: JSONObject?
+    payload: JSONObject
   ): Single<JSONObject> = Single.fromCallable {
-    api.preformAction(PerformActionRequest(action, id, payload)).payload ?: JSONObject()
+    api.preformAction(PerformActionRequest(action, payload)).payload ?: JSONObject()
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun preformAction(
     action: VatomManager.Action,
-    id: String,
-    payload: JSONObject?
-  ): Single<JSONObject> = preformAction(action.action(), id, payload)
+    payload: JSONObject
+  ): Single<JSONObject> = preformAction(action.action(), payload)
 
-  override fun acquireVatom(id: String): Single<JSONObject> = preformAction(VatomManager.Action.ACQUIRE, id, null)
+  override fun acquireVatom(id: String): Single<JSONObject> =
+    preformAction(VatomManager.Action.ACQUIRE, JSONObject().put("this.id", id))
 
   override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Completable {
     val payload = JSONObject()
+    payload.put("this.id", id)
     when (tokenType) {
       VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
       VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
       VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
     }
-    return preformAction(VatomManager.Action.TRANSFER, id, payload).toCompletable()
+    return Completable.fromSingle(preformAction(VatomManager.Action.TRANSFER, payload))
   }
 
   override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {
     val payload = JSONObject()
+    payload.put("this.id", id)
     payload.put(
       "geo.pos", JSONObject()
         .put("lat", latitude)
         .put("lon", longitude)
     )
-    return preformAction(VatomManager.Action.DROP, id, payload).toCompletable()
+    return Completable.fromSingle(preformAction(VatomManager.Action.DROP, payload))
   }
 
   override fun pickupVatom(id: String): Completable =
-    preformAction(VatomManager.Action.PICKUP, id, null).toCompletable()
+    Completable.fromSingle(
+      preformAction(
+        VatomManager.Action.PICKUP,
+        JSONObject().put("this.id", id)
+      )
+    )
 
   override fun discover(query: JSONObject): Single<List<Vatom>> = Single.fromCallable {
     query.put(
