@@ -18,6 +18,7 @@ import io.blockv.common.model.Vatom
 import io.blockv.face.client.FaceManager.EmbeddedProcedure.*
 import io.blockv.face.client.manager.ResourceManager
 import io.reactivex.Single
+import org.json.JSONObject
 
 interface FaceManager {
 
@@ -247,6 +248,8 @@ interface FaceManager {
      */
     fun setLoaderDelay(time: Long): Builder
 
+    fun setMessageHandler(): Builder
+
     enum class Error(val message: String) {
       FACTORY_NOT_FOUND("The face's display url is not a registered native face"),
       FACE_MODEL_IS_NULL("The face selection procedure has returned null"),
@@ -258,6 +261,34 @@ interface FaceManager {
 
     class VatomViewException(val error: Error) : Exception(error.message)
   }
+
+  interface MessageHandler {
+
+    fun onMessageReceived(name: String, payload: JSONObject, handler: ResponseHandler)
+
+    interface ResponseHandler {
+
+      /**
+       * This must be called once the the viewer has completed processing the message
+       * but has no response.
+       */
+      fun onComplete()
+
+      /**
+       * This
+       */
+      fun onCompleteWithResponse(name: String, payload: JSONObject)
+
+      /**
+       * This must be called if an error has occurred during processing of the message.
+       *
+       * @param error is the throwable to be returned.
+       */
+      fun onError(error: Throwable)
+
+    }
+  }
+
 
   /**
    * View Emitter is used to create custom loader and error views.
