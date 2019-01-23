@@ -204,7 +204,7 @@ class HttpClient(
       }
       val boundary = "1234567890"
 
-      connection.setRequestProperty("X-Vatomic-App-Id", environment!!.appId)
+      connection.setRequestProperty("App-Id", environment!!.appId)
       connection.useCaches = false
       connection.doInput = true
       connection.doOutput = true
