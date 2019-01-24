@@ -13,4 +13,13 @@ interface MessageManager {
     val name: String,
     val payload: JSONObject
   )
+
+  enum class Error {
+    UNSUPPORTED_MESSAGE,
+    INVALID_PAYLOAD,
+    OTHER
+  }
+
+  class MessageException(val error: Error, message: String) : Throwable(message)
+
 }

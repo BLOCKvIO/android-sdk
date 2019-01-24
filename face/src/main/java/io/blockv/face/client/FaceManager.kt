@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 import io.blockv.face.client.FaceManager.EmbeddedProcedure.*
+import io.blockv.face.client.manager.MessageManager
 import io.blockv.face.client.manager.ResourceManager
 import io.reactivex.Single
 import org.json.JSONObject
@@ -286,7 +287,7 @@ interface FaceManager {
      *
      * @param error is the throwable to be returned.
      */
-    fun onError(error: Throwable)
+    fun onError(error: MessageManager.MessageException)
 
   }
 

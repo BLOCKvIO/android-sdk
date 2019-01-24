@@ -177,7 +177,7 @@ class FaceManagerImpl(
                               }
                             }
 
-                            override fun onError(error: Throwable) {
+                            override fun onError(error: MessageManager.MessageException) {
                               if (!emitter.isDisposed) {
                                 emitter.onError(error)
                               }
