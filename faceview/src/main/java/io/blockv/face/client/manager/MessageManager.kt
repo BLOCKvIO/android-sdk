@@ -17,6 +17,7 @@ interface MessageManager {
   enum class Error {
     UNSUPPORTED_MESSAGE,
     INVALID_PAYLOAD,
+    INVALID_PERMISSION,
     OTHER
   }
 
