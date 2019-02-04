@@ -155,16 +155,6 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun discoverCount(query: JSONObject): Single<Int> = Single.fromCallable {
-    query.put(
-      "return",
-      JSONObject()
-        .put("type", DiscoverQueryBuilder.ResultType.COUNT)
-        .put("fields", JSONArray())
-    )
-    api.discover(query).payload.count
-  }
-
   override fun trashVatom(id: String): Completable = Completable.fromCallable {
     api.trashVatom(TrashVatomRequest(id))
   }
