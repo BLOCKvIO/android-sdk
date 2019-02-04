@@ -49,7 +49,7 @@ apply plugin: 'kotlin-android' //This should be at the top of the file.
 //
 dependencies {
   // ...
-  implementation 'io.blockv.sdk:face:3.0.0'
+  implementation 'io.blockv.sdk:face:3.0.1'
   // Make sure android Studio version is > 3.0 or include the Kotlin Plugin
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version'
 }
