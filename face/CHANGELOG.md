@@ -2,7 +2,7 @@
 All notable changes to the face module will be documented in this file.
 
 #### 3.x Releases
-- `3.0.x` Releases - [3.0.0](#300)
+- `3.0.x` Releases - [3.0.1](#300)
 ---
 #### 2.x Releases
 - `2.2.x` Releases - [2.2.0](#220)|[2.2.1](#221)|[2.2.2](#222)|[2.2.3](#223)
@@ -14,14 +14,16 @@ All notable changes to the face module will be documented in this file.
 - `1.0.x` Releases - [1.0.0](#100)
 ---
 
-## [3.0.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/face/3.0.0)
-Released on 2018-xx-xx
+## [3.0.1](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/face/3.0.1)
+Released on 2019-02-05
 
 #### Updated
 - `FaceManagerImpl` to use version 3.0.0 of [FaceView](/faceview) module.
   - Pull Request [#115](https://github.com/BLOCKvIO/android-sdk/pull/115)
 - Face builder to support web faces.
-  - Pull Request [#xxx](https://github.com/BLOCKvIO/android-sdk/pull/xxx)
+  - Pull Request [#116](https://github.com/BLOCKvIO/android-sdk/pull/116)
+- Replace `Callable` with `RxJava2`.
+  - Pull Request [#119](https://github.com/BLOCKvIO/android-sdk/pull/119)
   
 ## [2.2.2](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/face/2.2.3)
 Released on 2018-11-12

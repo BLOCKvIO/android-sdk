@@ -2,7 +2,7 @@
 All notable changes to the core module will be documented in this file.
 
 #### 3.x Releases
-- `3.0.x` Releases - [3.0.0](#300)
+- `3.0.x` Releases - [3.0.1](#300)
 ---
 
 #### 2.x Releases
@@ -16,14 +16,20 @@ All notable changes to the core module will be documented in this file.
 - `1.1.x` Releases - [1.1.0](#110)
 ---
 
-## [3.0.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/core/3.0.0)
-Released on 2018-xx-xx
+## [3.0.1](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/core/3.0.1)
+Released on 2018-02-05
 
 #### Updated
 - `Blockv` to use version 3.0.0 of [Face](/face) module.
   - Pull Request [#115](https://github.com/BLOCKvIO/android-sdk/pull/115)
 - `Blockv` to use version 2.0.0 of [Common](/common) module.
   - Pull Request [#115](https://github.com/BLOCKvIO/android-sdk/pull/115)
+- Replaced `Callable` with RxJava2.
+ - Pull Request [#119](https://github.com/BLOCKvIO/android-sdk/pull/119)
+
+#### Removed
+- `DiscoverCount` method from `VatomManager`.
+  - Pull Request [#124](https://github.com/BLOCKvIO/android-sdk/pull/124)
 
 ## [2.3.0](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/core/2.3.0)
 Released on 2018-11-06
