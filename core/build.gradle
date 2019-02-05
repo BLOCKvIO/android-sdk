@@ -48,6 +48,10 @@ dependencies {
     {
       exclude group: 'io.blockv.sdk'
     }
+  implementation("io.blockv.faces:web-face:2.0.0")
+    {
+      exclude group: 'io.blockv.sdk'
+    }
   implementation project(':common')
   implementation project(':face')
   implementation project(':faceview')

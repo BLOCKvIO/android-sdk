@@ -23,10 +23,7 @@ import io.blockv.common.model.*
 import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
-import io.blockv.faces.ImageFace
-import io.blockv.faces.ImageLayeredFace
-import io.blockv.faces.ImagePolicyFace
-import io.blockv.faces.ImageProgressFace
+import io.blockv.faces.*
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.plugins.RxJavaPlugins
@@ -135,6 +132,7 @@ class Blockv {
           internalFaceManager!!.registerFace(ImageProgressFace.factory)
           internalFaceManager!!.registerFace(ImagePolicyFace.factory)
           internalFaceManager!!.registerFace(ImageLayeredFace.factory)
+          internalFaceManager!!.registerFace(WebFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {
