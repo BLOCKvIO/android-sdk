@@ -11,26 +11,7 @@
 package io.blockv.core.client
 
 import android.content.Context
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
-import io.blockv.common.internal.json.deserializer.EnvironmentDeserialzier
-import io.blockv.common.internal.json.deserializer.JwtDeserializer
-import io.blockv.common.internal.json.deserializer.activity.ActivityMessageDeserializer
-import io.blockv.common.internal.json.deserializer.activity.ActivityMessageListDeserializer
-import io.blockv.common.internal.json.deserializer.activity.ActivityThreadDeserializer
-import io.blockv.common.internal.json.deserializer.activity.ActivityThreadListDeserializer
-import io.blockv.common.internal.json.deserializer.event.ActivityEventDeserializer
-import io.blockv.common.internal.json.deserializer.event.InventoryEventDeserializer
-import io.blockv.common.internal.json.deserializer.event.StateEventDeserializer
-import io.blockv.common.internal.json.deserializer.event.WebsocketEventDeserializer
-import io.blockv.common.internal.json.deserializer.resource.AssetProviderDeserialzier
-import io.blockv.common.internal.json.deserializer.user.PublicUserDeserializer
-import io.blockv.common.internal.json.deserializer.user.TokenDeserializer
-import io.blockv.common.internal.json.deserializer.user.UserDeserializer
-import io.blockv.common.internal.json.deserializer.vatom.*
-import io.blockv.common.internal.json.serializer.user.AssetProviderSerializer
-import io.blockv.common.internal.json.serializer.user.EnviromentSerializer
-import io.blockv.common.internal.json.serializer.user.JwtSerializer
 import io.blockv.common.internal.net.NetModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.auth.AuthenticatorImpl
@@ -39,15 +20,16 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
-import io.blockv.common.util.Callable
 import io.blockv.core.client.manager.*
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
-import io.blockv.faces.ImageFace
-import io.blockv.faces.ImageLayeredFace
-import io.blockv.faces.ImagePolicyFace
-import io.blockv.faces.ImageProgressFace
+import io.blockv.faces.*
+import io.reactivex.Flowable
+import io.reactivex.Single
+import io.reactivex.plugins.RxJavaPlugins
+import org.json.JSONObject
 import java.io.File
+import kotlin.reflect.KClass
 
 class Blockv {
   private val preferences: Preferences
@@ -59,6 +41,12 @@ class Blockv {
   val vatomManager: VatomManager
   val resourceManager: ResourceManager
   val activityManager: ActivityManager
+
+  init {
+    RxJavaPlugins.setErrorHandler { throwable ->
+      throwable.printStackTrace()
+    }
+  }
 
   private val cacheDir: File
 
@@ -85,64 +73,66 @@ class Blockv {
       if (internalFaceManager == null) {
         try {
           val encoder = ResourceEncoderImpl(preferences)
-          for (it in FaceManagerImpl::class.constructors) {
-            if (it.parameters.size == 1) {
-              internalFaceManager = it.call(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder))
-            } else
-              if (it.parameters.size == 4) {
-                internalFaceManager = it.call(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder),
-                  object : io.blockv.face.client.UserManager {
-                    override fun getCurrentUser(): Callable<PublicUser?> {
-                      return userManager.getCurrentUser()
-                        .map {
-                          if (it != null) {
-                            PublicUser(
-                              it.id,
-                              if (it.isNamePublic) it.firstName else "",
-                              if (it.isNamePublic) it.lastName else "",
-                              if (it.isAvatarPublic) it.avatarUri else ""
-                            )
-                          } else
-                            null
-                        }
-                    }
 
-                    override fun getPublicUser(userId: String): Callable<PublicUser?> {
-                      return userManager.getPublicUser(userId)
-                    }
-
-                  },
-                  object : io.blockv.face.client.VatomManager {
-                    override fun getVatoms(vararg ids: String): Callable<List<Vatom>> {
-                      return vatomManager.getVatoms(*ids)
-                    }
-
-                    override fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>> {
-                      return vatomManager.getInventory(id, page, limit)
-                    }
-
-                  },
-                  object : io.blockv.face.client.EventManager {
-                    override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
-                      return Callable.single {
-                        eventManager
-                      }
-                        .flatMap { eventManager.getVatomStateEvents() }
-                    }
-
-                    override fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>> {
-                      return Callable.single {
-                        eventManager
-                      }
-                        .flatMap { eventManager.getInventoryEvents() }
-                    }
-                  })
+          internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder),
+            object : io.blockv.face.client.manager.UserManager {
+              override fun getCurrentUser(): Single<PublicUser> {
+                return userManager.getCurrentUser()
+                  .map {
+                    PublicUser(
+                      it.id,
+                      if (it.isNamePublic) it.firstName else "",
+                      if (it.isNamePublic) it.lastName else "",
+                      if (it.isAvatarPublic) it.avatarUri else ""
+                    )
+                  }
               }
-          }
+
+              override fun getPublicUser(userId: String): Single<PublicUser> {
+                return userManager.getPublicUser(userId)
+              }
+
+            },
+            object : io.blockv.face.client.manager.VatomManager {
+              override fun preformAction(action: String, payload: JSONObject): Single<JSONObject> {
+                return vatomManager.preformAction(action, payload)
+              }
+
+              override fun getVatoms(vararg ids: String): Single<List<Vatom>> {
+                return vatomManager.getVatoms(*ids)
+              }
+
+              override fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>> {
+                return vatomManager.getInventory(id, page, limit)
+              }
+
+            },
+            object : io.blockv.face.client.manager.EventManager {
+              override fun getVatomStateEvents(): Flowable<WebSocketEvent<StateUpdateEvent>> {
+                return eventManager.getVatomStateEvents()
+              }
+
+              override fun getInventoryEvents(): Flowable<WebSocketEvent<InventoryEvent>> {
+                return eventManager.getInventoryEvents()
+              }
+            },
+            object : io.blockv.face.client.manager.JsonSerializer {
+              override fun <T : Model> deserialize(kclass: KClass<T>, json: JSONObject): T? {
+                return jsonModule.deserialize(kclass, json)
+              }
+
+              override fun <T : Model> serialize(data: T): JSONObject? {
+                return jsonModule.serialize(data)
+              }
+
+            }
+          )
+
           internalFaceManager!!.registerFace(ImageFace.factory)
           internalFaceManager!!.registerFace(ImageProgressFace.factory)
           internalFaceManager!!.registerFace(ImagePolicyFace.factory)
           internalFaceManager!!.registerFace(ImageLayeredFace.factory)
+          internalFaceManager!!.registerFace(WebFace.factory)
         } catch (e: NoClassDefFoundError) {
           throw MissingFaceModuleException()
         } catch (e: Exception) {
@@ -156,34 +146,7 @@ class Blockv {
   constructor(context: Context, appId: String) {
 
     this.cacheDir = context.cacheDir
-    val faceDeserializer = FaceDeserializer()
-    val actionDeserializer = ActionDeserializer()
-    val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
-    val inventoryDeserializer = InventoryDeserializer(vatomDeserializer, faceDeserializer, actionDeserializer)
-    val messageDeserializer = ActivityMessageDeserializer()
-    this.jsonModule = JsonModule(
-      UserDeserializer(),
-      TokenDeserializer(),
-      vatomDeserializer,
-      faceDeserializer,
-      actionDeserializer,
-      AssetProviderDeserialzier(),
-      AssetProviderSerializer(),
-      EnvironmentDeserialzier(),
-      EnviromentSerializer(),
-      inventoryDeserializer,
-      JwtDeserializer(),
-      JwtSerializer(),
-      DiscoverDeserializer(inventoryDeserializer),
-      PublicUserDeserializer(),
-      GeoGroupDeserializer(),
-      InventoryEventDeserializer(),
-      StateEventDeserializer(),
-      ActivityEventDeserializer(),
-      WebsocketEventDeserializer(),
-      ActivityThreadListDeserializer(ActivityThreadDeserializer(messageDeserializer)),
-      ActivityMessageListDeserializer(messageDeserializer)
-    )
+    this.jsonModule = JsonModule()
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = Environment(
@@ -210,34 +173,7 @@ class Blockv {
 
   constructor(context: Context, environment: Environment) {
     this.cacheDir = context.cacheDir
-    val faceDeserializer = FaceDeserializer()
-    val actionDeserializer = ActionDeserializer()
-    val vatomDeserializer = VatomDeserializer(faceDeserializer, actionDeserializer)
-    val inventoryDeserializer = InventoryDeserializer(vatomDeserializer, faceDeserializer, actionDeserializer)
-    val messageDeserializer = ActivityMessageDeserializer()
-    this.jsonModule = JsonModule(
-      UserDeserializer(),
-      TokenDeserializer(),
-      vatomDeserializer,
-      faceDeserializer,
-      actionDeserializer,
-      AssetProviderDeserialzier(),
-      AssetProviderSerializer(),
-      EnvironmentDeserialzier(),
-      EnviromentSerializer(),
-      inventoryDeserializer,
-      JwtDeserializer(),
-      JwtSerializer(),
-      DiscoverDeserializer(inventoryDeserializer),
-      PublicUserDeserializer(),
-      GeoGroupDeserializer(),
-      InventoryEventDeserializer(),
-      StateEventDeserializer(),
-      ActivityEventDeserializer(),
-      WebsocketEventDeserializer(),
-      ActivityThreadListDeserializer(ActivityThreadDeserializer(messageDeserializer)),
-      ActivityMessageListDeserializer(messageDeserializer)
-    )
+    this.jsonModule = JsonModule()
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment

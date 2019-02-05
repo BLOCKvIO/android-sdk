@@ -10,31 +10,49 @@
  */
 package io.blockv.common.internal.json
 
-import io.blockv.common.internal.json.deserializer.Deserializer
+import io.blockv.common.internal.json.serializer.GenericSerializer
 import io.blockv.common.internal.json.serializer.Serializer
-import io.blockv.common.model.*
+import io.blockv.common.internal.json.serializer.custom.ActionSerializer
+import io.blockv.common.model.Action
+import io.blockv.common.model.Model
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
-class JsonModule(
-  val userDeserializer: Deserializer<User?>,
-  val tokenDeserializer: Deserializer<Token?>,
-  val vatomDeserializer: Deserializer<Vatom?>,
-  val faceDeserializer: Deserializer<Face?>,
-  val actionDeserializer: Deserializer<Action?>,
-  val assetProviderDeserializer: Deserializer<AssetProvider?>,
-  val assetProviderSerializer: Serializer<AssetProvider?>,
-  val environmentDeserializer: Deserializer<Environment?>,
-  val environmentSerializer: Serializer<Environment?>,
-  val inventoryDeserializer: Deserializer<List<Vatom>>,
-  val jctDeserializer: Deserializer<Jwt?>,
-  val jwtSerializer: Serializer<Jwt?>,
-  val discoverDeserializer: Deserializer<DiscoverPack?>,
-  val publicUserDeserializer: Deserializer<PublicUser?>,
-  val geoDiscoverGroupDeserializer: Deserializer<GeoGroup?>,
-  val inventoryEventDeserializer: Deserializer<InventoryEvent?>,
-  val stateUpdateEventDeserializer: Deserializer<StateUpdateEvent?>,
-  val activityEventDeserializer: Deserializer<ActivityEvent?>,
-  val websocketEventDeserializer: Deserializer<WebSocketEvent<JSONObject>?>,
-  val activityThreadListDeserializer: Deserializer<ActivityThreadList?>,
-  val activityMessageListDeserializer: Deserializer<ActivityMessageList?>
-)
+class JsonModule {
+
+  val TAG: String = "JsonModule"
+
+  val serializers: HashMap<KClass<*>, Serializer<Any>> = HashMap()
+
+  val genericSerializer: Serializer<Any> = GenericSerializer()
+
+  init {
+    registerSerializer<Action>(ActionSerializer())
+  }
+
+
+  inline fun <reified T : Model> registerSerializer(serializer: Serializer<*>) {
+    val key = T::class
+    serializers[key] = serializer as Serializer<Any>
+  }
+
+  inline fun <reified T : Model> deserialize(json: JSONObject): T {
+    val key = T::class
+    val serializer = serializers[key]
+    return (serializer ?: genericSerializer).deserialize(key, json, serializers) as T
+  }
+
+  fun <T : Model> deserialize(kclass: KClass<T>, json: JSONObject): T? {
+    val serializer = serializers[kclass]
+    return (serializer ?: genericSerializer).deserialize(kclass, json, serializers) as T
+  }
+
+  fun <T : Model> serialize(data: T): JSONObject? {
+
+    val serializer = serializers[data::class]
+
+    return (serializer ?: genericSerializer).serialize(data, serializers)
+
+  }
+
+}

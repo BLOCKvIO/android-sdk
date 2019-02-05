@@ -10,6 +10,8 @@
  */
 package io.blockv.face.client
 
+import io.blockv.face.client.manager.*
+
 /**
  * Face bridge provides access to SDK functions.
  */
@@ -17,5 +19,7 @@ class FaceBridge(
   val resourceManager: ResourceManager,
   val userManager: UserManager,
   val vatomManager: VatomManager,
-  val eventManager: EventManager
+  val eventManager: EventManager,
+  val jsonSerializer: JsonSerializer,
+  val messageManager: MessageManager
 )

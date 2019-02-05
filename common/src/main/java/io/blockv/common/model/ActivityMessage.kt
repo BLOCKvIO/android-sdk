@@ -10,18 +10,55 @@
  */
 package io.blockv.common.model
 
-class ActivityMessage(
-  val id: Long,
-  val targetUserId: String,
-  val vatomIds: List<String>,
-  val templateVariationIds: List<String>,
-  val message: String,
-  val actionName: String,
-  val whenCreated: String,
-  val triggerUserId: String,
-  val resources: List<Resource>,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class ActivityMessage : Model {
+
+  @Serializer.Serialize(name = "msg_id")
+  val id: Long
+  @Serializer.Serialize(name = "user_id")
+  val targetUserId: String
+  @Serializer.Serialize(name = "vatoms")
+  val vatomIds: List<String>
+  @Serializer.Serialize(name = "templ_vars")
+  val templateVariationIds: List<String>
+  @Serializer.Serialize(name = "msg")
+  val message: String
+  @Serializer.Serialize(name = "action_name")
+  val actionName: String
+  @Serializer.Serialize(name = "when_created")
+  val whenCreated: String
+  @Serializer.Serialize(name = "triggered_by")
+  val triggerUserId: String
+  @Serializer.Serialize(name = "generic")
+  val resources: List<Resource>
+  @Serializer.Serialize(name = "geo_pos")
   val geoPosition: List<Double>
-) {
+
+  @Serializer.Serializable
+  constructor(
+    id: Long,
+    targetUserId: String,
+    vatomIds: List<String>,
+    templateVariationIds: List<String>,
+    message: String,
+    actionName: String,
+    whenCreated: String,
+    triggerUserId: String,
+    resources: List<Resource>,
+    geoPosition: List<Double>
+  ) {
+    this.id = id
+    this.targetUserId = targetUserId
+    this.vatomIds = vatomIds
+    this.templateVariationIds = templateVariationIds
+    this.message = message
+    this.actionName = actionName
+    this.whenCreated = whenCreated
+    this.triggerUserId = triggerUserId
+    this.resources = resources
+    this.geoPosition = geoPosition
+  }
 
   private val hash = toString().hashCode()
 

@@ -17,15 +17,124 @@ import io.blockv.common.model.ActivityEvent
 import io.blockv.common.model.InventoryEvent
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.WebSocketEvent
-import io.blockv.common.util.Callable
-import io.blockv.common.util.Cancellable
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 
-
 class EventManagerImpl(
-  private val webSocket: WebsocketImpl,
+  val webSocket: WebsocketImpl,
   val jsonModule: JsonModule
 ) : EventManager {
+
+  @Volatile
+  private var eventFlowable: Flowable<WebSocketEvent<JSONObject>>? = null
+
+  @Synchronized
+  override fun getEvents(): Flowable<WebSocketEvent<JSONObject>> {
+    if (eventFlowable == null) {
+      eventFlowable = connect().share()
+    }
+    return eventFlowable!!
+  }
+
+  override fun getVatomStateEvents(): Flowable<WebSocketEvent<StateUpdateEvent>> {
+    return getEvents()
+      .observeOn(Schedulers.computation())
+      .filter { event -> event.type == WebSocketEvent.MessageType.STATE_UPDATE }
+      .map { event ->
+        var stateEvent = NULL_STATE_EVENT
+        if (event.payload != null) {
+          val payload = jsonModule.deserialize<StateUpdateEvent>(event.payload!!)
+          stateEvent = WebSocketEvent(
+            event.messageType,
+            event.userId,
+            payload
+          )
+        }
+        stateEvent
+      }
+      .onErrorReturn {
+        it.printStackTrace()
+        NULL_STATE_EVENT
+      }
+      .filter { event -> event !== NULL_STATE_EVENT }
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
+  override fun getInventoryEvents(): Flowable<WebSocketEvent<InventoryEvent>> {
+    return getEvents()
+      .observeOn(Schedulers.computation())
+      .filter { event -> event.type == WebSocketEvent.MessageType.INVENTORY }
+      .map { event ->
+        var stateEvent = NULL_INVENTORY_EVENT
+        if (event.payload != null) {
+          val payload = jsonModule.deserialize<InventoryEvent>(event.payload!!)
+          stateEvent = WebSocketEvent(
+            event.messageType,
+            event.userId,
+            payload
+          )
+        }
+        stateEvent
+      }
+      .onErrorReturn {
+        it.printStackTrace()
+        NULL_INVENTORY_EVENT
+      }
+      .filter { event -> event !== NULL_INVENTORY_EVENT }
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
+  override fun getActivityEvents(): Flowable<WebSocketEvent<ActivityEvent>> {
+    return getEvents()
+      .observeOn(Schedulers.computation())
+      .filter { event -> event.type == WebSocketEvent.MessageType.ACTIVITY }
+      .map { event ->
+        var stateEvent = NULL_ACTIVITY_EVENT
+        if (event.payload != null) {
+          val payload = jsonModule.deserialize<ActivityEvent>(event.payload!!)
+          stateEvent = WebSocketEvent(
+            event.messageType,
+            event.userId,
+            payload
+          )
+        }
+        stateEvent
+      }
+      .onErrorReturn {
+        it.printStackTrace()
+        NULL_ACTIVITY_EVENT
+      }
+      .filter { event -> event !== NULL_ACTIVITY_EVENT }
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
+  private fun connect(): Flowable<WebSocketEvent<JSONObject>> {
+
+    return Flowable.create<WebSocketEvent<JSONObject>>({ subscriber ->
+      val listener: Websocket.WebSocketListener = object : Websocket.WebSocketListener {
+        override fun onEvent(event: WebSocketEvent<JSONObject>) {
+          if (!subscriber.isCancelled) {
+            subscriber.onNext(event)
+          }
+        }
+
+        override fun onError(throwable: Throwable) {
+          if (!subscriber.isCancelled) {
+            subscriber.onError(throwable)
+            subscriber.onComplete()
+          }
+        }
+
+      }
+      subscriber.setCancellable { webSocket.disconnect() }
+      webSocket.connect(listener)
+    }, BackpressureStrategy.BUFFER)
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+  }
 
   companion object {
     val NULL_STATE_EVENT = WebSocketEvent<StateUpdateEvent>("", "", null)
@@ -33,143 +142,4 @@ class EventManagerImpl(
     val NULL_ACTIVITY_EVENT = WebSocketEvent<ActivityEvent>("", "", null)
   }
 
-  @Volatile
-  private var cancellable: Cancellable? = null
-
-  private val resultEmitters: HashSet<Callable.ResultEmitter<WebSocketEvent<JSONObject>>> = HashSet()
-
-  override fun getEvents(): Callable<WebSocketEvent<JSONObject>> {
-    return Callable.create<WebSocketEvent<JSONObject>> {
-      synchronized(resultEmitters) {
-        it.doOnCompletion {
-          synchronized(resultEmitters) {
-            resultEmitters.remove(it)
-            if (resultEmitters.size == 0) {
-              cancellable?.cancel()
-            }
-          }
-        }
-        resultEmitters.add(it)
-        if (cancellable == null || cancellable!!.isComplete() || cancellable!!.isCanceled()) {
-          cancellable = connect().call({
-            val event = it
-            synchronized(resultEmitters) {
-              resultEmitters.forEach {
-                it.onResult(event)
-              }
-            }
-          }) {
-            synchronized(resultEmitters) {
-              val throwable = it
-              resultEmitters.forEach {
-                it.onError(throwable)
-              }
-            }
-          }
-        }
-      }
-    }.runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.MAIN)
-  }
-
-  override fun getVatomStateEvents(): Callable<WebSocketEvent<StateUpdateEvent>> {
-    return getEvents()
-      .filter { it.type == WebSocketEvent.MessageType.STATE_UPDATE }
-      .returnOn(Callable.Scheduler.IO)
-      .map {
-        var updateEvent: WebSocketEvent<StateUpdateEvent> = NULL_STATE_EVENT
-        if (it.payload != null) {
-          val stateEvent = jsonModule.stateUpdateEventDeserializer.deserialize(it.payload!!)
-          if (stateEvent != null) {
-            updateEvent = WebSocketEvent(
-              it.messageType,
-              it.userId,
-              stateEvent
-            )
-          }
-        }
-        updateEvent
-      }
-      .filter { it !== NULL_STATE_EVENT }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.MAIN)
-  }
-
-  override fun getInventoryEvents(): Callable<WebSocketEvent<InventoryEvent>> {
-    return getEvents()
-      .filter { it.type == WebSocketEvent.MessageType.INVENTORY }
-      .returnOn(Callable.Scheduler.IO)
-      .map {
-        var event: WebSocketEvent<InventoryEvent> = NULL_INVENTORY_EVENT
-        if (it.payload != null) {
-          val inventoryEvent = jsonModule.inventoryEventDeserializer.deserialize(it.payload!!)
-          if (inventoryEvent != null) {
-            event = WebSocketEvent(
-              it.messageType,
-              it.userId,
-              inventoryEvent
-            )
-          }
-        }
-        event
-      }
-      .filter { it !== NULL_INVENTORY_EVENT }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.MAIN)
-  }
-
-  override fun getActivityEvents(): Callable<WebSocketEvent<ActivityEvent>> {
-    return getEvents()
-      .filter { it.type == WebSocketEvent.MessageType.ACTIVITY }
-      .returnOn(Callable.Scheduler.IO)
-      .map {
-        var event: WebSocketEvent<ActivityEvent> = NULL_ACTIVITY_EVENT
-        if (it.payload != null) {
-          val activityEvent = jsonModule.activityEventDeserializer.deserialize(it.payload!!)
-          if (activityEvent != null) {
-            event = WebSocketEvent(
-              it.messageType,
-              it.userId,
-              activityEvent
-            )
-          }
-        }
-        event
-      }
-      .filter { it !== NULL_ACTIVITY_EVENT }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.MAIN)
-  }
-
-  private fun connect(): Callable<WebSocketEvent<JSONObject>> {
-
-    return Callable.create<WebSocketEvent<JSONObject>> {
-
-      val listener: Websocket.WebSocketListener = object : Websocket.WebSocketListener {
-
-        override fun onEvent(event: WebSocketEvent<JSONObject>) {
-          if (!it.isCanceled() && !it.isComplete()) {
-            it.onResult(event)
-          }
-        }
-
-        override fun onError(throwable: Throwable) {
-          if (!it.isCanceled() && !it.isComplete()) {
-            it.onError(throwable)
-          }
-        }
-      }
-
-      webSocket.connect(listener)
-    }.runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.COMP)
-      .doFinally {
-        webSocket.disconnect()
-        synchronized(resultEmitters) {
-          resultEmitters.clear()
-        }
-      }
-
-
-  }
 }

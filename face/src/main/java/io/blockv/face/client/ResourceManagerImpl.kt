@@ -16,8 +16,11 @@ import android.graphics.BitmapFactory
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Resource
-import io.blockv.common.util.Callable
-import io.blockv.common.util.Cancellable
+import io.blockv.common.util.Optional
+import io.blockv.face.client.manager.ResourceManager
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -25,9 +28,10 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 
-open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: ResourceEncoder) : ResourceManager {
+open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: ResourceEncoder) :
+  ResourceManager {
 
-  val downloads = HashMap<String, Download>()
+  val downloads = HashMap<String, Observable<File>>()
 
   val disk = File(cacheDir, "blockv_resources")
   val diskCache = object : LruCache<String, File>(200 * 1024 * 1024) {
@@ -51,7 +55,8 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
     }
   }
 
-  fun getFileFromDisk(url: String): File? {
+  @Synchronized
+  fun getFileFromDisk(url: String): Optional<File> {
 
     val key = hash(url)
 
@@ -59,68 +64,117 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
 
     if (file != null) {
       if (file.exists()) {
-        return file
+        return Optional(file)
       } else {
         diskCache.remove(key)
       }
     }
 
-    return null
+    return Optional(null)
   }
 
-  override fun getFile(resource: Resource): Callable<File> {
-    return Callable.single {
+  override fun getFile(resource: Resource): Single<File> {
+    return Single.fromCallable {
       getFileFromDisk(resource.url)
     }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.IO)
+      .subscribeOn(Schedulers.io())
+      .observeOn(Schedulers.io())
       .flatMap {
-        if (it == null) {
+        if (it.isEmpty()) {
           synchronized(downloads)
           {
             if (!downloads.containsKey(resource.url)) {
-              val encodedUrl = resourceEncoder.encodeUrl(resource.url)
-              downloads[resource.url] = Download(resource.url, encodedUrl, disk, diskCache)
-            }
-            downloads[resource.url]!!.download()
-              .doFinally {
-                synchronized(downloads)
-                {
-                  downloads.remove(resource.url)
+              downloads[resource.url] = Observable.fromCallable {
+                val encoded = resourceEncoder.encodeUrl(resource.url)
+                val connection = Request(encoded, 10000, 10000).connect()
+                try {
+                  val responseCode: Int = connection.responseCode
+                  if (responseCode == 200) {
+                    val input = DataInputStream(connection.inputStream)
+                    val file = File(disk, hash(resource.url) + ".download")
+                    file.createNewFile()
+                    val out = FileOutputStream(file)
+                    var read: Int
+                    val buffer = ByteArray(16 * 1024)
+                    do {
+                      read = input.read(buffer, 0, buffer.size)
+                      if (read != -1) {
+                        out.write(buffer, 0, read)
+                      }
+                    } while (read != -1)
+                    out.flush()
+                    out.close()
+                    val outFile = File(disk, hash(resource.url))
+                    file.renameTo(outFile)
+                    outFile
+                  } else {
+                    val input = DataInputStream(connection.errorStream)
+                    val out = ByteArrayOutputStream()
+                    var read: Int
+                    val buffer = ByteArray(16 * 1024)
+                    do {
+                      read = input.read(buffer, 0, buffer.size)
+                      if (read != -1) {
+                        out.write(buffer, 0, read)
+                      }
+                    } while (read != -1)
+
+                    out.flush()
+                    out.close()
+                    throw Exception(String(out.toByteArray()))
+                  }
+
+                } finally {
+                  connection.disconnect()
                 }
+
               }
+
+                .observeOn(Schedulers.io())
+                .doFinally {
+                  synchronized(downloads)
+                  {
+                    downloads.remove(resource.url)
+                  }
+                }
+                .share()
+            }
+            Single.fromObservable(downloads[resource.url])
           }
         } else {
-          Callable.single<File> { it }
+          Single.fromCallable<File> { it.value }
         }
       }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.IO)
+      .subscribeOn(Schedulers.io())
+      .observeOn(Schedulers.io())
   }
 
-  override fun getInputStream(resource: Resource): Callable<InputStream> {
+  override fun getInputStream(resource: Resource): Single<InputStream> {
 
     return getFile(resource)
       .map<InputStream> { file ->
         FileInputStream(file)
       }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.IO)
+      .subscribeOn(Schedulers.io())
+      .observeOn(Schedulers.io())
   }
 
-  override fun getBitmap(resource: Resource): Callable<Bitmap> {
+  override fun getBitmap(resource: Resource): Single<Bitmap> {
     return getBitmap(resource, -1, -1)
   }
 
-  override fun getBitmap(resource: Resource, width: Int, height: Int): Callable<Bitmap> {
+  override fun getBitmap(resource: Resource, width: Int, height: Int): Single<Bitmap> {
     val key = hash(resource.url + "${width}x$height")
-    return Callable.single {
-      imageCache.get(key)
+    return Single.fromCallable {
+      synchronized(imageCache)
+      {
+        Optional(imageCache.get(key))
+      }
     }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.IO)
+      .subscribeOn(Schedulers.io())
+      .observeOn(Schedulers.io())
       .flatMap {
-        if (it == null) {
+        if (it.isEmpty()) {
           getFile(resource)
             .map { image ->
               var reqWidth = width
@@ -133,16 +187,23 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
               options.inJustDecodeBounds = true
               BitmapFactory.decodeFile(image.absolutePath, options)
               options.inJustDecodeBounds = false
-              options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
+              options.inSampleSize = calculateInSampleSize(
+                options,
+                reqWidth,
+                reqHeight
+              )
               val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)
-              imageCache.put(key, bitmap)
+              synchronized(imageCache)
+              {
+                imageCache.put(key, bitmap)
+              }
               bitmap
             }
         } else
-          Callable.single { it }
+          Single.fromCallable { it.value }
       }
-      .runOn(Callable.Scheduler.IO)
-      .returnOn(Callable.Scheduler.IO)
+      .subscribeOn(Schedulers.io())
+      .observeOn(Schedulers.io())
   }
 
   class Request(
@@ -214,100 +275,4 @@ open class ResourceManagerImpl(cacheDir: File, override val resourceEncoder: Res
       return inSampleSize
     }
   }
-
-
-  class Download(
-    val resId: String,
-    val resource: String,
-    private val cacheDir: File,
-    val cache: LruCache<String, File>
-  ) {
-
-    @Volatile
-    private var cancellable: Cancellable? = null
-
-    private val resultEmitters: HashSet<Callable.ResultEmitter<File>> = HashSet()
-
-    fun download(): Callable<File> {
-      return Callable.create<File> { emitter ->
-        synchronized(resultEmitters) {
-          emitter.doOnCompletion {
-            synchronized(resultEmitters) {
-              resultEmitters.remove(emitter)
-              if (resultEmitters.size == 0) {
-                cancellable?.cancel()
-              }
-            }
-          }
-          resultEmitters.add(emitter)
-          if (cancellable == null || cancellable!!.isComplete() || cancellable!!.isCanceled()) {
-            cancellable = Callable.single {
-              val connection = Request(resource, 10000, 10000).connect()
-              try {
-                val responseCode: Int = connection.responseCode
-
-                if (responseCode == 200) {
-                  val input = DataInputStream(connection.inputStream)
-                  val file = File(cacheDir, hash(resId) + ".download")
-                  file.createNewFile()
-                  val out = FileOutputStream(file)
-                  var read: Int
-                  val buffer = ByteArray(16 * 1024)
-                  do {
-                    read = input.read(buffer, 0, buffer.size)
-                    if (read != -1) {
-                      out.write(buffer, 0, read)
-                    }
-                  } while (read != -1)
-                  out.flush()
-                  out.close()
-                  val outFile = File(cacheDir, hash(resId))
-                  file.renameTo(outFile)
-                  outFile
-                } else {
-                  val input = DataInputStream(connection.errorStream)
-                  val out = ByteArrayOutputStream()
-                  var read: Int
-                  val buffer = ByteArray(16 * 1024)
-                  do {
-                    read = input.read(buffer, 0, buffer.size)
-                    if (read != -1) {
-                      out.write(buffer, 0, read)
-                    }
-                  } while (read != -1)
-
-                  out.flush()
-                  out.close()
-                  throw Exception(String(out.toByteArray()))
-                }
-
-              } finally {
-                connection.disconnect()
-              }
-
-            }.call({ file ->
-              synchronized(resultEmitters) {
-                cache.put(file.name, file)
-                resultEmitters.forEach {
-                  it.onResult(file)
-                  it.onComplete()
-                }
-              }
-            }) {
-              synchronized(resultEmitters) {
-                val throwable = it
-                resultEmitters.forEach {
-                  it.onError(throwable)
-                }
-              }
-            }
-          }
-        }
-      }
-        .runOn(Callable.Scheduler.IO)
-        .returnOn(Callable.Scheduler.IO)
-    }
-  }
-
-
 }

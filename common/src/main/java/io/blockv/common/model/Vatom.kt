@@ -10,17 +10,44 @@
  */
 package io.blockv.common.model
 
+import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
-open class Vatom(
-  val id: String,
-  val whenCreated: String,
-  val whenModified: String,
-  val property: VatomProperty,
-  val private: JSONObject?,
-  val faces: List<Face>,
-  val actions: List<Action>
-) {
+open class Vatom : Model {
+
+  @Serializer.Serialize
+  val id: String
+  @Serializer.Serialize(name = "when_created")
+  val whenCreated: String
+  @Serializer.Serialize(name = "when_modified")
+  val whenModified: String
+  @Serializer.Serialize(name = "vAtom::vAtomType")
+  val property: VatomProperty
+  @Serializer.Serialize
+  val private: JSONObject?
+  @Serializer.Serialize
+  var faces: List<Face>
+  @Serializer.Serialize
+  var actions: List<Action>
+
+  @Serializer.Serializable
+  constructor(
+    id: String,
+    whenCreated: String,
+    whenModified: String,
+    property: VatomProperty,
+    private: JSONObject?,
+    faces: List<Face>,
+    actions: List<Action>
+  ) {
+    this.id = id
+    this.whenCreated = whenCreated
+    this.whenModified = whenModified
+    this.property = property
+    this.private = private
+    this.faces = faces
+    this.actions = actions
+  }
 
   override fun toString(): String {
     return "Vatom{" +

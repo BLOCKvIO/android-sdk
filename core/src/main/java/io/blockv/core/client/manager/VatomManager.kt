@@ -11,12 +11,11 @@
 package io.blockv.core.client.manager
 
 import io.blockv.common.builder.DiscoverQueryBuilder
-import io.blockv.common.model.GeoGroup
-import io.blockv.common.model.StateUpdateEvent
-import io.blockv.common.model.Vatom
-import io.blockv.common.util.Callable
+import io.blockv.common.model.*
+import io.reactivex.Completable
+import io.reactivex.Single
 import org.json.JSONObject
-import java.util.*
+import java.util.HashMap
 
 /**
  *  This interface contains the available BLOCKv vAtom functions.
@@ -27,10 +26,10 @@ interface VatomManager {
    * Fetches vAtoms by id.
    *
    * @param ids is a list of vAtom id's in the current users inventory.
-   * @return new Callable<List<Vatom>> instance.
+   * @return new Single<List<Vatom>> instance.
    * @see Vatom
    */
-  fun getVatoms(vararg ids: String): Callable<List<Vatom>>
+  fun getVatoms(vararg ids: String): Single<List<Vatom>>
 
   /**
    * Fetches the current user's inventory of vAtoms.
@@ -41,10 +40,10 @@ interface VatomManager {
    *             zero, the first page is returned.
    * @param limit defines the number of vAtoms per response page (up to 100). If omitted or set as
    *              zero, the max number is returned.
-   * @return new Callable<List<Vatom>> instance.
+   * @return new Single<List<Vatom>> instance.
    * @see Vatom
    */
-  fun getInventory(id: String?, page: Int, limit: Int): Callable<List<Vatom>>
+  fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>>
 
   /**
    * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
@@ -58,7 +57,7 @@ interface VatomManager {
    * @param topRightLat is the top right latitude coordinate.
    * @param topRightLon is the top right longitude coordinate.
    * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
-   * @return new Callable<List<Vatom>> instance.
+   * @return new Single<List<Vatom>> instance.
    * @see GeoFilter
    * @see Vatom
    */
@@ -67,8 +66,8 @@ interface VatomManager {
     bottomLeftLon: Double,
     topRightLat: Double,
     topRightLon: Double,
-    filter: GeoFilter
-  ): Callable<List<Vatom>>
+    filter: VatomManager.GeoFilter
+  ): Single<List<Vatom>>
 
   /**
    * Fetches the count of vAtoms dropped in the specified area.
@@ -81,7 +80,7 @@ interface VatomManager {
    *                  Lower values return fewer groups (with a higher vatom count) — less dense.
    *                  Higher values return more groups (with a lower vatom count) - more dense.
    * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
-   * @return new Callable<List<GeoGroup> instance.
+   * @return new Single<List<GeoGroup> instance.
    * @see GeoFilter
    * @see GeoGroup
    */
@@ -91,56 +90,57 @@ interface VatomManager {
     topRightLat: Double,
     topRightLon: Double,
     precision: Int,
-    filter: GeoFilter
-  ): Callable<List<GeoGroup>>
+    filter: VatomManager.GeoFilter
+  ): Single<List<GeoGroup>>
 
   /**
    * Updates the vAtom's properties.
    *
    * @param payload contains the properties to update.
-   * @return new Callable<Void> instance.
+   * @return new Completable instance.
    */
-  fun updateVatom(payload: JSONObject): Callable<Void?>
+  fun updateVatom(payload: JSONObject): Completable
 
   /**
    * Fetches all the actions configured for a template.
    *
    * @param templateId is the unique identified of the template.
-   * @return new Callable<List<Action>> instance.
+   * @return new Single<List<Action>> instance.
    * @see io.blockv.common.model.Action
    */
-  fun getVatomActions(templateId: String): Callable<List<io.blockv.common.model.Action>>
+  fun getVatomActions(templateId: String): Single<List<io.blockv.common.model.Action>>
 
   /**
    * Performs an action on the BLOCKv Platform.
    *
    * @param action is the name of the action to perform, e.g. "Drop".
-   * @param id is the id of the vAtom to preform the action on.
    * @param payload contains the data required to do the action.
-   * @return new Callable<JSONObject>.
+   * @return new Single<JSONObject> instance.
    */
-  fun preformAction(action: String, id: String, payload: JSONObject?): Callable<JSONObject?>
+  fun preformAction(action: String, payload: JSONObject): Single<JSONObject>
 
   /**
    * Performs an action on the BLOCKv Platform.
    *
    * @param action is the action to perform.
-   * @param id is the id of the vAtom to preform the action on.
    * @param payload contains the data required to do the action.
-   * @return new Callable<JSONObject>.
+   * @return new Single<JSONObject> instance.
    */
-  fun preformAction(action: Action, id: String, payload: JSONObject?): Callable<JSONObject?>
+  fun preformAction(
+    action: Action,
+    payload: JSONObject
+  ): Single<JSONObject>
 
   /**
    * Performs an acquire action on a vAtom.
    *
-   * Often, only a vAtom's ID is known, e.g. scanning a QR code with an embedded vAtom
+   * Often, only a vAtom's ID is known, e.g. scanning a QR code with an embedded vAtom.
    * ID. This call is useful is such circumstances.
    *
    * @param id is the identifier of the vAtom to acquire.
-   * @return new Callable<JSONObject>.
+   * @return new Single<JSONObject> instance.
    */
-  fun acquireVatom(id: String): Callable<JSONObject?>
+  fun acquireVatom(id: String): Single<JSONObject>
 
   /**
    * Attempts to transfer a vAtom to a user.
@@ -148,9 +148,13 @@ interface VatomManager {
    * @param id is the vAtom's id.
    * @param tokenType is the type of the user's token.
    * @param token is the user's token matching the provided type.
-   * @return new Callable<JSONObject>.
+   * @return new Completable instance.
    */
-  fun transferVatom(id: String, tokenType: TokenType, token: String): Callable<JSONObject?>
+  fun transferVatom(
+    id: String,
+    tokenType: TokenType,
+    token: String
+  ): Completable
 
   /**
    * Attempts to drop a vAtom on the map.
@@ -158,35 +162,27 @@ interface VatomManager {
    * @param id is the vAtom's id.
    * @param latitude
    * @param longitude
-   * @return new Callable<JSONObject>.
+   * @return new Completable instance.
    */
-  fun dropVatom(id: String, latitude: Double, longitude: Double): Callable<JSONObject?>
+  fun dropVatom(id: String, latitude: Double, longitude: Double): Completable
 
   /**
    * Attempts to pick up a vAtom from the map.
    *
    * @param id is the vAtom's id.
-   * @return new Callable<JSONObject>.
+   * @return new Completable instance.
    */
-  fun pickupVatom(id: String): Callable<JSONObject?>
+  fun pickupVatom(id: String): Completable
+
 
   /**
-   * Searches for vAtoms on the BLOCKv platform.
+   * Searches for vAtoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query.
-   * @return new Callable<List<Vatom>>.
+   * @return new Single<List<Vatom>.
    * @see DiscoverQueryBuilder
    */
-  fun discover(query: JSONObject): Callable<List<Vatom>>
-
-  /**
-   * Tallies vAtoms on the BLOCKv platform based on the search query.
-   *
-   * @param query is a JSONObject containing the discover query.
-   * @return new Callable<Int>.
-   * @see DiscoverQueryBuilder
-   */
-  fun discoverCount(query: JSONObject): Callable<Int>
+  fun discover(query: JSONObject): Single<List<Vatom>>
 
   /**
    * Trashes the specified vAtom.
@@ -194,9 +190,9 @@ interface VatomManager {
    * This will remove the vAtom from the current user's inventory.
    *
    * @param id is the identifier of the vAtom.
-   * @return new Callable<Void>.
+   * @return new Completable instance.
    */
-  fun trashVatom(id: String): Callable<Void?>
+  fun trashVatom(id: String): Completable
 
   /**
    * Creates a new updated vAtom by merging properties from the state update
@@ -204,9 +200,9 @@ interface VatomManager {
    *
    * @param vatom is the vAtom model to be updated.
    * @param update is the state update to be merged into the vAtom.
-   * @return new Callable<Vatom>.
+   * @return new Single<Vatom>.
    */
-  fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Callable<Vatom>
+  fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Single<Vatom>
 
 
   enum class TokenType {

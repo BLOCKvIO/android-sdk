@@ -10,11 +10,23 @@
  */
 package io.blockv.common.model
 
-open class Environment(
-  val rest: String,
-  val wss: String,
+import io.blockv.common.internal.json.serializer.Serializer
+
+open class Environment : Model {
+  @Serializer.Serialize
+  val rest: String
+  @Serializer.Serialize
+  val wss: String
+  @Serializer.Serialize(name = "app_id")
   val appId: String
-) {
+
+  @Serializer.Serializable
+  constructor(rest: String, wss: String, appId: String) {
+    this.rest = rest
+    this.wss = wss
+    this.appId = appId
+  }
+
   companion object {
     val DEFAULT_SERVER = "https://api.blockv.io/"
     val DEFAULT_WEBSOCKET = "wss://newws.blockv.io/ws"

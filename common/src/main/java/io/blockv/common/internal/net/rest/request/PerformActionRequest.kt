@@ -14,13 +14,11 @@ import org.json.JSONObject
 
 class PerformActionRequest(
   val action: String,
-  val id: String,
   val payload: JSONObject?
 ) {
 
   fun toJson(): JSONObject {
     val data: JSONObject = payload ?: JSONObject()
-    data.put("this.id", id)
     return data
   }
 }

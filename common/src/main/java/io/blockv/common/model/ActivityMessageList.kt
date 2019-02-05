@@ -10,10 +10,20 @@
  */
 package io.blockv.common.model
 
-class ActivityMessageList(
-  val cursor: String,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class ActivityMessageList : Model {
+  @Serializer.Serialize
+  val cursor: String
+  @Serializer.Serialize
   val messages: List<ActivityMessage>
-) {
+
+  @Serializer.Serializable
+  constructor(cursor: String, messages: List<ActivityMessage>) {
+    this.cursor = cursor
+    this.messages = messages
+  }
+
   override fun toString(): String {
     return "ActivityMessageList{" +
       "cursor='" + cursor + '\'' +

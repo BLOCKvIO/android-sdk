@@ -10,12 +10,19 @@
  */
 package io.blockv.common.model
 
-open class PublicUser {
+import io.blockv.common.internal.json.serializer.Serializer
 
+open class PublicUser : Model {
+
+  @Serializer.Serialize
   var id: String? = null
+  @Serializer.Serialize(name = "first_name", path = "properties")
   var firstName: String? = null
+  @Serializer.Serialize(name = "last_name", path = "properties")
   var lastName: String? = null
+  @Serializer.Serialize(name = "avatar_uri", path = "properties")
   var avatarUri: String? = null
+
   val name: String
     get() = ((this.firstName ?: "") + " " + (this.lastName ?: "")).trim()
 

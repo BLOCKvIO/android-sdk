@@ -19,66 +19,195 @@ import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
-import io.blockv.common.util.Callable
+import io.blockv.common.util.Optional
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
 class UserManagerImpl(
-  var api: UserApi,
-  var authenticator: Authenticator,
-  var preferences: Preferences,
-  var jwtDecoder: JwtDecoder
+  val api: UserApi,
+  val authenticator: Authenticator,
+  val preferences: Preferences,
+  val jwtDecoder: JwtDecoder
 ) : UserManager {
 
   override fun addCurrentUserToken(
     token: String,
     tokenType: UserManager.TokenType,
     isDefault: Boolean
-  ): Callable<Token?> = Callable.single {
-    api.createUserToken(
-      CreateTokenRequest(
-        tokenType.name.toLowerCase(),
-        token,
-        isDefault
-      )
-    ).payload
+  ): Single<Token> = Single.fromCallable {
+    api.createUserToken(CreateTokenRequest(tokenType.name.toLowerCase(), token, isDefault)).payload
   }
-
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
   override fun addCurrentUserOauthToken(
     token: String,
     tokenType: String,
-    code: String,
-    isDefault: Boolean
-  ): Callable<Token?> = Callable.single {
-    api.createUserOauthToken(
-      CreateOauthTokenRequest(
-        tokenType,
-        token,
-        code,
-        isDefault
+    code: String, isDefault: Boolean
+  ): Single<Token> = Single.fromCallable {
+    api.createUserOauthToken(CreateOauthTokenRequest(tokenType, token, code, isDefault)).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun setCurrentUserDefaultToken(tokenId: String): Completable = Completable.fromCallable {
+    api.setDefaultUserToken(tokenId)
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun deleteCurrentUserToken(tokenId: String): Completable = Completable.fromCallable {
+    api.deleteUserToken(tokenId)
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getPublicUser(userId: String): Single<PublicUser> = Single.fromCallable {
+    api.getPublicUser(userId).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun register(registration: Registration): Single<User> = Single.fromCallable {
+    val tokens = JSONArray()
+    registration.tokens?.forEach {
+      val data = JSONObject()
+      data.put("token_type", it.type)
+      data.put("token", it.value)
+      if (it is Registration.OauthToken) {
+        data.put("auth_data", JSONObject().put("auth_data", it.auth))
+      }
+      tokens.put(data)
+    }
+    api.register(
+      CreateUserRequest(
+        registration.firstName,
+        registration.lastName,
+        registration.birthday,
+        registration.avatarUri,
+        registration.password,
+        registration.language,
+        tokens
       )
     ).payload
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-  override fun setCurrentUserDefaultToken(tokenId: String): Callable<Void?> = Callable.single {
-    api.setDefaultUserToken(tokenId).payload
+  override fun login(
+    token: String,
+    tokenType: UserManager.TokenType,
+    password: String
+  ): Single<User> = Single.fromCallable {
+    api.login(
+      LoginRequest(
+        tokenType.name.toLowerCase(),
+        token,
+        password
+      )
+    ).payload
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-  override fun deleteCurrentUserToken(tokenId: String): Callable<Void?> = Callable.single {
-    api.deleteUserToken(tokenId).payload
+  override fun loginOauth(
+    provider: String,
+    oauthToken: String
+  ): Single<User> = Single.fromCallable {
+    api.oauthLogin(
+      OauthLoginRequest(
+        provider,
+        oauthToken
+      )
+    ).payload
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getPublicUser(userId: String): Callable<PublicUser?> = Callable.single {
-    api.getPublicUser(userId).payload
+  override fun loginGuest(guestId: String): Single<User> = Single.fromCallable {
+    api.loginGuest(
+      GuestLoginRequest(
+        guestId
+      )
+    ).payload
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
-
-  override fun getAccessToken(): Callable<Jwt?> = Callable.single {
-    authenticator.refreshToken()
+  override fun verifyUserToken(
+    token: String,
+    tokenType: UserManager.TokenType,
+    code: String
+  ): Completable = Completable.fromCallable {
+    api.verifyToken(VerifyTokenRequest(tokenType.name.toLowerCase(), token, code))
   }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
+  override fun resetToken(
+    token: String,
+    tokenType: UserManager.TokenType
+  ): Completable = Completable.fromCallable {
+    api.resetToken(ResetTokenRequest(tokenType.name.toLowerCase(), token)).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun resendVerification(
+    token: String,
+    tokenType: UserManager.TokenType
+  ): Completable = Completable.fromCallable {
+    api.resetVerificationToken(ResetTokenRequest(tokenType.name.toLowerCase(), token))
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getCurrentUser(): Single<User> = Single.fromCallable {
+    api.getCurrentUser().payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun updateCurrentUser(update: UserUpdate): Single<User> = Single.fromCallable {
+    api.updateCurrentUser(
+      UpdateUserRequest(
+        update.firstName,
+        update.lastName,
+        update.birthday,
+        update.avatarUri,
+        update.language,
+        update.password
+      )
+    ).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getCurrentUserTokens(): Single<List<Token>> = Single.fromCallable {
+    api.getUserTokens().payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun logout(): Completable = Completable.fromCallable {
+    preferences.refreshToken = null
+    api.logout()
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun uploadAvatar(avatar: Bitmap): Completable = Completable.fromCallable {
+    val stream = ByteArrayOutputStream()
+    avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    api.uploadAvatar(UploadAvatarRequest("avatar", "avatar.png", "image/png", stream.toByteArray())).payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 
   override fun isLoggedIn(): Boolean {
     val token = preferences.refreshToken
@@ -94,139 +223,9 @@ class UserManagerImpl(
     return false
   }
 
-  override fun uploadAvatar(avatar: Bitmap): Callable<Void?> = Callable.single {
-    val stream = ByteArrayOutputStream()
-    avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
-    api.uploadAvatar(UploadAvatarRequest("avatar", "avatar.png", "image/png", stream.toByteArray())).payload
+  override fun getAccessToken(): Single<Optional<Jwt>> = Single.fromCallable {
+    Optional(authenticator.refreshToken())
   }
-
-  override fun loginGuest(guestId: String): Callable<User?> = Callable.single {
-    api.loginGuest(GuestLoginRequest(guestId)).payload
-  }
-
-  override fun loginOauth(
-    provider: String,
-    oauthToken: String
-  ): Callable<User?> = Callable.single {
-    api.oauthLogin(
-      OauthLoginRequest(
-        provider,
-        oauthToken
-      )
-    ).payload
-  }
-
-  private fun login(
-    token: String,
-    tokenType: String,
-    auth: String
-  ): Callable<User?> = Callable.single {
-    api.login(
-      LoginRequest(
-        tokenType,
-        token,
-        auth
-      )
-    ).payload
-  }
-
-  override fun login(
-    token: String,
-    tokenType: UserManager.TokenType,
-    password: String
-  ): Callable<User?> = login(token, tokenType.name.toLowerCase(), password)
-
-  private fun resetToken(
-    token: String,
-    type: String
-  ): Callable<Void?> = Callable.single {
-    api.resetToken(ResetTokenRequest(type, token)).payload
-  }
-
-  override fun resetToken(
-    token: String,
-    tokenType: UserManager.TokenType
-  ): Callable<Void?> = resetToken(token, tokenType.name.toLowerCase())
-
-  private fun resendVerification(
-    token: String,
-    type: String
-  ): Callable<Void?> = Callable.single {
-    api.resetVerificationToken(ResetTokenRequest(type, token))
-    null
-  }
-
-  override fun resendVerification(
-    token: String,
-    tokenType: UserManager.TokenType
-  ): Callable<Void?> = resendVerification(token, tokenType.name.toLowerCase())
-
-  override fun register(registration: Registration): Callable<User?> = Callable.single {
-    val tokens = JSONArray()
-
-    registration.tokens?.forEach {
-      val data = JSONObject()
-      data.put("token_type", it.type)
-      data.put("token", it.value)
-      if (it is Registration.OauthToken) {
-        data.put("auth_data", JSONObject().put("auth_data", it.auth))
-      }
-      tokens.put(data)
-    }
-
-    api.register(
-      CreateUserRequest(
-        registration.firstName,
-        registration.lastName,
-        registration.birthday,
-        registration.avatarUri,
-        registration.password,
-        registration.language,
-        tokens
-      )
-    ).payload
-  }
-
-  private fun verifyUserToken(
-    token: String,
-    type: String,
-    code: String
-  ): Callable<Void?> = Callable.single {
-    api.verifyToken(VerifyTokenRequest(type, token, code))
-    null
-  }
-
-  override fun verifyUserToken(
-    token: String,
-    tokenType: UserManager.TokenType,
-    code: String
-  ): Callable<Void?> = verifyUserToken(token, tokenType.name.toLowerCase(), code)
-
-  override fun logout(): Callable<Void?> = Callable.single {
-    preferences.refreshToken = null
-    preferences.assetProviders = ArrayList()
-    api.logout()
-    null
-  }
-
-  override fun getCurrentUser(): Callable<User?> = Callable.single {
-    api.getCurrentUser().payload
-  }
-
-  override fun getCurrentUserTokens(): Callable<List<Token>> = Callable.single {
-    api.getUserTokens().payload
-  }
-
-  override fun updateCurrentUser(update: UserUpdate): Callable<User?> = Callable.single {
-    api.updateCurrentUser(
-      UpdateUserRequest(
-        update.firstName,
-        update.lastName,
-        update.birthday,
-        update.avatarUri,
-        update.language,
-        update.password
-      )
-    ).payload
-  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
 }

@@ -10,10 +10,20 @@
  */
 package io.blockv.common.model
 
-class ActivityThreadList(
-  val cursor: String,
+import io.blockv.common.internal.json.serializer.Serializer
+
+class ActivityThreadList : Model {
+  @Serializer.Serialize
+  val cursor: String
+  @Serializer.Serialize
   val threads: List<ActivityThread>
-) {
+
+  @Serializer.Serializable
+  constructor(cursor: String, threads: List<ActivityThread>) {
+    this.cursor = cursor
+    this.threads = threads
+  }
+
   override fun toString(): String {
     return "ActivityThreadList{" +
       "cursor='" + cursor + '\'' +
