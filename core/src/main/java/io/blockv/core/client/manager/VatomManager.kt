@@ -185,15 +185,6 @@ interface VatomManager {
   fun discover(query: JSONObject): Single<List<Vatom>>
 
   /**
-   * Tallies vAtoms on the BLOCKv platform based on the search query.
-   *
-   * @param query is a JSONObject containing the discover query.
-   * @return new Single<Int>.
-   * @see DiscoverQueryBuilder
-   */
-  fun discoverCount(query: JSONObject): Single<Int>
-
-  /**
    * Trashes the specified vAtom.
    *
    * This will remove the vAtom from the current user's inventory.
