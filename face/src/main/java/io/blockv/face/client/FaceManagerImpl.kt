@@ -18,11 +18,13 @@ import io.blockv.common.model.Vatom
 import io.blockv.common.util.Optional
 import io.blockv.face.R
 import io.blockv.face.client.manager.*
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONObject
 
 class FaceManagerImpl(
   var resourceManager: ResourceManager,
@@ -112,6 +114,11 @@ class FaceManagerImpl(
       override var errorView: View? = null
       override var loaderView: View? = null
       override var loaderDelay: Long = 0
+      override var messageHandler: ((
+        name: String,
+        payload: JSONObject,
+        handler: FaceManager.MessageHandler
+      ) -> Unit)? = null
 
       fun load(vatomView: VatomView): Single<FaceView> {
         return Single.fromCallable {
@@ -138,7 +145,53 @@ class FaceManagerImpl(
                   userManager,
                   vatomManager,
                   eventManager,
-                  jsonSerializer
+                  jsonSerializer,
+                  object : MessageManager {
+                    override fun sendMessage(message: MessageManager.Message): Maybe<MessageManager.Message> {
+                      var handler: ((
+                        name: String,
+                        payload: JSONObject,
+                        handler: FaceManager.MessageHandler
+                      ) -> Unit)? = messageHandler
+                        ?: return Maybe.error(FaceManager.Builder.Error.MESSAGE_HANDLER_IS_NULL.exception)
+
+                      return Maybe.create { emitter ->
+
+                        emitter.setCancellable {
+                          handler = null
+                        }
+
+                        handler?.invoke(
+                          message.name,
+                          message.payload,
+                          object : FaceManager.MessageHandler {
+                            override fun onComplete() {
+                              if (!emitter.isDisposed) {
+                                emitter.onComplete()
+                              }
+                            }
+
+                            override fun onCompleteWithResponse(name: String, payload: JSONObject) {
+                              if (!emitter.isDisposed) {
+                                emitter.onSuccess(MessageManager.Message(name, payload))
+                              }
+                            }
+
+                            override fun onError(error: MessageManager.MessageException) {
+                              if (!emitter.isDisposed) {
+                                emitter.onError(error)
+                              }
+                            }
+                          })
+                      }
+
+                    }
+
+                    override fun sendMessage(name: String, payload: JSONObject): Maybe<MessageManager.Message> {
+                      return sendMessage(MessageManager.Message(name, payload))
+                    }
+
+                  }
                 )
               )
             vatomView.faceView = view
@@ -255,7 +308,6 @@ class FaceManagerImpl(
 
       }
 
-
       override fun setEmbeddedProcedure(embeddedProcedure: FaceManager.EmbeddedProcedure): FaceManager.Builder {
         this.faceProcedure = embeddedProcedure.procedure
         return this
@@ -278,6 +330,17 @@ class FaceManagerImpl(
 
       override fun setLoaderDelay(time: Long): FaceManager.Builder {
         loaderDelay = time
+        return this
+      }
+
+      override fun setMessageHandler(
+        handler: ((
+          name: String,
+          payload: JSONObject,
+          handler: FaceManager.MessageHandler
+        ) -> Unit)?
+      ): FaceManager.Builder {
+        messageHandler = handler
         return this
       }
     }

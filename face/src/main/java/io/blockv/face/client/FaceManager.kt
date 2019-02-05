@@ -16,8 +16,10 @@ import android.view.ViewGroup
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 import io.blockv.face.client.FaceManager.EmbeddedProcedure.*
+import io.blockv.face.client.manager.MessageManager
 import io.blockv.face.client.manager.ResourceManager
 import io.reactivex.Single
+import org.json.JSONObject
 
 interface FaceManager {
 
@@ -182,6 +184,7 @@ interface FaceManager {
     val loaderView: View?
     val loaderDelay: Long
     val faceProcedure: FaceSelectionProcedure
+    val messageHandler: ((name: String, payload: JSONObject, handler: MessageHandler) -> Unit)?
 
     /**
      * Builds a Callable to load a FaceView into the provided VatomView.
@@ -247,10 +250,13 @@ interface FaceManager {
      */
     fun setLoaderDelay(time: Long): Builder
 
+    fun setMessageHandler(handler: ((name: String, payload: JSONObject, handler: MessageHandler) -> Unit)?): Builder
+
     enum class Error(val message: String) {
       FACTORY_NOT_FOUND("The face's display url is not a registered native face"),
       FACE_MODEL_IS_NULL("The face selection procedure has returned null"),
-      FACE_VIEW_CHANGED("The face view being displayed has been changed");
+      FACE_VIEW_CHANGED("The face view being displayed has been changed"),
+      MESSAGE_HANDLER_IS_NULL("The viewer has not assigned a message handler");
 
       val exception: Exception
         get() = VatomViewException(this)
@@ -258,6 +264,33 @@ interface FaceManager {
 
     class VatomViewException(val error: Error) : Exception(error.message)
   }
+
+  interface MessageHandler {
+
+    /**
+     * This must be called once the the viewer has completed processing the message
+     * but has no response to send back to the face.
+     */
+    fun onComplete()
+
+    /**
+     * This must be called once the the viewer has completed processing the message
+     * and has a response to send back to the face.
+     *
+     * @param name is the message name.
+     * @param payload contains additional information for the face.
+     */
+    fun onCompleteWithResponse(name: String, payload: JSONObject)
+
+    /**
+     * This must be called if an error has occurred during processing of the message.
+     *
+     * @param error is the throwable to be returned.
+     */
+    fun onError(error: MessageManager.MessageException)
+
+  }
+
 
   /**
    * View Emitter is used to create custom loader and error views.
