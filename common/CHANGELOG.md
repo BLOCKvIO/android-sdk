@@ -2,7 +2,7 @@
 All notable changes to the common module will be documented in this file.
 
 #### 2.x Releases (API v1)
-- `2.0.x` Releases - [2.0.1](#200)
+- `2.0.x` Releases - [2.0.1](#201)[2.0.2](#202)
 ---
 #### 1.x Releases (API v1)
 - `1.3.x` Releases - [1.3.0](#130)|[1.3.1](#131)|[1.3.2](#132)
@@ -10,6 +10,13 @@ All notable changes to the common module will be documented in this file.
 - `1.1.x` Releases - [1.1.0](#110)|[1.1.1](#111)
 - `1.0.x` Releases - [1.0.0](#100)
 ---
+
+## [2.0.2](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/common/2.0.2)
+Released on 2019-03-29
+
+### Fixed
+- `MessageThread` serialization.
+ - Pull Request [#126](https://github.com/BLOCKvIO/android-sdk/pull/126)
 
 ## [2.0.1](https://maven.blockv.io/artifactory/webapp/#/artifacts/browse/tree/General/BLOCKv/io/blockv/sdk/common/2.0.1)
 Released on 2019-02-05
