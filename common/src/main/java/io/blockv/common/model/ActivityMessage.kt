@@ -14,25 +14,25 @@ import io.blockv.common.internal.json.serializer.Serializer
 
 class ActivityMessage : Model {
 
-  @Serializer.Serialize(name = "msg_id")
+  @Serializer.Serialize(name = "msg_id", path = "message")
   val id: Long
-  @Serializer.Serialize(name = "user_id")
+  @Serializer.Serialize(name = "user_id", path = "message")
   val targetUserId: String
-  @Serializer.Serialize(name = "vatoms")
+  @Serializer.Serialize(name = "vatoms", path = "message")
   val vatomIds: List<String>
-  @Serializer.Serialize(name = "templ_vars")
+  @Serializer.Serialize(name = "templ_vars", path = "message")
   val templateVariationIds: List<String>
-  @Serializer.Serialize(name = "msg")
+  @Serializer.Serialize(name = "msg", path = "message")
   val message: String
-  @Serializer.Serialize(name = "action_name")
+  @Serializer.Serialize(name = "action_name", path = "message")
   val actionName: String
-  @Serializer.Serialize(name = "when_created")
+  @Serializer.Serialize(name = "when_created", path = "message")
   val whenCreated: String
-  @Serializer.Serialize(name = "triggered_by")
+  @Serializer.Serialize(name = "triggered_by", path = "message")
   val triggerUserId: String
-  @Serializer.Serialize(name = "generic")
+  @Serializer.Serialize(name = "generic", path = "message")
   val resources: List<Resource>
-  @Serializer.Serialize(name = "geo_pos")
+  @Serializer.Serialize(name = "geo_pos", path = " message")
   val geoPosition: List<Double>
 
   @Serializer.Serializable
