@@ -13,7 +13,9 @@ package io.blockv.common.internal.json
 import io.blockv.common.internal.json.serializer.GenericSerializer
 import io.blockv.common.internal.json.serializer.Serializer
 import io.blockv.common.internal.json.serializer.custom.ActionSerializer
+import io.blockv.common.internal.json.serializer.custom.ActivityMessageListSerializer
 import io.blockv.common.model.Action
+import io.blockv.common.model.ActivityMessageList
 import io.blockv.common.model.Model
 import org.json.JSONObject
 import kotlin.reflect.KClass
@@ -27,9 +29,10 @@ class JsonModule {
   val genericSerializer: Serializer<Any> = GenericSerializer()
 
   init {
+    serializers[Any::class] = genericSerializer
+    registerSerializer<ActivityMessageList>(ActivityMessageListSerializer())
     registerSerializer<Action>(ActionSerializer())
   }
-
 
   inline fun <reified T : Model> registerSerializer(serializer: Serializer<*>) {
     val key = T::class
