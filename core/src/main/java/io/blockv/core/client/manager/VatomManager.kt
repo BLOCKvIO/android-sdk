@@ -11,11 +11,14 @@
 package io.blockv.core.client.manager
 
 import io.blockv.common.builder.DiscoverQueryBuilder
-import io.blockv.common.model.*
+import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomUpdate
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.json.JSONObject
-import java.util.HashMap
+import java.util.*
 
 /**
  *  This interface contains the available BLOCKv vAtom functions.
@@ -94,12 +97,14 @@ interface VatomManager {
   ): Single<List<GeoGroup>>
 
   /**
-   * Updates the vAtom's properties.
+   * Set one or more Vatoms' parent id.
    *
-   * @param payload contains the properties to update.
-   * @return new Completable instance.
+   * @param parentId is the value which will be used to update the Vatoms' parent id.
+   * @param vatomIds is list of one or more Vatom id.
+   * @return new Single<VatomUpdate> instance.
+   * @see VatomUpdate
    */
-  fun updateVatom(payload: JSONObject): Completable
+  fun setParentId(parentId: String, vararg vatomIds: String): Single<VatomUpdate>
 
   /**
    * Fetches all the actions configured for a template.
