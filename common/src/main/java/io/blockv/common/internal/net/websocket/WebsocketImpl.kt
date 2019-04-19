@@ -21,6 +21,10 @@ import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.GenericSocketEvent
 import io.blockv.common.model.WebSocketEvent
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 
 class WebsocketImpl(
@@ -29,13 +33,9 @@ class WebsocketImpl(
   val authenticator: Authenticator
 ) : WebSocketAdapter(), Websocket {
 
-  private var listener: WebSocketAdapter? = null
-  private var webSocket: com.neovisionaries.ws.client.WebSocket? = null
+  val websocket = Flowable.create<WebSocketEvent<JSONObject>>({ emitter ->
 
-  @Synchronized
-  override fun connect(listener: Websocket.WebSocketListener) {
-    this.disconnect()
-    this.listener = object : WebSocketAdapter() {
+    val listener = object : WebSocketAdapter() {
 
       override fun onTextMessage(websocket: WebSocket?, message: String?) {
         if (message != null) {
@@ -43,7 +43,9 @@ class WebsocketImpl(
             val event: GenericSocketEvent? =
               jsonModule.deserialize(JSONObject(message))
             if (event != null) {
-              listener.onEvent(event)
+              if (!emitter.isCancelled) {
+                emitter.onNext(event)
+              }
             }
           } catch (exception: Exception) {
             Log.i("WebSocket", exception.message)
@@ -57,35 +59,37 @@ class WebsocketImpl(
         clientCloseFrame: WebSocketFrame,
         closedByServer: Boolean
       ) {
-        listener.onError(BlockvWsException(BlockvWsException.Error.CONNECTION_DISCONNECTED, null))
+        if (!emitter.isCancelled) {
+          emitter.onError(BlockvWsException(BlockvWsException.Error.CONNECTION_DISCONNECTED, null))
+        }
         websocket.removeListener(this)
       }
     }
 
     try {
-      this.webSocket = WebSocketFactory()
+      val webSocket = WebSocketFactory()
         .createSocket(getAddress())
-        .addListener(this.listener)
+        .addListener(listener)
         .connect()
+      emitter.setCancellable { webSocket.disconnect() }
     } catch (exception: Exception) {
-      listener.onError(
-        BlockvWsException(
-          BlockvWsException.Error.CONNECTION_FAILED,
-          exception
+      if (!emitter.isCancelled) {
+        emitter.onError(
+          BlockvWsException(
+            BlockvWsException.Error.CONNECTION_FAILED,
+            exception
+          )
         )
-      )
+      }
     }
-
-  }
+  }, BackpressureStrategy.BUFFER)
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+    .share()
 
   @Synchronized
-  override fun disconnect() {
-    if (this.webSocket != null) {
-      this.webSocket!!.disconnect()
-      this.webSocket!!.removeListener(this.listener)
-    }
-    this.webSocket = null
-    this.listener = null
+  override fun connect(): Flowable<WebSocketEvent<JSONObject>> {
+    return websocket
   }
 
   @Throws(Exception::class)
