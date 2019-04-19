@@ -36,7 +36,7 @@ class VatomApiImpl(
   override fun updateVatom(request: JSONObject): BaseResponse<JSONObject> {
     val response: JSONObject = client.patch("v1/vatoms", request)
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       response
     )
   }
@@ -45,7 +45,7 @@ class VatomApiImpl(
     val response: JSONObject = client.post("v1/vatom/geodiscover", request.toJson())
     val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       payload
     )
   }
@@ -56,7 +56,7 @@ class VatomApiImpl(
     val pack = jsonModule.deserialize<Pack>(payload)
 
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
     )
   }
@@ -77,7 +77,7 @@ class VatomApiImpl(
       }
     }
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       list
     )
   }
@@ -86,7 +86,7 @@ class VatomApiImpl(
     val response: JSONObject = client.post("v1/user/vatom/get", request.toJson())
     val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       payload
     )
   }
@@ -97,7 +97,7 @@ class VatomApiImpl(
     val pack = jsonModule.deserialize<Pack>(payload)
 
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
     )
   }
@@ -107,7 +107,7 @@ class VatomApiImpl(
     val payload: JSONObject = response.getJSONObject("payload")
 
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       payload
     )
   }
@@ -119,7 +119,7 @@ class VatomApiImpl(
     combineVatomProperties(discoverPack.vatoms, discoverPack.faces, discoverPack.actions)
 
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       discoverPack
     )
   }
@@ -128,7 +128,7 @@ class VatomApiImpl(
     val response: JSONObject = client.post("/v1/user/vatom/inventory", request.toJson())
     val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       payload
     )
   }
@@ -139,7 +139,7 @@ class VatomApiImpl(
     val pack = jsonModule.deserialize<Pack>(payload)
 
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
     )
 
@@ -160,7 +160,7 @@ class VatomApiImpl(
       }
     }
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       list
     )
   }
@@ -169,7 +169,7 @@ class VatomApiImpl(
     val response: JSONObject = client.post("v1/user/vatom/action/" + request.action, request.toJson())
     val payload: JSONObject = response.getJSONObject("payload") ?: JSONObject()
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       payload
     )
   }
@@ -177,7 +177,7 @@ class VatomApiImpl(
   override fun trashVatom(request: TrashVatomRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("/v1/user/vatom/trash", request.toJson())
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       response
     )
   }

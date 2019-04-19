@@ -30,7 +30,7 @@ class ActivityApiImpl(
     val payload: JSONObject = response.getJSONObject("payload")
 
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       jsonModule.deserialize(payload)
     )
   }
@@ -40,7 +40,7 @@ class ActivityApiImpl(
     val payload: JSONObject = response.getJSONObject("payload")
 
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       jsonModule.deserialize(payload)
     )
   }
@@ -49,7 +49,7 @@ class ActivityApiImpl(
     val response: JSONObject = client.post("v1/user/message", request.toJson())
 
     return BaseResponse(
-      response.getString("response_id"),
+      response.getString("request_id"),
       Unit
     )
   }
