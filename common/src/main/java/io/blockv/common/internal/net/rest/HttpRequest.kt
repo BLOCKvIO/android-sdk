@@ -63,7 +63,6 @@ class HttpRequest {
 
       val responseCode: Int = connection.responseCode
 
-      Log.e("httpclient", "" + responseCode)
       val input: DataInputStream
       if (responseCode == 200) {
         input = DataInputStream(connection.inputStream)
