@@ -19,11 +19,30 @@ import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.*
-import io.blockv.core.client.manager.*
+import io.blockv.common.model.Environment
+import io.blockv.common.model.InventoryEvent
+import io.blockv.common.model.Model
+import io.blockv.common.model.PublicUser
+import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.Vatom
+import io.blockv.common.model.WebSocketEvent
+import io.blockv.core.client.manager.ActivityManager
+import io.blockv.core.client.manager.ActivityManagerImpl
+import io.blockv.core.client.manager.EventManager
+import io.blockv.core.client.manager.EventManagerImpl
+import io.blockv.core.client.manager.ResourceManager
+import io.blockv.core.client.manager.ResourceManagerImpl
+import io.blockv.core.client.manager.UserManager
+import io.blockv.core.client.manager.UserManagerImpl
+import io.blockv.core.client.manager.VatomManager
+import io.blockv.core.client.manager.VatomManagerImpl
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
-import io.blockv.faces.*
+import io.blockv.faces.ImageFace
+import io.blockv.faces.ImageLayeredFace
+import io.blockv.faces.ImagePolicyFace
+import io.blockv.faces.ImageProgressFace
+import io.blockv.faces.WebFace
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.plugins.RxJavaPlugins
@@ -41,6 +60,7 @@ class Blockv {
   val vatomManager: VatomManager
   val resourceManager: ResourceManager
   val activityManager: ActivityManager
+  val eventManager: EventManager
 
   init {
     RxJavaPlugins.setErrorHandler { throwable ->
@@ -49,22 +69,6 @@ class Blockv {
   }
 
   private val cacheDir: File
-
-  @Volatile
-  private var internalEventManager: EventManager? = null
-  val eventManager: EventManager
-    get() {
-      if (internalEventManager == null) {
-        try {
-          internalEventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
-        } catch (e: NoClassDefFoundError) {
-          throw MissingWebSocketDependencyException()
-        } catch (e: Exception) {
-          throw MissingWebSocketDependencyException()
-        }
-      }
-      return internalEventManager!!
-    }
 
   @Volatile
   private var internalFaceManager: FaceManager? = null
@@ -144,7 +148,6 @@ class Blockv {
 
 
   constructor(context: Context, appId: String) {
-
     this.cacheDir = context.cacheDir
     this.jsonModule = JsonModule()
     this.appId = appId
@@ -169,6 +172,7 @@ class Blockv {
     )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
+    this.eventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
   }
 
   constructor(context: Context, environment: Environment) {
@@ -188,6 +192,7 @@ class Blockv {
     )
     this.vatomManager = VatomManagerImpl(netModule.vatomApi)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
+    this.eventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
   }
 
 
@@ -216,16 +221,12 @@ class Blockv {
     this.userManager = userManager
     this.vatomManager = vatomManager
     this.resourceManager = resourceManager
-    this.internalEventManager = eventManager
+    this.eventManager = eventManager
     this.activityManager = activityManager
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
   }
 
-  class MissingWebSocketDependencyException :
-    Exception("Include dependency 'com.neovisionaries:nv-websocket-client:2.5' to use the event manager.")
-
   class MissingFaceModuleException :
     Exception("Include dependency 'io.blockv.sdk:face:+' to use the face manager.")
-
 
 }
