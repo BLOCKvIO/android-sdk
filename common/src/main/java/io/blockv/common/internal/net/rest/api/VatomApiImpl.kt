@@ -12,9 +12,19 @@ package io.blockv.common.internal.net.rest.api
 
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.Client
-import io.blockv.common.internal.net.rest.request.*
+import io.blockv.common.internal.net.rest.request.GeoGroupRequest
+import io.blockv.common.internal.net.rest.request.GeoRequest
+import io.blockv.common.internal.net.rest.request.InventoryRequest
+import io.blockv.common.internal.net.rest.request.PerformActionRequest
+import io.blockv.common.internal.net.rest.request.TrashVatomRequest
+import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
-import io.blockv.common.model.*
+import io.blockv.common.model.Action
+import io.blockv.common.model.DiscoverPack
+import io.blockv.common.model.Face
+import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.Pack
+import io.blockv.common.model.Vatom
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -22,12 +32,23 @@ class VatomApiImpl(
   val client: Client,
   val jsonModule: JsonModule
 ) : VatomApi {
-  override fun updateVatom(request: JSONObject): BaseResponse<Unit> {
+
+  override fun updateVatom(request: JSONObject): BaseResponse<JSONObject> {
     val response: JSONObject = client.patch("v1/vatoms", request)
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
-      Unit
+      response
+    )
+  }
+
+  override fun geoDiscoverJson(request: GeoRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("v1/vatom/geodiscover", request.toJson())
+    val payload: JSONObject = response.getJSONObject("payload")
+    return BaseResponse(
+      response.optInt("error"),
+      response.optString("message"),
+      payload
     )
   }
 
@@ -72,6 +93,16 @@ class VatomApiImpl(
     )
   }
 
+  override fun getVatomJson(request: VatomRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("v1/user/vatom/get", request.toJson())
+    val payload: JSONObject = response.getJSONObject("payload")
+    return BaseResponse(
+      response.optInt("error"),
+      response.optString("message"),
+      payload
+    )
+  }
+
   override fun getUserVatom(request: VatomRequest): BaseResponse<List<Vatom>> {
     val response: JSONObject = client.post("v1/user/vatom/get", request.toJson())
     val payload: JSONObject? = response.optJSONObject("payload")
@@ -88,6 +119,17 @@ class VatomApiImpl(
       if (pack != null) combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
       else
         ArrayList()
+    )
+  }
+
+  override fun discoverJson(request: JSONObject): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("v1/vatom/discover", request)
+    val payload: JSONObject = response.getJSONObject("payload")
+
+    return BaseResponse(
+      response.optInt("error"),
+      response.optString("message"),
+      payload
     )
   }
 
@@ -110,6 +152,15 @@ class VatomApiImpl(
     )
   }
 
+  override fun getInventoryJson(request: InventoryRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("/v1/user/vatom/inventory", request.toJson())
+    val payload: JSONObject = response.getJSONObject("payload")
+    return BaseResponse(
+      response.optInt("error"),
+      response.optString("message"),
+      payload
+    )
+  }
 
   override fun getUserInventory(request: InventoryRequest): BaseResponse<List<Vatom>> {
     val response: JSONObject = client.post("/v1/user/vatom/inventory", request.toJson())
@@ -152,9 +203,9 @@ class VatomApiImpl(
     )
   }
 
-  override fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?> {
+  override fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("v1/user/vatom/action/" + request.action, request.toJson())
-    val payload: JSONObject? = response.optJSONObject("payload")
+    val payload: JSONObject = response.optJSONObject("payload") ?: JSONObject()
     return BaseResponse(
       response.optInt("error"),
       response.optString("message"),
