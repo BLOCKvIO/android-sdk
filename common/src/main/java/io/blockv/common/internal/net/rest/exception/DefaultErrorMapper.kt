@@ -23,7 +23,7 @@ class DefaultErrorMapper : ErrorMapper {
     return try {
       val errorCode: Int = payload.optInt("error", 0)
       val message: String = payload.optString("message", "An networking error has occurred")
-      val responseId: String? = payload.optString("response_id", null)
+      val requestId: String? = payload.optString("request_id", null)
       val error: Error?
       error = if ((httpCode == 401 && errorCode == 0)
         && payload.has("exp") && payload.getString("exp").equals("token expired", true)
@@ -32,7 +32,7 @@ class DefaultErrorMapper : ErrorMapper {
         Error.USER_ACCESS_TOKEN_INVALID
       } else
         Error.from(errorCode)
-      BlockvException(responseId, httpCode, message, errorCode, error)
+      BlockvException(requestId, httpCode, message, errorCode, error)
     } catch (exception: Exception) {
       BlockvException(null, httpCode, exception.message, null, null)
     }
