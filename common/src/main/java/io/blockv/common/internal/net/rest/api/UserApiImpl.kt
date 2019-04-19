@@ -10,7 +10,6 @@
  */
 package io.blockv.common.internal.net.rest.api
 
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.Client
 import io.blockv.common.internal.net.rest.request.*
@@ -28,8 +27,7 @@ class UserApiImpl(
   override fun setDefaultUserToken(tokenId: String): BaseResponse<Unit> {
     val response: JSONObject = client.put("v1/user/tokens/$tokenId/default")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       Unit
     )
   }
@@ -37,38 +35,34 @@ class UserApiImpl(
   override fun deleteUserToken(tokenId: String): BaseResponse<Unit> {
     val response: JSONObject = client.del("v1/user/tokens/$tokenId")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       Unit
     )
   }
 
   override fun getPublicUser(userId: String): BaseResponse<PublicUser> {
     val response: JSONObject = client.get("v1/users/$userId")
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
 
   override fun createUserToken(request: CreateTokenRequest): BaseResponse<Token> {
     val response: JSONObject = client.post("v1/user/tokens", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
 
   override fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Token> {
     val response: JSONObject = client.post("v1/user/tokens", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
@@ -82,92 +76,80 @@ class UserApiImpl(
       request.payload
     )
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       Unit
     )
   }
 
   override fun loginGuest(request: GuestLoginRequest): BaseResponse<User> {
     val response: JSONObject = client.http("POST", "v1/user/login", request.toJson(), false)
-    val payload: JSONObject = response.optJSONObject("payload")
-    val user: JSONObject = payload.optJSONObject("user")
+    val payload: JSONObject = response.getJSONObject("payload")
+    val user: JSONObject = payload.getJSONObject("user")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(user)
     )
   }
 
   override fun oauthLogin(request: OauthLoginRequest): BaseResponse<User> {
     val response: JSONObject = client.http("POST", "v1/user/login", request.toJson(), false)
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
 
   override fun register(request: CreateUserRequest): BaseResponse<User> {
-    Log.e("register", request.toJson().toString())
     val response: JSONObject = client.http("POST", "v1/users", request.toJson(), false)
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
-      jsonModule.deserialize(payload.optJSONObject("user"))
+      response.getString("response_id"),
+      jsonModule.deserialize(payload.getJSONObject("user"))
     )
   }
 
   override fun login(request: LoginRequest): BaseResponse<User> {
-    Log.e("login", request.toJson().toString())
     val response: JSONObject = client.http("POST", "v1/user/login", request.toJson(), false)
-    val payload: JSONObject = response.optJSONObject("payload")
-    val user: JSONObject = payload.optJSONObject("user")
+    val payload: JSONObject = response.getJSONObject("payload")
+    val user: JSONObject = payload.getJSONObject("user")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(user)
     )
   }
 
   override fun getCurrentUser(): BaseResponse<User> {
     val response: JSONObject = client.get("v1/user")
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
 
   override fun updateCurrentUser(request: UpdateUserRequest): BaseResponse<User> {
     val response: JSONObject = client.patch("v1/user", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
 
   override fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token> {
     val response: JSONObject = client.post("v1/user/reset_token_verification", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
 
   override fun resetToken(request: ResetTokenRequest): BaseResponse<Unit> {
     val response: JSONObject = client.post("v1/user/reset_token", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       Unit
     )
   }
@@ -175,15 +157,14 @@ class UserApiImpl(
   override fun verifyToken(request: VerifyTokenRequest): BaseResponse<Unit> {
     val response: JSONObject = client.post("v1/user/verify_token", request.toJson())
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       Unit
     )
   }
 
   override fun getUserTokens(): BaseResponse<List<Token>> {
     val response: JSONObject = client.get("v1/user/tokens")
-    val payload: JSONArray = response.optJSONArray("payload")
+    val payload: JSONArray = response.getJSONArray("payload")
     val list: ArrayList<Token> = ArrayList()
     var count = 0
     while (count < payload.length()) {
@@ -195,18 +176,16 @@ class UserApiImpl(
     }
 
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       list
     )
   }
 
   override fun logout(): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("v1/user/logout", null)
-    val payload: JSONObject = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       payload
     )
   }

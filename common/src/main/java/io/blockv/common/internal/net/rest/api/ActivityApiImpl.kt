@@ -19,7 +19,6 @@ import io.blockv.common.internal.net.rest.response.BaseResponse
 import io.blockv.common.model.ActivityMessageList
 import io.blockv.common.model.ActivityThreadList
 import org.json.JSONObject
-import java.util.*
 
 class ActivityApiImpl(
   val client: Client,
@@ -28,35 +27,30 @@ class ActivityApiImpl(
 
   override fun getThreadList(request: ActivityThreadListRequest): BaseResponse<ActivityThreadList> {
     val response: JSONObject = client.post("v1/activity/mythreads", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload") ?: JSONObject()
+    val payload: JSONObject = response.getJSONObject("payload")
 
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
 
   override fun getThreadMessages(request: ActivityMessageListRequest): BaseResponse<ActivityMessageList> {
     val response: JSONObject = client.post("v1/activity/mythreadmessages", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload") ?: JSONObject()
+    val payload: JSONObject = response.getJSONObject("payload")
 
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       jsonModule.deserialize(payload)
     )
   }
 
   override fun sendMessage(request: SendMessageRequest): BaseResponse<Unit> {
     val response: JSONObject = client.post("v1/user/message", request.toJson())
-    val payload: JSONObject = response.optJSONObject("payload")
 
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("response_id"),
       Unit
     )
-
   }
 }

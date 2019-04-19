@@ -11,7 +11,6 @@
 package io.blockv.common.internal.net.rest.response
 
 class BaseResponse<T>(
-  val error: Int?,
-  val message: String?,
+  val requestId: String,
   val payload: T
 )
