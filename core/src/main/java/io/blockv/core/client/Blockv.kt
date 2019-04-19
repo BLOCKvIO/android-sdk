@@ -52,7 +52,6 @@ import kotlin.reflect.KClass
 
 class Blockv {
   private val preferences: Preferences
-  private val jsonModule: JsonModule
   private val auth: Authenticator
   val appId: String
   val netModule: NetModule
@@ -61,6 +60,7 @@ class Blockv {
   val resourceManager: ResourceManager
   val activityManager: ActivityManager
   val eventManager: EventManager
+  val jsonModule: JsonModule
 
   init {
     RxJavaPlugins.setErrorHandler { throwable ->
