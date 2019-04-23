@@ -116,12 +116,11 @@ class HttpClient(
           }
         }
       } catch (e: Exception) {
-        Log.e("httpCLient", e.toString())
+        Log.e("httpClient", e.toString())
       }
       return response
     } else {
       val exception: BlockvException = errorMapper.map(requestResponse.first, requestResponse.second)
-      Log.e("httpClient", exception.toString())
       if (withAuth && exception.error == Error.USER_ACCESS_TOKEN_INVALID && retry == 0) {
         authenticator.refreshToken()
         return http(method, endpoint, payload, 1, withAuth)
@@ -282,12 +281,11 @@ class HttpClient(
           }
 
         } catch (e: Exception) {
-          Log.e("httpCLient", e.toString())
+          Log.e("httpClient", e.toString())
         }
         return response
       } else {
         val exception: BlockvException = errorMapper.map(responseCode, response)
-        Log.e("httpCLient", exception.toString())
         if (exception.error == Error.USER_ACCESS_TOKEN_INVALID && retry == 0) {
           connection.disconnect()
           return multipart(endpoint, fieldName, fileName, type, payload, 1)
