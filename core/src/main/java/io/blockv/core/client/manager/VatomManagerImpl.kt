@@ -12,8 +12,18 @@ package io.blockv.core.client.manager
 
 import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.internal.net.rest.api.VatomApi
-import io.blockv.common.internal.net.rest.request.*
-import io.blockv.common.model.*
+import io.blockv.common.internal.net.rest.request.GeoGroupRequest
+import io.blockv.common.internal.net.rest.request.GeoRequest
+import io.blockv.common.internal.net.rest.request.InventoryRequest
+import io.blockv.common.internal.net.rest.request.PerformActionRequest
+import io.blockv.common.internal.net.rest.request.TrashVatomRequest
+import io.blockv.common.internal.net.rest.request.VatomRequest
+import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomProperty
+import io.blockv.common.model.VatomUpdate
+import io.blockv.common.model.VatomVisibility
 import io.blockv.common.util.JsonUtil
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -66,8 +76,12 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun updateVatom(payload: JSONObject): Completable = Completable.fromCallable {
-    api.updateVatom(payload)
+  override fun setParentId(parentId: String, vararg vatomIds: String): Single<VatomUpdate> = Single.fromCallable {
+    api.updateVatom(
+      JSONObject()
+        .put("parent_id", parentId)
+        .put("ids", JSONArray(vatomIds))
+    ).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
