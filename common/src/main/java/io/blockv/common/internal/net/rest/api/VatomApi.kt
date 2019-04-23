@@ -10,28 +10,44 @@
  */
 package io.blockv.common.internal.net.rest.api
 
-import io.blockv.common.internal.net.rest.request.*
+import io.blockv.common.internal.net.rest.request.GeoGroupRequest
+import io.blockv.common.internal.net.rest.request.GeoRequest
+import io.blockv.common.internal.net.rest.request.InventoryRequest
+import io.blockv.common.internal.net.rest.request.PerformActionRequest
+import io.blockv.common.internal.net.rest.request.TrashVatomRequest
+import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
-import io.blockv.common.model.*
+import io.blockv.common.model.Action
+import io.blockv.common.model.DiscoverPack
+import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.Vatom
 import org.json.JSONObject
 
 interface VatomApi {
 
   fun getUserVatom(request: VatomRequest): BaseResponse<List<Vatom>>
 
+  fun getVatomJson(request: VatomRequest): BaseResponse<JSONObject>
+
   fun getUserInventory(request: InventoryRequest): BaseResponse<List<Vatom>>
+
+  fun getInventoryJson(request: InventoryRequest): BaseResponse<JSONObject>
 
   fun getVatomActions(template: String?): BaseResponse<List<Action>>
 
-  fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?>
+  fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject>
 
   fun discover(request: JSONObject): BaseResponse<DiscoverPack>
 
+  fun discoverJson(request: JSONObject): BaseResponse<JSONObject>
+
   fun geoDiscover(request: GeoRequest): BaseResponse<List<Vatom>>
+
+  fun geoDiscoverJson(request: GeoRequest): BaseResponse<JSONObject>
 
   fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>>
 
-  fun updateVatom(request: JSONObject): BaseResponse<Unit>
+  fun updateVatom(request: JSONObject): BaseResponse<JSONObject>
 
   fun trashVatom(request: TrashVatomRequest): BaseResponse<JSONObject>
 }
