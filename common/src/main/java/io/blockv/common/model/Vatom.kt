@@ -30,6 +30,13 @@ open class Vatom : Model {
   @Serializer.Serialize
   var actions: List<Action>
 
+  val rootType: Type
+
+  val isContainer: Boolean
+    get() {
+      return rootType != Type.STANDARD || rootType != Type.UNKNOWN
+    }
+
   @Serializer.Serializable
   constructor(
     id: String,
@@ -47,6 +54,7 @@ open class Vatom : Model {
     this.private = private
     this.faces = faces
     this.actions = actions
+    this.rootType = Type.from(property.rootType ?: "")
   }
 
   override fun toString(): String {
@@ -67,5 +75,27 @@ open class Vatom : Model {
 
   override fun hashCode(): Int {
     return id.hashCode()
+  }
+
+  enum class Type {
+    STANDARD,
+    CONTAINER_FOLDER,
+    CONTAINER_DISCOVER,
+    CONTAINER_PACKAGE,
+    CONTAINER_DEFINED,
+    UNKNOWN;
+
+    companion object {
+      fun from(type: String): Type {
+        return when (type) {
+          "vAtom::vAtomType" -> STANDARD
+          "vAtom::vAtomType::DefinedFolderContainerType" -> CONTAINER_DEFINED
+          "vAtom::vAtomType::FolderContainerType" -> CONTAINER_FOLDER
+          "vAtom::vAtomType::DiscoverContainerType" -> CONTAINER_DISCOVER
+          "vAtom::vAtomType::PackageContainerType" -> CONTAINER_PACKAGE
+          else -> UNKNOWN
+        }
+      }
+    }
   }
 }

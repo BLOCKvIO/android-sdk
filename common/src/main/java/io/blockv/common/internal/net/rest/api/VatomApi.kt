@@ -21,6 +21,7 @@ import io.blockv.common.model.Action
 import io.blockv.common.model.DiscoverPack
 import io.blockv.common.model.GeoGroup
 import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomUpdate
 import org.json.JSONObject
 
 interface VatomApi {
@@ -47,7 +48,7 @@ interface VatomApi {
 
   fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>>
 
-  fun updateVatom(request: JSONObject): BaseResponse<JSONObject>
+  fun updateVatom(request: JSONObject): BaseResponse<VatomUpdate>
 
   fun trashVatom(request: TrashVatomRequest): BaseResponse<JSONObject>
 }

@@ -25,6 +25,7 @@ import io.blockv.common.model.Face
 import io.blockv.common.model.GeoGroup
 import io.blockv.common.model.Pack
 import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomUpdate
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -33,11 +34,13 @@ class VatomApiImpl(
   val jsonModule: JsonModule
 ) : VatomApi {
 
-  override fun updateVatom(request: JSONObject): BaseResponse<JSONObject> {
+  override fun updateVatom(request: JSONObject): BaseResponse<VatomUpdate> {
     val response: JSONObject = client.patch("v1/vatoms", request)
     return BaseResponse(
       response.getString("request_id"),
-      response
+      jsonModule.deserialize(
+        response.getJSONObject("payload")
+      )
     )
   }
 
