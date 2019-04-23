@@ -11,18 +11,10 @@
 package io.blockv.common.internal.net.websocket
 
 import io.blockv.common.model.WebSocketEvent
+import io.reactivex.Flowable
 import org.json.JSONObject
 
 interface Websocket {
 
-  fun connect(listener: WebSocketListener)
-
-  fun disconnect()
-
-  interface WebSocketListener {
-
-    fun onEvent(event: WebSocketEvent<JSONObject>)
-
-    fun onError(throwable: Throwable)
-  }
+  fun connect(): Flowable<WebSocketEvent<JSONObject>>
 }
