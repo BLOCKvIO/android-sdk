@@ -12,9 +12,20 @@ package io.blockv.common.internal.net.rest.api
 
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.Client
-import io.blockv.common.internal.net.rest.request.*
+import io.blockv.common.internal.net.rest.request.GeoGroupRequest
+import io.blockv.common.internal.net.rest.request.GeoRequest
+import io.blockv.common.internal.net.rest.request.InventoryRequest
+import io.blockv.common.internal.net.rest.request.PerformActionRequest
+import io.blockv.common.internal.net.rest.request.TrashVatomRequest
+import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
-import io.blockv.common.model.*
+import io.blockv.common.model.Action
+import io.blockv.common.model.DiscoverPack
+import io.blockv.common.model.Face
+import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.Pack
+import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomUpdate
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -22,38 +33,41 @@ class VatomApiImpl(
   val client: Client,
   val jsonModule: JsonModule
 ) : VatomApi {
+
   override fun updateVatom(request: JSONObject): BaseResponse<VatomUpdate> {
     val response: JSONObject = client.patch("v1/vatoms", request)
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
-      jsonModule.deserialize(response.getJSONObject("payload"))
+      response.getString("request_id"),
+      jsonModule.deserialize(
+        response.getJSONObject("payload")
+      )
+    )
+  }
+
+  override fun geoDiscoverJson(request: GeoRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("v1/vatom/geodiscover", request.toJson())
+    val payload: JSONObject = response.getJSONObject("payload")
+    return BaseResponse(
+      response.getString("request_id"),
+      payload
     )
   }
 
   override fun geoDiscover(request: GeoRequest): BaseResponse<List<Vatom>> {
     val response: JSONObject = client.post("v1/vatom/geodiscover", request.toJson())
-    val payload: JSONObject? = response.optJSONObject("payload")
-
-    val pack =
-      if (payload != null)
-        jsonModule.deserialize<Pack>(payload)
-      else
-        null
+    val payload: JSONObject = response.getJSONObject("payload")
+    val pack = jsonModule.deserialize<Pack>(payload)
 
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
-      if (pack != null) combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
-      else
-        ArrayList()
+      response.getString("request_id"),
+      combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
     )
   }
 
   override fun geoGroupDiscover(request: GeoGroupRequest): BaseResponse<List<GeoGroup>> {
     val response: JSONObject = client.post("v1/vatom/geodiscovergroups", request.toJson())
-    val payload: JSONObject? = response.optJSONObject("payload")
-    val group: JSONArray = payload?.optJSONArray("groups") ?: JSONArray()
+    val payload: JSONObject? = response.getJSONObject("payload")
+    val group: JSONArray = payload?.getJSONArray("groups") ?: JSONArray()
     val list: ArrayList<GeoGroup> = ArrayList()
     if (payload != null) {
       var count = 0
@@ -66,74 +80,77 @@ class VatomApiImpl(
       }
     }
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("request_id"),
       list
+    )
+  }
+
+  override fun getVatomJson(request: VatomRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("v1/user/vatom/get", request.toJson())
+    val payload: JSONObject = response.getJSONObject("payload")
+    return BaseResponse(
+      response.getString("request_id"),
+      payload
     )
   }
 
   override fun getUserVatom(request: VatomRequest): BaseResponse<List<Vatom>> {
     val response: JSONObject = client.post("v1/user/vatom/get", request.toJson())
-    val payload: JSONObject? = response.optJSONObject("payload")
-
-    val pack =
-      if (payload != null)
-        jsonModule.deserialize<Pack>(payload)
-      else
-        null
+    val payload: JSONObject = response.getJSONObject("payload")
+    val pack = jsonModule.deserialize<Pack>(payload)
 
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
-      if (pack != null) combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
-      else
-        ArrayList()
+      response.getString("request_id"),
+      combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
+    )
+  }
+
+  override fun discoverJson(request: JSONObject): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("v1/vatom/discover", request)
+    val payload: JSONObject = response.getJSONObject("payload")
+
+    return BaseResponse(
+      response.getString("request_id"),
+      payload
     )
   }
 
   override fun discover(request: JSONObject): BaseResponse<DiscoverPack> {
     val response: JSONObject = client.post("v1/vatom/discover", request)
-    val payload: JSONObject? = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload")
+    val discoverPack = jsonModule.deserialize<DiscoverPack>(payload)
+    combineVatomProperties(discoverPack.vatoms, discoverPack.faces, discoverPack.actions)
 
-    val discoverPack = if (payload != null) {
-      jsonModule.deserialize<DiscoverPack>(payload)
-    } else
-      null
-
-    if (discoverPack != null) {
-      combineVatomProperties(discoverPack.vatoms, discoverPack.faces, discoverPack.actions)
-    }
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
-      discoverPack ?: DiscoverPack(0, ArrayList())
+      response.getString("request_id"),
+      discoverPack
     )
   }
 
+  override fun getInventoryJson(request: InventoryRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("/v1/user/vatom/inventory", request.toJson())
+    val payload: JSONObject = response.getJSONObject("payload")
+    return BaseResponse(
+      response.getString("request_id"),
+      payload
+    )
+  }
 
   override fun getUserInventory(request: InventoryRequest): BaseResponse<List<Vatom>> {
     val response: JSONObject = client.post("/v1/user/vatom/inventory", request.toJson())
-    val payload: JSONObject? = response.optJSONObject("payload")
-
-    val pack =
-      if (payload != null)
-        jsonModule.deserialize<Pack>(payload)
-      else
-        null
+    val payload: JSONObject = response.getJSONObject("payload")
+    val pack = jsonModule.deserialize<Pack>(payload)
 
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
-      if (pack != null) combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
-      else
-        ArrayList()
+      response.getString("request_id"),
+      combineVatomProperties(pack.vatoms, pack.faces, pack.actions)
     )
 
   }
 
   override fun getVatomActions(template: String?): BaseResponse<List<Action>> {
     val response: JSONObject = client.get("v1/user/actions/$template")
-    val payload: JSONArray? = response.optJSONArray("payload")
+    val payload: JSONArray? = response.getJSONArray("payload")
     val list: ArrayList<Action> = ArrayList()
     if (payload != null) {
       var count = 0
@@ -146,18 +163,16 @@ class VatomApiImpl(
       }
     }
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("request_id"),
       list
     )
   }
 
-  override fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject?> {
+  override fun preformAction(request: PerformActionRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("v1/user/vatom/action/" + request.action, request.toJson())
-    val payload: JSONObject? = response.optJSONObject("payload")
+    val payload: JSONObject = response.getJSONObject("payload") ?: JSONObject()
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("request_id"),
       payload
     )
   }
@@ -165,8 +180,7 @@ class VatomApiImpl(
   override fun trashVatom(request: TrashVatomRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("/v1/user/vatom/trash", request.toJson())
     return BaseResponse(
-      response.optInt("error"),
-      response.optString("message"),
+      response.getString("request_id"),
       response
     )
   }

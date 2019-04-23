@@ -14,6 +14,7 @@ import io.blockv.common.model.Error
 import java.io.IOException
 
 class BlockvException(
+  var requestId: String?,
   var httpCode: Int,
   message: String?,
   var blockvCode: Int?,
@@ -21,7 +22,7 @@ class BlockvException(
 ) : IOException(message) {
 
   override fun toString(): String {
-    return "httpCode = $httpCode\nmessage = $message\nbockvCode = $blockvCode\nblockvError = $error"
+    return "requestId = $requestId\n httpCode = $httpCode\nmessage = $message\nbockvCode = $blockvCode\nblockvError = $error"
   }
 }
 
