@@ -112,28 +112,7 @@ class EventManagerImpl(
   }
 
   private fun connect(): Flowable<WebSocketEvent<JSONObject>> {
-
-    return Flowable.create<WebSocketEvent<JSONObject>>({ subscriber ->
-      val listener: Websocket.WebSocketListener = object : Websocket.WebSocketListener {
-        override fun onEvent(event: WebSocketEvent<JSONObject>) {
-          if (!subscriber.isCancelled) {
-            subscriber.onNext(event)
-          }
-        }
-
-        override fun onError(throwable: Throwable) {
-          if (!subscriber.isCancelled) {
-            subscriber.onError(throwable)
-            subscriber.onComplete()
-          }
-        }
-
-      }
-      subscriber.setCancellable { webSocket.disconnect() }
-      webSocket.connect(listener)
-    }, BackpressureStrategy.BUFFER)
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
+    return webSocket.connect()
   }
 
   companion object {
