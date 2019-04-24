@@ -10,6 +10,7 @@
  */
 package io.blockv.common.internal.json.serializer
 
+import android.util.Log
 import io.blockv.common.util.JsonUtil
 import org.json.JSONArray
 import org.json.JSONObject
@@ -21,12 +22,12 @@ import kotlin.reflect.full.memberProperties
 
 class GenericSerializer : Serializer<Any> {
 
-  val deserializationData = HashMap<KClass<*>, ValueCache>()
+  val serializationData = HashMap<KClass<*>, ValueCache>()
 
   @Synchronized
-  fun getDeserializationData(type: KClass<*>): ValueCache {
-    if (deserializationData.containsKey(type)) {
-      return deserializationData[type]!!
+  fun getSerializationData(type: KClass<*>): ValueCache {
+    if (serializationData.containsKey(type)) {
+      return serializationData[type]!!
     } else {
       val constructor = type.constructors.find { constructor ->
         constructor.annotations.find {
@@ -56,52 +57,42 @@ class GenericSerializer : Serializer<Any> {
             else -> null
           }
           data.values.add(ValueCache.Value(name, jsonName, jsonPath, fieldType, default, inner))
+          data.props[prop.name] = prop
           if (!prop.isConst && prop is KMutableProperty<*>) {
-            data.props.add(prop)
+            data.propsMutable.add(prop)
           }
         }
       }
-      deserializationData[type] = data
+      serializationData[type] = data
       return data
     }
   }
 
   override fun serialize(data: Any, serializers: Map<KClass<*>, Serializer<Any>>): JSONObject? {
-    val clss = data::class
-
+    val type = data::class
+    val valueData = getSerializationData(type)
     val out = JSONObject()
-    for (it in clss.memberProperties) {
-      val fieldType = it.returnType.classifier as KClass<*>
+    valueData.values.forEach { value ->
 
-      val annotation: Annotation? = it.annotations.find { annotation ->
-        annotation is Serializer.Serialize
-      }
+      val outPath = if (value.jsonPath.isNotEmpty()) {
+        val path = value.jsonPath.split(".")
 
-      if (annotation != null) {
-        annotation as Serializer.Serialize
+        var start = out
 
-        val name = if (annotation.name.isEmpty()) it.name else annotation.name
-
-        val outPath = if (annotation.path.isNotEmpty()) {
-          val path = annotation.path.split(".")
-
-          var start = out
-
-          path.forEach {
-            if (!start.has(it)) {
-              start.put(it, JSONObject())
-            }
-            start = start[it] as JSONObject
+        path.forEach {
+          if (!start.has(it)) {
+            start.put(it, JSONObject())
           }
+          start = start[it] as JSONObject
+        }
 
-          start
-        } else
-          out
+        start
+      } else
+        out
 
-        outPath.put(name, getAsJsonValue(fieldType, it, data, serializers))
-
-      }
+      outPath.put(value.jsonName, getAsJsonValue(value.type, valueData.props[value.name]!!, data, serializers))
     }
+
     return out
   }
 
@@ -110,7 +101,7 @@ class GenericSerializer : Serializer<Any> {
     if (serializers.containsKey(type)) {
       return serializers[type]!!.deserialize(type, data, serializers)
     }
-    val valueData = getDeserializationData(type)
+    val valueData = getSerializationData(type)
 
     val values = getValues(type, data, serializers, valueData)
 
@@ -119,7 +110,7 @@ class GenericSerializer : Serializer<Any> {
     } else {
       valueData.constructor.call(*(valueData.constructor.parameters.map { values[it.name] }.toTypedArray()))
     }
-    valueData.props.forEach { prop ->
+    valueData.propsMutable.forEach { prop ->
       prop.setter.call(instance, values[prop.name])
     }
     return instance
@@ -375,7 +366,8 @@ class GenericSerializer : Serializer<Any> {
 
   class ValueCache(
     val constructor: KFunction<Any>,
-    val props: ArrayList<KMutableProperty<*>> = ArrayList(),
+    val props: HashMap<String, KProperty<*>> = HashMap(),
+    val propsMutable: ArrayList<KMutableProperty<*>> = ArrayList(),
     val values: ArrayList<Value> = ArrayList()
   ) {
     class Value(
