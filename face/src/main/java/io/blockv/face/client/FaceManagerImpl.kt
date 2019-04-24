@@ -221,7 +221,7 @@ class FaceManagerImpl(
               })
               emitter.setDisposable(disposables)
             }
-              .subscribeOn(Schedulers.io())
+              .subscribeOn(AndroidSchedulers.mainThread())
           }
           .observeOn(AndroidSchedulers.mainThread())
 
