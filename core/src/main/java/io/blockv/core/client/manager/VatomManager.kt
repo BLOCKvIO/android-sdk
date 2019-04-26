@@ -12,10 +12,12 @@ package io.blockv.core.client.manager
 
 import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.VatomUpdate
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
 import org.json.JSONObject
 import java.util.*
@@ -47,6 +49,16 @@ interface VatomManager {
    * @see Vatom
    */
   fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>>
+
+  /**
+   * Fetches the current user's inventory of vAtoms.
+   *
+   * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
+   *           user's root inventory will be returned.
+   * @return new Flowable<Message<Vatom>> instance.
+   * @see Vatom
+   */
+  fun getInventory(id: String): Flowable<Message<Vatom>>
 
   /**
    * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been

@@ -18,6 +18,7 @@ import io.blockv.common.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
+import io.blockv.common.internal.repository.DatabaseImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
 import io.blockv.common.model.InventoryEvent
@@ -36,6 +37,10 @@ import io.blockv.core.client.manager.UserManager
 import io.blockv.core.client.manager.UserManagerImpl
 import io.blockv.core.client.manager.VatomManager
 import io.blockv.core.client.manager.VatomManagerImpl
+import io.blockv.core.internal.datapool.InventoryImpl
+import io.blockv.core.internal.repository.mapper.ActionMapper
+import io.blockv.core.internal.repository.mapper.FaceMapper
+import io.blockv.core.internal.repository.mapper.VatomMapper
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
 import io.blockv.faces.ImageFace
@@ -170,9 +175,15 @@ class Blockv {
       preferences,
       JwtDecoderImpl()
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi)
+    val websocket = WebsocketImpl(preferences, jsonModule, auth)
+    val database = DatabaseImpl(context, "blockv-datapool.db")
+    database.addMapper(ActionMapper())
+    database.addMapper(FaceMapper())
+    database.addMapper(VatomMapper())
+    this.vatomManager =
+      VatomManagerImpl(netModule.vatomApi, InventoryImpl(netModule.vatomApi, websocket, jsonModule, database))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
-    this.eventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
+    this.eventManager = EventManagerImpl(websocket, jsonModule)
   }
 
   constructor(context: Context, environment: Environment) {
@@ -190,9 +201,15 @@ class Blockv {
       preferences,
       JwtDecoderImpl()
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi)
+    val websocket = WebsocketImpl(preferences, jsonModule, auth)
+    val database = DatabaseImpl(context, "blockv-datapool.db")
+    database.addMapper(ActionMapper())
+    database.addMapper(FaceMapper())
+    database.addMapper(VatomMapper())
+    this.vatomManager =
+      VatomManagerImpl(netModule.vatomApi, InventoryImpl(netModule.vatomApi, websocket, jsonModule, database))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
-    this.eventManager = EventManagerImpl(WebsocketImpl(preferences, jsonModule, auth), jsonModule)
+    this.eventManager = EventManagerImpl(websocket, jsonModule)
   }
 
 

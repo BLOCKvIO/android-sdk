@@ -19,20 +19,26 @@ import io.blockv.common.internal.net.rest.request.PerformActionRequest
 import io.blockv.common.internal.net.rest.request.TrashVatomRequest
 import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.VatomProperty
 import io.blockv.common.model.VatomUpdate
 import io.blockv.common.model.VatomVisibility
 import io.blockv.common.util.JsonUtil
+import io.blockv.core.internal.datapool.Inventory
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import org.json.JSONObject
 
-class VatomManagerImpl(val api: VatomApi) : VatomManager {
+class VatomManagerImpl(
+  val api: VatomApi,
+  val inventory: Inventory
+) : VatomManager {
 
   override fun geoDiscover(
     bottomLeftLat: Double,
@@ -103,6 +109,11 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getInventory(id: String): Flowable<Message<Vatom>> {
+    return inventory.getRegion(id)
+      .observeOn(AndroidSchedulers.mainThread())
+  }
 
   override fun getVatomActions(templateId: String): Single<List<io.blockv.common.model.Action>> = Single.fromCallable {
     api.getVatomActions(templateId).payload
