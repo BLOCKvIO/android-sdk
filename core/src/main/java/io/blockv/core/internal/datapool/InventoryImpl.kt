@@ -225,9 +225,6 @@ class InventoryImpl(
         dbLock.acquire()
         try {
           val vatoms = getCachedVatoms(id, false)
-            .map { vatoms ->
-              vatoms.filter { it.property.parentId == id }
-            }
             .blockingGet()
 
           emitter.onNext(Message(vatoms, Message.Type.INITIAL, state))
