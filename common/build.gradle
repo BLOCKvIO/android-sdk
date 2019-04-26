@@ -47,9 +47,9 @@ dependencies {
 repositories {
   mavenCentral()
 }
-def libraryGroupId = 'io.blockv.sdk'
+def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'common'
-def libraryVersion = '2.0.3'
+def libraryVersion = '3.0.0-alpha.4'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -102,7 +102,7 @@ publishing {
   }
   repositories {
     maven {
-      url "https://maven.blockv.io/artifactory/BLOCKv/"
+      url "https://maven.blockv.io/artifactory/Blockv-Debug/"
       credentials {
         username = "${blockv_artifactory_username}"
         password = "${blockv_artifactory_password}"

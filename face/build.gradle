@@ -41,9 +41,9 @@ dependencies {
 repositories {
   mavenCentral()
 }
-def libraryGroupId = 'io.blockv.sdk'
+def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'face'
-def libraryVersion = '3.0.2'
+def libraryVersion = '4.0.0-alpha.6'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -61,17 +61,17 @@ publishing {
       pom.withXml {
         def dependenciesNode = asNode().appendNode('dependencies')
         def commonDependency = dependenciesNode.appendNode('dependency')
-        commonDependency.appendNode('groupId', 'io.blockv.sdk')
+        commonDependency.appendNode('groupId', 'io.blockv.sdk-alpha')
         commonDependency.appendNode('artifactId', 'common')
-        commonDependency.appendNode('version', '[2.0.0,3.0.0)')
+        commonDependency.appendNode('version', '3.0.0-alpha.4')
         def coreDependency = dependenciesNode.appendNode('dependency')
-        coreDependency.appendNode('groupId', 'io.blockv.sdk')
+        coreDependency.appendNode('groupId', 'io.blockv.sdk-alpha')
         coreDependency.appendNode('artifactId', 'core')
-        coreDependency.appendNode('version', '[3.0.0,4.0.0)')
+        coreDependency.appendNode('version', '4.0.0-alpha.6')
         def faceviewDependency = dependenciesNode.appendNode('dependency')
-        faceviewDependency.appendNode('groupId', 'io.blockv.sdk')
+        faceviewDependency.appendNode('groupId', 'io.blockv.sdk-alpha')
         faceviewDependency.appendNode('artifactId', 'faceview')
-        faceviewDependency.appendNode('version', '[3.0.0,4.0.0)')
+        faceviewDependency.appendNode('version', '4.0.0-alpha.5')
         def imageFaceDependency = dependenciesNode.appendNode('dependency')
         imageFaceDependency.appendNode('groupId', 'io.blockv.faces')
         imageFaceDependency.appendNode('artifactId', 'image-face')
@@ -107,7 +107,7 @@ publishing {
   }
   repositories {
     maven {
-      url "https://maven.blockv.io/artifactory/BLOCKv/"
+      url "https://maven.blockv.io/artifactory/Blockv-Debug/"
       credentials {
         username = "${blockv_artifactory_username}"
         password = "${blockv_artifactory_password}"
