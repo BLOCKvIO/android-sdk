@@ -12,8 +12,17 @@ package io.blockv.core.client.manager
 
 import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.internal.net.rest.api.VatomApi
-import io.blockv.common.internal.net.rest.request.*
-import io.blockv.common.model.*
+import io.blockv.common.internal.net.rest.request.GeoGroupRequest
+import io.blockv.common.internal.net.rest.request.GeoRequest
+import io.blockv.common.internal.net.rest.request.InventoryRequest
+import io.blockv.common.internal.net.rest.request.PerformActionRequest
+import io.blockv.common.internal.net.rest.request.TrashVatomRequest
+import io.blockv.common.internal.net.rest.request.VatomRequest
+import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomProperty
+import io.blockv.common.model.VatomVisibility
 import io.blockv.common.util.JsonUtil
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -122,6 +131,17 @@ class VatomManagerImpl(val api: VatomApi) : VatomManager {
       VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
     }
     return Completable.fromSingle(preformAction(VatomManager.Action.TRANSFER, payload))
+  }
+
+  override fun cloneVatom(id: String, tokenType: VatomManager.TokenType, token: String): Completable {
+    val payload = JSONObject()
+    payload.put("this.id", id)
+    when (tokenType) {
+      VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
+      VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
+      VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
+    }
+    return Completable.fromSingle(preformAction(VatomManager.Action.CLONE, payload))
   }
 
   override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {

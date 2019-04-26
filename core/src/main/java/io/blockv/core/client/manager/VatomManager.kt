@@ -157,6 +157,20 @@ interface VatomManager {
   ): Completable
 
   /**
+   * Attempts to clone a vAtom to a user.
+   *
+   * @param id is the vAtom's id.
+   * @param tokenType is the type of the user's token.
+   * @param token is the user's token matching the provided type.
+   * @return new Completable instance.
+   */
+  fun cloneVatom(
+    id: String,
+    tokenType: TokenType,
+    token: String
+  ): Completable
+
+  /**
    * Attempts to drop a vAtom on the map.
    *
    * @param id is the vAtom's id.
@@ -224,6 +238,9 @@ interface VatomManager {
     },
     TRANSFER {
       override fun action(): String = "Transfer"
+    },
+    CLONE {
+      override fun action(): String = "Clone"
     },
     DROP {
       override fun action(): String = "Drop"
