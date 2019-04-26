@@ -16,10 +16,25 @@ import io.blockv.common.internal.net.rest.api.UserApi
 import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.auth.JwtDecoder
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
-import io.blockv.common.internal.net.rest.request.*
+import io.blockv.common.internal.net.rest.request.CreateOauthTokenRequest
+import io.blockv.common.internal.net.rest.request.CreateTokenRequest
+import io.blockv.common.internal.net.rest.request.CreateUserRequest
+import io.blockv.common.internal.net.rest.request.GuestLoginRequest
+import io.blockv.common.internal.net.rest.request.LoginRequest
+import io.blockv.common.internal.net.rest.request.OauthLoginRequest
+import io.blockv.common.internal.net.rest.request.ResetTokenRequest
+import io.blockv.common.internal.net.rest.request.UpdateUserRequest
+import io.blockv.common.internal.net.rest.request.UploadAvatarRequest
+import io.blockv.common.internal.net.rest.request.VerifyTokenRequest
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.*
+import io.blockv.common.model.Jwt
+import io.blockv.common.model.PublicUser
+import io.blockv.common.model.Registration
+import io.blockv.common.model.Token
+import io.blockv.common.model.User
+import io.blockv.common.model.UserUpdate
 import io.blockv.common.util.Optional
+import io.blockv.core.internal.datapool.Inventory
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -32,7 +47,8 @@ class UserManagerImpl(
   val api: UserApi,
   val authenticator: Authenticator,
   val preferences: Preferences,
-  val jwtDecoder: JwtDecoder
+  val jwtDecoder: JwtDecoder,
+  val inventory: Inventory
 ) : UserManager {
 
   override fun addCurrentUserToken(
@@ -194,12 +210,15 @@ class UserManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun logout(): Completable = Completable.fromCallable {
-    preferences.refreshToken = null
-    api.logout()
-  }
-    .subscribeOn(Schedulers.io())
-    .observeOn(AndroidSchedulers.mainThread())
+  override fun logout(): Completable =
+    inventory.reset()
+      .andThen(
+        Completable.fromCallable {
+          preferences.refreshToken = null
+          api.logout()
+        })
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
 
   override fun uploadAvatar(avatar: Bitmap): Completable = Completable.fromCallable {
     val stream = ByteArrayOutputStream()

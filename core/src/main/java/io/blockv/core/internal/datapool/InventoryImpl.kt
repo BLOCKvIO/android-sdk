@@ -447,6 +447,20 @@ class InventoryImpl(
     }
   }
 
+  override fun reset(): Completable {
+    return Completable.fromCallable {
+      dispose()
+      dbLock.acquire()
+      try {
+        database.deleteAll("vatom").blockingGet()
+        database.deleteAll("action").blockingGet()
+        database.deleteAll("face").blockingGet()
+      } finally {
+        dbLock.release()
+      }
+    }.subscribeOn(Schedulers.io())
+  }
+
   class DatapoolException(val error: Error) : Exception(error.message) {
     enum class Error(val message: String) {
       INVENTORY_DISPOSED("Datapool inventory has been disposed");
