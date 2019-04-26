@@ -9,7 +9,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class DatabaseImpl(context: Context, val name: String = "blockv.db", val version: Int = 0) : Database {
+class DatabaseImpl(context: Context, val name: String = "blockv.db", val version: Int = 1) : Database {
 
   private val dbHelper: SQLiteOpenHelper
 
