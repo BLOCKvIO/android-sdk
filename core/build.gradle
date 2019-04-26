@@ -65,9 +65,9 @@ repositories {
   mavenCentral()
 }
 
-def libraryGroupId = 'io.blockv.sdk'
+def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'core'
-def libraryVersion = '3.0.1'
+def libraryVersion = '4.0.0-alpha.6'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -86,9 +86,9 @@ publishing {
       pom.withXml {
         def dependenciesNode = asNode().appendNode('dependencies')
         def common = dependenciesNode.appendNode('dependency')
-        common.appendNode('groupId', 'io.blockv.sdk')
+        common.appendNode('groupId', 'io.blockv.sdk-alpha')
         common.appendNode('artifactId', 'common')
-        common.appendNode('version', '[2.0.0,3.0.0)')
+        common.appendNode('version', '3.0.0-alpha.4')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')
@@ -105,7 +105,7 @@ publishing {
   }
   repositories {
     maven {
-      url "https://maven.blockv.io/artifactory/BLOCKv/"
+      url "https://maven.blockv.io/artifactory/Blockv-Debug/"
       credentials {
         username = "${blockv_artifactory_username}"
         password = "${blockv_artifactory_password}"

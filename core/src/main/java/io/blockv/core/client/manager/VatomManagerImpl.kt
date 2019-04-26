@@ -149,6 +149,17 @@ class VatomManagerImpl(
     return Completable.fromSingle(preformAction(VatomManager.Action.TRANSFER, payload))
   }
 
+  override fun cloneVatom(id: String, tokenType: VatomManager.TokenType, token: String): Completable {
+    val payload = JSONObject()
+    payload.put("this.id", id)
+    when (tokenType) {
+      VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
+      VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
+      VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
+    }
+    return Completable.fromSingle(preformAction(VatomManager.Action.CLONE, payload))
+  }
+
   override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {
     val payload = JSONObject()
     payload.put("this.id", id)
