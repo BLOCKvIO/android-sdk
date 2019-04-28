@@ -169,19 +169,21 @@ class Blockv {
       preferences,
       jsonModule
     )
-    this.userManager = UserManagerImpl(
-      netModule.userApi,
-      auth,
-      preferences,
-      JwtDecoderImpl()
-    )
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
     val database = DatabaseImpl(context, "blockv-datapool.db")
     database.addMapper(ActionMapper())
     database.addMapper(FaceMapper())
     database.addMapper(VatomMapper())
-    this.vatomManager =
-      VatomManagerImpl(netModule.vatomApi, InventoryImpl(netModule.vatomApi, websocket, jsonModule, database))
+    val inventory = InventoryImpl(netModule.vatomApi, websocket, jsonModule, database)
+
+    this.userManager = UserManagerImpl(
+      netModule.userApi,
+      auth,
+      preferences,
+      JwtDecoderImpl(),
+      inventory
+    )
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
   }
@@ -195,19 +197,20 @@ class Blockv {
     this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
-    this.userManager = UserManagerImpl(
-      netModule.userApi,
-      auth,
-      preferences,
-      JwtDecoderImpl()
-    )
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
     val database = DatabaseImpl(context, "blockv-datapool.db")
     database.addMapper(ActionMapper())
     database.addMapper(FaceMapper())
     database.addMapper(VatomMapper())
-    this.vatomManager =
-      VatomManagerImpl(netModule.vatomApi, InventoryImpl(netModule.vatomApi, websocket, jsonModule, database))
+    val inventory = InventoryImpl(netModule.vatomApi, websocket, jsonModule, database)
+    this.userManager = UserManagerImpl(
+      netModule.userApi,
+      auth,
+      preferences,
+      JwtDecoderImpl(),
+      inventory
+    )
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
   }
