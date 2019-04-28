@@ -11,11 +11,13 @@
 package io.blockv.core.client
 
 import android.content.Context
+import android.graphics.Bitmap
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.NetModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
+import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.DatabaseImpl
@@ -24,6 +26,7 @@ import io.blockv.common.model.Environment
 import io.blockv.common.model.InventoryEvent
 import io.blockv.common.model.Model
 import io.blockv.common.model.PublicUser
+import io.blockv.common.model.Resource
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.WebSocketEvent
@@ -37,6 +40,7 @@ import io.blockv.core.client.manager.UserManager
 import io.blockv.core.client.manager.UserManagerImpl
 import io.blockv.core.client.manager.VatomManager
 import io.blockv.core.client.manager.VatomManagerImpl
+import io.blockv.core.internal.datapool.GeoMapImpl
 import io.blockv.core.internal.datapool.InventoryImpl
 import io.blockv.core.internal.repository.mapper.ActionMapper
 import io.blockv.core.internal.repository.mapper.FaceMapper
@@ -53,6 +57,7 @@ import io.reactivex.Single
 import io.reactivex.plugins.RxJavaPlugins
 import org.json.JSONObject
 import java.io.File
+import java.io.InputStream
 import kotlin.reflect.KClass
 
 class Blockv {
@@ -83,7 +88,27 @@ class Blockv {
         try {
           val encoder = ResourceEncoderImpl(preferences)
 
-          internalFaceManager = FaceManagerImpl(io.blockv.face.client.ResourceManagerImpl(cacheDir, encoder),
+          internalFaceManager = FaceManagerImpl(object : io.blockv.face.client.manager.ResourceManager {
+            override val resourceEncoder: ResourceEncoder
+              get() = encoder
+
+            override fun getFile(resource: Resource): Single<File> {
+              return resourceManager.getFile(resource.url)
+            }
+
+            override fun getInputStream(resource: Resource): Single<InputStream> {
+              return resourceManager.getInputStream(resource.url)
+            }
+
+            override fun getBitmap(resource: Resource): Single<Bitmap> {
+              return resourceManager.getBitmap(resource.url)
+            }
+
+            override fun getBitmap(resource: Resource, width: Int, height: Int): Single<Bitmap> {
+              return resourceManager.getBitmap(resource.url, width, height)
+            }
+
+          },
             object : io.blockv.face.client.manager.UserManager {
               override fun getCurrentUser(): Single<PublicUser> {
                 return userManager.getCurrentUser()
@@ -162,7 +187,7 @@ class Blockv {
       Environment.DEFAULT_WEBSOCKET,
       appId
     )
-    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences), preferences)
+    this.resourceManager = ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
       auth,
@@ -183,7 +208,7 @@ class Blockv {
       JwtDecoderImpl(),
       inventory
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory)
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
   }
@@ -194,7 +219,7 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences), preferences)
+    this.resourceManager = ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
@@ -210,7 +235,7 @@ class Blockv {
       JwtDecoderImpl(),
       inventory
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory)
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
   }

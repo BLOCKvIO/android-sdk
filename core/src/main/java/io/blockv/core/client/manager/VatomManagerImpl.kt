@@ -26,6 +26,7 @@ import io.blockv.common.model.VatomProperty
 import io.blockv.common.model.VatomUpdate
 import io.blockv.common.model.VatomVisibility
 import io.blockv.common.util.JsonUtil
+import io.blockv.core.internal.datapool.GeoMap
 import io.blockv.core.internal.datapool.Inventory
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -37,7 +38,8 @@ import org.json.JSONObject
 
 class VatomManagerImpl(
   val api: VatomApi,
-  val inventory: Inventory
+  val inventory: Inventory,
+  val map: GeoMap
 ) : VatomManager {
 
   override fun geoDiscover(
@@ -59,6 +61,15 @@ class VatomManagerImpl(
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
+
+  override fun geoDiscover(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double
+  ): Flowable<Message<Vatom>> {
+    return map.getRegion(bottomLeftLat, bottomLeftLon, topRightLat, topRightLon)
+  }
 
   override fun geoDiscoverGroups(
     bottomLeftLat: Double,

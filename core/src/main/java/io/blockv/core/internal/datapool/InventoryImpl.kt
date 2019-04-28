@@ -207,7 +207,7 @@ class InventoryImpl(
       }
       .retryWhen { errors ->
         errors.flatMap { error ->
-          if (error is DatapoolException && error.error == DatapoolException.Error.INVENTORY_DISPOSED) {
+          if (error is DatapoolException && error.error == DatapoolException.Error.REGION_DISPOSED) {
             Flowable.error(error)
           } else
             Flowable.just(error)
@@ -443,7 +443,7 @@ class InventoryImpl(
   override fun dispose() {
     disposable?.dispose()
     if (emitter?.isCancelled == false) {
-      emitter?.onError(DatapoolException.Error.INVENTORY_DISPOSED.exception())
+      emitter?.onError(DatapoolException.Error.REGION_DISPOSED.exception())
     }
   }
 
@@ -459,15 +459,5 @@ class InventoryImpl(
         dbLock.release()
       }
     }.subscribeOn(Schedulers.io())
-  }
-
-  class DatapoolException(val error: Error) : Exception(error.message) {
-    enum class Error(val message: String) {
-      INVENTORY_DISPOSED("Datapool inventory has been disposed");
-
-      fun exception(): DatapoolException {
-        return DatapoolException(this)
-      }
-    }
   }
 }
