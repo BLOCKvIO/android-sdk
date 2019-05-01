@@ -14,14 +14,17 @@ import android.net.Uri
 import android.util.Log
 import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketAdapter
+import com.neovisionaries.ws.client.WebSocketExtension
 import com.neovisionaries.ws.client.WebSocketFactory
 import com.neovisionaries.ws.client.WebSocketFrame
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
+import io.blockv.common.internal.net.websocket.request.BaseRequest
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.GenericSocketEvent
 import io.blockv.common.model.WebSocketEvent
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -33,22 +36,22 @@ class WebsocketImpl(
   val authenticator: Authenticator
 ) : WebSocketAdapter(), Websocket {
 
-  val websocket = Flowable.create<WebSocketEvent<JSONObject>>({ emitter ->
+  @set:Synchronized
+  @get:Synchronized
+  var webSocket: WebSocket? = null
+  val webSocketFlowable = Flowable.create<WebSocketEvent<JSONObject>>({ emitter ->
 
     val listener = object : WebSocketAdapter() {
 
       override fun onTextMessage(websocket: WebSocket?, message: String?) {
         if (message != null) {
-          try {
-            val event: GenericSocketEvent? =
-              jsonModule.deserialize(JSONObject(message))
-            if (event != null) {
-              if (!emitter.isCancelled) {
-                emitter.onNext(event)
-              }
+          if (!emitter.isCancelled) {
+            try {
+              val event: GenericSocketEvent = jsonModule.deserialize(JSONObject(message))
+              emitter.onNext(event)
+            } catch (exception: Exception) {
+              Log.i("WebSocket", exception.message)
             }
-          } catch (exception: Exception) {
-            Log.i("WebSocket", exception.message)
           }
         }
       }
@@ -60,7 +63,11 @@ class WebsocketImpl(
         closedByServer: Boolean
       ) {
         if (!emitter.isCancelled) {
-          emitter.onError(BlockvWsException(BlockvWsException.Error.CONNECTION_DISCONNECTED, null))
+          emitter.onError(
+            BlockvWsException(
+              BlockvWsException.Error.CONNECTION_DISCONNECTED, null
+            )
+          )
         }
         websocket.removeListener(this)
       }
@@ -69,9 +76,14 @@ class WebsocketImpl(
     try {
       val webSocket = WebSocketFactory()
         .createSocket(getAddress())
+        .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
         .addListener(listener)
         .connect()
-      emitter.setCancellable { webSocket.disconnect() }
+      this.webSocket = webSocket
+      emitter.onNext(WebSocketEvent("connected", null, null))
+      emitter.setCancellable {
+        webSocket.disconnect()
+      }
     } catch (exception: Exception) {
       if (!emitter.isCancelled) {
         emitter.onError(
@@ -84,12 +96,37 @@ class WebsocketImpl(
     }
   }, BackpressureStrategy.BUFFER)
     .subscribeOn(Schedulers.io())
-    .observeOn(AndroidSchedulers.mainThread())
+    .doOnError { it.printStackTrace() }
+    .doFinally {
+      synchronized(this)
+      {
+        webSocket = null
+      }
+    }
     .share()
+
+  override fun handleCallbackError(websocket: WebSocket, cause: Throwable) {
+    cause.printStackTrace()
+  }
 
   @Synchronized
   override fun connect(): Flowable<WebSocketEvent<JSONObject>> {
-    return websocket
+    return Flowable.create({ emitter ->
+      synchronized(this)
+      {
+        if (webSocket != null) {
+          emitter.onNext(WebSocketEvent("connected", null, null))
+        }
+        emitter.setDisposable(
+          webSocketFlowable
+            .subscribe({
+              emitter.onNext(it)
+            }, {
+              emitter.onError(it)
+            })
+        )
+      }
+    }, BackpressureStrategy.BUFFER)
   }
 
   @Throws(Exception::class)
@@ -108,6 +145,30 @@ class WebsocketImpl(
       }
     }
     return out.build().toString()
+  }
+
+  override fun sendMessage(message: String): Completable {
+    return Completable.fromCallable {
+      Log.e("message", message)
+      webSocket!!.sendText(message)
+    }
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
+  override fun sendMessage(request: BaseRequest): Completable {
+    return sendMessage(request.toJson().toString())
+  }
+
+  override fun connectAndMessage(request: BaseRequest): Flowable<WebSocketEvent<JSONObject>> {
+    return connect()
+      .flatMap {
+        if (it.type == WebSocketEvent.MessageType.CONNECTED) {
+          sendMessage(request)
+            .andThen(Flowable.just(it))
+        } else
+          Flowable.just(it)
+      }
   }
 
 }

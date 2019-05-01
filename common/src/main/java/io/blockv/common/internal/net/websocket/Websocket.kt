@@ -10,11 +10,19 @@
  */
 package io.blockv.common.internal.net.websocket
 
+import io.blockv.common.internal.net.websocket.request.BaseRequest
 import io.blockv.common.model.WebSocketEvent
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import org.json.JSONObject
 
 interface Websocket {
 
   fun connect(): Flowable<WebSocketEvent<JSONObject>>
+
+  fun sendMessage(message: String): Completable
+
+  fun sendMessage(request: BaseRequest): Completable
+
+  fun connectAndMessage(request: BaseRequest): Flowable<WebSocketEvent<JSONObject>>
 }

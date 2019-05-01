@@ -84,6 +84,13 @@ interface VatomManager {
     filter: VatomManager.GeoFilter
   ): Single<List<Vatom>>
 
+  fun geoDiscover(
+    bottomLeftLat: Double,
+    bottomLeftLon: Double,
+    topRightLat: Double,
+    topRightLon: Double
+  ): Flowable<Message<Vatom>>
+
   /**
    * Fetches the count of vAtoms dropped in the specified area.
    *
@@ -188,7 +195,7 @@ interface VatomManager {
   ): Completable
 
   /**
-   * Attempts to drop a vAtom on the map.
+   * Attempts to drop a vAtom on the GeoMap.
    *
    * @param id is the vAtom's id.
    * @param latitude
@@ -198,7 +205,7 @@ interface VatomManager {
   fun dropVatom(id: String, latitude: Double, longitude: Double): Completable
 
   /**
-   * Attempts to pick up a vAtom from the map.
+   * Attempts to pick up a vAtom from the GeoMap.
    *
    * @param id is the vAtom's id.
    * @return new Completable instance.
