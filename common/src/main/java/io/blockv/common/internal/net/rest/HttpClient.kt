@@ -100,7 +100,6 @@ class HttpClient(
 
           if (pay.has("access_token")) {
             authenticator.setToken(jsonModule.deserialize(pay.getJSONObject("access_token")))
-
           }
           if (pay.has("asset_provider")) {
             val assetProviders = pay.getJSONArray("asset_provider")

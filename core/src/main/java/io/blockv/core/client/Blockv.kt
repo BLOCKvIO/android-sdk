@@ -152,7 +152,7 @@ class Blockv {
     }
 
 
-  constructor(context: Context, appId: String) {
+  constructor(context: Context, appId: String, redirectUri: String) {
     this.cacheDir = context.cacheDir
     this.jsonModule = JsonModule()
     this.appId = appId
@@ -160,7 +160,8 @@ class Blockv {
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
-      appId
+      appId,
+      redirectUri
     )
     this.resourceManager = ResourceManagerImpl(ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
@@ -219,6 +220,7 @@ class Blockv {
   constructor(
     context: Context,
     appId: String,
+    redirectUrl: String,
     preferences: Preferences,
     jsonModule: JsonModule,
     netModule: NetModule,
@@ -234,7 +236,8 @@ class Blockv {
     this.preferences.environment = Environment(
       Environment.DEFAULT_SERVER,
       Environment.DEFAULT_WEBSOCKET,
-      appId
+      appId,
+      redirectUrl
     )
     this.jsonModule = jsonModule
     this.netModule = netModule

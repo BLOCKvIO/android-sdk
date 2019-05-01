@@ -10,8 +10,14 @@
  */
 package io.blockv.core.client.manager
 
+import android.content.Context
 import android.graphics.Bitmap
-import io.blockv.common.model.*
+import io.blockv.common.model.Jwt
+import io.blockv.common.model.PublicUser
+import io.blockv.common.model.Registration
+import io.blockv.common.model.Token
+import io.blockv.common.model.User
+import io.blockv.common.model.UserUpdate
 import io.blockv.common.util.Optional
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -49,6 +55,15 @@ interface UserManager {
    * @return new Single<User> instance.
    */
   fun loginOauth(provider: String, oauthToken: String): Single<User>
+
+  /**
+   * Logs a user into the BLOCKv platform using oAuth.
+   *
+   * @param context
+   * @param scope is the platform permissions to request, current only `all` is supported
+   * @return new Completable instance.
+   */
+  fun loginOauth(context: Context, scope: String): Completable
 
   /**
    * Logs a user into the BLOCKv platform. Accepts a guest id.

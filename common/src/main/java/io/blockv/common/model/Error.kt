@@ -36,6 +36,7 @@ enum class Error {
   INVALID_PHONE_NUMBER,// Invalid phone number.
   USER_ACCESS_TOKEN_INVALID;
 
+
   companion object {
 
     private val MAP: MutableMap<Int, Error> = HashMap()

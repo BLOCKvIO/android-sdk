@@ -1,3 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.blockv.core"
-/>
+          package="io.blockv.core">
+
+  <application>
+    <activity
+      android:name="io.blockv.core.internal.oauth.OauthActivity"
+      android:excludeFromRecents="true"
+      android:label="Blockv OAuth"
+      />
+  </application>
+
+</manifest>

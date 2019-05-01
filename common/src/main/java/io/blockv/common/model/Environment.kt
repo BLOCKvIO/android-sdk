@@ -19,12 +19,15 @@ open class Environment : Model {
   val wss: String
   @Serializer.Serialize(name = "app_id")
   val appId: String
+  @Serializer.Serialize(name = "redirect_uri")
+  val redirectUri: String
 
   @Serializer.Serializable
-  constructor(rest: String, wss: String, appId: String) {
+  constructor(rest: String, wss: String, appId: String, redirectUri: String) {
     this.rest = rest
     this.wss = wss
     this.appId = appId
+    this.redirectUri = redirectUri
   }
 
   companion object {
