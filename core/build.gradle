@@ -66,7 +66,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'core'
-def libraryVersion = '4.0.0-alpha.10'
+def libraryVersion = '4.0.0-alpha.11'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -87,7 +87,7 @@ publishing {
         def common = dependenciesNode.appendNode('dependency')
         common.appendNode('groupId', 'io.blockv.sdk-alpha')
         common.appendNode('artifactId', 'common')
-        common.appendNode('version', '3.0.0-alpha.6')
+        common.appendNode('version', '3.0.0-alpha.7')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')
