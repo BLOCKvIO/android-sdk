@@ -208,7 +208,7 @@ class Blockv {
       JwtDecoderImpl(),
       inventory
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket))
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket,jsonModule))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
   }
@@ -235,7 +235,7 @@ class Blockv {
       JwtDecoderImpl(),
       inventory
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket))
+    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket,jsonModule))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
   }

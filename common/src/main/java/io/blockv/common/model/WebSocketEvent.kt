@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 open class WebSocketEvent<T>(
   open val messageType: String,
-  open val userId: String,
+  open val userId: String?,
   open val payload: T?
 ) {
 
@@ -20,6 +20,7 @@ open class WebSocketEvent<T>(
     get() = MessageType.from(messageType)
 
   enum class MessageType {
+    CONNECTED,
     INVENTORY,
     STATE_UPDATE,
     ACTIVITY,
@@ -29,6 +30,7 @@ open class WebSocketEvent<T>(
     companion object {
       fun from(name: String): MessageType {
         return when (name) {
+          "connected" -> CONNECTED
           "inventory" -> INVENTORY
           "state_update" -> STATE_UPDATE
           "my_events" -> ACTIVITY
