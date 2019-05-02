@@ -12,7 +12,17 @@ package io.blockv.common.internal.net.rest.api
 
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.Client
-import io.blockv.common.internal.net.rest.request.*
+import io.blockv.common.internal.net.rest.request.CreateOauthTokenRequest
+import io.blockv.common.internal.net.rest.request.CreateTokenRequest
+import io.blockv.common.internal.net.rest.request.CreateUserRequest
+import io.blockv.common.internal.net.rest.request.GuestLoginRequest
+import io.blockv.common.internal.net.rest.request.LoginRequest
+import io.blockv.common.internal.net.rest.request.OauthLoginRequest
+import io.blockv.common.internal.net.rest.request.ResetTokenRequest
+import io.blockv.common.internal.net.rest.request.TokenRequest
+import io.blockv.common.internal.net.rest.request.UpdateUserRequest
+import io.blockv.common.internal.net.rest.request.UploadAvatarRequest
+import io.blockv.common.internal.net.rest.request.VerifyTokenRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
 import io.blockv.common.model.PublicUser
 import io.blockv.common.model.Token
@@ -24,6 +34,15 @@ class UserApiImpl(
   val client: Client,
   val jsonModule: JsonModule
 ) : UserApi {
+
+  override fun refreshAssetProviders(): BaseResponse<JSONObject> {
+    val response: JSONObject = client.get("/v1/user/asset_providers")
+    return BaseResponse(
+      response.getString("request_id"),
+      response.getJSONObject("payload")
+    )
+  }
+
   override fun setDefaultUserToken(tokenId: String): BaseResponse<Unit> {
     val response: JSONObject = client.put("v1/user/tokens/$tokenId/default")
     return BaseResponse(
@@ -188,6 +207,11 @@ class UserApiImpl(
       response.getString("request_id"),
       payload
     )
+  }
+
+  override fun getAccessTokens(request: TokenRequest): JSONObject {
+    val response: JSONObject = client.http("POST", "/v1/oauth/token", request.toJson(), false)
+    return response
   }
 
 }

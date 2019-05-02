@@ -10,6 +10,7 @@
  */
 package io.blockv.core.client.manager
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import io.blockv.common.internal.net.rest.api.UserApi
@@ -23,6 +24,7 @@ import io.blockv.common.internal.net.rest.request.GuestLoginRequest
 import io.blockv.common.internal.net.rest.request.LoginRequest
 import io.blockv.common.internal.net.rest.request.OauthLoginRequest
 import io.blockv.common.internal.net.rest.request.ResetTokenRequest
+import io.blockv.common.internal.net.rest.request.TokenRequest
 import io.blockv.common.internal.net.rest.request.UpdateUserRequest
 import io.blockv.common.internal.net.rest.request.UploadAvatarRequest
 import io.blockv.common.internal.net.rest.request.VerifyTokenRequest
@@ -35,9 +37,12 @@ import io.blockv.common.model.User
 import io.blockv.common.model.UserUpdate
 import io.blockv.common.util.Optional
 import io.blockv.core.internal.datapool.Inventory
+import io.blockv.core.internal.oauth.BlockvOauthException
+import io.blockv.core.internal.oauth.OauthActivity
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import org.json.JSONObject
@@ -144,6 +149,38 @@ class UserManagerImpl(
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
+
+  override fun loginOauth(context: Context, scope: String): Completable {
+    return Completable.create { emitter ->
+      val environment = preferences.environment!!
+      val disposable = CompositeDisposable()
+      emitter.setDisposable(disposable)
+      OauthActivity.start(context, environment.appId, environment.redirectUri, scope, object : OauthActivity.Handler {
+        override fun onSuccess(code: String) {
+          disposable.add(
+            Single.fromCallable {
+              api.getAccessTokens(TokenRequest(environment.appId, code, environment.redirectUri))
+            }.subscribeOn(Schedulers.io())
+              .map {
+                preferences.refreshToken = Jwt(it.getString("refresh_token"), "bearer")
+                authenticator.setToken(Jwt(it.getString("access_token"), "bearer"))
+                api.refreshAssetProviders()
+              }
+              .subscribe({
+                emitter.onComplete()
+              }, {
+                emitter.onError(it)
+              })
+          )
+        }
+
+        override fun onError(exception: BlockvOauthException) {
+          emitter.onError(exception)
+        }
+
+      })
+    }.subscribeOn(AndroidSchedulers.mainThread())
+  }
 
   override fun loginGuest(guestId: String): Single<User> = Single.fromCallable {
     api.loginGuest(
