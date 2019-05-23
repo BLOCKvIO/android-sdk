@@ -155,7 +155,7 @@ class VatomManagerImpl(
     when (tokenType) {
       VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
       VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
-      VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
+      VatomManager.TokenType.ID -> payload.put("new.owner.id", token)
     }
     return Completable.fromSingle(preformAction(VatomManager.Action.TRANSFER, payload))
   }
@@ -166,7 +166,7 @@ class VatomManagerImpl(
     when (tokenType) {
       VatomManager.TokenType.EMAIL -> payload.put("new.owner.email", token)
       VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
-      VatomManager.TokenType.ID -> payload.put("new.owner.email", token)
+      VatomManager.TokenType.ID -> payload.put("new.owner.id", token)
     }
     return Completable.fromSingle(preformAction(VatomManager.Action.CLONE, payload))
   }
