@@ -449,14 +449,18 @@ class InventoryImpl(
 
   override fun reset(): Completable {
     return Completable.fromCallable {
-      dispose()
-      dbLock.acquire()
-      try {
-        database.deleteAll("vatom").blockingGet()
-        database.deleteAll("action").blockingGet()
-        database.deleteAll("face").blockingGet()
-      } finally {
-        dbLock.release()
+      synchronized(vatoms)
+      {
+        dispose()
+        dbLock.acquire()
+        try {
+          vatoms.clear()
+          database.deleteAll("vatom").blockingGet()
+          database.deleteAll("action").blockingGet()
+          database.deleteAll("face").blockingGet()
+        } finally {
+          dbLock.release()
+        }
       }
     }.subscribeOn(Schedulers.io())
   }
