@@ -270,6 +270,11 @@ class Blockv {
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
   }
 
+  /**
+   * Fetches the current supported app version.
+   *
+   * @return new Single<AppVersion> instance.
+   */
   fun getSupportedVersion(): Single<AppVersion> {
     return Single.fromCallable {
       netModule.appApi.getAppVersion()

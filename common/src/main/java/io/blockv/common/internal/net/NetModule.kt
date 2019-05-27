@@ -33,5 +33,5 @@ class NetModule(val authenticator: Authenticator, val preferences: Preferences, 
   val vatomApi: VatomApi = VatomApiImpl(client, jsonModule)
   val activityApi: ActivityApi = ActivityApiImpl(client, jsonModule)
   val appApi: AppApi = AppApiImpl(client, jsonModule)
-  
+
 }
