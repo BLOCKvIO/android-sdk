@@ -18,7 +18,6 @@ import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.exception.DefaultErrorMapper
 import io.blockv.common.internal.repository.Preferences
 
-
 class NetModule(val authenticator: Authenticator, val preferences: Preferences, val jsonModule: JsonModule) {
 
   val client: Client = HttpClient(
@@ -33,4 +32,6 @@ class NetModule(val authenticator: Authenticator, val preferences: Preferences, 
   val userApi: UserApi = UserApiImpl(client, jsonModule)
   val vatomApi: VatomApi = VatomApiImpl(client, jsonModule)
   val activityApi: ActivityApi = ActivityApiImpl(client, jsonModule)
+  val appApi: AppApi = AppApiImpl(client, jsonModule)
+
 }
