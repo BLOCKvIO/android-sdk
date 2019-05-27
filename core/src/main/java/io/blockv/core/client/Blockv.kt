@@ -14,6 +14,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.NetModule
+import io.blockv.common.internal.net.rest.api.AppApi
 import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
@@ -22,14 +23,7 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.DatabaseImpl
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.Environment
-import io.blockv.common.model.InventoryEvent
-import io.blockv.common.model.Model
-import io.blockv.common.model.PublicUser
-import io.blockv.common.model.Resource
-import io.blockv.common.model.StateUpdateEvent
-import io.blockv.common.model.Vatom
-import io.blockv.common.model.WebSocketEvent
+import io.blockv.common.model.*
 import io.blockv.core.client.manager.ActivityManager
 import io.blockv.core.client.manager.ActivityManagerImpl
 import io.blockv.core.client.manager.EventManager
@@ -54,7 +48,9 @@ import io.blockv.faces.ImageProgressFace
 import io.blockv.faces.WebFace
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.plugins.RxJavaPlugins
+import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 import java.io.File
 import java.io.InputStream
@@ -272,6 +268,15 @@ class Blockv {
     this.eventManager = eventManager
     this.activityManager = activityManager
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
+  }
+
+  fun getSupportedVersion(): Single<AppVersion> {
+    return Single.fromCallable {
+      netModule.appApi.getAppVersion()
+        .payload
+    }
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
   }
 
   class MissingFaceModuleException :
