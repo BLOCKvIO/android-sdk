@@ -42,9 +42,9 @@ class InventoryImpl(
   val dbLock = Semaphore(1)
   var disposable: Disposable? = null
   val vatoms = HashMap<String, Vatom>()
-  var emitter: FlowableEmitter<Message<Vatom>>? = null
+  var emitter: FlowableEmitter<Message<Item<Vatom>>>? = null
   val inventory =
-    Flowable.create<Message<Vatom>>({ emitter ->
+    Flowable.create<Message<Item<Vatom>>>({ emitter ->
       val disposable = CompositeDisposable()
       val messages = ArrayList<WebSocketEvent<JSONObject>>()
       emitter.setDisposable(disposable)
@@ -61,7 +61,7 @@ class InventoryImpl(
                 if (vatoms.isNotEmpty()) {
                   emitter.onNext(
                     Message(
-                      vatoms.first(),
+                      Item(vatoms.first(), vatoms.first().property.parentId),
                       Message.Type.ADDED,
                       Message.State.STABLE
                     )
@@ -82,9 +82,10 @@ class InventoryImpl(
                 } finally {
                   dbLock.release()
                 }
+                val vatom = jsonModule.deserialize<Vatom>(dbVatoms.first().data)
                 emitter.onNext(
                   Message(
-                    jsonModule.deserialize<Vatom>(dbVatoms.first().data),
+                    Item(vatom, vatom.property.parentId),
                     Message.Type.REMOVED,
                     Message.State.STABLE
                   )
@@ -101,13 +102,18 @@ class InventoryImpl(
                     if (dbVatoms.isNotEmpty()) {
                       JsonUtil.merge(dbVatoms.first().data, event.vatomProperties)
                       val vatom = jsonModule.deserialize<Vatom>(dbVatoms.first().data)
+                      val old = vatoms[vatom.id]
+                      vatom.faces = old?.faces ?: emptyList()
+                      vatom.actions = old?.actions ?: emptyList()
                       synchronized(vatoms)
                       {
                         vatoms[vatom.id] = vatom
                       }
                       emitter.onNext(
                         Message(
-                          vatom,
+                          Item(
+                            vatom, old?.property?.parentId ?: vatom.property.parentId
+                          ),
                           Message.Type.UPDATED,
                           Message.State.STABLE
                         )
@@ -152,9 +158,21 @@ class InventoryImpl(
                   synchronized(this) {
                     if (state == Message.State.UNSTABLE) {
                       state = Message.State.STABILISING
-                      emitter.onNext(Message(vatoms, Message.Type.INITIAL, Message.State.STABILISING))
+                      emitter.onNext(
+                        Message(
+                          vatoms.map { Item(it, it.property.parentId) },
+                          Message.Type.INITIAL,
+                          Message.State.STABILISING
+                        )
+                      )
                     } else {
-                      emitter.onNext(Message(vatoms, Message.Type.ADDED, Message.State.STABILISING))
+                      emitter.onNext(
+                        Message(
+                          vatoms.map { Item(it, it.property.parentId) },
+                          Message.Type.ADDED,
+                          Message.State.STABILISING
+                        )
+                      )
                     }
                   }
 
@@ -226,13 +244,20 @@ class InventoryImpl(
         try {
           val vatoms = getCachedVatoms(id, false)
             .blockingGet()
+            .filter { it.property.parentId == id }
 
           emitter.onNext(Message(vatoms, Message.Type.INITIAL, state))
           emitter.setDisposable(
             inventory
               .observeOn(Schedulers.computation())
               .map { message ->
-                Message(message.items.filter { it.property.parentId == id }, message.type, message.state)
+                Message(
+                  message.items
+                    .filter { it.value.property.parentId == id || it.region == id }
+                    .map { it.value },
+                  message.type,
+                  message.state
+                )
               }
               .subscribe {
                 emitter.onNext(it)
@@ -248,9 +273,6 @@ class InventoryImpl(
     }, BackpressureStrategy.BUFFER)
       .subscribeOn(Schedulers.io())
       .observeOn(Schedulers.computation())
-      .map { message ->
-        Message(message.items.filter { it.property.parentId == id }, message.type, message.state)
-      }
       .filter {
         it.items.isNotEmpty()
           || it.type == Message.Type.INITIAL
