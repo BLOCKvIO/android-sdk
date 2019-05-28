@@ -109,6 +109,11 @@ class VatomManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
+  override fun getVatom(id: String): Flowable<Message<Vatom>> {
+    return inventory.getVatom(id)
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
   override fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>> = Single.fromCallable {
     api.getUserInventory(
       InventoryRequest(

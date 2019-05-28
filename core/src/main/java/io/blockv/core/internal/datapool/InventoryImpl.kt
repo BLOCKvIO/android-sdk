@@ -281,6 +281,52 @@ class InventoryImpl(
       .observeOn(AndroidSchedulers.mainThread())
   }
 
+  @Synchronized
+  override fun getVatom(id: String): Flowable<Message<Vatom>> {
+    return Flowable.create<Message<Vatom>>({ emitter ->
+      synchronized(this)
+      {
+        dbLock.acquire()
+        try {
+          val vatoms = getCachedVatoms(null, false)
+            .blockingGet()
+            .filter { it.id == id }
+
+          emitter.onNext(Message(vatoms, Message.Type.INITIAL, state))
+          emitter.setDisposable(
+            inventory
+              .observeOn(Schedulers.computation())
+              .map { message ->
+                Message(
+                  message.items
+                    .filter { it.value.id == id}
+                    .map { it.value },
+                  message.type,
+                  message.state
+                )
+              }
+              .subscribe {
+                emitter.onNext(it)
+              })
+
+        } finally {
+          dbLock.release()
+        }
+        if (disposable == null || disposable!!.isDisposed) {
+          disposable = inventory.subscribe()
+        }
+      }
+    }, BackpressureStrategy.BUFFER)
+      .subscribeOn(Schedulers.io())
+      .observeOn(Schedulers.computation())
+      .filter {
+        it.items.isNotEmpty()
+          || it.type == Message.Type.INITIAL
+          || (it.type == Message.Type.ADDED && it.state == Message.State.STABLE)
+      }
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
   private fun getCachedVatoms(parentId: String? = null, needLock: Boolean = true): Single<List<Vatom>> {
     return Single.fromCallable {
       synchronized(vatoms)
