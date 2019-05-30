@@ -28,7 +28,6 @@ import io.blockv.common.model.VatomVisibility
 import io.blockv.common.util.JsonUtil
 import io.blockv.core.internal.datapool.GeoMap
 import io.blockv.core.internal.datapool.Inventory
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -136,7 +135,7 @@ class VatomManagerImpl(
     action: String,
     payload: JSONObject
   ): Single<JSONObject> = Single.fromCallable {
-    api.preformAction(PerformActionRequest(action, payload)).payload ?: JSONObject()
+    api.preformAction(PerformActionRequest(action, payload)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -149,7 +148,7 @@ class VatomManagerImpl(
   override fun acquireVatom(id: String): Single<JSONObject> =
     preformAction(VatomManager.Action.ACQUIRE, JSONObject().put("this.id", id))
 
-  override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Completable {
+  override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Single<JSONObject> {
     val payload = JSONObject()
     payload.put("this.id", id)
     when (tokenType) {
@@ -157,10 +156,10 @@ class VatomManagerImpl(
       VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
       VatomManager.TokenType.ID -> payload.put("new.owner.id", token)
     }
-    return Completable.fromSingle(preformAction(VatomManager.Action.TRANSFER, payload))
+    return preformAction(VatomManager.Action.TRANSFER, payload)
   }
 
-  override fun cloneVatom(id: String, tokenType: VatomManager.TokenType, token: String): Completable {
+  override fun cloneVatom(id: String, tokenType: VatomManager.TokenType, token: String): Single<JSONObject> {
     val payload = JSONObject()
     payload.put("this.id", id)
     when (tokenType) {
@@ -168,10 +167,10 @@ class VatomManagerImpl(
       VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
       VatomManager.TokenType.ID -> payload.put("new.owner.id", token)
     }
-    return Completable.fromSingle(preformAction(VatomManager.Action.CLONE, payload))
+    return preformAction(VatomManager.Action.CLONE, payload)
   }
 
-  override fun dropVatom(id: String, latitude: Double, longitude: Double): Completable {
+  override fun dropVatom(id: String, latitude: Double, longitude: Double): Single<JSONObject> {
     val payload = JSONObject()
     payload.put("this.id", id)
     payload.put(
@@ -179,16 +178,15 @@ class VatomManagerImpl(
         .put("lat", latitude)
         .put("lon", longitude)
     )
-    return Completable.fromSingle(preformAction(VatomManager.Action.DROP, payload))
+    return preformAction(VatomManager.Action.DROP, payload)
   }
 
-  override fun pickupVatom(id: String): Completable =
-    Completable.fromSingle(
-      preformAction(
-        VatomManager.Action.PICKUP,
-        JSONObject().put("this.id", id)
-      )
+  override fun pickupVatom(id: String): Single<JSONObject> {
+    return preformAction(
+      VatomManager.Action.PICKUP,
+      JSONObject().put("this.id", id)
     )
+  }
 
   override fun discover(query: JSONObject): Single<List<Vatom>> = Single.fromCallable {
     query.put(
@@ -202,8 +200,8 @@ class VatomManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun trashVatom(id: String): Completable = Completable.fromCallable {
-    api.trashVatom(TrashVatomRequest(id))
+  override fun trashVatom(id: String): Single<JSONObject> = Single.fromCallable {
+    api.trashVatom(TrashVatomRequest(id)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())

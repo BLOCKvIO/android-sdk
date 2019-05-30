@@ -16,7 +16,6 @@ import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.VatomUpdate
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import org.json.JSONObject
@@ -172,13 +171,13 @@ interface VatomManager {
    * @param id is the vAtom's id.
    * @param tokenType is the type of the user's token.
    * @param token is the user's token matching the provided type.
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
   fun transferVatom(
     id: String,
     tokenType: TokenType,
     token: String
-  ): Completable
+  ): Single<JSONObject>
 
   /**
    * Attempts to clone a vAtom to a user.
@@ -186,13 +185,13 @@ interface VatomManager {
    * @param id is the vAtom's id.
    * @param tokenType is the type of the user's token.
    * @param token is the user's token matching the provided type.
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
   fun cloneVatom(
     id: String,
     tokenType: TokenType,
     token: String
-  ): Completable
+  ): Single<JSONObject>
 
   /**
    * Attempts to drop a vAtom on the GeoMap.
@@ -200,17 +199,17 @@ interface VatomManager {
    * @param id is the vAtom's id.
    * @param latitude
    * @param longitude
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun dropVatom(id: String, latitude: Double, longitude: Double): Completable
+  fun dropVatom(id: String, latitude: Double, longitude: Double): Single<JSONObject>
 
   /**
    * Attempts to pick up a vAtom from the GeoMap.
    *
    * @param id is the vAtom's id.
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun pickupVatom(id: String): Completable
+  fun pickupVatom(id: String): Single<JSONObject>
 
 
   /**
@@ -228,9 +227,9 @@ interface VatomManager {
    * This will remove the vAtom from the current user's inventory.
    *
    * @param id is the identifier of the vAtom.
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun trashVatom(id: String): Completable
+  fun trashVatom(id: String): Single<JSONObject>
 
   /**
    * Creates a new updated vAtom by merging properties from the state update

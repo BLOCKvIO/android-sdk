@@ -76,14 +76,14 @@ class UserManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun setCurrentUserDefaultToken(tokenId: String): Completable = Completable.fromCallable {
-    api.setDefaultUserToken(tokenId)
+  override fun setCurrentUserDefaultToken(tokenId: String): Single<JSONObject> = Single.fromCallable {
+    api.setDefaultUserToken(tokenId).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun deleteCurrentUserToken(tokenId: String): Completable = Completable.fromCallable {
-    api.deleteUserToken(tokenId)
+  override fun deleteCurrentUserToken(tokenId: String): Single<JSONObject> = Single.fromCallable {
+    api.deleteUserToken(tokenId).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -196,8 +196,8 @@ class UserManagerImpl(
     token: String,
     tokenType: UserManager.TokenType,
     code: String
-  ): Completable = Completable.fromCallable {
-    api.verifyToken(VerifyTokenRequest(tokenType.name.toLowerCase(), token, code))
+  ): Single<JSONObject> = Single.fromCallable {
+    api.verifyToken(VerifyTokenRequest(tokenType.name.toLowerCase(), token, code)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -205,7 +205,7 @@ class UserManagerImpl(
   override fun resetToken(
     token: String,
     tokenType: UserManager.TokenType
-  ): Completable = Completable.fromCallable {
+  ): Single<JSONObject> = Single.fromCallable {
     api.resetToken(ResetTokenRequest(tokenType.name.toLowerCase(), token)).payload
   }
     .subscribeOn(Schedulers.io())
@@ -214,8 +214,8 @@ class UserManagerImpl(
   override fun resendVerification(
     token: String,
     tokenType: UserManager.TokenType
-  ): Completable = Completable.fromCallable {
-    api.resetVerificationToken(ResetTokenRequest(tokenType.name.toLowerCase(), token))
+  ): Single<JSONObject> = Single.fromCallable {
+    api.resetVerificationToken(ResetTokenRequest(tokenType.name.toLowerCase(), token)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -247,17 +247,18 @@ class UserManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun logout(): Completable =
+  override fun logout(): Single<JSONObject> =
     inventory.reset()
       .andThen(
-        Completable.fromCallable {
+        Single.fromCallable {
+          val out = api.logout().payload
           preferences.refreshToken = null
-          api.logout()
+          out
         })
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
 
-  override fun uploadAvatar(avatar: Bitmap): Completable = Completable.fromCallable {
+  override fun uploadAvatar(avatar: Bitmap): Single<Unit> = Single.fromCallable {
     val stream = ByteArrayOutputStream()
     avatar.compress(Bitmap.CompressFormat.PNG, 100, stream)
     api.uploadAvatar(UploadAvatarRequest("avatar", "avatar.png", "image/png", stream.toByteArray())).payload
