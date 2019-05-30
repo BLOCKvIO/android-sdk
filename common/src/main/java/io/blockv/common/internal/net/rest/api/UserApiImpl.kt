@@ -43,19 +43,19 @@ class UserApiImpl(
     )
   }
 
-  override fun setDefaultUserToken(tokenId: String): BaseResponse<Unit> {
+  override fun setDefaultUserToken(tokenId: String): BaseResponse<JSONObject> {
     val response: JSONObject = client.put("v1/user/tokens/$tokenId/default")
     return BaseResponse(
       response.getString("request_id"),
-      Unit
+      response.getJSONObject("payload")
     )
   }
 
-  override fun deleteUserToken(tokenId: String): BaseResponse<Unit> {
+  override fun deleteUserToken(tokenId: String): BaseResponse<JSONObject> {
     val response: JSONObject = client.del("v1/user/tokens/$tokenId")
     return BaseResponse(
       response.getString("request_id"),
-      Unit
+      response.getJSONObject("payload")
     )
   }
 
@@ -156,28 +156,28 @@ class UserApiImpl(
     )
   }
 
-  override fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token> {
+  override fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("v1/user/reset_token_verification", request.toJson())
     val payload: JSONObject = response.getJSONObject("payload")
     return BaseResponse(
       response.getString("request_id"),
-      jsonModule.deserialize(payload)
+      payload
     )
   }
 
-  override fun resetToken(request: ResetTokenRequest): BaseResponse<Unit> {
+  override fun resetToken(request: ResetTokenRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("v1/user/reset_token", request.toJson())
     return BaseResponse(
       response.getString("request_id"),
-      Unit
+      response.getJSONObject("payload")
     )
   }
 
-  override fun verifyToken(request: VerifyTokenRequest): BaseResponse<Unit> {
+  override fun verifyToken(request: VerifyTokenRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("v1/user/verify_token", request.toJson())
     return BaseResponse(
       response.getString("request_id"),
-      Unit
+      response.getJSONObject("payload")
     )
   }
 
