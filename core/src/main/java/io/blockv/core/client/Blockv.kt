@@ -14,7 +14,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.NetModule
-import io.blockv.common.internal.net.rest.api.AppApi
 import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.auth.AuthenticatorImpl
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
@@ -23,7 +22,16 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.DatabaseImpl
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.*
+import io.blockv.common.model.AppVersion
+import io.blockv.common.model.Environment
+import io.blockv.common.model.InventoryEvent
+import io.blockv.common.model.Message
+import io.blockv.common.model.Model
+import io.blockv.common.model.PublicUser
+import io.blockv.common.model.Resource
+import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.Vatom
+import io.blockv.common.model.WebSocketEvent
 import io.blockv.core.client.manager.ActivityManager
 import io.blockv.core.client.manager.ActivityManagerImpl
 import io.blockv.core.client.manager.EventManager
@@ -124,6 +132,14 @@ class Blockv {
 
             },
             object : io.blockv.face.client.manager.VatomManager {
+              override fun getVatom(id: String): Flowable<Message<Vatom>> {
+                return vatomManager.getVatom(id)
+              }
+
+              override fun getInventory(id: String): Flowable<Message<Vatom>> {
+                return vatomManager.getInventory(id)
+              }
+
               override fun preformAction(action: String, payload: JSONObject): Single<JSONObject> {
                 return vatomManager.preformAction(action, payload)
               }
@@ -205,7 +221,8 @@ class Blockv {
       JwtDecoderImpl(),
       inventory
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket,jsonModule))
+    this.vatomManager =
+      VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket, jsonModule))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
   }
@@ -232,7 +249,8 @@ class Blockv {
       JwtDecoderImpl(),
       inventory
     )
-    this.vatomManager = VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket,jsonModule))
+    this.vatomManager =
+      VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket, jsonModule))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
   }

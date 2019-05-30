@@ -10,20 +10,31 @@
  */
 package io.blockv.face.client.manager
 
+import io.blockv.common.model.Message
 import io.blockv.common.model.Vatom
+import io.reactivex.Flowable
 import io.reactivex.Single
 import org.json.JSONObject
 
 interface VatomManager {
 
   /**
-   * Fetches vAtoms by id.
+   * Fetches Vatoms by id.
    *
    * @param ids is a list of vAtom id's in the current users inventory.
    * @return new Single<List<Vatom>> instance.
    * @see Vatom
    */
   fun getVatoms(vararg ids: String): Single<List<Vatom>>
+
+  /**
+   * Fetch a Vatom by id.
+   *
+   * @param id is a vAtom identifier in the current users inventory.
+   * @return new Flowable<Message<Vatom>> instance.
+   * @see Vatom
+   */
+  fun getVatom(id: String): Flowable<Message<Vatom>>
 
   /**
    * Fetches the current user's inventory of vAtoms.
@@ -38,6 +49,16 @@ interface VatomManager {
    * @see Vatom
    */
   fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>>
+
+  /**
+   * Fetches the current user's inventory of vAtoms.
+   *
+   * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
+   *           user's root inventory will be returned.
+   * @return new Flowable<Message<Vatom>> instance.
+   * @see Vatom
+   */
+  fun getInventory(id: String): Flowable<Message<Vatom>>
 
   /**
    * Performs an action on the BLOCKv Platform.
