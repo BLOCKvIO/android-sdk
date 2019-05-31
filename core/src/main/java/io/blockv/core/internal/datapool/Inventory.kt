@@ -9,6 +9,8 @@ interface Inventory {
 
   fun getRegion(id: String = "."): Flowable<Message<Vatom>>
 
+  fun getVatom(id: String): Flowable<Message<Vatom>>
+
   fun dispose()
 
   fun reset(): Completable

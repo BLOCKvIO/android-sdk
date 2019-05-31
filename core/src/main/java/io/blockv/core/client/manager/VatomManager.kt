@@ -37,6 +37,15 @@ interface VatomManager {
   fun getVatoms(vararg ids: String): Single<List<Vatom>>
 
   /**
+   * Fetches vAtoms by id.
+   *
+   * @param id is a vAtom identifier in the current users inventory.
+   * @return new Flowable<Message<Vatom>> instance.
+   * @see Vatom
+   */
+  fun getVatom(id: String): Flowable<Message<Vatom>>
+
+  /**
    * Fetches the current user's inventory of vAtoms.
    *
    * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
