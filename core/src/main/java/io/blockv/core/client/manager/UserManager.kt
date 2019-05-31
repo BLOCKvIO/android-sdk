@@ -21,6 +21,7 @@ import io.blockv.common.model.UserUpdate
 import io.blockv.common.util.Optional
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.json.JSONObject
 
 /**
  *  This interface contains the available Blockv user functions.
@@ -79,9 +80,9 @@ interface UserManager {
    * @param token the user's phone(E.164) or email.
    * @param tokenType the type of the token (phone or email).
    * @param code the verification code send to the user's token (phone or email).
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun verifyUserToken(token: String, tokenType: TokenType, code: String): Completable
+  fun verifyUserToken(token: String, tokenType: TokenType, code: String): Single<JSONObject>
 
   /**
    * Sends a One-Time-Pin (OTP) to the user's token (phone or email).
@@ -90,9 +91,9 @@ interface UserManager {
    *
    * @param token the user's phone(E.164) or email.
    * @param tokenType the type of the token (phone or email).
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun resetToken(token: String, tokenType: TokenType): Completable
+  fun resetToken(token: String, tokenType: TokenType): Single<JSONObject>
 
   /**
    * Sends a verification code to the user's token (phone or email).
@@ -101,9 +102,9 @@ interface UserManager {
    *
    * @param token the user's phone(E.164) or email.
    * @param tokenType the type of the token (phone or email).
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun resendVerification(token: String, tokenType: TokenType): Completable
+  fun resendVerification(token: String, tokenType: TokenType): Single<JSONObject>
 
   /**
    * Fetches the current user's profile information from the BLOCKv platform.
@@ -134,7 +135,7 @@ interface UserManager {
    * @param token the user token to be linked to the current user.
    * @param tokenType the type of the token (phone or email).
    * @param isDefault determines whether the token is the primary token on this account.
-   * @return new Completable instance.
+   * @return new Single<Token> instance.
    */
   fun addCurrentUserToken(token: String, tokenType: TokenType, isDefault: Boolean): Single<Token>
 
@@ -145,7 +146,7 @@ interface UserManager {
    * @param tokenType is the OAuth provider (e.g facebook).
    * @param code is the auth OAuth token from the provider.
    * @param isDefault determines whether the token is the primary token on this account.
-   * @return new Completable instance.
+   * @return new Single<Token> instance.
    */
   fun addCurrentUserOauthToken(token: String, tokenType: String, code: String, isDefault: Boolean): Single<Token>
 
@@ -158,17 +159,17 @@ interface UserManager {
    * is_primary flag of an existing token to false , because only one token can be the primary token.
    *
    * @param tokenId is the unique identifier of the token to be deleted.
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun setCurrentUserDefaultToken(tokenId: String): Completable
+  fun setCurrentUserDefaultToken(tokenId: String): Single<JSONObject>
 
   /**
    * Removes the token from the current user's token list on the BLOCKv Platform.
    *
    * @param tokenId is the unique identifier of the token.
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun deleteCurrentUserToken(tokenId: String): Completable
+  fun deleteCurrentUserToken(tokenId: String): Single<JSONObject>
 
   /**
    * Fetches the publicly available attributes of any user given their user id.
@@ -187,16 +188,16 @@ interface UserManager {
    *
    * The current user will not longer be authorized to perform user scoped requests on the BLOCkv platform.
    *
-   * @return new Completable instance.
+   * @return new Single<JSONObject> instance.
    */
-  fun logout(): Completable
+  fun logout(): Single<JSONObject>
 
   /**
    * Upload Bitmap to server to be used as the user's avatar.
    *
-   * @return new Completable instance.
+   * @return new Single<Unit> instance.
    */
-  fun uploadAvatar(avatar: Bitmap): Completable
+  fun uploadAvatar(avatar: Bitmap): Single<Unit>
 
   /**
    * Determines whether a user is logged in.

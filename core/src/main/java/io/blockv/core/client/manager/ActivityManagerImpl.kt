@@ -20,6 +20,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONObject
 
 class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
 
@@ -52,7 +53,7 @@ class ActivityManagerImpl(val api: ActivityApi) : ActivityManager {
     return getThreadMessages(id, "")
   }
 
-  override fun sendMessage(userId: String, message: String): Completable = Completable.fromCallable {
+  override fun sendMessage(userId: String, message: String): Single<JSONObject> = Single.fromCallable {
     api.sendMessage(SendMessageRequest(userId, message)).payload
   }
     .subscribeOn(Schedulers.io())

@@ -41,11 +41,11 @@ interface UserApi {
 
   fun updateCurrentUser(request: UpdateUserRequest): BaseResponse<User>
 
-  fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<Token>
+  fun resetVerificationToken(request: ResetTokenRequest): BaseResponse<JSONObject>
 
-  fun resetToken(request: ResetTokenRequest): BaseResponse<Unit>
+  fun resetToken(request: ResetTokenRequest): BaseResponse<JSONObject>
 
-  fun verifyToken(request: VerifyTokenRequest): BaseResponse<Unit>
+  fun verifyToken(request: VerifyTokenRequest): BaseResponse<JSONObject>
 
   fun getUserTokens(): BaseResponse<List<Token>>
 
@@ -53,9 +53,9 @@ interface UserApi {
 
   fun createUserOauthToken(request: CreateOauthTokenRequest): BaseResponse<Token>
 
-  fun setDefaultUserToken(tokenId: String): BaseResponse<Unit>
+  fun setDefaultUserToken(tokenId: String): BaseResponse<JSONObject>
 
-  fun deleteUserToken(tokenId: String): BaseResponse<Unit>
+  fun deleteUserToken(tokenId: String): BaseResponse<JSONObject>
 
   fun getPublicUser(userId: String): BaseResponse<PublicUser>
 

@@ -16,6 +16,7 @@ import io.blockv.common.internal.net.rest.request.SendMessageRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
 import io.blockv.common.model.ActivityMessageList
 import io.blockv.common.model.ActivityThreadList
+import org.json.JSONObject
 
 interface ActivityApi {
 
@@ -23,5 +24,5 @@ interface ActivityApi {
 
   fun getThreadMessages(request: ActivityMessageListRequest): BaseResponse<ActivityMessageList>
 
-  fun sendMessage(request: SendMessageRequest): BaseResponse<Unit>
+  fun sendMessage(request: SendMessageRequest): BaseResponse<JSONObject>
 }

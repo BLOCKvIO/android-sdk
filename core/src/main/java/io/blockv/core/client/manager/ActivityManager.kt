@@ -12,8 +12,8 @@ package io.blockv.core.client.manager
 
 import io.blockv.common.model.ActivityMessageList
 import io.blockv.common.model.ActivityThreadList
-import io.reactivex.Completable
 import io.reactivex.Single
+import org.json.JSONObject
 
 /**
  * This interface contains the available BLOCKv activity functions.
@@ -106,8 +106,8 @@ interface ActivityManager {
    *
    * @param userId is the identifier of the BLOCKv user.
    * @param message is the message you want to send to the other user.
-   * @return new Completable instance
+   * @return new Single<JSONObject> instance
    */
-  fun sendMessage(userId: String, message: String): Completable
+  fun sendMessage(userId: String, message: String): Single<JSONObject>
 
 }

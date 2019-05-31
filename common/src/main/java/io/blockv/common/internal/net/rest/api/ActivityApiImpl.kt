@@ -45,12 +45,12 @@ class ActivityApiImpl(
     )
   }
 
-  override fun sendMessage(request: SendMessageRequest): BaseResponse<Unit> {
+  override fun sendMessage(request: SendMessageRequest): BaseResponse<JSONObject> {
     val response: JSONObject = client.post("v1/user/message", request.toJson())
 
     return BaseResponse(
       response.getString("request_id"),
-      Unit
+      response.optJSONObject("payload") ?: JSONObject()
     )
   }
 }
