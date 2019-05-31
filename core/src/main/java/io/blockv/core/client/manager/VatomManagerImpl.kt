@@ -136,7 +136,7 @@ class VatomManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun preformAction(
+  override fun performAction(
     action: String,
     payload: JSONObject
   ): Single<JSONObject> = Single.fromCallable {
@@ -145,13 +145,13 @@ class VatomManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun preformAction(
+  override fun performAction(
     action: VatomManager.Action,
     payload: JSONObject
-  ): Single<JSONObject> = preformAction(action.action(), payload)
+  ): Single<JSONObject> = performAction(action.action(), payload)
 
   override fun acquireVatom(id: String): Single<JSONObject> =
-    preformAction(VatomManager.Action.ACQUIRE, JSONObject().put("this.id", id))
+    performAction(VatomManager.Action.ACQUIRE, JSONObject().put("this.id", id))
 
   override fun transferVatom(id: String, tokenType: VatomManager.TokenType, token: String): Single<JSONObject> {
     val payload = JSONObject()
@@ -161,7 +161,7 @@ class VatomManagerImpl(
       VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
       VatomManager.TokenType.ID -> payload.put("new.owner.id", token)
     }
-    return preformAction(VatomManager.Action.TRANSFER, payload)
+    return performAction(VatomManager.Action.TRANSFER, payload)
   }
 
   override fun cloneVatom(id: String, tokenType: VatomManager.TokenType, token: String): Single<JSONObject> {
@@ -172,7 +172,7 @@ class VatomManagerImpl(
       VatomManager.TokenType.PHONE_NUMBER -> payload.put("new.owner.phone_number", token)
       VatomManager.TokenType.ID -> payload.put("new.owner.id", token)
     }
-    return preformAction(VatomManager.Action.CLONE, payload)
+    return performAction(VatomManager.Action.CLONE, payload)
   }
 
   override fun dropVatom(id: String, latitude: Double, longitude: Double): Single<JSONObject> {
@@ -183,11 +183,11 @@ class VatomManagerImpl(
         .put("lat", latitude)
         .put("lon", longitude)
     )
-    return preformAction(VatomManager.Action.DROP, payload)
+    return performAction(VatomManager.Action.DROP, payload)
   }
 
   override fun pickupVatom(id: String): Single<JSONObject> {
-    return preformAction(
+    return performAction(
       VatomManager.Action.PICKUP,
       JSONObject().put("this.id", id)
     )

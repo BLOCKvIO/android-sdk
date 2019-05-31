@@ -145,14 +145,14 @@ interface FaceManager {
   var defaultError: ViewEmitter?
 
   /**
-   * FaceSelectionProcedure is used to select a Face for a vAtom.
+   * FaceSelectionProcedure is used to select a Face for a Vatom.
    *
    * @see EmbeddedProcedure
    */
   interface FaceSelectionProcedure {
 
     /**
-     * Selects a Face model for a vAtom base on some custom logic.
+     * Selects a Face model for a Vatom base on some custom logic.
      *
      * @param vatom contains the list of Face models that should be used by the procedure.
      * @param displayUrls is a set of all available FaceView factories.
@@ -166,9 +166,9 @@ interface FaceManager {
   }
 
   /**
-   * Creates a builder to load a VatomView for the specified vAtom.
+   * Creates a builder to load a VatomView for the specified Vatom.
    *
-   * @param vatom is the vAtom you want a VatomView to display.
+   * @param vatom is the Vatom you want a VatomView to display.
    * @return a new Builder.
    *
    * @see Builder
@@ -198,7 +198,7 @@ interface FaceManager {
     fun into(vatomView: VatomView): Single<FaceView>
 
     /**
-     * Sets an embedded procedure to be used to selected a Face model for the vAtom.
+     * Sets an embedded procedure to be used to selected a Face model for the Vatom.
      *
      * @param embeddedProcedure to be used to select a face.
      * @return this Builder.
@@ -208,7 +208,7 @@ interface FaceManager {
     fun setEmbeddedProcedure(embeddedProcedure: EmbeddedProcedure): Builder
 
     /**
-     * Set a custom procedure to be used to select a Face model for the vAtom.
+     * Set a custom procedure to be used to select a Face model for the Vatom.
      *
      * @param procedure to be used to select the Face model.
      * @return this Builder.

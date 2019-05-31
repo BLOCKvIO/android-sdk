@@ -140,8 +140,8 @@ class Blockv {
                 return vatomManager.getInventory(id)
               }
 
-              override fun preformAction(action: String, payload: JSONObject): Single<JSONObject> {
-                return vatomManager.preformAction(action, payload)
+              override fun performAction(action: String, payload: JSONObject): Single<JSONObject> {
+                return vatomManager.performAction(action, payload)
               }
 
               override fun getVatoms(vararg ids: String): Single<List<Vatom>> {
