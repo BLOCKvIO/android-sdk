@@ -30,24 +30,24 @@ interface EventManager {
   fun getEvents(): Flowable<WebSocketEvent<JSONObject>>
 
   /**
-   *  Provides a stream of vAtom state update events.
+   *  Provides a stream of Vatom state update events.
    *
    *  @return Flowable<WebSocketEvent<StateUpdateEvent>> instance.
    */
   fun getVatomStateEvents(): Flowable<WebSocketEvent<StateUpdateEvent>>
 
   /**
-   *  Provides a stream of inventory update events. This only indicates if a vAtom
-   *  has been added or removed from a specific inventory
+   *  Provides a stream of inventory update events. This only indicates if a Vatom
+   *  has been added or removed from a specific inventory.
    *
-   *  @return Flowable<WebSocketEvent<InventoryEvent>> instance
+   *  @return Flowable<WebSocketEvent<InventoryEvent>> instance.
    */
   fun getInventoryEvents(): Flowable<WebSocketEvent<InventoryEvent>>
 
   /**
-   * Provides a stream of activity events
+   * Provides a stream of activity events.
    *
-   * @return Flowable<WebSocketEvent<ActivityEvent>> instance
+   * @return Flowable<WebSocketEvent<ActivityEvent>> instance.
    */
   fun getActivityEvents(): Flowable<WebSocketEvent<ActivityEvent>>
 }

@@ -21,7 +21,7 @@ interface VatomManager {
   /**
    * Fetches Vatoms by id.
    *
-   * @param ids is a list of vAtom id's in the current users inventory.
+   * @param ids is a list of Vatom id's in the current users inventory.
    * @return new Single<List<Vatom>> instance.
    * @see Vatom
    */
@@ -30,20 +30,20 @@ interface VatomManager {
   /**
    * Fetch a Vatom by id.
    *
-   * @param id is a vAtom identifier in the current users inventory.
+   * @param id is a Vatom identifier in the current users inventory.
    * @return new Flowable<Message<Vatom>> instance.
    * @see Vatom
    */
   fun getVatom(id: String): Flowable<Message<Vatom>>
 
   /**
-   * Fetches the current user's inventory of vAtoms.
+   * Fetches the current user's inventory of Vatoms.
    *
    * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
    *           user's root inventory will be returned.
-   * @param page indicates which slice of the vAtom inventory is returned. If set as
+   * @param page indicates which slice of the Vatom inventory is returned. If set as
    *             zero, the first page is returned.
-   * @param limit defines the number of vAtoms per response page (up to 100). If omitted or set as
+   * @param limit defines the number of Vatoms per response page (up to 100). If omitted or set as
    *              zero, the max number is returned.
    * @return new Single<List<Vatom>> instance.
    * @see Vatom
@@ -51,7 +51,7 @@ interface VatomManager {
   fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>>
 
   /**
-   * Fetches the current user's inventory of vAtoms.
+   * Fetches the current user's inventory of Vatoms.
    *
    * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
    *           user's root inventory will be returned.
@@ -67,6 +67,6 @@ interface VatomManager {
    * @param payload contains the data required to do the action.
    * @return new Single<JSONObject>.
    */
-  fun preformAction(action: String, payload: JSONObject): Single<JSONObject>
+  fun performAction(action: String, payload: JSONObject): Single<JSONObject>
 
 }

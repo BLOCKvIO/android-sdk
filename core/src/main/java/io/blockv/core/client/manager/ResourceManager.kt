@@ -41,7 +41,7 @@ interface ResourceManager {
    *
    * This can either come from directly from cache or via the network.
    *
-   * @param url is the vAtom resource that must be fetched.
+   * @param url is the Vatom resource that must be fetched.
    * @return new Single<InputStream>
    */
   fun getInputStream(url: String): Single<InputStream>

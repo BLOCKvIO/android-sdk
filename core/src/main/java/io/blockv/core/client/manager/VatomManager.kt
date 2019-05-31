@@ -22,36 +22,36 @@ import org.json.JSONObject
 import java.util.*
 
 /**
- *  This interface contains the available BLOCKv vAtom functions.
+ *  This interface contains the available BLOCKv Vatom functions.
  */
 interface VatomManager {
 
   /**
-   * Fetches vAtoms by id.
+   * Fetches Vatoms by id.
    *
-   * @param ids is a list of vAtom id's in the current users inventory.
+   * @param ids is a list of Vatom id's in the current users inventory.
    * @return new Single<List<Vatom>> instance.
    * @see Vatom
    */
   fun getVatoms(vararg ids: String): Single<List<Vatom>>
 
   /**
-   * Fetches vAtoms by id.
+   * Fetches a Vatom by id.
    *
-   * @param id is a vAtom identifier in the current users inventory.
+   * @param id is a Vatom identifier in the current users inventory.
    * @return new Flowable<Message<Vatom>> instance.
    * @see Vatom
    */
   fun getVatom(id: String): Flowable<Message<Vatom>>
 
   /**
-   * Fetches the current user's inventory of vAtoms.
+   * Fetches the current user's inventory of Vatoms.
    *
    * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
    *           user's root inventory will be returned.
-   * @param page indicates which slice of the vAtom inventory is returned. If set as
+   * @param page indicates which slice of the Vatom inventory is returned. If set as
    *             zero, the first page is returned.
-   * @param limit defines the number of vAtoms per response page (up to 100). If omitted or set as
+   * @param limit defines the number of Vatoms per response page (up to 100). If omitted or set as
    *              zero, the max number is returned.
    * @return new Single<List<Vatom>> instance.
    * @see Vatom
@@ -59,7 +59,7 @@ interface VatomManager {
   fun getInventory(id: String?, page: Int, limit: Int): Single<List<Vatom>>
 
   /**
-   * Fetches the current user's inventory of vAtoms.
+   * Fetches the current user's inventory of Vatoms.
    *
    * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
    *           user's root inventory will be returned.
@@ -69,8 +69,8 @@ interface VatomManager {
   fun getInventory(id: String): Flowable<Message<Vatom>>
 
   /**
-   * Performs a geo-search for vAtoms on the BLOCKv platform (i.e. vAtoms that have been
-   * dropped by the vAtom owners).
+   * Performs a geo-search for Vatoms on the BLOCKv platform (i.e. Vatoms that have been
+   * dropped by the Vatom owners).
    *
    * You must supply two coordinates (bottom-left and top-right) which from a rectangle.
    * This rectangle defines the geo search region.
@@ -79,7 +79,7 @@ interface VatomManager {
    * @param bottomLeftLon is the bottom left longitude coordinate.
    * @param topRightLat is the top right latitude coordinate.
    * @param topRightLon is the top right longitude coordinate.
-   * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
+   * @param filter is the Vatom filter option to apply. Defaults to "vatoms".
    * @return new Single<List<Vatom>> instance.
    * @see GeoFilter
    * @see Vatom
@@ -100,7 +100,7 @@ interface VatomManager {
   ): Flowable<Message<Vatom>>
 
   /**
-   * Fetches the count of vAtoms dropped in the specified area.
+   * Fetches the count of Vatoms dropped in the specified area.
    *
    * @param bottomLeftLat is the bottom left latitude coordinate.
    * @param bottomLeftLon is the bottom left longitude coordinate.
@@ -109,7 +109,7 @@ interface VatomManager {
    * @param precision controls the density of the group distribution. Defaults to 3.
    *                  Lower values return fewer groups (with a higher vatom count) — less dense.
    *                  Higher values return more groups (with a lower vatom count) - more dense.
-   * @param filter is the vAtom filter option to apply. Defaults to "vatoms".
+   * @param filter is the Vatom filter option to apply. Defaults to "vatoms".
    * @return new Single<List<GeoGroup> instance.
    * @see GeoFilter
    * @see GeoGroup
@@ -149,7 +149,7 @@ interface VatomManager {
    * @param payload contains the data required to do the action.
    * @return new Single<JSONObject> instance.
    */
-  fun preformAction(action: String, payload: JSONObject): Single<JSONObject>
+  fun performAction(action: String, payload: JSONObject): Single<JSONObject>
 
   /**
    * Performs an action on the BLOCKv Platform.
@@ -158,26 +158,26 @@ interface VatomManager {
    * @param payload contains the data required to do the action.
    * @return new Single<JSONObject> instance.
    */
-  fun preformAction(
+  fun performAction(
     action: Action,
     payload: JSONObject
   ): Single<JSONObject>
 
   /**
-   * Performs an acquire action on a vAtom.
+   * Performs an acquire action on a Vatom.
    *
-   * Often, only a vAtom's ID is known, e.g. scanning a QR code with an embedded vAtom.
+   * Often, only a Vatom's ID is known, e.g. scanning a QR code with an embedded Vatom.
    * ID. This call is useful is such circumstances.
    *
-   * @param id is the identifier of the vAtom to acquire.
+   * @param id is the identifier of the Vatom to acquire.
    * @return new Single<JSONObject> instance.
    */
   fun acquireVatom(id: String): Single<JSONObject>
 
   /**
-   * Attempts to transfer a vAtom to a user.
+   * Attempts to transfer a Vatom to a user.
    *
-   * @param id is the vAtom's id.
+   * @param id is the Vatom's id.
    * @param tokenType is the type of the user's token.
    * @param token is the user's token matching the provided type.
    * @return new Single<JSONObject> instance.
@@ -189,9 +189,9 @@ interface VatomManager {
   ): Single<JSONObject>
 
   /**
-   * Attempts to clone a vAtom to a user.
+   * Attempts to clone a Vatom to a user.
    *
-   * @param id is the vAtom's id.
+   * @param id is the Vatom's id.
    * @param tokenType is the type of the user's token.
    * @param token is the user's token matching the provided type.
    * @return new Single<JSONObject> instance.
@@ -203,9 +203,9 @@ interface VatomManager {
   ): Single<JSONObject>
 
   /**
-   * Attempts to drop a vAtom on the GeoMap.
+   * Attempts to drop a Vatom on the GeoMap.
    *
-   * @param id is the vAtom's id.
+   * @param id is the Vatom's id.
    * @param latitude
    * @param longitude
    * @return new Single<JSONObject> instance.
@@ -213,16 +213,16 @@ interface VatomManager {
   fun dropVatom(id: String, latitude: Double, longitude: Double): Single<JSONObject>
 
   /**
-   * Attempts to pick up a vAtom from the GeoMap.
+   * Attempts to pick up a Vatom from the GeoMap.
    *
-   * @param id is the vAtom's id.
+   * @param id is the Vatom's id.
    * @return new Single<JSONObject> instance.
    */
   fun pickupVatom(id: String): Single<JSONObject>
 
 
   /**
-   * Searches for vAtoms on the BLOCKv Platform.
+   * Searches for Vatoms on the BLOCKv Platform.
    *
    * @param query is a JSONObject containing the discover query.
    * @return new Single<List<Vatom>.
@@ -231,21 +231,21 @@ interface VatomManager {
   fun discover(query: JSONObject): Single<List<Vatom>>
 
   /**
-   * Trashes the specified vAtom.
+   * Trashes the specified Vatom.
    *
-   * This will remove the vAtom from the current user's inventory.
+   * This will remove the Vatom from the current user's inventory.
    *
-   * @param id is the identifier of the vAtom.
+   * @param id is the identifier of the Vatom.
    * @return new Single<JSONObject> instance.
    */
   fun trashVatom(id: String): Single<JSONObject>
 
   /**
-   * Creates a new updated vAtom by merging properties from the state update
-   * into the provided vAtom model.
+   * Creates a new updated Vatom by merging properties from the state update
+   * into the provided Vatom model.
    *
-   * @param vatom is the vAtom model to be updated.
-   * @param update is the state update to be merged into the vAtom.
+   * @param vatom is the Vatom model to be updated.
+   * @param update is the state update to be merged into the Vatom.
    * @return new Single<Vatom>.
    */
   fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Single<Vatom>

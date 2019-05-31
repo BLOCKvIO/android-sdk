@@ -18,7 +18,7 @@ import io.reactivex.Flowable
 interface EventManager {
 
   /**
-   *  Provides a stream of vAtom state update events.
+   *  Provides a stream of Vatom state update events.
    *
    *  @return Flowable<WebSocketEvent<StateUpdateEvent> instance.
    */
@@ -26,7 +26,7 @@ interface EventManager {
 
   /**
    *  Provides a stream of inventory update events. Receiving this event indicates
-   *  that a vAtom has been either added or removed from the user's inventory.
+   *  that a Vatom has been either added or removed from the user's inventory.
    *
    *  @return Flowable<WebSocketEvent<InventoryEvent> instance
    */

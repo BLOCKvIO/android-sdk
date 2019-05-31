@@ -34,7 +34,7 @@ interface ResourceManager {
    *
    * This can either come from directly from cache or via the network.
    *
-   * @param resource is the vAtom resource that must be fetched.
+   * @param resource is the Vatom resource that must be fetched.
    * @return new Single<File>
    */
   fun getFile(resource: Resource): Single<File>
@@ -44,7 +44,7 @@ interface ResourceManager {
    *
    * This can either come from directly from cache or via the network.
    *
-   * @param resource is the vAtom resource that must be fetched.
+   * @param resource is the Vatom resource that must be fetched.
    * @return new Single<InputStream>
    */
   fun getInputStream(resource: Resource): Single<InputStream>
@@ -55,7 +55,7 @@ interface ResourceManager {
    *
    * This can either come from directly from cache or via the network.
    *
-   * @param resource is the vAtom resource that must be fetched.
+   * @param resource is the Vatom resource that must be fetched.
    * @return new Single<Bitmap>
    */
   fun getBitmap(resource: Resource): Single<Bitmap>
@@ -66,7 +66,7 @@ interface ResourceManager {
    *
    * This can either come from directly from cache or via the network.
    *
-   * @param resource is the vAtom resource that must be fetched.
+   * @param resource is the Vatom resource that must be fetched.
    * @param width is the max width of the image. -1 defaults to screen width.
    * @param height is the max height of the image. -1 defaults to screen height.
    * @return new Single<Bitmap>
