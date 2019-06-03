@@ -12,6 +12,7 @@ package io.blockv.face.client.manager
 
 import io.blockv.common.model.Message
 import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomUpdate
 import io.reactivex.Flowable
 import io.reactivex.Single
 import org.json.JSONObject
@@ -69,4 +70,13 @@ interface VatomManager {
    */
   fun performAction(action: String, payload: JSONObject): Single<JSONObject>
 
+  /**
+   * Set a Vatom's parent id.
+   *
+   * @param vatomId is the identifier of the Vatom.
+   * @param parentId is the value which will be used to update the Vatom's parent id.
+   * @return new Single<VatomUpdate> instance.
+   * @see VatomUpdate
+   */
+  fun setParentId(vatomId: String, parentId: String): Single<VatomUpdate>
 }

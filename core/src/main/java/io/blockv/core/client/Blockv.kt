@@ -31,6 +31,7 @@ import io.blockv.common.model.PublicUser
 import io.blockv.common.model.Resource
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomUpdate
 import io.blockv.common.model.WebSocketEvent
 import io.blockv.core.client.manager.ActivityManager
 import io.blockv.core.client.manager.ActivityManagerImpl
@@ -132,6 +133,11 @@ class Blockv {
 
             },
             object : io.blockv.face.client.manager.VatomManager {
+
+              override fun setParentId(vatomId: String, parentId: String): Single<VatomUpdate> {
+                return vatomManager.setParentId(parentId, vatomId)
+              }
+
               override fun getVatom(id: String): Flowable<Message<Vatom>> {
                 return vatomManager.getVatom(id)
               }
