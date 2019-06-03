@@ -250,17 +250,47 @@ class InventoryImpl(
           emitter.setDisposable(
             inventory
               .observeOn(Schedulers.computation())
-              .map { message ->
-                Message(
-                  message.items
-                    .filter { it.value.property.parentId == id || it.region == id }
-                    .map { it.value },
-                  message.type,
-                  message.state
-                )
-              }
-              .subscribe {
-                emitter.onNext(it)
+              .subscribe { message ->
+                if (message.type == Message.Type.UPDATED) {
+                  val items = message.items.filter { it.value.property.parentId == id || it.region == id }
+                  val added = ArrayList<Vatom>()
+                  val removed = ArrayList<Vatom>()
+                  val updated = ArrayList<Vatom>()
+
+                  items.forEach {
+                    if (it.value.property.parentId != it.region) {
+                      if (it.value.property.parentId == id) {
+                        added.add(it.value)
+                      } else {
+                        removed.add(it.value)
+                      }
+                    } else {
+                      updated.add(it.value)
+                    }
+                  }
+
+                  if (added.isNotEmpty()) {
+                    emitter.onNext(Message(added, Message.Type.ADDED, message.state))
+                  }
+                  if (removed.isNotEmpty()) {
+                    emitter.onNext(Message(removed, Message.Type.REMOVED, message.state))
+                  }
+                  if (updated.isNotEmpty()) {
+                    emitter.onNext(Message(updated, Message.Type.UPDATED, message.state))
+                  }
+
+                } else {
+                  emitter.onNext(Message(
+                    message.items
+                      .filter { it.value.property.parentId == id || it.region == id }
+                      .map {
+                        it.value
+                      },
+                    message.type,
+                    message.state
+                  )
+                  )
+                }
               })
 
         } finally {
@@ -299,7 +329,7 @@ class InventoryImpl(
               .map { message ->
                 Message(
                   message.items
-                    .filter { it.value.id == id}
+                    .filter { it.value.id == id }
                     .map { it.value },
                   message.type,
                   message.state
