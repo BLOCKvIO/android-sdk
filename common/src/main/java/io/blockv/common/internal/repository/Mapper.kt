@@ -54,7 +54,7 @@ interface Mapper<T> {
     override fun toString(): String {
       var out = "{table:$name, columns:["
       columns.sortedBy { it.name }.forEach {
-        out += "[${it.name},${it.type.name}],"
+        out += "[${it.name},${it.type.value}],"
       }
       out += "]}"
       return out
@@ -66,13 +66,13 @@ interface Mapper<T> {
       return other.toString() == toString()
     }
 
-    enum class Type {
-      BOOLEAN,
-      STRING,
-      INTEGER,
-      FLOAT,
-      DOUBLE,
-      LONG
+    enum class Type(val value: String) {
+      BOOLEAN("BOOLEAN"),
+      STRING("TEXT"),
+      INTEGER("INTEGER"),
+      FLOAT("FLOAT"),
+      DOUBLE("DOUBLE"),
+      LONG("LONG")
     }
 
     class Builder(val name: String) {
