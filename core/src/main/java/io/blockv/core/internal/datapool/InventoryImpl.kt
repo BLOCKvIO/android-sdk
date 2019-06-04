@@ -136,6 +136,7 @@ class InventoryImpl(
       synchronized(this) {
         state = Message.State.UNSTABLE
         val timer = Flowable.timer(300, TimeUnit.MILLISECONDS)
+          .observeOn(Schedulers.computation())
           .doFinally {
             synchronized(vatoms)
             {
@@ -216,6 +217,7 @@ class InventoryImpl(
       }
 
     }, BackpressureStrategy.BUFFER)
+      .subscribeOn(Schedulers.io())
       .doOnError {
         it.printStackTrace()
         synchronized(this)
@@ -232,10 +234,8 @@ class InventoryImpl(
               .delay(3, TimeUnit.SECONDS)
         }
       }
-      .subscribeOn(Schedulers.io())
       .share()
 
-  @Synchronized
   override fun getRegion(id: String): Flowable<Message<Vatom>> {
     return Flowable.create<Message<Vatom>>({ emitter ->
       synchronized(this)
@@ -311,7 +311,6 @@ class InventoryImpl(
       .observeOn(AndroidSchedulers.mainThread())
   }
 
-  @Synchronized
   override fun getVatom(id: String): Flowable<Message<Vatom>> {
     return Flowable.create<Message<Vatom>>({ emitter ->
       synchronized(this)
