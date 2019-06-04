@@ -73,7 +73,7 @@ class DatabaseImpl(context: Context, val name: String = "blockv.db", val version
               db.execSQL("DROP TABLE IF EXISTS $tableName")
               var command = "CREATE TABLE $tableName ( _id TEXT PRIMARY KEY ON CONFLICT REPLACE"
               table.columns.forEach {
-                command += ",${it.name} ${it.type.name}"
+                command += ",${it.name} ${it.type.value}"
               }
               command += ");"
               db.execSQL(command)
