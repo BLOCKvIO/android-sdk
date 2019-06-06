@@ -20,9 +20,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -41,6 +39,60 @@ class GeoMapImpl(
   var emitter: FlowableEmitter<Message<Vatom>>? = null
   var flowable: Flowable<Message<Vatom>>? = null
   val disposable = CompositeDisposable()
+  var brainDisposable: Disposable? = null
+  val brainUpdater = Observable.interval(1000 / 15, TimeUnit.MILLISECONDS)
+    .observeOn(Schedulers.computation())
+    .map {
+      synchronized(vatoms)
+      {
+        synchronized(brains)
+        {
+          val updates = ArrayList<Vatom>()
+          brains.keys.forEach {
+            val vatom = vatoms[it]
+            val brain = brains[it]
+            if (vatom != null && brain != null) {
+              brain.path = brain.filter(brain.path)
+              val current = Date().time
+              val startPos = ArrayList(vatom.property.geoPos!!.coordinates)
+              if (brain.path.isNotEmpty()) {
+                val endPos = brain.path[0]
+                val remainingTime = endPos.time - current
+
+                var interval = (remainingTime * 15f / (1000))
+
+                if (interval < 1) {
+                  interval = 1f
+                }
+                val lon = (endPos.lon - startPos[1]) / interval
+                val lat = (endPos.lat - startPos[0]) / interval
+                startPos[0] += lat
+                startPos[1] += lon
+
+                vatom.property.geoPos?.coordinates = startPos
+                updates.add(vatom)
+              } else {
+              }
+            }
+
+          }
+          if (emitter?.isCancelled == false && updates.isNotEmpty()) {
+            emitter?.onNext(Message(updates, Message.Type.UPDATED, Message.State.STABLE))
+          }
+          if (updates.isEmpty()) {
+            Log.e("brain", "updates disposed")
+            brainDisposable?.dispose()
+            brainDisposable = null
+          }
+        }
+      }
+
+    }
+    .retryWhen { it }
+    .doOnSubscribe{
+      Log.e("brain", "updates started")
+    }
+
 
   override fun getRegion(
     bottomLeftLat: Double,
@@ -94,11 +146,17 @@ class GeoMapImpl(
               }.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe({
-                  vatoms.clear()
-                  it.forEach {
-                    vatoms[it.id] = it
+                  synchronized(vatoms) {
+                    val old = HashMap(vatoms)
+                    vatoms.clear()
+                    it.forEach {
+                      if (brains.containsKey(it.id) && old.containsKey(it.id)) {
+                        it.property.geoPos = old[it.id]!!.property.geoPos
+                      }
+                      vatoms[it.id] = it
+                    }
+                    emitter.onNext(Message(vatoms.values.toList(), Message.Type.INITIAL, Message.State.STABLE))
                   }
-                  emitter.onNext(Message(vatoms.values.toList(), Message.Type.INITIAL, Message.State.STABLE))
                 }, { emitter.onError(it) })
             )
 
@@ -172,7 +230,7 @@ class GeoMapImpl(
         ) {
           synchronized(brains)
           {
-            brains.remove(it.vatomId)?.stop()
+            brains.remove(it.vatomId)//?.stop()
           }
           synchronized(vatoms)
           {
@@ -195,9 +253,16 @@ class GeoMapImpl(
               }
               if (brains.containsKey(it.vatomId)) {
                 brains[it.vatomId]!!.updatePath(path)
+
               } else {
-                disposable.add(Brain(it.vatomId, ArrayList(path)).start())
+                brains[it.vatomId] = Brain(it.vatomId, ArrayList(path))
               }
+              if (brainDisposable?.isDisposed != false) {
+                brainDisposable = brainUpdater.subscribe({
+                }, { Log.e("brain", it.message) })
+                disposable.add(brainDisposable!!)
+              }
+
             }
             Optional(null)
           } else
@@ -214,18 +279,6 @@ class GeoMapImpl(
     var vatomId: String,
     var path: MutableList<Position>
   ) {
-
-    @get:Synchronized
-    var timeStep: Long = 300
-
-    var updater: Disposable? = null
-
-    @Synchronized
-    private fun calucalteTimeStep() {
-      if (this.path.size > 1) {
-        timeStep = this.path[1].time - this.path[0].time
-      }
-    }
 
     @Synchronized
     fun updatePath(path: List<Position>) {
@@ -248,7 +301,6 @@ class GeoMapImpl(
           this.path = sorted
         }
       }
-      calucalteTimeStep()
     }
 
     @Synchronized
@@ -257,77 +309,7 @@ class GeoMapImpl(
       val out = path.filter {
         it.time >= current
       }
-      if (out.isNotEmpty()) {
-        timeStep = out[0].time - current
-      }
       return ArrayList(out)
-    }
-
-    @Synchronized
-    fun start(): Disposable {
-      if (updater == null || updater!!.isDisposed) {
-        updater = Observable
-          .fromCallable {
-            synchronized(this)
-            {
-              path = filter(path)
-              timeStep
-            }
-          }
-          .subscribeOn(Schedulers.computation())
-          .flatMap { time -> Observable.timer(time, TimeUnit.MILLISECONDS) }
-          .repeat()
-          .observeOn(Schedulers.computation())
-          .switchMap {
-            synchronized(vatoms) {
-              synchronized(this) {
-                if (path.isNotEmpty()) {
-                  val position = path.removeAt(0)
-                  calucalteTimeStep()
-                  val vatom = vatoms[vatomId]!!
-                  val startPos = ArrayList(vatom.property.geoPos!!.coordinates)
-                  val deltaLat = position.lat - startPos[0]
-                  val deltaLon = position.lon - startPos[1]
-                  val interval = (timeStep.toDouble() / (timeStep.toDouble() / 1000 * 15)).toLong()
-                  Observable.interval(interval, TimeUnit.MILLISECONDS)
-                    .observeOn(Schedulers.computation())
-                    .map { value ->
-                      val step = ((value + 1) * interval).toFloat()
-                      val newPos = ArrayList<Float>()
-                      newPos.add(startPos[0] + deltaLat * (step / timeStep.toFloat()))
-                      newPos.add(startPos[1] + deltaLon * (step / timeStep.toFloat()))
-                      vatom.property.geoPos!!.coordinates = newPos
-                      if (emitter?.isCancelled == false) {
-                        emitter?.onNext(Message(vatom, Message.Type.UPDATED, Message.State.STABLE))
-                      }
-                      value
-                    }
-                } else {
-                  Observable.just(-1L)
-                }
-              }
-            }
-          }
-          .doFinally {
-            synchronized(brains)
-            {
-              brains.remove(vatomId)
-            }
-          }
-          .doOnSubscribe {
-            synchronized(brains)
-            {
-              brains.put(vatomId, this)
-            }
-          }
-          .subscribe({}, {})
-      }
-      return updater!!
-    }
-
-    @Synchronized
-    fun stop() {
-      updater?.dispose()
     }
   }
 
