@@ -58,7 +58,7 @@ class GeoMapImpl(
                 val endPos = brain.path[0]
                 val remainingTime = endPos.time - current
 
-                var interval = (remainingTime * 15f / (1000))
+                var interval = (remainingTime * 15f / 1000)
 
                 if (interval < 1) {
                   interval = 1f
