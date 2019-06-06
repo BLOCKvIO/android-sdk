@@ -17,6 +17,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import io.blockv.core.R
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
 
 class OauthActivity : AppCompatActivity() {
@@ -39,6 +41,8 @@ class OauthActivity : AppCompatActivity() {
     }
 
     private var handlers = HashMap<Long, Handler>()
+
+    private var complete = false
 
     private var handlerId: Long = 0
     @Synchronized
@@ -95,12 +99,25 @@ class OauthActivity : AppCompatActivity() {
                 handler.onError(BlockvOauthException.Error.UNKNOWN.exception())
                 Log.e("oauth", error)
               }
+              complete()
             } else
               if (data.getQueryParameter("code") != null) {
                 handler.onSuccess(data.getQueryParameter("code"))
-              } else
+                  .observeOn(AndroidSchedulers.mainThread())
+                  .doOnSubscribe {
+                    webView.visibility = View.GONE
+                    loader.visibility = View.VISIBLE
+                  }
+                  .doFinally {
+                    complete()
+                  }
+                  .subscribe()
+
+              } else {
                 handler.onError(BlockvOauthException.Error.UNKNOWN.exception())
-          finish()
+                complete()
+              }
+
           return true
         }
         return false
@@ -115,14 +132,14 @@ class OauthActivity : AppCompatActivity() {
       override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         super.onReceivedError(view, errorCode, description, failingUrl)
         handler.onError(BlockvOauthException.Error.OAUTH_UNAVAILABLE.exception())
-        finish()
+        complete()
       }
 
       @TargetApi(Build.VERSION_CODES.M)
       override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
         super.onReceivedError(view, request, error)
         handler.onError(BlockvOauthException.Error.OAUTH_UNAVAILABLE.exception())
-        finish()
+        complete()
       }
 
     }
@@ -153,13 +170,21 @@ class OauthActivity : AppCompatActivity() {
     webView.loadUrl(url)
   }
 
+  fun complete() {
+    complete = true
+    finish()
+  }
+
   override fun finish() {
     super.finish()
+    if (!complete) {
+      handler.onError(BlockvOauthException.Error.USER_CANCEL.exception())
+    }
     removeHandler(handlerId)
   }
 
   interface Handler {
-    fun onSuccess(code: String)
+    fun onSuccess(code: String): Completable
 
     fun onError(exception: BlockvOauthException)
   }

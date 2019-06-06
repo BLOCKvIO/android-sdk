@@ -156,22 +156,17 @@ class UserManagerImpl(
       val disposable = CompositeDisposable()
       emitter.setDisposable(disposable)
       OauthActivity.start(context, environment.appId, environment.redirectUri, scope, object : OauthActivity.Handler {
-        override fun onSuccess(code: String) {
-          disposable.add(
-            Single.fromCallable {
-              api.getAccessTokens(TokenRequest(environment.appId, code, environment.redirectUri))
-            }.subscribeOn(Schedulers.io())
-              .map {
-                preferences.refreshToken = Jwt(it.getString("refresh_token"), "bearer")
-                authenticator.setToken(Jwt(it.getString("access_token"), "bearer"))
-                api.refreshAssetProviders()
-              }
-              .subscribe({
-                emitter.onComplete()
-              }, {
-                emitter.onError(it)
-              })
-          )
+        override fun onSuccess(code: String): Completable {
+          return Completable.fromSingle(Single.fromCallable {
+            api.getAccessTokens(TokenRequest(environment.appId, code, environment.redirectUri))
+          }.subscribeOn(Schedulers.io())
+            .map {
+              preferences.refreshToken = Jwt(it.getString("refresh_token"), "bearer")
+              authenticator.setToken(Jwt(it.getString("access_token"), "bearer"))
+              api.refreshAssetProviders()
+            })
+            .doOnComplete { emitter.onComplete() }
+            .doOnError { emitter.onError(it) }
         }
 
         override fun onError(exception: BlockvOauthException) {
