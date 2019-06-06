@@ -89,7 +89,7 @@ class GeoMapImpl(
 
     }
     .retryWhen { it }
-    .doOnSubscribe{
+    .doOnSubscribe {
       Log.e("brain", "updates started")
     }
 
@@ -230,7 +230,7 @@ class GeoMapImpl(
         ) {
           synchronized(brains)
           {
-            brains.remove(it.vatomId)//?.stop()
+            brains.remove(it.vatomId)
           }
           synchronized(vatoms)
           {
