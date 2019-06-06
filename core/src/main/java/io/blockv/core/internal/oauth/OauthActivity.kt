@@ -100,7 +100,7 @@ class OauthActivity : AppCompatActivity() {
                 handler.onSuccess(data.getQueryParameter("code"))
               } else
                 handler.onError(BlockvOauthException.Error.UNKNOWN.exception())
-          finish()
+          loader.visibility = View.VISIBLE
           return true
         }
         return false
@@ -151,6 +151,7 @@ class OauthActivity : AppCompatActivity() {
         }
       }
     webView.loadUrl(url)
+    finish()
   }
 
   override fun finish() {
