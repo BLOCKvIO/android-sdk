@@ -1,6 +1,5 @@
 package io.blockv.core.internal.datapool
 
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.GeoRequest
@@ -71,7 +70,6 @@ class GeoMapImpl(
 
                 vatom.property.geoPos?.coordinates = startPos
                 updates.add(vatom)
-              } else {
               }
             }
 
@@ -80,7 +78,6 @@ class GeoMapImpl(
             emitter?.onNext(Message(updates, Message.Type.UPDATED, Message.State.STABLE))
           }
           if (updates.isEmpty()) {
-            Log.e("brain", "updates disposed")
             brainDisposable?.dispose()
             brainDisposable = null
           }
@@ -89,10 +86,6 @@ class GeoMapImpl(
 
     }
     .retryWhen { it }
-    .doOnSubscribe {
-      Log.e("brain", "updates started")
-    }
-
 
   override fun getRegion(
     bottomLeftLat: Double,
@@ -259,7 +252,7 @@ class GeoMapImpl(
               }
               if (brainDisposable?.isDisposed != false) {
                 brainDisposable = brainUpdater.subscribe({
-                }, { Log.e("brain", it.message) })
+                }, {})
                 disposable.add(brainDisposable!!)
               }
 
