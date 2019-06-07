@@ -22,7 +22,6 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.DatabaseImpl
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.AppVersion
 import io.blockv.common.model.Environment
 import io.blockv.common.model.InventoryEvent
 import io.blockv.common.model.Message
@@ -35,6 +34,8 @@ import io.blockv.common.model.VatomUpdate
 import io.blockv.common.model.WebSocketEvent
 import io.blockv.core.client.manager.ActivityManager
 import io.blockv.core.client.manager.ActivityManagerImpl
+import io.blockv.core.client.manager.AppManager
+import io.blockv.core.client.manager.AppManagerImpl
 import io.blockv.core.client.manager.EventManager
 import io.blockv.core.client.manager.EventManagerImpl
 import io.blockv.core.client.manager.ResourceManager
@@ -57,9 +58,7 @@ import io.blockv.faces.ImageProgressFace
 import io.blockv.faces.WebFace
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 import java.io.File
 import java.io.InputStream
@@ -74,6 +73,7 @@ class Blockv {
   val vatomManager: VatomManager
   val resourceManager: ResourceManager
   val activityManager: ActivityManager
+  val appManager: AppManager
   val eventManager: EventManager
   val jsonModule: JsonModule
 
@@ -231,6 +231,7 @@ class Blockv {
       VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket, jsonModule))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
+    this.appManager = AppManagerImpl(netModule.appApi)
   }
 
   constructor(context: Context, environment: Environment) {
@@ -259,6 +260,7 @@ class Blockv {
       VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket, jsonModule))
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
+    this.appManager = AppManagerImpl(netModule.appApi)
   }
 
 
@@ -273,7 +275,8 @@ class Blockv {
     vatomManager: VatomManager,
     activityManager: ActivityManager,
     eventManager: EventManager,
-    resourceManager: ResourceManager
+    resourceManager: ResourceManager,
+    appManager: AppManager
   ) {
     this.cacheDir = context.cacheDir
     this.appId = appId
@@ -291,21 +294,8 @@ class Blockv {
     this.resourceManager = resourceManager
     this.eventManager = eventManager
     this.activityManager = activityManager
+    this.appManager = appManager
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
-  }
-
-  /**
-   * Fetches the current supported app version.
-   *
-   * @return new Single<AppVersion> instance.
-   */
-  fun getSupportedVersion(): Single<AppVersion> {
-    return Single.fromCallable {
-      netModule.appApi.getAppVersion()
-        .payload
-    }
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
   }
 
   class MissingFaceModuleException :
