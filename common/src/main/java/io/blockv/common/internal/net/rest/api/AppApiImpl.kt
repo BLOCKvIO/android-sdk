@@ -12,6 +12,7 @@ package io.blockv.common.internal.net.rest.api
 
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.Client
+import io.blockv.common.internal.net.rest.request.PushTokenRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
 import io.blockv.common.model.AppVersion
 import org.json.JSONObject
@@ -20,6 +21,14 @@ class AppApiImpl(
   val client: Client,
   val jsonModule: JsonModule
 ) : AppApi {
+
+  override fun registerPushToken(request: PushTokenRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("v1/user/pushnotification", request.toJson())
+    return BaseResponse(
+      response.getString("request_id"),
+      response.getJSONObject("payload")
+    )
+  }
 
   override fun getAppVersion(): BaseResponse<AppVersion> {
     val response: JSONObject = client.get("v1/general/app/version")

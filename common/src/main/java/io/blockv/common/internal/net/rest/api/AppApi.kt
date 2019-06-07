@@ -10,10 +10,14 @@
  */
 package io.blockv.common.internal.net.rest.api
 
+import io.blockv.common.internal.net.rest.request.PushTokenRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
 import io.blockv.common.model.AppVersion
+import org.json.JSONObject
 
 interface AppApi {
 
   fun getAppVersion(): BaseResponse<AppVersion>
+
+  fun registerPushToken(request: PushTokenRequest): BaseResponse<JSONObject>
 }
