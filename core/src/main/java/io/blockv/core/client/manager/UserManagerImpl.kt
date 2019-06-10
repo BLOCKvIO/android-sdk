@@ -244,12 +244,10 @@ class UserManagerImpl(
 
   override fun logout(): Single<JSONObject> =
     inventory.reset()
-      .andThen(
-        Single.fromCallable {
-          val out = api.logout().payload
-          preferences.refreshToken = null
-          out
-        })
+      .map {
+        preferences.refreshToken = null
+        api.logout().payload
+      }
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
 
