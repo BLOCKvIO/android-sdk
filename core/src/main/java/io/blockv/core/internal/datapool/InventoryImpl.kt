@@ -544,8 +544,8 @@ class InventoryImpl(
     }
   }
 
-  override fun reset(): Completable {
-    return Completable.fromCallable {
+  override fun reset(): Single<Unit> {
+    return Single.fromCallable {
       synchronized(vatoms)
       {
         dispose()
@@ -559,6 +559,7 @@ class InventoryImpl(
           dbLock.release()
         }
       }
+      Unit
     }.subscribeOn(Schedulers.io())
   }
 }

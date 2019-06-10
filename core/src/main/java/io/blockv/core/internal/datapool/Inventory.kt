@@ -2,8 +2,8 @@ package io.blockv.core.internal.datapool
 
 import io.blockv.common.model.Message
 import io.blockv.common.model.Vatom
-import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 
 interface Inventory {
 
@@ -13,6 +13,6 @@ interface Inventory {
 
   fun dispose()
 
-  fun reset(): Completable
+  fun reset(): Single<Unit>
 
 }
