@@ -193,6 +193,11 @@ interface UserManager {
   fun logout(): Single<JSONObject>
 
   /**
+   * Set a `LogoutListener` callback to be invoked when the user's session becomes invalid.
+   */
+  var onLogoutListener: LogoutListener?
+
+  /**
    * Upload Bitmap to server to be used as the user's avatar.
    *
    * @return new Single<Unit> instance.
@@ -219,6 +224,10 @@ interface UserManager {
   enum class TokenType {
     EMAIL,
     PHONE_NUMBER
+  }
+
+  interface LogoutListener {
+    fun onLogout()
   }
 
 }
