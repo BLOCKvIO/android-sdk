@@ -56,6 +56,14 @@ class UserManagerImpl(
   val inventory: Inventory
 ) : UserManager {
 
+  override var onLogoutListener: UserManager.LogoutListener? = null
+
+  init {
+    authenticator.onUnAuthorizedListener = {
+      onLogoutListener?.onLogout()
+    }
+  }
+
   override fun addCurrentUserToken(
     token: String,
     tokenType: UserManager.TokenType,
@@ -244,11 +252,15 @@ class UserManagerImpl(
 
   override fun logout(): Single<JSONObject> =
     inventory.reset()
+      .observeOn(AndroidSchedulers.mainThread())
       .map {
         preferences.refreshToken = null
+        onLogoutListener?.onLogout()
+      }
+      .observeOn(Schedulers.io())
+      .map {
         api.logout().payload
       }
-      .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
 
   override fun uploadAvatar(avatar: Bitmap): Single<Unit> = Single.fromCallable {

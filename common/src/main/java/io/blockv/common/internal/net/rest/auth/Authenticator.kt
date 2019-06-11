@@ -20,4 +20,6 @@ interface Authenticator {
 
   fun setToken(token: Jwt?)
 
+  var onUnAuthorizedListener: (() -> Unit)?
+
 }

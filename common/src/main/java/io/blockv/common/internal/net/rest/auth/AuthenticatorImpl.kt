@@ -25,6 +25,10 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
   private var accessToken: Jwt? = null
   private val lock: Semaphore = Semaphore(1)
 
+  override var onUnAuthorizedListener: (() -> Unit)? = null
+
+  var logoutCalled = false
+
   override fun refreshToken(): Jwt? {
     try {
 
@@ -47,17 +51,20 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
           val requestResponse = request.execute()
           if (requestResponse.first == 200) {
             val response = requestResponse.second
-
+            logoutCalled = false
             if (response.has("payload") && (response.get("payload") is JSONObject)) {
               val pay: JSONObject = response.getJSONObject("payload")
               if (pay.has("access_token")) {
                 accessToken = jsonModule.deserialize(pay.getJSONObject("access_token"))
-
               }
             }
+          } else if (requestResponse.first == 401) {
+            preferences.refreshToken = null
+            onUnAuthorizedListener?.invoke()
           }
+        } else {
+          onUnAuthorizedListener?.invoke()
         }
-
         Log.e("httpclient", "" + accessToken)
       } else {
         lock.acquire()
