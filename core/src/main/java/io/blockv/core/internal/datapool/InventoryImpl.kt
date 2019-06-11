@@ -244,6 +244,7 @@ class InventoryImpl(
         try {
           val vatoms = getCachedVatoms(id, false)
             .blockingGet()
+            .values
             .filter { it.property.parentId == id }
 
           emitter.onNext(Message(vatoms, Message.Type.INITIAL, state))
@@ -317,11 +318,9 @@ class InventoryImpl(
       {
         dbLock.acquire()
         try {
-          val vatoms = getCachedVatoms(null, false)
-            .blockingGet()
-            .filter { it.id == id }
-
-          emitter.onNext(Message(vatoms, Message.Type.INITIAL, state))
+          val vatom = getCachedVatoms(null, false)
+            .blockingGet()[id]
+          emitter.onNext(Message(listOfNotNull(vatom), Message.Type.INITIAL, state))
           emitter.setDisposable(
             inventory
               .observeOn(Schedulers.computation())
@@ -356,17 +355,17 @@ class InventoryImpl(
       .observeOn(AndroidSchedulers.mainThread())
   }
 
-  private fun getCachedVatoms(parentId: String? = null, needLock: Boolean = true): Single<List<Vatom>> {
-    return Single.fromCallable {
+  private fun getCachedVatoms(parentId: String? = null, needLock: Boolean = true): Single<Map<String, Vatom>> {
+    return Single.fromCallable<Map<String, Vatom>> {
       synchronized(vatoms)
       {
-        vatoms.values
+        HashMap(vatoms)
       }
     }
       .observeOn(Schedulers.computation())
       .flatMap { cached ->
         if (cached.isNotEmpty()) {
-          Single.just(ArrayList(cached))
+          Single.just(cached)
         } else {
           Completable.fromCallable {
             if (needLock) dbLock.acquire()
@@ -420,15 +419,16 @@ class InventoryImpl(
                 vatom.faces = faceMap[vatom.property.templateId] ?: ArrayList()
                 vatom
               }
+              val outMap = HashMap<String, Vatom>()
               synchronized(vatoms)
               {
                 this.vatoms.clear()
                 out.forEach {
+                  outMap[it.id] = it
                   this.vatoms[it.id] = it
                 }
-
               }
-              out
+              outMap
             }
             .observeOn(AndroidSchedulers.mainThread())
         }
