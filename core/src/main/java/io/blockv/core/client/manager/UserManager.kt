@@ -193,7 +193,7 @@ interface UserManager {
   fun logout(): Single<JSONObject>
 
   /**
-   * Listen to log out events.
+   * Set a `LogoutListener` callback to be invoked when the user's session becomes invalid.
    */
   var onLogoutListener: LogoutListener?
 
