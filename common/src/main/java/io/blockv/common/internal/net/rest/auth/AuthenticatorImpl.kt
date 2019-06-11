@@ -27,8 +27,6 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
 
   override var onUnAuthorizedListener: (() -> Unit)? = null
 
-  var logoutCalled = false
-
   override fun refreshToken(): Jwt? {
     try {
 
@@ -51,7 +49,6 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
           val requestResponse = request.execute()
           if (requestResponse.first == 200) {
             val response = requestResponse.second
-            logoutCalled = false
             if (response.has("payload") && (response.get("payload") is JSONObject)) {
               val pay: JSONObject = response.getJSONObject("payload")
               if (pay.has("access_token")) {
