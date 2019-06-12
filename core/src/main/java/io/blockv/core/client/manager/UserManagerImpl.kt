@@ -39,7 +39,6 @@ import io.blockv.common.util.Optional
 import io.blockv.core.internal.datapool.Inventory
 import io.blockv.core.internal.oauth.BlockvOauthException
 import io.blockv.core.internal.oauth.OauthActivity
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -158,22 +157,25 @@ class UserManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun loginOauth(context: Context, scope: String): Completable {
-    return Completable.create { emitter ->
+  override fun loginOauth(context: Context, scope: String): Single<User> {
+    return Single.create<User> { emitter ->
       val environment = preferences.environment!!
       val disposable = CompositeDisposable()
       emitter.setDisposable(disposable)
       OauthActivity.start(context, environment.appId, environment.redirectUri, scope, object : OauthActivity.Handler {
-        override fun onSuccess(code: String): Completable {
-          return Completable.fromSingle(Single.fromCallable {
+        override fun onSuccess(code: String): Single<User> {
+          return Single.fromCallable {
             api.getAccessTokens(TokenRequest(environment.appId, code, environment.redirectUri))
           }.subscribeOn(Schedulers.io())
             .map {
               preferences.refreshToken = Jwt(it.getString("refresh_token"), "bearer")
               authenticator.setToken(Jwt(it.getString("access_token"), "bearer"))
               api.refreshAssetProviders()
-            })
-            .doOnComplete { emitter.onComplete() }
+              api.getCurrentUser().payload
+            }
+            .doOnSuccess {
+              emitter.onSuccess(it)
+            }
             .doOnError { emitter.onError(it) }
         }
 

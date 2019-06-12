@@ -64,7 +64,7 @@ interface UserManager {
    * @param scope is the platform permissions to request, current only `all` is supported
    * @return new Completable instance.
    */
-  fun loginOauth(context: Context, scope: String): Completable
+  fun loginOauth(context: Context, scope: String): Single<User>
 
   /**
    * Logs a user into the BLOCKv platform. Accepts a guest id.

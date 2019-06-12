@@ -16,8 +16,10 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import io.blockv.common.model.User
 import io.blockv.core.R
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
 
@@ -184,7 +186,7 @@ class OauthActivity : AppCompatActivity() {
   }
 
   interface Handler {
-    fun onSuccess(code: String): Completable
+    fun onSuccess(code: String): Single<User>
 
     fun onError(exception: BlockvOauthException)
   }
