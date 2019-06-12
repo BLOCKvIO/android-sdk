@@ -39,9 +39,7 @@ import io.blockv.common.util.Optional
 import io.blockv.core.internal.datapool.Inventory
 import io.blockv.core.internal.oauth.BlockvOauthException
 import io.blockv.core.internal.oauth.OauthActivity
-import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
