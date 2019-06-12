@@ -171,9 +171,10 @@ class UserManagerImpl(
               preferences.refreshToken = Jwt(it.getString("refresh_token"), "bearer")
               authenticator.setToken(Jwt(it.getString("access_token"), "bearer"))
               api.refreshAssetProviders()
+              api.getCurrentUser().payload
             }
-            .flatMap {
-              getCurrentUser()
+            .doOnSuccess {
+              emitter.onSuccess(it)
             }
             .doOnError { emitter.onError(it) }
         }
