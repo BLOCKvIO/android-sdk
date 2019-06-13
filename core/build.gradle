@@ -31,26 +31,12 @@ dependencies {
   implementation 'com.android.support:appcompat-v7:27.1.1'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-  implementation("io.blockv.faces:image-face:3.0.0")
-    {
-      exclude group: 'io.blockv.sdk'
-    }
-  implementation("io.blockv.faces:image-progress-face:3.0.0")
-    {
-      exclude group: 'io.blockv.sdk'
-    }
-  implementation("io.blockv.faces:image-policy-face:2.0.0")
-    {
-      exclude group: 'io.blockv.sdk'
-    }
-  implementation("io.blockv.faces:image-layered-face:2.0.0")
-    {
-      exclude group: 'io.blockv.sdk'
-    }
-  implementation("io.blockv.faces:web-face:2.0.0")
-    {
-      exclude group: 'io.blockv.sdk'
-    }
+  implementation("io.blockv.faces-alpha:image-face:4.0.0-alpha")
+  implementation("io.blockv.faces-alpha:image-progress-face:4.0.0-alpha")
+  implementation("io.blockv.faces-alpha:image-policy-face:4.0.0-alpha.1")
+  implementation("io.blockv.faces-alpha:image-layered-face:4.0.0-alpha.1")
+  implementation("io.blockv.faces-alpha:web-face:4.0.0-alpha.3")
+
   implementation project(':common')
   implementation project(':face')
   implementation project(':faceview')
@@ -66,7 +52,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'core'
-def libraryVersion = '4.0.0-alpha.15'
+def libraryVersion = '4.0.0-alpha.23'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -87,7 +73,7 @@ publishing {
         def common = dependenciesNode.appendNode('dependency')
         common.appendNode('groupId', 'io.blockv.sdk-alpha')
         common.appendNode('artifactId', 'common')
-        common.appendNode('version', '3.0.0-alpha.9')
+        common.appendNode('version', '3.0.0-alpha.14')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')

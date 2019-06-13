@@ -23,7 +23,16 @@ allprojects {
     }
     maven {
       url "https://maven.blockv.io/artifactory/BLOCKv"
-
+    }
+    maven {
+      url "https://maven.blockv.io/artifactory/Blockv-Debug/"
+      credentials {
+        username = "${blockv_artifactory_username}"
+        password = "${blockv_artifactory_password}"
+      }
+      authentication {
+        basic(BasicAuthentication)
+      }
     }
   }
 }
