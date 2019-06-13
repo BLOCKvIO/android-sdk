@@ -95,40 +95,38 @@ class InventoryImpl(
             if (message.type == WebSocketEvent.MessageType.STATE_UPDATE) {
               val event = jsonModule.deserialize<StateUpdateEvent>(message.payload!!)
               if (event.operation.toLowerCase() == "update") {
-                if (event.vatomProperties.optJSONObject("vAtom::vAtomType") != null) {
-                  try {
-                    val dbVatoms = database.get<VatomIndex>("vatom", listOf(event.vatomId))
-                      .blockingGet()
-                    if (dbVatoms.isNotEmpty()) {
-                      JsonUtil.merge(dbVatoms.first().data, event.vatomProperties)
-                      val vatom = jsonModule.deserialize<Vatom>(dbVatoms.first().data)
-                      val old = vatoms[vatom.id]
-                      vatom.faces = old?.faces ?: emptyList()
-                      vatom.actions = old?.actions ?: emptyList()
-                      synchronized(vatoms)
-                      {
-                        vatoms[vatom.id] = vatom
-                      }
-                      emitter.onNext(
-                        Message(
-                          Item(
-                            vatom, old?.property?.parentId ?: vatom.property.parentId
-                          ),
-                          Message.Type.UPDATED,
-                          Message.State.STABLE
-                        )
-                      )
-                      dbLock.acquire()
-                      try {
-                        val throwable = database.addOrUpdate("vatom", dbVatoms).blockingGet()
-                        throwable?.printStackTrace()
-                      } finally {
-                        dbLock.release()
-                      }
+                try {
+                  val dbVatoms = database.get<VatomIndex>("vatom", listOf(event.vatomId))
+                    .blockingGet()
+                  if (dbVatoms.isNotEmpty()) {
+                    JsonUtil.merge(dbVatoms.first().data, event.vatomProperties)
+                    val vatom = jsonModule.deserialize<Vatom>(dbVatoms.first().data)
+                    val old = vatoms[vatom.id]
+                    vatom.faces = old?.faces ?: emptyList()
+                    vatom.actions = old?.actions ?: emptyList()
+                    synchronized(vatoms)
+                    {
+                      vatoms[vatom.id] = vatom
                     }
-                  } catch (e: Exception) {
-                    e.printStackTrace()
+                    emitter.onNext(
+                      Message(
+                        Item(
+                          vatom, old?.property?.parentId ?: vatom.property.parentId
+                        ),
+                        Message.Type.UPDATED,
+                        Message.State.STABLE
+                      )
+                    )
+                    dbLock.acquire()
+                    try {
+                      val throwable = database.addOrUpdate("vatom", dbVatoms).blockingGet()
+                      throwable?.printStackTrace()
+                    } finally {
+                      dbLock.release()
+                    }
                   }
+                } catch (e: Exception) {
+                  e.printStackTrace()
                 }
               }
             }
