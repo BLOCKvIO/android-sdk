@@ -17,7 +17,12 @@ import android.widget.ImageView
 import io.blockv.common.model.Vatom
 import io.blockv.common.util.Optional
 import io.blockv.face.R
-import io.blockv.face.client.manager.*
+import io.blockv.face.client.manager.EventManager
+import io.blockv.face.client.manager.JsonSerializer
+import io.blockv.face.client.manager.MessageManager
+import io.blockv.face.client.manager.ResourceManager
+import io.blockv.face.client.manager.UserManager
+import io.blockv.face.client.manager.VatomManager
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -124,10 +129,10 @@ class FaceManagerImpl(
         return Single.fromCallable {
           //unload previous face view
           vatomView.faceView?.onUnload()
-          vatomView.faceView = null
           vatomView.showLoader(true, loaderDelay)
         }
           .subscribeOn(AndroidSchedulers.mainThread())
+          .flatMap { vatomView.loadFaceView(null) }
           .observeOn(Schedulers.computation())
           .map {
             val face = faceProcedure.select(vatom, faceRoster.keys)
@@ -194,8 +199,12 @@ class FaceManagerImpl(
                   }
                 )
               )
-            vatomView.faceView = view
             view
+          }
+          .observeOn(Schedulers.computation())
+          .flatMap { faceView ->
+            vatomView.loadFaceView(faceView)
+              .map { faceView }
           }
           .observeOn(AndroidSchedulers.mainThread())
           .flatMap { faceView ->
@@ -301,7 +310,7 @@ class FaceManagerImpl(
             .doOnError {
               if (it !is FaceManager.Builder.VatomViewException || it.error != FaceManager.Builder.Error.FACE_VIEW_CHANGED) {
                 vatomView.showError(true)
-                vatomView.faceView = null
+                vatomView.loadFaceView(null).subscribe()
               }
             }
         }
