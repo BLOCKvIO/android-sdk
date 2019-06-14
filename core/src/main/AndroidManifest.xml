@@ -6,6 +6,7 @@
       android:name="io.blockv.core.internal.oauth.OauthActivity"
       android:excludeFromRecents="true"
       android:label="Blockv OAuth"
+      android:screenOrientation="portrait"
       />
   </application>
 
