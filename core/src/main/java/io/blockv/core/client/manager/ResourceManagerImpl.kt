@@ -33,7 +33,6 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 
-
 class ResourceManagerImpl(
   cacheDir: File,
   private val encoder: ResourceEncoder,
