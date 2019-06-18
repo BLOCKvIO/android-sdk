@@ -16,7 +16,11 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import io.reactivex.Single
+import io.reactivex.SingleEmitter
+import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
 
 /**
@@ -75,25 +79,48 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   @Volatile
   private var loaderDelayTimer: Timer? = null
 
-  @set:Synchronized
+
   @get:Synchronized
-  var faceView: FaceView?
-    set(value) {
-      if (view != null) {
-        this.removeView(view)
-        view = null
-      }
-      faceCode = value
-      if (value != null) {
-        val fView = value.onCreateView(LayoutInflater.from(context), this)
-        fView.alpha = 0.000000001f
-        view = fView
-        addView(fView)
-      }
-    }
+  val faceView: FaceView?
     get() {
       return faceCode
     }
+
+  private var layoutEmitter: SingleEmitter<Unit>? = null
+
+  fun loadFaceView(faceView: FaceView?): Single<Unit> {
+    return Single.create<Unit> { emitter ->
+      synchronized(this)
+      {
+        if (layoutEmitter?.isDisposed == false) {
+          layoutEmitter?.onError(Throwable("faceview changed"))
+        }
+        if (view != null) {
+          this.removeView(view)
+          view = null
+        }
+        faceCode = faceView
+        if (faceView != null) {
+          layoutEmitter = emitter
+          val fView = faceView.onCreateView(LayoutInflater.from(context), this)
+          fView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+              fView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+              if (!emitter.isDisposed) {
+                emitter.onSuccess(Unit)
+              }
+            }
+          })
+          fView.alpha = 0.000000001f
+          view = fView
+          addView(fView)
+        } else {
+          emitter.onSuccess(Unit)
+        }
+      }
+    }
+      .subscribeOn(AndroidSchedulers.mainThread())
+  }
 
   @Synchronized
   fun showError(show: Boolean) {
