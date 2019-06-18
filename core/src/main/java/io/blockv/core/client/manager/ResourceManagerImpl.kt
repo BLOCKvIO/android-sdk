@@ -31,6 +31,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.*
 
 class ResourceManagerImpl(
   cacheDir: File,
@@ -44,10 +45,8 @@ class ResourceManagerImpl(
 
   @Throws(ResourceEncoder.MissingAssetProviderException::class)
   override fun encodeUrl(url: String): String {
-    return encoder.encodeUrl(url);
+    return encoder.encodeUrl(url)
   }
-
-  val downloads = HashMap<String, Observable<File>>()
 
   val disk = File(cacheDir, "blockv_resources")
   val diskCache = object : LruCache<String, File>(200 * 1024 * 1024) {
@@ -60,6 +59,8 @@ class ResourceManagerImpl(
       return value.byteCount
     }
   }
+  val maxDownloads = Lock(10)
+  val maxImageProcess = Lock(10)
 
   init {
     disk.mkdirs()
@@ -70,6 +71,9 @@ class ResourceManagerImpl(
       }
     }
   }
+
+  private val fileMap = HashMap<String, Observable<File>>()
+  private val imageMap = HashMap<String, Observable<Bitmap>>()
 
   @Synchronized
   fun getFileFromDisk(url: String): Optional<File> {
@@ -90,17 +94,18 @@ class ResourceManagerImpl(
   }
 
   override fun getFile(url: String): Single<File> {
-    return Single.fromCallable {
-      getFileFromDisk(url)
-    }
-      .subscribeOn(Schedulers.io())
-      .observeOn(Schedulers.io())
-      .flatMap {
-        if (it.isEmpty()) {
-          synchronized(downloads)
-          {
-            if (!downloads.containsKey(url)) {
-              downloads[url] = Observable.fromCallable {
+    maxDownloads.prioritize(url)
+    synchronized(fileMap)
+    {
+      if (!fileMap.containsKey(url)) {
+        fileMap[url] = Observable.fromCallable {
+          getFileFromDisk(url)
+        }
+          .subscribeOn(Schedulers.io())
+          .map {
+            if (it.isEmpty()) {
+              try {
+                maxDownloads.acquire(url)
                 val encoded = encoder.encodeUrl(url)
                 val connection = Request(encoded, 10000, 10000).connect()
                 try {
@@ -143,26 +148,18 @@ class ResourceManagerImpl(
                 } finally {
                   connection.disconnect()
                 }
-
+              } finally {
+                maxDownloads.release()
               }
-
-                .observeOn(Schedulers.io())
-                .doFinally {
-                  synchronized(downloads)
-                  {
-                    downloads.remove(url)
-                  }
-                }
-                .share()
+            } else {
+              it.value!!
             }
-            Single.fromObservable(downloads[url])
           }
-        } else {
-          Single.fromCallable<File> { it.value }
-        }
+          .subscribeOn(Schedulers.io())
+          .share()
       }
-      .subscribeOn(Schedulers.io())
-      .observeOn(Schedulers.io())
+    }
+    return Single.fromObservable(fileMap[url]!!)
   }
 
   override fun getInputStream(url: String): Single<InputStream> {
@@ -172,7 +169,6 @@ class ResourceManagerImpl(
         FileInputStream(file)
       }
       .subscribeOn(Schedulers.io())
-      .observeOn(Schedulers.io())
   }
 
   override fun getBitmap(url: String): Single<Bitmap> {
@@ -180,46 +176,60 @@ class ResourceManagerImpl(
   }
 
   override fun getBitmap(url: String, width: Int, height: Int): Single<Bitmap> {
-    val key = hash(url + "${width}x$height")
-    return Single.fromCallable {
-      synchronized(imageCache)
-      {
-        Optional(imageCache.get(key))
-      }
+    var reqWidth = width
+    var reqHeight = height
+    if (reqWidth <= 0 || reqHeight <= 0) {
+      reqWidth = Resources.getSystem().displayMetrics.widthPixels
+      reqHeight = Resources.getSystem().displayMetrics.heightPixels
     }
-      .subscribeOn(Schedulers.io())
-      .observeOn(Schedulers.io())
-      .flatMap {
-        if (it.isEmpty()) {
-          getFile(url)
-            .map { image ->
-              var reqWidth = width
-              var reqHeight = height
-              if (reqWidth <= 0 || reqHeight <= 0) {
-                reqWidth = Resources.getSystem().displayMetrics.widthPixels
-                reqHeight = Resources.getSystem().displayMetrics.heightPixels
+    synchronized(imageMap)
+    {
+      val key = hash(url + "${reqWidth}x$reqHeight")
+      maxImageProcess.prioritize(key)
+      if (!imageMap.containsKey(key)) {
+        imageMap[key] = Observable.fromCallable {
+          synchronized(imageCache)
+          {
+            Optional(imageCache.get(key))
+          }
+        }
+          .subscribeOn(Schedulers.io())
+          .flatMap {
+            if (it.isEmpty()) {
+              try {
+                maxImageProcess.acquire(key)
+                getFile(url)
+                  .toObservable()
+                  .map { image ->
+                    val options = BitmapFactory.Options()
+                    options.inJustDecodeBounds = true
+                    BitmapFactory.decodeFile(image.absolutePath, options)
+                    options.inJustDecodeBounds = false
+                    options.inSampleSize = calculateInSampleSize(
+                      options,
+                      reqWidth,
+                      reqHeight
+                    )
+                    val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)!!
+                    synchronized(imageCache)
+                    {
+                      imageCache.put(key, bitmap)
+                    }
+                    bitmap
+                  }
+              } finally {
+                maxImageProcess.release()
               }
-              val options = BitmapFactory.Options()
-              options.inJustDecodeBounds = true
-              BitmapFactory.decodeFile(image.absolutePath, options)
-              options.inJustDecodeBounds = false
-              options.inSampleSize = calculateInSampleSize(
-                options,
-                reqWidth,
-                reqHeight
-              )
-              val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)
-              synchronized(imageCache)
-              {
-                imageCache.put(key, bitmap)
+            } else
+              Observable.fromCallable<Bitmap> {
+                it.value!!
               }
-              bitmap
-            }
-        } else
-          Single.fromCallable { it.value }
+          }
+          .subscribeOn(Schedulers.io())
+          .share()
       }
-      .subscribeOn(Schedulers.io())
-      .observeOn(Schedulers.io())
+      return Single.fromObservable(imageMap[key]!!)
+    }
   }
 
   class Request(
@@ -235,7 +245,6 @@ class ResourceManagerImpl(
       val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
       connection.readTimeout = readTimeout
       connection.connectTimeout = connectTimeout
-
       connection.requestMethod = method
       connection.useCaches = true
       connection.doInput = true
@@ -289,6 +298,83 @@ class ResourceManagerImpl(
         }
       }
       return inSampleSize
+    }
+  }
+
+  class Lock(val permits: Int) {
+    private val locks = ArrayList<Permit>()
+    private var state: Int = permits
+
+    fun acquire(key: String) {
+      var wait = false
+      val permit = Permit(Object(), key, System.currentTimeMillis())
+      synchronized(this)
+      {
+        if (this.state <= 0) {
+          locks.add(permit)
+          wait = true
+        } else {
+          state--
+        }
+      }
+
+      if (wait) {
+        permit.lock()
+      }
+    }
+
+    @Synchronized
+    fun prioritize(key: String) {
+      locks.forEach {
+        if (it.key == key) {
+          it.age = System.currentTimeMillis()
+        }
+      }
+    }
+
+    @Synchronized
+    fun release() {
+      if (state < permits) {
+        state++
+      }
+
+      if (locks.size > 0 && state > 0) {
+        state--
+        locks.sortedByDescending { it.age }
+        val permit = locks.removeAt(0)
+        synchronized(permit.lock) {
+          permit.release()
+        }
+      }
+    }
+
+    class Permit(val lock: Object, val key: String, var age: Long) {
+      var isLocked = false
+      var isReleased = false
+      fun lock() {
+        synchronized(lock)
+        {
+          synchronized(this)
+          {
+            if (isLocked || isReleased) return
+            isLocked = true
+          }
+          try {
+            lock.wait()
+          } catch (ie: InterruptedException) {
+          }
+        }
+
+      }
+
+      fun release() {
+        synchronized(this)
+        {
+          if (!isLocked || isReleased) return
+          isReleased = true
+          lock.notify()
+        }
+      }
     }
   }
 }
