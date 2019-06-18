@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -61,7 +62,7 @@ class ResourceManagerImpl(
     }
   }
   val maxDownloads = Lock(10)
-  val maxImageProcess = Lock(8)
+  val maxImageProcess = Lock(10)
 
   init {
     disk.mkdirs()
@@ -94,71 +95,73 @@ class ResourceManagerImpl(
     return Optional(null)
   }
 
-  @Synchronized
   override fun getFile(url: String): Single<File> {
     maxDownloads.prioritize(url)
-    if (!fileMap.containsKey(url)) {
-      fileMap[url] = Observable.fromCallable {
-        getFileFromDisk(url)
-      }
-        .subscribeOn(Schedulers.io())
-        .observeOn(Schedulers.io())
-        .map {
-          if (it.isEmpty()) {
-            try {
-              maxDownloads.acquire(url)
-              val encoded = encoder.encodeUrl(url)
-              val connection = Request(encoded, 10000, 10000).connect()
-              try {
-                val responseCode: Int = connection.responseCode
-                if (responseCode == 200) {
-                  val input = DataInputStream(connection.inputStream)
-                  val file = File(disk, hash(url) + ".download")
-                  file.createNewFile()
-                  val out = FileOutputStream(file)
-                  var read: Int
-                  val buffer = ByteArray(16 * 1024)
-                  do {
-                    read = input.read(buffer, 0, buffer.size)
-                    if (read != -1) {
-                      out.write(buffer, 0, read)
-                    }
-                  } while (read != -1)
-                  out.flush()
-                  out.close()
-                  val outFile = File(disk, hash(url))
-                  file.renameTo(outFile)
-                  outFile
-                } else {
-                  val input = DataInputStream(connection.errorStream)
-                  val out = ByteArrayOutputStream()
-                  var read: Int
-                  val buffer = ByteArray(16 * 1024)
-                  do {
-                    read = input.read(buffer, 0, buffer.size)
-                    if (read != -1) {
-                      out.write(buffer, 0, read)
-                    }
-                  } while (read != -1)
-
-                  out.flush()
-                  out.close()
-                  throw Exception(String(out.toByteArray()))
-                }
-
-              } finally {
-                connection.disconnect()
-              }
-            } finally {
-              maxDownloads.release()
-            }
-          } else {
-            it.value!!
-          }
+    synchronized(fileMap)
+    {
+      if (!fileMap.containsKey(url)) {
+        fileMap[url] = Observable.fromCallable {
+          getFileFromDisk(url)
         }
-        .subscribeOn(Schedulers.io())
-        .observeOn(Schedulers.io())
-        .share()
+          .subscribeOn(Schedulers.io())
+          .observeOn(Schedulers.io())
+          .map {
+            if (it.isEmpty()) {
+              try {
+                maxDownloads.acquire(url)
+                val encoded = encoder.encodeUrl(url)
+                val connection = Request(encoded, 10000, 10000).connect()
+                try {
+                  val responseCode: Int = connection.responseCode
+                  if (responseCode == 200) {
+                    val input = DataInputStream(connection.inputStream)
+                    val file = File(disk, hash(url) + ".download")
+                    file.createNewFile()
+                    val out = FileOutputStream(file)
+                    var read: Int
+                    val buffer = ByteArray(16 * 1024)
+                    do {
+                      read = input.read(buffer, 0, buffer.size)
+                      if (read != -1) {
+                        out.write(buffer, 0, read)
+                      }
+                    } while (read != -1)
+                    out.flush()
+                    out.close()
+                    val outFile = File(disk, hash(url))
+                    file.renameTo(outFile)
+                    outFile
+                  } else {
+                    val input = DataInputStream(connection.errorStream)
+                    val out = ByteArrayOutputStream()
+                    var read: Int
+                    val buffer = ByteArray(16 * 1024)
+                    do {
+                      read = input.read(buffer, 0, buffer.size)
+                      if (read != -1) {
+                        out.write(buffer, 0, read)
+                      }
+                    } while (read != -1)
+
+                    out.flush()
+                    out.close()
+                    throw Exception(String(out.toByteArray()))
+                  }
+
+                } finally {
+                  connection.disconnect()
+                }
+              } finally {
+                maxDownloads.release()
+              }
+            } else {
+              it.value!!
+            }
+          }
+          .subscribeOn(Schedulers.io())
+          .observeOn(Schedulers.io())
+          .share()
+      }
     }
     return Single.fromObservable(fileMap[url]!!)
   }
@@ -177,7 +180,6 @@ class ResourceManagerImpl(
     return getBitmap(url, -1, -1)
   }
 
-  @Synchronized
   override fun getBitmap(url: String, width: Int, height: Int): Single<Bitmap> {
     var reqWidth = width
     var reqHeight = height
@@ -185,53 +187,56 @@ class ResourceManagerImpl(
       reqWidth = Resources.getSystem().displayMetrics.widthPixels
       reqHeight = Resources.getSystem().displayMetrics.heightPixels
     }
-    val key = hash(url + "${reqWidth}x$reqHeight")
-    maxImageProcess.prioritize(key)
-    if (!imageMap.containsKey(key)) {
-      imageMap[key] = Observable.fromCallable {
-        synchronized(imageCache)
-        {
-          Optional(imageCache.get(key))
+    synchronized(imageMap)
+    {
+      val key = hash(url + "${reqWidth}x$reqHeight")
+      maxImageProcess.prioritize(key)
+      if (!imageMap.containsKey(key)) {
+        imageMap[key] = Observable.fromCallable {
+          synchronized(imageCache)
+          {
+            Optional(imageCache.get(key))
+          }
         }
-      }
-        .subscribeOn(Schedulers.io())
-        .observeOn(Schedulers.io())
-        .flatMap {
-          if (it.isEmpty()) {
-            try {
-              maxImageProcess.acquire(key)
-              getFile(url)
-                .toObservable()
-                .map { image ->
-                  val options = BitmapFactory.Options()
-                  options.inJustDecodeBounds = true
-                  BitmapFactory.decodeFile(image.absolutePath, options)
-                  options.inJustDecodeBounds = false
-                  options.inSampleSize = calculateInSampleSize(
-                    options,
-                    reqWidth,
-                    reqHeight
-                  )
-                  val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)!!
-                  synchronized(imageCache)
-                  {
-                    imageCache.put(key, bitmap)
+          .subscribeOn(Schedulers.io())
+          .observeOn(Schedulers.io())
+          .flatMap {
+            if (it.isEmpty()) {
+              try {
+                maxImageProcess.acquire(key)
+                getFile(url)
+                  .toObservable()
+                  .map { image ->
+                    val options = BitmapFactory.Options()
+                    options.inJustDecodeBounds = true
+                    BitmapFactory.decodeFile(image.absolutePath, options)
+                    options.inJustDecodeBounds = false
+                    options.inSampleSize = calculateInSampleSize(
+                      options,
+                      reqWidth,
+                      reqHeight
+                    )
+                    val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)!!
+                    synchronized(imageCache)
+                    {
+                      imageCache.put(key, bitmap)
+                    }
+                    bitmap
                   }
-                  bitmap
-                }
-            } finally {
-              maxImageProcess.release()
-            }
-          } else
-            Observable.fromCallable<Bitmap> {
-              it.value!!
-            }
-        }
-        .subscribeOn(Schedulers.io())
-        .observeOn(Schedulers.io())
-        .share()
+              } finally {
+                maxImageProcess.release()
+              }
+            } else
+              Observable.fromCallable<Bitmap> {
+                it.value!!
+              }
+          }
+          .subscribeOn(Schedulers.io())
+          .observeOn(Schedulers.io())
+          .share()
+      }
+      return Single.fromObservable(imageMap[key]!!)
     }
-    return Single.fromObservable(imageMap[key]!!)
   }
 
   class Request(
@@ -310,28 +315,19 @@ class ResourceManagerImpl(
 
     fun acquire(key: String) {
       var wait = false
+      val permit = Permit(Object(), key, System.currentTimeMillis())
       synchronized(this)
       {
         if (this.state <= 0) {
+          locks.add(permit)
           wait = true
         } else {
           state--
         }
       }
-      val lock = Object()
-      try {
-        if (wait) {
-          synchronized(this)
-          {
-            locks.add(Permit(lock, key, System.currentTimeMillis()))
-            locks.sortedByDescending { it.age }
-          }
-          synchronized(lock)
-          {
-            lock.wait()
-          }
-        }
-      } catch (ie: InterruptedException) {
+
+      if (wait) {
+        permit.lock()
       }
     }
 
@@ -346,19 +342,48 @@ class ResourceManagerImpl(
 
     @Synchronized
     fun release() {
-      if (locks.size > 0) {
+      if (state < permits) {
+        state++
+      }
+
+      if (locks.size > 0 && state > 0) {
+        state--
         locks.sortedByDescending { it.age }
         val permit = locks.removeAt(0)
         synchronized(permit.lock) {
-          permit.lock.notify()
+          permit.release()
         }
-      } else
-        if (state < permits) {
-          state++
-        }
+      }
     }
 
-    class Permit(val lock: Object, val key: String, var age: Long)
+    class Permit(val lock: Object, val key: String, var age: Long) {
+      var isLocked = false
+      var isReleased = false
+      fun lock() {
+        synchronized(lock)
+        {
+          synchronized(this)
+          {
+            if (isLocked || isReleased) return
+            isLocked = true
+          }
+          try {
+            lock.wait()
+          } catch (ie: InterruptedException) {
+          }
+        }
+
+      }
+
+      fun release() {
+        synchronized(this)
+        {
+          if (!isLocked || isReleased) return
+          isReleased = true
+          lock.notify()
+        }
+      }
+    }
 
   }
 
