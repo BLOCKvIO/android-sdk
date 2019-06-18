@@ -13,7 +13,6 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -47,7 +46,7 @@ class ResourceManagerImpl(
 
   @Throws(ResourceEncoder.MissingAssetProviderException::class)
   override fun encodeUrl(url: String): String {
-    return encoder.encodeUrl(url);
+    return encoder.encodeUrl(url)
   }
 
   val disk = File(cacheDir, "blockv_resources")
@@ -104,7 +103,6 @@ class ResourceManagerImpl(
           getFileFromDisk(url)
         }
           .subscribeOn(Schedulers.io())
-          .observeOn(Schedulers.io())
           .map {
             if (it.isEmpty()) {
               try {
@@ -159,7 +157,6 @@ class ResourceManagerImpl(
             }
           }
           .subscribeOn(Schedulers.io())
-          .observeOn(Schedulers.io())
           .share()
       }
     }
@@ -173,7 +170,6 @@ class ResourceManagerImpl(
         FileInputStream(file)
       }
       .subscribeOn(Schedulers.io())
-      .observeOn(Schedulers.io())
   }
 
   override fun getBitmap(url: String): Single<Bitmap> {
@@ -199,7 +195,6 @@ class ResourceManagerImpl(
           }
         }
           .subscribeOn(Schedulers.io())
-          .observeOn(Schedulers.io())
           .flatMap {
             if (it.isEmpty()) {
               try {
@@ -232,7 +227,6 @@ class ResourceManagerImpl(
               }
           }
           .subscribeOn(Schedulers.io())
-          .observeOn(Schedulers.io())
           .share()
       }
       return Single.fromObservable(imageMap[key]!!)
@@ -252,7 +246,6 @@ class ResourceManagerImpl(
       val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
       connection.readTimeout = readTimeout
       connection.connectTimeout = connectTimeout
-
       connection.requestMethod = method
       connection.useCaches = true
       connection.doInput = true
@@ -384,8 +377,5 @@ class ResourceManagerImpl(
         }
       }
     }
-
   }
-
-
 }
