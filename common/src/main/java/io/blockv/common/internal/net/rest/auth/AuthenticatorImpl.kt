@@ -55,7 +55,7 @@ class AuthenticatorImpl(val preferences: Preferences, val jsonModule: JsonModule
                 accessToken = jsonModule.deserialize(pay.getJSONObject("access_token"))
               }
             }
-          } else if (requestResponse.first == 401) {
+          } else if (requestResponse.first == 401 || requestResponse.first == 400) {
             preferences.refreshToken = null
             onUnAuthorizedListener?.invoke()
           }
