@@ -124,7 +124,6 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
   @Synchronized
   fun showError(show: Boolean) {
-
     if (show) {
       showLoader(false)
       showFaceView(false)
@@ -133,7 +132,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
       }
     } else {
       if (error != null && error?.parent != null) {
-        removeView(loader)
+        removeView(error)
       }
     }
   }
