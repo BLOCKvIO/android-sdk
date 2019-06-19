@@ -45,6 +45,7 @@ class InventoryImpl(
   var emitter: FlowableEmitter<Message<Item<Vatom>>>? = null
   val inventory =
     Flowable.create<Message<Item<Vatom>>>({ emitter ->
+      this.emitter = emitter
       val disposable = CompositeDisposable()
       val messages = ArrayList<WebSocketEvent<JSONObject>>()
       emitter.setDisposable(disposable)
@@ -225,8 +226,12 @@ class InventoryImpl(
       }
       .retryWhen { errors ->
         errors.flatMap { error ->
-          if (error is DatapoolException && error.error == DatapoolException.Error.REGION_DISPOSED) {
-            Flowable.error(error)
+          if (error is DatapoolException) {
+            if (error.error == DatapoolException.Error.REGION_DISPOSED) {
+              Flowable.error(error)
+            } else
+              Flowable.just(error)
+                .delay(300, TimeUnit.MILLISECONDS)
           } else
             Flowable.just(error)
               .delay(3, TimeUnit.SECONDS)
@@ -559,5 +564,11 @@ class InventoryImpl(
       }
       Unit
     }.subscribeOn(Schedulers.io())
+  }
+
+  override fun invalidate() {
+    if (emitter?.isCancelled == false) {
+      emitter?.onError(DatapoolException.Error.REGION_INVALIDATED.exception())
+    }
   }
 }
