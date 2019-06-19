@@ -576,7 +576,7 @@ class InventoryImpl(
             ) {
               val vatom = vatoms[id]!!
               when (action) {
-                "transfer", "redeem" -> {
+                "transfer", "redeem", "trash" -> {
                   emitter?.onNext(
                     Message(
                       Item(vatom, vatom.property.parentId),
