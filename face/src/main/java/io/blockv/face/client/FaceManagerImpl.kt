@@ -10,6 +10,7 @@
  */
 package io.blockv.face.client
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -225,6 +226,7 @@ class FaceManagerImpl(
                 override fun onError(error: Throwable) {
                   if (!emitter.isDisposed) {
                     emitter.onError(error)
+                    error.printStackTrace()
                   }
                 }
               })
