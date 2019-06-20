@@ -12,7 +12,6 @@ package io.blockv.face.client
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnLayoutChangeListener
@@ -62,7 +61,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
   private var error: View? = null
   var errorView: View?
-  @Synchronized set(value) {
+    @Synchronized set(value) {
       if (this.error?.parent != null) {
         removeView(this.error)
         if (value != null) {
@@ -121,7 +120,6 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
           fView.addOnLayoutChangeListener(layoutListener)
           fView.alpha = 0.000000001f
           emitter.setCancellable {
-            Log.e("faceview", "${fView.width} : ${fView.height}")
             fView.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
             fView.removeOnLayoutChangeListener(layoutListener)
           }
