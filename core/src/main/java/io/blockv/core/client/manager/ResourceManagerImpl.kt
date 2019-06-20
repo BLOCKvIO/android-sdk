@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -94,72 +95,95 @@ class ResourceManagerImpl(
   }
 
   override fun getFile(url: String): Single<File> {
-    maxDownloads.prioritize(url)
-    synchronized(fileMap)
-    {
-      if (!fileMap.containsKey(url)) {
-        fileMap[url] = Observable.fromCallable {
-          getFileFromDisk(url)
-        }
-          .subscribeOn(Schedulers.io())
-          .map {
-            if (it.isEmpty()) {
-              try {
-                maxDownloads.acquire(url)
-                val encoded = encoder.encodeUrl(url)
-                val connection = Request(encoded, 10000, 10000).connect()
-                try {
-                  val responseCode: Int = connection.responseCode
-                  if (responseCode == 200) {
-                    val input = DataInputStream(connection.inputStream)
-                    val file = File(disk, hash(url) + ".download")
-                    file.createNewFile()
-                    val out = FileOutputStream(file)
-                    var read: Int
-                    val buffer = ByteArray(16 * 1024)
-                    do {
-                      read = input.read(buffer, 0, buffer.size)
-                      if (read != -1) {
-                        out.write(buffer, 0, read)
-                      }
-                    } while (read != -1)
-                    out.flush()
-                    out.close()
-                    val outFile = File(disk, hash(url))
-                    file.renameTo(outFile)
-                    outFile
-                  } else {
-                    val input = DataInputStream(connection.errorStream)
-                    val out = ByteArrayOutputStream()
-                    var read: Int
-                    val buffer = ByteArray(16 * 1024)
-                    do {
-                      read = input.read(buffer, 0, buffer.size)
-                      if (read != -1) {
-                        out.write(buffer, 0, read)
-                      }
-                    } while (read != -1)
+    return Single.create<File> { emitter ->
+      maxDownloads.prioritize(url)
 
-                    out.flush()
-                    out.close()
-                    throw Exception(String(out.toByteArray()))
-                  }
-
-                } finally {
-                  connection.disconnect()
-                }
-              } finally {
-                maxDownloads.release()
-              }
-            } else {
-              it.value!!
-            }
+      synchronized(fileMap)
+      {
+        if (!fileMap.containsKey(url)) {
+          fileMap[url] = Observable.fromCallable {
+            getFileFromDisk(url)
           }
-          .subscribeOn(Schedulers.io())
-          .share()
+            .subscribeOn(Schedulers.io())
+            .map {
+              if (it.isEmpty()) {
+                try {
+                  maxDownloads.acquire(url)
+                  val encoded = encoder.encodeUrl(url)
+                  val connection = Request(encoded, 10000, 10000).connect()
+                  try {
+                    val responseCode: Int = connection.responseCode
+                    if (responseCode == 200) {
+                      val input = DataInputStream(connection.inputStream)
+                      val file = File(disk, hash(url) + ".download")
+                      file.createNewFile()
+                      val out = FileOutputStream(file)
+                      var read: Int
+                      val buffer = ByteArray(16 * 1024)
+                      do {
+                        read = input.read(buffer, 0, buffer.size)
+                        if (read != -1) {
+                          out.write(buffer, 0, read)
+                        }
+                      } while (read != -1)
+                      out.flush()
+                      out.close()
+                      val outFile = File(disk, hash(url))
+                      file.renameTo(outFile)
+                      outFile
+                    } else {
+                      val input = DataInputStream(connection.errorStream)
+                      val out = ByteArrayOutputStream()
+                      var read: Int
+                      val buffer = ByteArray(16 * 1024)
+                      do {
+                        read = input.read(buffer, 0, buffer.size)
+                        if (read != -1) {
+                          out.write(buffer, 0, read)
+                        }
+                      } while (read != -1)
+
+                      out.flush()
+                      out.close()
+                      throw Exception(String(out.toByteArray()))
+                    }
+
+                  } finally {
+                    connection.disconnect()
+                  }
+                } finally {
+                  maxDownloads.release()
+                }
+              } else {
+                it.value!!
+              }
+            }
+            .subscribeOn(Schedulers.io())
+            .share()
+        }
+
+        emitter.setDisposable(
+          fileMap[url]!!
+            .map { Optional(it) }
+            .defaultIfEmpty(Optional(null))
+            .map { it.value ?: throw RetryException() }
+            .retryWhen { error ->
+              error.flatMap {
+                if (it is RetryException) {
+                  Observable.just(it)
+                } else
+                  Observable.error(it)
+              }
+            }
+            .subscribe({
+              emitter.onSuccess(it)
+            }, {
+              emitter.onError(it)
+            })
+        )
       }
     }
-    return Single.fromObservable(fileMap[url]!!)
+      .subscribeOn(Schedulers.io())
   }
 
   override fun getInputStream(url: String): Single<InputStream> {
@@ -176,61 +200,95 @@ class ResourceManagerImpl(
   }
 
   override fun getBitmap(url: String, width: Int, height: Int): Single<Bitmap> {
-    var reqWidth = width
-    var reqHeight = height
-    if (reqWidth <= 0 || reqHeight <= 0) {
-      reqWidth = Resources.getSystem().displayMetrics.widthPixels
-      reqHeight = Resources.getSystem().displayMetrics.heightPixels
-    }
-    synchronized(imageMap)
-    {
-      val key = hash(url + "${reqWidth}x$reqHeight")
-      maxImageProcess.prioritize(key)
-      if (!imageMap.containsKey(key)) {
-        imageMap[key] = Observable.fromCallable {
-          synchronized(imageCache)
-          {
-            Optional(imageCache.get(key))
+    return Single.create<Bitmap> { emitter ->
+      var reqWidth = width
+      var reqHeight = height
+      if (reqWidth <= 0 || reqHeight <= 0) {
+        reqWidth = Resources.getSystem().displayMetrics.widthPixels
+        reqHeight = Resources.getSystem().displayMetrics.heightPixels
+      }
+      synchronized(imageMap)
+      {
+        val key = hash(url + "${reqWidth}x$reqHeight")
+        synchronized(imageCache)
+        {
+          val image = Optional(imageCache.get(key))
+          if (!image.isEmpty()) {
+            emitter.onSuccess(image.value!!)
+          } else {
+            maxImageProcess.prioritize(key)
+            if (!imageMap.containsKey(key)) {
+              imageMap[key] = Observable.fromCallable {
+                synchronized(imageCache)
+                {
+                  Optional(imageCache.get(key))
+                }
+              }
+                .subscribeOn(Schedulers.io())
+                .flatMap {
+                  if (it.isEmpty()) {
+                    try {
+                      maxImageProcess.acquire(key)
+                      getFile(url)
+                        .toObservable()
+                        .map { image ->
+                          val options = BitmapFactory.Options()
+                          options.inJustDecodeBounds = true
+                          BitmapFactory.decodeFile(image.absolutePath, options)
+                          options.inJustDecodeBounds = false
+                          options.inSampleSize = calculateInSampleSize(
+                            options,
+                            reqWidth,
+                            reqHeight
+                          )
+                          val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)
+                            ?: throw NullPointerException("Bitmap is null!")
+                          synchronized(imageCache)
+                          {
+                            imageCache.put(key, bitmap)
+                          }
+                          Log.e("resource", "" + bitmap)
+                          bitmap
+                        }
+                    } finally {
+                      maxImageProcess.release()
+                    }
+                  } else
+                    Observable.fromCallable<Bitmap> {
+                      it.value!!
+                    }
+                }
+                .subscribeOn(Schedulers.io())
+                .share()
+            }
+            emitter.setDisposable(imageMap[key]!!
+              .map { Optional(it) }
+              .defaultIfEmpty(Optional(null))
+              .map {
+                it.value ?: throw RetryException()
+              }
+              .retryWhen { error ->
+                error.flatMap {
+                  if (it is RetryException) {
+                    Observable.just(it)
+                  } else
+                    Observable.error(it)
+                }
+              }
+              .subscribe({
+                emitter.onSuccess(it)
+              }, {
+                emitter.onError(it)
+              })
+            )
           }
         }
-          .subscribeOn(Schedulers.io())
-          .flatMap {
-            if (it.isEmpty()) {
-              try {
-                maxImageProcess.acquire(key)
-                getFile(url)
-                  .toObservable()
-                  .map { image ->
-                    val options = BitmapFactory.Options()
-                    options.inJustDecodeBounds = true
-                    BitmapFactory.decodeFile(image.absolutePath, options)
-                    options.inJustDecodeBounds = false
-                    options.inSampleSize = calculateInSampleSize(
-                      options,
-                      reqWidth,
-                      reqHeight
-                    )
-                    val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)!!
-                    synchronized(imageCache)
-                    {
-                      imageCache.put(key, bitmap)
-                    }
-                    bitmap
-                  }
-              } finally {
-                maxImageProcess.release()
-              }
-            } else
-              Observable.fromCallable<Bitmap> {
-                it.value!!
-              }
-          }
-          .subscribeOn(Schedulers.io())
-          .share()
       }
-      return Single.fromObservable(imageMap[key]!!)
     }
+      .subscribeOn(Schedulers.io())
   }
+
+  class RetryException : Exception()
 
   class Request(
     private val endpoint: String,
