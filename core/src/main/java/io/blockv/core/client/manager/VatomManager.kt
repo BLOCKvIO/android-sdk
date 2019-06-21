@@ -63,10 +63,12 @@ interface VatomManager {
    *
    * @param id is the id of the inventory you want to fetch. If null or '.' supplied the
    *           user's root inventory will be returned.
+   * @param invalidate indicates if the cache should be resynchronized.
+   *
    * @return new Flowable<Message<Vatom>> instance.
    * @see Vatom
    */
-  fun getInventory(id: String): Flowable<Message<Vatom>>
+  fun getInventory(id: String, invalidate: Boolean = false): Flowable<Message<Vatom>>
 
   /**
    * Performs a geo-search for Vatoms on the BLOCKv platform (i.e. Vatoms that have been

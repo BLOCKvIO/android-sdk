@@ -125,8 +125,17 @@ class VatomManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getInventory(id: String): Flowable<Message<Vatom>> {
-    return inventory.getRegion(id)
+  override fun getInventory(id: String, invalidate: Boolean): Flowable<Message<Vatom>> {
+
+    return Single.fromCallable {
+      if (invalidate) {
+        inventory.invalidate()
+      }
+    }
+      .toFlowable()
+      .flatMap {
+        inventory.getRegion(id)
+      }
       .observeOn(AndroidSchedulers.mainThread())
   }
 
