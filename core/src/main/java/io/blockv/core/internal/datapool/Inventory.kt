@@ -11,6 +11,8 @@ interface Inventory {
 
   fun getVatom(id: String): Flowable<Message<Vatom>>
 
+  fun invalidate()
+
   fun dispose()
 
   fun reset(): Single<Unit>
