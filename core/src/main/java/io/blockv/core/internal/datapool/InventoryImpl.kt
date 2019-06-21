@@ -144,6 +144,7 @@ class InventoryImpl(
               database.deleteAll("face").blockingGet()
               database.deleteAll("action").blockingGet()
             }
+            emitter.onNext(Message(emptyList(), Message.Type.ADDED, state))
             disposable.add(
               fetchInventory()
                 .observeOn(Schedulers.io())
@@ -209,6 +210,7 @@ class InventoryImpl(
               }
             }
           }, {
+            emitter.onNext(Message(emptyList(), Message.Type.ADDED, Message.State.UNSTABLE))
             emitter.onError(it)
           })
         )
@@ -309,7 +311,7 @@ class InventoryImpl(
       .filter {
         it.items.isNotEmpty()
           || it.type == Message.Type.INITIAL
-          || (it.type == Message.Type.ADDED && it.state == Message.State.STABLE)
+          || (it.type == Message.Type.ADDED)
       }
       .observeOn(AndroidSchedulers.mainThread())
   }
