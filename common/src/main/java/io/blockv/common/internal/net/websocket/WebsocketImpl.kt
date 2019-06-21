@@ -14,6 +14,7 @@ import android.net.Uri
 import android.util.Log
 import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketAdapter
+import com.neovisionaries.ws.client.WebSocketException
 import com.neovisionaries.ws.client.WebSocketExtension
 import com.neovisionaries.ws.client.WebSocketFactory
 import com.neovisionaries.ws.client.WebSocketFrame
@@ -54,6 +55,19 @@ class WebsocketImpl(
             }
           }
         }
+      }
+
+      override fun onError(websocket: WebSocket, cause: WebSocketException) {
+        super.onError(websocket, cause)
+        if (!emitter.isCancelled) {
+          cause.printStackTrace()
+          emitter.onError(
+            BlockvWsException(
+              BlockvWsException.Error.CONNECTION_DISCONNECTED, null
+            )
+          )
+        }
+        websocket.removeListener(this)
       }
 
       override fun onDisconnected(
