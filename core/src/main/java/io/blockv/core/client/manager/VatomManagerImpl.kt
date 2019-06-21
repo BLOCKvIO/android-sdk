@@ -152,6 +152,12 @@ class VatomManagerImpl(
     api.preformAction(PerformActionRequest(action, payload)).payload
   }
     .subscribeOn(Schedulers.io())
+    .flatMap { data ->
+      inventory.performAction(action, payload)
+        .map {
+          data
+        }
+    }
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun performAction(
@@ -217,6 +223,12 @@ class VatomManagerImpl(
   override fun trashVatom(id: String): Single<JSONObject> = Single.fromCallable {
     api.trashVatom(TrashVatomRequest(id)).payload
   }
+    .flatMap { data ->
+      inventory.performAction("trash", JSONObject().put("this.id", id))
+        .map {
+          data
+        }
+    }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 

@@ -566,6 +566,51 @@ class InventoryImpl(
     }.subscribeOn(Schedulers.io())
   }
 
+  override fun performAction(action: String, payload: JSONObject): Single<Unit> {
+    return Single.fromCallable {
+      val action = action.toLowerCase()
+      val id = payload.optString("this.id")
+      if (id != null) {
+        synchronized(vatoms)
+        {
+          try {
+            dbLock.acquire()
+            if (state == Message.State.STABLE
+              && vatoms.containsKey(id)
+              && emitter?.isCancelled == false
+            ) {
+              val vatom = vatoms[id]!!
+              when (action) {
+                "transfer", "redeem", "trash" -> {
+                  emitter?.onNext(
+                    Message(
+                      Item(vatom, vatom.property.parentId),
+                      Message.Type.REMOVED,
+                      Message.State.UNSTABLE
+                    )
+                  )
+                }
+                "drop" -> {
+                  vatom.property.isDropped = true
+                  emitter?.onNext(
+                    Message(
+                      Item(vatom, vatom.property.parentId),
+                      Message.Type.UPDATED,
+                      Message.State.UNSTABLE
+                    )
+                  )
+                }
+              }
+            }
+          } finally {
+            dbLock.release()
+          }
+        }
+      }
+    }
+      .subscribeOn(Schedulers.io())
+  }
+
   override fun invalidate() {
     if (emitter?.isCancelled == false) {
       emitter?.onError(DatapoolException.Error.REGION_INVALIDATED.exception())
