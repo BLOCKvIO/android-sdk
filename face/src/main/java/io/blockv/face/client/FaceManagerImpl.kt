@@ -225,6 +225,7 @@ class FaceManagerImpl(
                 override fun onError(error: Throwable) {
                   if (!emitter.isDisposed) {
                     emitter.onError(error)
+                    error.printStackTrace()
                   }
                 }
               })
@@ -310,6 +311,7 @@ class FaceManagerImpl(
             .doOnError {
               if (it !is FaceManager.Builder.VatomViewException || it.error != FaceManager.Builder.Error.FACE_VIEW_CHANGED) {
                 vatomView.showError(true)
+                vatomView.faceView?.isLoaded = false
                 vatomView.loadFaceView(null).subscribe()
               }
             }

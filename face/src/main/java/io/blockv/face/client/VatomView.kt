@@ -11,17 +11,18 @@
 package io.blockv.face.client
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnLayoutChangeListener
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
-import java.util.*
+import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 
 /**
  * VatomView is used to display a FaceView for a vAtom.
@@ -45,7 +46,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
   private var loader: View? = null
   var loaderView: View?
-    set(value) {
+    @Synchronized set(value) {
       if (this.loader?.parent != null) {
         removeView(this.loader)
         if (value != null) {
@@ -60,7 +61,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
   private var error: View? = null
   var errorView: View?
-    set(value) {
+    @Synchronized set(value) {
       if (this.error?.parent != null) {
         removeView(this.error)
         if (value != null) {
@@ -77,7 +78,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   private var view: View? = null
 
   @Volatile
-  private var loaderDelayTimer: Timer? = null
+  private var loaderDelay: Disposable? = null
 
 
   @get:Synchronized
@@ -103,15 +104,25 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
         if (faceView != null) {
           layoutEmitter = emitter
           val fView = faceView.onCreateView(LayoutInflater.from(context), this)
-          fView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-              fView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+          val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+            if (!emitter.isDisposed) {
+              emitter.onSuccess(Unit)
+            }
+          }
+          val layoutListener =
+            OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
               if (!emitter.isDisposed) {
                 emitter.onSuccess(Unit)
               }
             }
-          })
+
+          fView.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
+          fView.addOnLayoutChangeListener(layoutListener)
           fView.alpha = 0.000000001f
+          emitter.setCancellable {
+            fView.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
+            fView.removeOnLayoutChangeListener(layoutListener)
+          }
           view = fView
           addView(fView)
         } else {
@@ -124,7 +135,6 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
 
   @Synchronized
   fun showError(show: Boolean) {
-
     if (show) {
       showLoader(false)
       showFaceView(false)
@@ -133,7 +143,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
       }
     } else {
       if (error != null && error?.parent != null) {
-        removeView(loader)
+        removeView(error)
       }
     }
   }
@@ -141,10 +151,7 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   @Synchronized
   fun showLoader(show: Boolean) {
 
-    if (loaderDelayTimer != null) {
-      loaderDelayTimer?.cancel()
-      loaderDelayTimer = null
-    }
+    loaderDelay?.dispose()
 
     if (show) {
       showError(false)
@@ -162,20 +169,12 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
   @Synchronized
   fun showLoader(show: Boolean, delay: Long) {
     if (delay > 0) {
-      if (loaderDelayTimer != null) {
-        loaderDelayTimer?.cancel()
-      }
-      loaderDelayTimer = Timer()
-      loaderDelayTimer?.schedule(object : TimerTask() {
-        override fun run() {
-          val handler = Handler(Looper.getMainLooper())
-          handler.post {
-            if (loaderDelayTimer != null) {
-              showLoader(show)
-            }
-          }
-        }
-      }, delay)
+      loaderDelay?.dispose()
+      loaderDelay = Observable.timer(delay, TimeUnit.MILLISECONDS)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({
+          showLoader(show)
+        }, {})
     } else
       showLoader(show)
   }
