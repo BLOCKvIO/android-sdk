@@ -38,6 +38,8 @@ class User : Model {
   val isPasswordSet: Boolean
   @Serializer.Serialize(name = "nonpush_notification", path = "properties")
   val nonPushNotifications: Boolean
+  @Serializer.Serialize(name = "guest_id", path = "properties")
+  val guestId: String
 
   @Serializer.Serializable
   constructor(
@@ -52,7 +54,8 @@ class User : Model {
     isNamePublic: Boolean,
     isAvatarPublic: Boolean,
     isPasswordSet: Boolean,
-    nonPushNotifications: Boolean
+    nonPushNotifications: Boolean,
+    guestId: String
   ) {
 
     this.id = id
@@ -67,6 +70,7 @@ class User : Model {
     this.isAvatarPublic = isAvatarPublic
     this.isPasswordSet = isPasswordSet
     this.nonPushNotifications = nonPushNotifications
+    this.guestId = guestId
   }
 
   val name: String
@@ -86,6 +90,7 @@ class User : Model {
       ", isAvatarPublic='" + isAvatarPublic + '\'' +
       ", isPasswordSet='" + isPasswordSet + '\'' +
       ", nonPushNotifications='" + nonPushNotifications + '\'' +
+      ", guestId='" + guestId + '\'' +
       '}'
   }
 
