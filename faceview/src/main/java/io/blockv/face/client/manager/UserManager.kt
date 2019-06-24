@@ -11,6 +11,7 @@
 package io.blockv.face.client.manager
 
 import io.blockv.common.model.PublicUser
+import io.blockv.common.model.User
 import io.reactivex.Single
 
 interface UserManager {
@@ -28,10 +29,10 @@ interface UserManager {
   fun getPublicUser(userId: String): Single<PublicUser>
 
   /**
-   * Fetches the current user's public information from the BLOCKv platform.
+   * Fetches the current user's profile information from the BLOCKv platform.
    *
-   * @return new Single<PublicUser> instance.
+   * @return new Single<User> instance.
    */
-  fun getCurrentUser(): Single<PublicUser>
+  fun getCurrentUser(): Single<User>
 
 }
