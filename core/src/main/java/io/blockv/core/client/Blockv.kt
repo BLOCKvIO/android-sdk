@@ -29,6 +29,7 @@ import io.blockv.common.model.Model
 import io.blockv.common.model.PublicUser
 import io.blockv.common.model.Resource
 import io.blockv.common.model.StateUpdateEvent
+import io.blockv.common.model.User
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.VatomUpdate
 import io.blockv.common.model.WebSocketEvent
@@ -115,16 +116,8 @@ class Blockv {
 
           },
             object : io.blockv.face.client.manager.UserManager {
-              override fun getCurrentUser(): Single<PublicUser> {
+              override fun getCurrentUser(): Single<User> {
                 return userManager.getCurrentUser()
-                  .map {
-                    PublicUser(
-                      it.id,
-                      if (it.isNamePublic) it.firstName else "",
-                      if (it.isNamePublic) it.lastName else "",
-                      if (it.isAvatarPublic) it.avatarUri else ""
-                    )
-                  }
               }
 
               override fun getPublicUser(userId: String): Single<PublicUser> {
