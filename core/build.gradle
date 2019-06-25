@@ -35,7 +35,7 @@ dependencies {
   implementation("io.blockv.faces-alpha:image-progress-face:4.0.0-alpha.1")
   implementation("io.blockv.faces-alpha:image-policy-face:4.0.0-alpha.2")
   implementation("io.blockv.faces-alpha:image-layered-face:4.0.0-alpha.2")
-  implementation("io.blockv.faces-alpha:web-face:4.0.0-alpha.4")
+  implementation("io.blockv.faces-alpha:web-face:4.0.0-alpha.5")
 
   implementation project(':common')
   implementation project(':face')
@@ -52,7 +52,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'core'
-def libraryVersion = '4.0.0-alpha.29'
+def libraryVersion = '4.0.0-alpha.30'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
