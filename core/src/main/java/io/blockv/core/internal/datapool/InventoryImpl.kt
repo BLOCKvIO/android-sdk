@@ -588,7 +588,7 @@ class InventoryImpl(
                     Message(
                       Item(vatom, vatom.property.parentId),
                       Message.Type.REMOVED,
-                      Message.State.UNSTABLE
+                      state
                     )
                   )
                 }
@@ -598,7 +598,7 @@ class InventoryImpl(
                     Message(
                       Item(vatom, vatom.property.parentId),
                       Message.Type.UPDATED,
-                      Message.State.UNSTABLE
+                      state
                     )
                   )
                 }
@@ -609,6 +609,44 @@ class InventoryImpl(
           }
         }
       }
+    }
+      .subscribeOn(Schedulers.io())
+  }
+
+  override fun setParentId(vatomId: String, parentId: String): Single<String> {
+    return Single.fromCallable<String> {
+      var oldParent: String? = ""
+      synchronized(vatoms)
+      {
+        try {
+          dbLock.acquire()
+          if (state == Message.State.STABLE
+            && vatoms.containsKey(vatomId)
+            && emitter?.isCancelled == false
+          ) {
+            val vatom = vatoms[vatomId]!!
+            oldParent = vatom.property.parentId
+            vatom.property.parentId = parentId
+            emitter?.onNext(
+              Message(
+                Item(vatom, parentId),
+                Message.Type.ADDED,
+                state
+              )
+            )
+            emitter?.onNext(
+              Message(
+                Item(vatom, oldParent),
+                Message.Type.REMOVED,
+                state
+              )
+            )
+          }
+        } finally {
+          dbLock.release()
+        }
+      }
+      oldParent ?: ""
     }
       .subscribeOn(Schedulers.io())
   }

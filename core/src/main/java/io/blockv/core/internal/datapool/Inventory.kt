@@ -20,4 +20,6 @@ interface Inventory {
 
   fun performAction(action: String, payload: JSONObject): Single<Unit>
 
+  fun setParentId(vatomId: String, parentId: String): Single<String>
+
 }
