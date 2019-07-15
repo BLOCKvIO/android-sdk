@@ -128,12 +128,12 @@ interface VatomManager {
   /**
    * Set one or more Vatoms' parent id.
    *
-   * @param parentId is the value which will be used to update the Vatoms' parent id.
-   * @param vatomIds is list of one or more Vatom id.
+   * @param parentId is the value which will be used to update the Vatom's parent id.
+   * @param vatomId is the id of the Vatom to update.
    * @return new Single<VatomUpdate> instance.
    * @see VatomUpdate
    */
-  fun setParentId(parentId: String, vararg vatomIds: String): Single<VatomUpdate>
+  fun setParentId(vatomId: String, parentId: String): Single<VatomUpdate>
 
   /**
    * Fetches all the actions configured for a template.

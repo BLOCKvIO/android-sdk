@@ -92,15 +92,29 @@ class VatomManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun setParentId(parentId: String, vararg vatomIds: String): Single<VatomUpdate> = Single.fromCallable {
-    api.updateVatom(
-      JSONObject()
-        .put("parent_id", parentId)
-        .put("ids", JSONArray(vatomIds))
-    ).payload
+  override fun setParentId(vatomId: String, parentId: String): Single<VatomUpdate> {
+    var oldParentId = ""
+    return inventory.setParentId(vatomId, parentId)
+      .map {
+        oldParentId = it
+        api.updateVatom(
+          JSONObject()
+            .put("parent_id", parentId)
+            .put("ids", JSONArray().put(vatomId))
+        )
+          .payload
+      }
+      .onErrorResumeNext { throwable ->
+        if (oldParentId.isNotEmpty()) {
+          inventory.setParentId(vatomId, oldParentId)
+            .map { throw throwable }
+        } else
+          throw  throwable
+      }
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
   }
-    .subscribeOn(Schedulers.io())
-    .observeOn(AndroidSchedulers.mainThread())
+
 
   override fun getVatoms(vararg ids: String): Single<List<Vatom>> = Single.fromCallable {
     api.getUserVatom(VatomRequest(ids.toList())).payload
