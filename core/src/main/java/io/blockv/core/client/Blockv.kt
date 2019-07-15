@@ -128,7 +128,7 @@ class Blockv {
             object : io.blockv.face.client.manager.VatomManager {
 
               override fun setParentId(vatomId: String, parentId: String): Single<VatomUpdate> {
-                return vatomManager.setParentId(parentId, vatomId)
+                return vatomManager.setParentId(vatomId, parentId)
               }
 
               override fun getVatom(id: String): Flowable<Message<Vatom>> {
