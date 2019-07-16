@@ -11,6 +11,7 @@
 package io.blockv.face.client.manager
 
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.Resource
 import io.reactivex.Single
@@ -50,18 +51,18 @@ interface ResourceManager {
   fun getInputStream(resource: Resource): Single<InputStream>
 
   /**
-   * Provides a bitmap representing the specified resource. The resource is required to
+   * Provides a drawable representing the specified resource. The resource is required to
    * be of type image.
    *
    * This can either come from directly from cache or via the network.
    *
    * @param resource is the Vatom resource that must be fetched.
-   * @return new Single<Bitmap>
+   * @return new Single<Drawable>
    */
-  fun getBitmap(resource: Resource): Single<Bitmap>
+  fun getDrawable(resource: Resource): Single<Drawable>
 
   /**
-   * Provides a scaled bitmap representing the specified resource. The resource is required to
+   * Provides a drawable representing a scaled version of the specified resource. The resource is required to
    * be of type image.
    *
    * This can either come from directly from cache or via the network.
@@ -69,8 +70,8 @@ interface ResourceManager {
    * @param resource is the Vatom resource that must be fetched.
    * @param width is the max width of the image. -1 defaults to screen width.
    * @param height is the max height of the image. -1 defaults to screen height.
-   * @return new Single<Bitmap>
+   * @return new Single<Drawable>
    */
-  fun getBitmap(resource: Resource, width: Int, height: Int): Single<Bitmap>
+  fun getDrawable(resource: Resource, width: Int, height: Int): Single<Drawable>
 
 }

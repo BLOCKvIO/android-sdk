@@ -13,6 +13,10 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.ColorFilter
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -20,6 +24,7 @@ import io.blockv.common.model.AssetProvider
 import io.blockv.common.util.Optional
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -36,7 +41,8 @@ import java.util.*
 class ResourceManagerImpl(
   cacheDir: File,
   private val encoder: ResourceEncoder,
-  private val preferences: Preferences
+  private val preferences: Preferences,
+  private val res: Resources
 ) :
   ResourceManager {
 
@@ -54,8 +60,14 @@ class ResourceManagerImpl(
       return value.length().toInt()
     }
   }
-  val imageCache = object : LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 8).toInt()) {
-    override fun sizeOf(key: String, value: Bitmap): Int {
+  val imageCache = object : LruCache<String, ImageDrawable>((Runtime.getRuntime().maxMemory() / 8).toInt()) {
+
+    override fun entryRemoved(evicted: Boolean, key: String?, oldValue: ImageDrawable?, newValue: ImageDrawable?) {
+      super.entryRemoved(evicted, key, oldValue, newValue)
+      oldValue?.recycle()
+    }
+
+    override fun sizeOf(key: String, value: ImageDrawable): Int {
       return value.byteCount
     }
   }
@@ -73,7 +85,7 @@ class ResourceManagerImpl(
   }
 
   private val fileMap = HashMap<String, Observable<File>>()
-  private val imageMap = HashMap<String, Observable<Bitmap>>()
+  private val imageMap = HashMap<String, Observable<Drawable>>()
 
   @Synchronized
   fun getFileFromDisk(url: String): Optional<File> {
@@ -127,6 +139,7 @@ class ResourceManagerImpl(
                       } while (read != -1)
                       out.flush()
                       out.close()
+                      input.close()
                       val outFile = File(disk, hash(url))
                       file.renameTo(outFile)
                       outFile
@@ -141,9 +154,9 @@ class ResourceManagerImpl(
                           out.write(buffer, 0, read)
                         }
                       } while (read != -1)
-
                       out.flush()
                       out.close()
+                      input.close()
                       throw Exception(String(out.toByteArray()))
                     }
 
@@ -194,12 +207,12 @@ class ResourceManagerImpl(
       .subscribeOn(Schedulers.io())
   }
 
-  override fun getBitmap(url: String): Single<Bitmap> {
-    return getBitmap(url, -1, -1)
+  override fun getDrawable(url: String): Single<Drawable> {
+    return getDrawable(url, -1, -1)
   }
 
-  override fun getBitmap(url: String, width: Int, height: Int): Single<Bitmap> {
-    return Single.create<Bitmap> { emitter ->
+  override fun getDrawable(url: String, width: Int, height: Int): Single<Drawable> {
+    return Single.create<Drawable> { emitter ->
       var reqWidth = width
       var reqHeight = height
       if (reqWidth <= 0 || reqHeight <= 0) {
@@ -212,9 +225,12 @@ class ResourceManagerImpl(
         synchronized(imageCache)
         {
           val image = Optional(imageCache.get(key))
-          if (!image.isEmpty()) {
+          if (!image.isEmpty() && !(image.value as ImageDrawable).isRecycled) {
             emitter.onSuccess(image.value!!)
           } else {
+            if (!image.isEmpty() && (image.value as ImageDrawable).isRecycled) {
+              imageCache.remove(key)//resource has been recycled so remove it
+            }
             maxImageProcess.prioritize(key)
             if (!imageMap.containsKey(key)) {
               imageMap[key] = Observable.fromCallable {
@@ -242,17 +258,18 @@ class ResourceManagerImpl(
                           )
                           val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)
                             ?: throw NullPointerException("Bitmap is null!")
+                          val drawable = ImageDrawable(url, width, height, res, bitmap)
                           synchronized(imageCache)
                           {
-                            imageCache.put(key, bitmap)
+                            imageCache.put(key, drawable)
                           }
-                          bitmap
+                          drawable
                         }
                     } finally {
                       maxImageProcess.release()
                     }
                   } else
-                    Observable.fromCallable<Bitmap> {
+                    Observable.fromCallable<Drawable> {
                       it.value!!
                     }
                 }
@@ -284,6 +301,14 @@ class ResourceManagerImpl(
       }
     }
       .subscribeOn(Schedulers.io())
+  }
+
+  fun reloadDrawable(drawable: ImageDrawable): Single<Drawable> {
+    return getDrawable(drawable.url, drawable.width, drawable.height)
+      .map {
+        drawable.bitmap = (it as ImageDrawable).bitmap
+        it
+      }
   }
 
   class RetryException : Exception()
@@ -430,6 +455,63 @@ class ResourceManagerImpl(
           isReleased = true
           lock.notify()
         }
+      }
+    }
+  }
+
+  inner class ImageDrawable(
+    val url: String,
+    val width: Int,
+    val height: Int,
+    val res: Resources,
+    image: Bitmap
+  ) : Drawable() {
+
+    internal var bitmap = image
+    internal var drawable = object : BitmapDrawable(res, bitmap) {}
+
+    val byteCount
+      get() = bitmap.byteCount
+
+    val isRecycled: Boolean
+      get() {
+        return bitmap.isRecycled
+      }
+
+    override fun setAlpha(alpha: Int) {
+      drawable.alpha = alpha
+    }
+
+    override fun getOpacity(): Int {
+      return drawable.opacity
+    }
+
+    override fun setColorFilter(colorFilter: ColorFilter?) {
+      drawable.colorFilter = colorFilter
+    }
+
+    @Synchronized
+    fun recycle() {
+      bitmap.recycle()
+    }
+
+    var reloading: Disposable? = null
+    @Synchronized
+    fun reload() {
+      if (reloading?.isDisposed != false) {
+        reloading = reloadDrawable(this)
+          .doFinally { synchronized(this) { reloading = null } }
+          .subscribe()
+      }
+    }
+
+    override fun draw(canvas: Canvas) {
+      try {
+        if (bitmap.isRecycled) {
+          reload()
+        } else
+          drawable.draw(canvas)
+      } catch (e: Exception) {
       }
     }
   }

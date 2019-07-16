@@ -11,7 +11,7 @@
 package io.blockv.core.client
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.NetModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
@@ -106,12 +106,12 @@ class Blockv {
               return resourceManager.getInputStream(resource.url)
             }
 
-            override fun getBitmap(resource: Resource): Single<Bitmap> {
-              return resourceManager.getBitmap(resource.url)
+            override fun getDrawable(resource: Resource): Single<Drawable> {
+              return resourceManager.getDrawable(resource.url)
             }
 
-            override fun getBitmap(resource: Resource, width: Int, height: Int): Single<Bitmap> {
-              return resourceManager.getBitmap(resource.url, width, height)
+            override fun getDrawable(resource: Resource, width: Int, height: Int): Single<Drawable> {
+              return resourceManager.getDrawable(resource.url, width, height)
             }
 
           },
@@ -199,7 +199,8 @@ class Blockv {
       appId,
       redirectUri
     )
-    this.resourceManager = ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences)
+    this.resourceManager =
+      ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences, context.resources)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
       auth,
@@ -233,7 +234,8 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences)
+    this.resourceManager = ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences,
+      context.resources)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     val websocket = WebsocketImpl(preferences, jsonModule, auth)

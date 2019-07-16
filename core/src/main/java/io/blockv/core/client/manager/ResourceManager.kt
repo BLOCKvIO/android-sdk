@@ -11,10 +11,9 @@
 
 package io.blockv.core.client.manager
 
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.AssetProvider
-import io.blockv.common.model.Resource
 import io.reactivex.Single
 import java.io.File
 import java.io.InputStream
@@ -47,18 +46,18 @@ interface ResourceManager {
   fun getInputStream(url: String): Single<InputStream>
 
   /**
-   * Provides a bitmap representing the specified resource. The resource is required to
+   * Provides a drawable representing the specified resource. The resource is required to
    * be of type image.
    *
    * This can either come from directly from cache or via the network.
    *
    * @param url is the resource that must be fetched.
-   * @return new Single<Bitmap>
+   * @return new Single<Drawable>
    */
-  fun getBitmap(url: String): Single<Bitmap>
+  fun getDrawable(url: String): Single<Drawable>
 
   /**
-   * Provides a scaled bitmap representing the specified resource. The resource is required to
+   * Provides a drawable representing a scaled version of the specified resource. The resource is required to
    * be of type image.
    *
    * This can either come from directly from cache or via the network.
@@ -66,7 +65,7 @@ interface ResourceManager {
    * @param url is the resource that must be fetched.
    * @param width is the max width of the image. -1 defaults to screen width.
    * @param height is the max height of the image. -1 defaults to screen height.
-   * @return new Single<Bitmap>
+   * @return new Single<Drawable>
    */
-  fun getBitmap(url: String, width: Int, height: Int): Single<Bitmap>
+  fun getDrawable(url: String, width: Int, height: Int): Single<Drawable>
 }
