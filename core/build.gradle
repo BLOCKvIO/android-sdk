@@ -31,10 +31,10 @@ dependencies {
   implementation 'com.android.support:appcompat-v7:27.1.1'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-  implementation("io.blockv.faces-alpha:image-face:4.0.0-alpha.1")
-  implementation("io.blockv.faces-alpha:image-progress-face:4.0.0-alpha.1")
-  implementation("io.blockv.faces-alpha:image-policy-face:4.0.0-alpha.2")
-  implementation("io.blockv.faces-alpha:image-layered-face:4.0.0-alpha.2")
+  implementation("io.blockv.faces-alpha:image-face:4.0.0-alpha.2")
+  implementation("io.blockv.faces-alpha:image-progress-face:4.0.0-alpha.2")
+  implementation("io.blockv.faces-alpha:image-policy-face:4.0.0-alpha.4")
+  implementation("io.blockv.faces-alpha:image-layered-face:4.0.0-alpha.3")
   implementation("io.blockv.faces-alpha:web-face:4.0.0-alpha.5")
 
   implementation project(':common')
@@ -52,7 +52,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'core'
-def libraryVersion = '4.0.0-alpha.31'
+def libraryVersion = '4.0.0-alpha.32'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs

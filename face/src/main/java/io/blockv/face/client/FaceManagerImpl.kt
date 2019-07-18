@@ -76,10 +76,10 @@ class FaceManagerImpl(
           if (resource != null) {
             loader.visibility = View.VISIBLE
             disposable.add(
-              resourceManager.getBitmap(resource, parent.width, parent.height)
+              resourceManager.getDrawable(resource, parent.width, parent.height)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                  activated.setImageBitmap(it)
+                  activated.setImageDrawable(it)
                   loader.visibility = View.GONE
                 }, {
                   loader.visibility = View.GONE

@@ -179,7 +179,6 @@ class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
       showLoader(show)
   }
 
-
   @Synchronized
   fun showFaceView(show: Boolean) {
 

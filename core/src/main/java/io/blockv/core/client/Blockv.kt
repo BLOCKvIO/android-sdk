@@ -234,8 +234,10 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences,
-      context.resources)
+    this.resourceManager = ResourceManagerImpl(
+      cacheDir, ResourceEncoderImpl(preferences), preferences,
+      context.resources
+    )
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
