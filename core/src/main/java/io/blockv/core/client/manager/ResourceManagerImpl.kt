@@ -14,9 +14,9 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.graphics.ColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -24,7 +24,6 @@ import io.blockv.common.model.AssetProvider
 import io.blockv.common.util.Optional
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -32,11 +31,13 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ResourceManagerImpl(
   cacheDir: File,
@@ -62,15 +63,23 @@ class ResourceManagerImpl(
   }
   val imageCache = object : LruCache<String, ImageDrawable>((Runtime.getRuntime().maxMemory() / 8).toInt()) {
 
-    override fun entryRemoved(evicted: Boolean, key: String?, oldValue: ImageDrawable?, newValue: ImageDrawable?) {
+    override fun entryRemoved(
+      evicted: Boolean,
+      key: String,
+      oldValue: ImageDrawable?,
+      newValue: ImageDrawable?
+    ) {
       super.entryRemoved(evicted, key, oldValue, newValue)
-      oldValue?.recycle()
+      if (oldValue != null) {
+        ImageDrawable.addVictim(key, oldValue)
+      }
     }
 
     override fun sizeOf(key: String, value: ImageDrawable): Int {
       return value.byteCount
     }
   }
+
   val maxDownloads = Lock(10)
   val maxImageProcess = Lock(10)
 
@@ -118,52 +127,51 @@ class ResourceManagerImpl(
             .subscribeOn(Schedulers.io())
             .map {
               if (it.isEmpty()) {
+                var connection: HttpURLConnection? = null
+                var input: InputStream? = null
+                var output: OutputStream? = null
                 try {
                   maxDownloads.acquire(url)
                   val encoded = encoder.encodeUrl(url)
-                  val connection = Request(encoded, 10000, 10000).connect()
-                  try {
-                    val responseCode: Int = connection.responseCode
-                    if (responseCode == 200) {
-                      val input = DataInputStream(connection.inputStream)
-                      val file = File(disk, hash(url) + ".download")
-                      file.createNewFile()
-                      val out = FileOutputStream(file)
-                      var read: Int
-                      val buffer = ByteArray(16 * 1024)
-                      do {
-                        read = input.read(buffer, 0, buffer.size)
-                        if (read != -1) {
-                          out.write(buffer, 0, read)
-                        }
-                      } while (read != -1)
-                      out.flush()
-                      out.close()
-                      input.close()
-                      val outFile = File(disk, hash(url))
-                      file.renameTo(outFile)
-                      outFile
-                    } else {
-                      val input = DataInputStream(connection.errorStream)
-                      val out = ByteArrayOutputStream()
-                      var read: Int
-                      val buffer = ByteArray(16 * 1024)
-                      do {
-                        read = input.read(buffer, 0, buffer.size)
-                        if (read != -1) {
-                          out.write(buffer, 0, read)
-                        }
-                      } while (read != -1)
-                      out.flush()
-                      out.close()
-                      input.close()
-                      throw Exception(String(out.toByteArray()))
-                    }
+                  connection = Request(encoded, 10000, 10000).connect()
 
-                  } finally {
-                    connection.disconnect()
+                  val responseCode: Int = connection.responseCode
+                  if (responseCode == 200) {
+                    input = DataInputStream(connection.inputStream)
+                    val file = File(disk, hash(url) + ".download")
+                    file.createNewFile()
+                    output = FileOutputStream(file)
+                    var read: Int
+                    val buffer = ByteArray(16 * 1024)
+                    do {
+                      read = input.read(buffer, 0, buffer.size)
+                      if (read != -1) {
+                        output.write(buffer, 0, read)
+                      }
+                    } while (read != -1)
+                    output.flush()
+                    val outFile = File(disk, hash(url))
+                    file.renameTo(outFile)
+                    outFile
+                  } else {
+                    input = DataInputStream(connection.errorStream)
+                    output = ByteArrayOutputStream()
+                    var read: Int
+                    val buffer = ByteArray(16 * 1024)
+                    do {
+                      read = input.read(buffer, 0, buffer.size)
+                      if (read != -1) {
+                        output.write(buffer, 0, read)
+                      }
+                    } while (read != -1)
+                    output.flush()
+                    throw Exception(String(output.toByteArray()))
                   }
+
                 } finally {
+                  connection?.disconnect()
+                  output?.close()
+                  input?.close()
                   maxDownloads.release()
                 }
               } else {
@@ -221,22 +229,30 @@ class ResourceManagerImpl(
       }
       synchronized(imageMap)
       {
+        var bitmap: Bitmap? = null
+        var drawable: ImageDrawable? = null
         val key = hash(url + "${reqWidth}x$reqHeight")
         synchronized(imageCache)
         {
           val image = Optional(imageCache.get(key))
-          if (!image.isEmpty() && !(image.value as ImageDrawable).isRecycled) {
-            emitter.onSuccess(image.value!!)
+          if (!image.isEmpty()) {
+            emitter.onSuccess(image.value!!.getDrawable()!!)
           } else {
-            if (!image.isEmpty() && (image.value as ImageDrawable).isRecycled) {
-              imageCache.remove(key)//resource has been recycled so remove it
-            }
             maxImageProcess.prioritize(key)
             if (!imageMap.containsKey(key)) {
               imageMap[key] = Observable.fromCallable {
                 synchronized(imageCache)
                 {
-                  Optional(imageCache.get(key))
+                  var cached = imageCache.get(key)?.getDrawable()
+                  if (cached == null) {
+                    val victim = ImageDrawable.removeVictim(key)
+                    cached = victim?.getDrawable()
+                    if (cached != null) {
+                      Log.e("drawable", "a victim receives a second chance")
+                      imageCache.put(key, victim)
+                    }
+                  }
+                  Optional(cached)
                 }
               }
                 .subscribeOn(Schedulers.io())
@@ -256,14 +272,14 @@ class ResourceManagerImpl(
                             reqWidth,
                             reqHeight
                           )
-                          val bitmap = BitmapFactory.decodeFile(image.absolutePath, options)
+                          bitmap = BitmapFactory.decodeFile(image.absolutePath, options)
                             ?: throw NullPointerException("Bitmap is null!")
-                          val drawable = ImageDrawable(url, width, height, res, bitmap)
+                          drawable = ImageDrawable(key, res, bitmap!!)
                           synchronized(imageCache)
                           {
-                            imageCache.put(key, drawable)
+                            imageCache.put(key, drawable!!)
                           }
-                          drawable
+                          drawable!!.getDrawable()!!
                         }
                     } finally {
                       maxImageProcess.release()
@@ -301,14 +317,6 @@ class ResourceManagerImpl(
       }
     }
       .subscribeOn(Schedulers.io())
-  }
-
-  fun reloadDrawable(drawable: ImageDrawable): Single<Drawable> {
-    return getDrawable(drawable.url, drawable.width, drawable.height)
-      .map {
-        drawable.bitmap = (it as ImageDrawable).bitmap
-        it
-      }
   }
 
   class RetryException : Exception()
@@ -459,60 +467,73 @@ class ResourceManagerImpl(
     }
   }
 
-  inner class ImageDrawable(
-    val url: String,
-    val width: Int,
-    val height: Int,
-    val res: Resources,
-    image: Bitmap
-  ) : Drawable() {
+  class ImageDrawable(
+    val key: String,
+    val androidRes: Resources,
+    val image: Bitmap
+  ) {
+    val byteCount = image.byteCount
 
-    internal var bitmap = image
-    internal var drawable = object : BitmapDrawable(res, bitmap) {}
+    @get:Synchronized
+    val isRecycled = image.isRecycled
 
-    val byteCount
-      get() = bitmap.byteCount
-
-    val isRecycled: Boolean
-      get() {
-        return bitmap.isRecycled
+    @get:Synchronized
+    @set:Synchronized
+    internal var isVictim = false
+      set(value) {
+        field = value
+        if (value && refCount == 0) {
+          removeVictim(key)
+          image.recycle()
+        }
       }
 
-    override fun setAlpha(alpha: Int) {
-      drawable.alpha = alpha
-    }
-
-    override fun getOpacity(): Int {
-      return drawable.opacity
-    }
-
-    override fun setColorFilter(colorFilter: ColorFilter?) {
-      drawable.colorFilter = colorFilter
-    }
+    @get:Synchronized
+    @set:Synchronized
+    var refCount = 0
+      set(value) {
+        field = value
+        if (value == 0 && isVictim) {
+          removeVictim(key)
+          image.recycle()
+        }
+      }
 
     @Synchronized
-    fun recycle() {
-      bitmap.recycle()
-    }
+    fun getDrawable(): BitmapDrawable? {
+      if (isRecycled) return null
+      refCount++
+      return object : BitmapDrawable(androidRes, image) {
 
-    var reloading: Disposable? = null
-    @Synchronized
-    fun reload() {
-      if (reloading?.isDisposed != false) {
-        reloading = reloadDrawable(this)
-          .doFinally { synchronized(this) { reloading = null } }
-          .subscribe()
+        override fun draw(canvas: Canvas?) {
+          try {
+            super.draw(canvas)
+          } catch (e: Exception) {
+          }
+        }
+
+        fun finalize() {
+          refCount--
+        }
       }
     }
 
-    override fun draw(canvas: Canvas) {
-      try {
-        if (bitmap.isRecycled) {
-          reload()
-        } else
-          drawable.draw(canvas)
-      } catch (e: Exception) {
+    companion object {
+      val victims = HashMap<String, ImageDrawable>()
+
+      @Synchronized
+      fun removeVictim(key: String): ImageDrawable? {
+        val drawable = victims.remove(key)
+        drawable?.isVictim = false
+        return drawable
+      }
+
+      @Synchronized
+      fun addVictim(key: String, victim: ImageDrawable) {
+        victims[key] = victim
+        victim.isVictim = true
       }
     }
   }
+
 }
