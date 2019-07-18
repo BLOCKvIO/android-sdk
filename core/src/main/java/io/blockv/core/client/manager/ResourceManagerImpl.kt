@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -28,11 +29,13 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.lang.ref.SoftReference
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
+import kotlin.collections.HashMap
 
 class ResourceManagerImpl(
   cacheDir: File,
@@ -56,10 +59,22 @@ class ResourceManagerImpl(
     }
   }
   val imageCache = object : LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 8).toInt()) {
+    override fun entryRemoved(evicted: Boolean, key: String?, oldValue: Bitmap?, newValue: Bitmap?) {
+      super.entryRemoved(evicted, key, oldValue, newValue)
+      if (evicted && key != null && oldValue != null) {
+        synchronized(this)
+        {
+          imageSoftCache[key] = SoftReference(oldValue)
+        }
+      }
+    }
+
     override fun sizeOf(key: String, value: Bitmap): Int {
       return value.byteCount
     }
   }
+  val imageSoftCache = HashMap<String, SoftReference<Bitmap>>()
+
   val maxDownloads = Lock(10)
   val maxImageProcess = Lock(10)
 
@@ -222,7 +237,16 @@ class ResourceManagerImpl(
               imageMap[key] = Observable.fromCallable {
                 synchronized(imageCache)
                 {
-                  Optional(imageCache.get(key))
+                  var cached = imageCache.get(key)
+                  if (cached == null) {
+                    val ref = imageSoftCache.remove(key)
+                    cached = ref?.get()
+                    if (cached != null) {
+                      Log.e("resources", "bitmap saved from the gc")
+                      imageCache.put(key, cached)
+                    }
+                  }
+                  Optional(cached)
                 }
               }
                 .subscribeOn(Schedulers.io())
