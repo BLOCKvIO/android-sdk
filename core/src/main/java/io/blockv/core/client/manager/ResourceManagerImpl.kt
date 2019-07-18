@@ -13,7 +13,6 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -242,7 +241,6 @@ class ResourceManagerImpl(
                     val ref = imageSoftCache.remove(key)
                     cached = ref?.get()
                     if (cached != null) {
-                      Log.e("resources", "bitmap saved from the gc")
                       imageCache.put(key, cached)
                     }
                   }
