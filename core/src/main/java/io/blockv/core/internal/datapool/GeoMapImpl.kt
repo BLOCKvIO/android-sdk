@@ -1,6 +1,5 @@
 package io.blockv.core.internal.datapool
 
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.GeoRequest
@@ -207,7 +206,6 @@ class GeoMapImpl(
       )
       .observeOn(Schedulers.io())
       .filter {
-        Log.e("map", it.messageType)
         (it.type == WebSocketEvent.MessageType.STATE_UPDATE
           || it.type == WebSocketEvent.MessageType.MAP)
       }
