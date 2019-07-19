@@ -27,11 +27,14 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.io.OutputStream
+import java.lang.ref.SoftReference
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
+import kotlin.collections.HashMap
 
 class ResourceManagerImpl(
   cacheDir: File,
@@ -55,10 +58,22 @@ class ResourceManagerImpl(
     }
   }
   val imageCache = object : LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 8).toInt()) {
+    override fun entryRemoved(evicted: Boolean, key: String?, oldValue: Bitmap?, newValue: Bitmap?) {
+      super.entryRemoved(evicted, key, oldValue, newValue)
+      if (evicted && key != null && oldValue != null) {
+        synchronized(this)
+        {
+          imageSoftCache[key] = SoftReference(oldValue)
+        }
+      }
+    }
+
     override fun sizeOf(key: String, value: Bitmap): Int {
       return value.byteCount
     }
   }
+  val imageSoftCache = HashMap<String, SoftReference<Bitmap>>()
+
   val maxDownloads = Lock(10)
   val maxImageProcess = Lock(10)
 
@@ -106,51 +121,52 @@ class ResourceManagerImpl(
             .subscribeOn(Schedulers.io())
             .map {
               if (it.isEmpty()) {
+                var connection: HttpURLConnection? = null
+                var input: InputStream? = null
+                var output: OutputStream? = null
                 try {
                   maxDownloads.acquire(url)
                   val encoded = encoder.encodeUrl(url)
-                  val connection = Request(encoded, 10000, 10000).connect()
-                  try {
-                    val responseCode: Int = connection.responseCode
-                    if (responseCode == 200) {
-                      val input = DataInputStream(connection.inputStream)
-                      val file = File(disk, hash(url) + ".download")
-                      file.createNewFile()
-                      val out = FileOutputStream(file)
-                      var read: Int
-                      val buffer = ByteArray(16 * 1024)
-                      do {
-                        read = input.read(buffer, 0, buffer.size)
-                        if (read != -1) {
-                          out.write(buffer, 0, read)
-                        }
-                      } while (read != -1)
-                      out.flush()
-                      out.close()
-                      val outFile = File(disk, hash(url))
-                      file.renameTo(outFile)
-                      outFile
-                    } else {
-                      val input = DataInputStream(connection.errorStream)
-                      val out = ByteArrayOutputStream()
-                      var read: Int
-                      val buffer = ByteArray(16 * 1024)
-                      do {
-                        read = input.read(buffer, 0, buffer.size)
-                        if (read != -1) {
-                          out.write(buffer, 0, read)
-                        }
-                      } while (read != -1)
+                  connection = Request(encoded, 10000, 10000).connect()
+                  val responseCode: Int = connection.responseCode
+                  if (responseCode == 200) {
+                    input = DataInputStream(connection.inputStream)
+                    val file = File(disk, hash(url) + ".download")
+                    file.createNewFile()
+                    output = FileOutputStream(file)
+                    var read: Int
+                    val buffer = ByteArray(16 * 1024)
+                    do {
+                      read = input.read(buffer, 0, buffer.size)
+                      if (read != -1) {
+                        output.write(buffer, 0, read)
+                      }
+                    } while (read != -1)
+                    output.flush()
 
-                      out.flush()
-                      out.close()
-                      throw Exception(String(out.toByteArray()))
-                    }
+                    val outFile = File(disk, hash(url))
+                    file.renameTo(outFile)
+                    outFile
+                  } else {
+                    input = DataInputStream(connection.errorStream)
+                    output = ByteArrayOutputStream()
+                    var read: Int
+                    val buffer = ByteArray(16 * 1024)
+                    do {
+                      read = input.read(buffer, 0, buffer.size)
+                      if (read != -1) {
+                        output.write(buffer, 0, read)
+                      }
+                    } while (read != -1)
 
-                  } finally {
-                    connection.disconnect()
+                    output.flush()
+                    throw Exception(String(output.toByteArray()))
                   }
+
                 } finally {
+                  connection?.disconnect()
+                  output?.close()
+                  input?.close()
                   maxDownloads.release()
                 }
               } else {
@@ -220,7 +236,15 @@ class ResourceManagerImpl(
               imageMap[key] = Observable.fromCallable {
                 synchronized(imageCache)
                 {
-                  Optional(imageCache.get(key))
+                  var cached = imageCache.get(key)
+                  if (cached == null) {
+                    val ref = imageSoftCache.remove(key)
+                    cached = ref?.get()
+                    if (cached != null) {
+                      imageCache.put(key, cached)
+                    }
+                  }
+                  Optional(cached)
                 }
               }
                 .subscribeOn(Schedulers.io())
