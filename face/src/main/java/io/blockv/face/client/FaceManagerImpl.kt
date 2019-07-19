@@ -67,8 +67,7 @@ class FaceManagerImpl(
       layout.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
 
         override fun onViewDetachedFromWindow(v: View?) {
-          disposable.dispose()
-          layout.removeOnAttachStateChangeListener(this)
+          disposable.clear()
         }
 
         override fun onViewAttachedToWindow(v: View?) {
