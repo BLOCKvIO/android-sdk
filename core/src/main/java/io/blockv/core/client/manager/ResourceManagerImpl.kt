@@ -422,9 +422,7 @@ class ResourceManagerImpl(
         state--
         locks.sortedByDescending { it.age }
         val permit = locks.removeAt(0)
-        synchronized(permit.lock) {
-          permit.release()
-        }
+        permit.release()
       }
     }
 
@@ -450,7 +448,10 @@ class ResourceManagerImpl(
       fun release() {
         synchronized(this)
         {
-          if (!isLocked || isReleased) return
+          if (!isLocked || isReleased) {
+            isReleased = true
+            return
+          }
           isReleased = true
           lock.notify()
         }
