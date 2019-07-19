@@ -1,11 +1,14 @@
 package io.blockv.core.internal.datapool
 
+import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.GeoRequest
+import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.internal.net.websocket.Websocket
 import io.blockv.common.internal.net.websocket.request.BaseRequest
 import io.blockv.common.internal.net.websocket.request.MonitorRequest
+import io.blockv.common.model.MapEvent
 import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
@@ -154,7 +157,7 @@ class GeoMapImpl(
             )
 
             disposable.add(
-              getBrainUpdates(
+              getMapUpdates(
                 bottomLeftLat,
                 bottomLeftLon,
                 topRightLat,
@@ -183,8 +186,7 @@ class GeoMapImpl(
       .observeOn(AndroidSchedulers.mainThread())
   }
 
-
-  fun getBrainUpdates(
+  fun getMapUpdates(
     bottomLeftLat: Double,
     bottomLeftLon: Double,
     topRightLat: Double,
@@ -205,61 +207,134 @@ class GeoMapImpl(
       )
       .observeOn(Schedulers.io())
       .filter {
-        it.type == WebSocketEvent.MessageType.STATE_UPDATE && it.payload?.optString("action_name") == "brain-update"
+        Log.e("map", it.messageType)
+        (it.type == WebSocketEvent.MessageType.STATE_UPDATE
+          || it.type == WebSocketEvent.MessageType.MAP)
       }
       .observeOn(Schedulers.computation())
-      .map {
-        if (it.payload != null) {
-          Optional(jsonModule.deserialize<StateUpdateEvent>(it.payload!!))
-        } else
-          Optional(null)
-      }
-      .filter { !it.isEmpty() }
-      .map { it.value!! }
-      .map {
-        if (it.vatomProperties
-            .optJSONObject("vAtom::vAtomType")
-            ?.optBoolean("dropped", true) == false
-        ) {
-          synchronized(brains)
-          {
-            brains.remove(it.vatomId)
-          }
-          synchronized(vatoms)
-          {
-            val vatom = vatoms.remove(it.vatomId)
-            if (vatom != null) {
-              Optional(Message(vatom, Message.Type.REMOVED, Message.State.STABLE))
+      .flatMap { event ->
+        if (event.type == WebSocketEvent.MessageType.STATE_UPDATE) {
+          Flowable.fromCallable {
+            if (event.payload != null) {
+              Optional(jsonModule.deserialize<StateUpdateEvent>(event.payload!!))
             } else
               Optional(null)
           }
-        } else
-          if (it.vatomProperties.has("next_positions")) {
-            synchronized(brains)
-            {
-              val positions = it.vatomProperties.getJSONArray("next_positions")
-              val path = (0 until positions.length()).map {
-                val pos = positions.getJSONObject(it)
-                val time = pos.getLong("time")
-                val geoPos = pos.getJSONArray("geo_pos")
-                Position(time, geoPos.getDouble(0).toFloat(), geoPos.getDouble(1).toFloat())
-              }
-              if (brains.containsKey(it.vatomId)) {
-                brains[it.vatomId]!!.updatePath(path)
+            .subscribeOn(Schedulers.computation())
+            .filter { !it.isEmpty() }
+            .map { it.value!! }
+            .flatMap {
+              when {
+                it.vatomProperties
+                  .optJSONObject("vAtom::vAtomType")
+                  ?.optBoolean("dropped", true) == false -> {
+                  synchronized(brains)
+                  {
+                    brains.remove(it.vatomId)
+                  }
+                  synchronized(vatoms)
+                  {
+                    val vatom = vatoms.remove(it.vatomId)
+                    if (vatom != null) {
+                      Flowable.just(Optional(Message(vatom, Message.Type.REMOVED, Message.State.STABLE)))
+                    } else
+                      Flowable.just(Optional(null))
+                  }
+                }
+                it.vatomProperties
+                  .optJSONObject("vAtom::vAtomType")
+                  ?.optBoolean("dropped", false) == true -> {
+                  Flowable.fromCallable {
+                    val list = vatomApi.getUserVatom(VatomRequest(listOf(it.vatomId)))
+                      .payload
+                    if (list.isNotEmpty()) {
+                      synchronized(vatoms)
+                      {
+                        vatoms[it.vatomId] = list[0]
+                        Optional(Message(list[0], Message.Type.ADDED, Message.State.STABLE))
+                      }
+                    } else
+                      Optional(null)
+                  }.subscribeOn(Schedulers.io())
+                    .onErrorReturn {
+                      Optional(null)
+                    }
+                }
+                it.vatomProperties.has("next_positions") -> {
+                  synchronized(brains)
+                  {
+                    val positions = it.vatomProperties.getJSONArray("next_positions")
+                    val path = (0 until positions.length()).map {
+                      val pos = positions.getJSONObject(it)
+                      val time = pos.getLong("time")
+                      val geoPos = pos.getJSONArray("geo_pos")
+                      Position(time, geoPos.getDouble(0).toFloat(), geoPos.getDouble(1).toFloat())
+                    }
+                    if (brains.containsKey(it.vatomId)) {
+                      brains[it.vatomId]!!.updatePath(path)
 
-              } else {
-                brains[it.vatomId] = Brain(it.vatomId, ArrayList(path))
-              }
-              if (brainDisposable?.isDisposed != false) {
-                brainDisposable = brainUpdater.subscribe({
-                }, {})
-                disposable.add(brainDisposable!!)
-              }
+                    } else {
+                      brains[it.vatomId] = Brain(it.vatomId, ArrayList(path))
+                    }
+                    if (brainDisposable?.isDisposed != false) {
+                      brainDisposable = brainUpdater.subscribe({
+                      }, {})
+                      disposable.add(brainDisposable!!)
+                    }
 
+                  }
+                  Flowable.just(Optional(null))
+                }
+                else -> Flowable.just(Optional(null))
+              }
             }
-            Optional(null)
-          } else
-            Optional(null)
+        } else {
+          Flowable.fromCallable {
+            if (event.payload != null) {
+              Optional(jsonModule.deserialize<MapEvent>(event.payload!!))
+            } else
+              Optional(null)
+          }
+            .subscribeOn(Schedulers.computation())
+            .filter { !it.isEmpty() }
+            .map { it.value!! }
+            .flatMap { event ->
+              when {
+                event.operation.equals("add", true) -> {
+                  Flowable.fromCallable {
+                    val list = vatomApi.getUserVatom(VatomRequest(listOf(event.vatomId)))
+                      .payload
+                    if (list.isNotEmpty()) {
+                      synchronized(vatoms)
+                      {
+                        vatoms[event.vatomId] = list[0]
+                        Optional(Message(list[0], Message.Type.ADDED, Message.State.STABLE))
+                      }
+                    } else
+                      Optional(null)
+                  }.subscribeOn(Schedulers.io())
+                    .onErrorReturn {
+                      Optional(null)
+                    }
+                }
+                event.operation.equals("remove", true) -> {
+                  Flowable.fromCallable {
+                    synchronized(vatoms)
+                    {
+                      val vatom = vatoms.remove(event.vatomId)
+                      if (vatom != null) {
+                        Optional(Message(vatom, Message.Type.REMOVED, Message.State.STABLE))
+                      } else
+                        Optional(null)
+                    }
+                  }
+                }
+                else -> {
+                  Flowable.just(Optional(null))
+                }
+              }
+            }
+        }
       }
       .filter { !it.isEmpty() }
       .map { it.value!! }
