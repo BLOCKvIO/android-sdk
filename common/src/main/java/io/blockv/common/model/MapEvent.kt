@@ -12,63 +12,52 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class InventoryEvent : Model {
-
+class MapEvent : Model {
   @Serializer.Serialize(name = "event_id")
   val eventId: String
   @Serializer.Serialize(name = "op")
   val operation: String
-  @Serializer.Serialize(name = "id")
+  @Serializer.Serialize(name = "vatom_id")
   val vatomId: String
-  @Serializer.Serialize(name = "new_owner")
-  val newOwnerId: String
-  @Serializer.Serialize(name = "old_owner")
-  val oldOwnerId: String
-  @Serializer.Serialize(name = "template_variation")
-  val templateVariationId: String
-  @Serializer.Serialize(name = "parent_id")
-  val parentId: String
   @Serializer.Serialize(name = "action_name")
   val actionName: String
+  @Serializer.Serialize(name = "lat")
+  val lat: Double
+  @Serializer.Serialize(name = "lon")
+  val lon: Double
 
   @Serializer.Serializable
   constructor(
     eventId: String,
     operation: String,
     vatomId: String,
-    newOwnerId: String,
-    oldOwnerId: String,
-    templateVariationId: String,
-    parentId: String,
-    actionName: String
+    actionName: String,
+    lat: Double,
+    lon: Double
   ) {
     this.eventId = eventId
     this.operation = operation
     this.vatomId = vatomId
-    this.newOwnerId = newOwnerId
-    this.oldOwnerId = oldOwnerId
-    this.templateVariationId = templateVariationId
-    this.parentId = parentId
     this.actionName = actionName
+    this.lat = lat
+    this.lon = lon
   }
 
 
   override fun toString(): String {
-    return "InventoryEvent{" +
+    return "StateUpdateEvent{" +
       "eventId='" + eventId + '\'' +
       ", operation='" + operation + '\'' +
       ", vatomId='" + vatomId + '\'' +
-      ", newOwnerId='" + newOwnerId + '\'' +
-      ", oldOwnerId='" + oldOwnerId + '\'' +
-      ", templateVariationId='" + templateVariationId + '\'' +
-      ", parentId='" + parentId + '\'' +
       ", actionName='" + actionName + '\'' +
+      ", lat='" + lat + '\'' +
+      ", lon='" + lon + '\'' +
       "}"
   }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other !is InventoryEvent) return false
+    if (other !is MapEvent) return false
     return eventId == other.eventId
   }
 

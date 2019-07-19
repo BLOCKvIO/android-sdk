@@ -22,18 +22,22 @@ class StateUpdateEvent : Model {
   val vatomId: String
   @Serializer.Serialize(name = "new_object")
   val vatomProperties: JSONObject
+  @Serializer.Serialize(name = "action_name")
+  val actionName: String
 
   @Serializer.Serializable
   constructor(
     eventId: String,
     operation: String,
     vatomId: String,
-    vatomProperties: JSONObject
+    vatomProperties: JSONObject,
+    actionName: String
   ) {
     this.eventId = eventId
     this.operation = operation
     this.vatomId = vatomId
     this.vatomProperties = vatomProperties
+    this.actionName = actionName
   }
 
 
@@ -43,6 +47,7 @@ class StateUpdateEvent : Model {
       ", operation='" + operation + '\'' +
       ", vatomId='" + vatomId + '\'' +
       ", vatomProperties='" + vatomProperties.toString() + '\'' +
+      ", actionName='" + actionName + '\'' +
       "}"
   }
 
