@@ -24,6 +24,7 @@ open class WebSocketEvent<T>(
     INVENTORY,
     STATE_UPDATE,
     ACTIVITY,
+    MAP,
     INFO,
     UNKNOWN;
 
@@ -35,6 +36,7 @@ open class WebSocketEvent<T>(
           "state_update" -> STATE_UPDATE
           "my_events" -> ACTIVITY
           "info" -> INFO
+          "map" -> MAP
           else -> UNKNOWN
         }
       }
