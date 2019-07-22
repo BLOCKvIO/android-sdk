@@ -26,6 +26,7 @@ import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.ref.SoftReference
@@ -165,8 +166,12 @@ class ResourceManagerImpl(
 
                 } finally {
                   connection?.disconnect()
-                  output?.close()
-                  input?.close()
+                  try {
+                    output?.close()
+                  } catch (e: IOException) { }
+                  try {
+                    input?.close()
+                  } catch (e: IOException) { }
                   maxDownloads.release()
                 }
               } else {
