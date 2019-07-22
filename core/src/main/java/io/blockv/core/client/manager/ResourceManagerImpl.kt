@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -26,7 +27,6 @@ import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.ref.SoftReference
@@ -165,14 +165,16 @@ class ResourceManagerImpl(
                   }
 
                 } finally {
+                  maxDownloads.release()
                   connection?.disconnect()
                   try {
                     output?.close()
-                  } catch (e: IOException) { }
+                  } catch (e: Exception) {
+                  }
                   try {
                     input?.close()
-                  } catch (e: IOException) { }
-                  maxDownloads.release()
+                  } catch (e: Exception) {
+                  }
                 }
               } else {
                 it.value!!
@@ -450,14 +452,15 @@ class ResourceManagerImpl(
 
       }
 
+      @Synchronized
       fun release() {
-        synchronized(this)
-        {
-          if (!isLocked || isReleased) {
-            isReleased = true
-            return
-          }
+        if (!isLocked || isReleased) {
           isReleased = true
+          return
+        }
+        isReleased = true
+        synchronized(lock)
+        {
           lock.notify()
         }
       }
