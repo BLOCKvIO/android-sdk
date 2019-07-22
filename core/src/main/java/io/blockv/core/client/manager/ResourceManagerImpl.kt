@@ -164,10 +164,16 @@ class ResourceManagerImpl(
                   }
 
                 } finally {
-                  connection?.disconnect()
-                  output?.close()
-                  input?.close()
                   maxDownloads.release()
+                  connection?.disconnect()
+                  try {
+                    output?.close()
+                  } catch (e: Exception) {
+                  }
+                  try {
+                    input?.close()
+                  } catch (e: Exception) {
+                  }
                 }
               } else {
                 it.value!!
@@ -445,14 +451,15 @@ class ResourceManagerImpl(
 
       }
 
+      @Synchronized
       fun release() {
-        synchronized(this)
-        {
-          if (!isLocked || isReleased) {
-            isReleased = true
-            return
-          }
+        if (!isLocked || isReleased) {
           isReleased = true
+          return
+        }
+        isReleased = true
+        synchronized(lock)
+        {
           lock.notify()
         }
       }
