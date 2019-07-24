@@ -625,22 +625,17 @@ class InventoryImpl(
             && emitter?.isCancelled == false
           ) {
             val vatom = vatoms[vatomId]!!
-            oldParent = vatom.property.parentId
-            vatom.property.parentId = parentId
-            emitter?.onNext(
-              Message(
-                Item(vatom, parentId),
-                Message.Type.ADDED,
-                state
+            if (vatom.property.parentId != parentId) {
+              oldParent = vatom.property.parentId
+              vatom.property.parentId = parentId
+              emitter?.onNext(
+                Message(
+                  Item(vatom, oldParent),
+                  Message.Type.UPDATED,
+                  state
+                )
               )
-            )
-            emitter?.onNext(
-              Message(
-                Item(vatom, oldParent),
-                Message.Type.REMOVED,
-                state
-              )
-            )
+            }
           }
         } finally {
           dbLock.release()
