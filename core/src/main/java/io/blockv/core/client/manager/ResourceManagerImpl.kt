@@ -13,7 +13,6 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -686,9 +685,7 @@ class ResourceManagerImpl(
             }
           }
         }
-
       }
-
   }
 }
 
