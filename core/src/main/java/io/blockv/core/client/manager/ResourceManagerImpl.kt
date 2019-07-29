@@ -13,6 +13,7 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -616,7 +617,7 @@ class ResourceManagerImpl(
             var chunk = 0
             var fileStream: InputStream? = null
             val lock = Object()
-            var count = 0
+            var count = -1
             @Synchronized
             override fun read(): Int {
               try {
@@ -633,7 +634,7 @@ class ResourceManagerImpl(
                   }
                 }
                 do {
-                  if (count <= 0) {
+                  if (count < 0) {
                     if (chunks.size > chunk) {
                       if (chunks[chunk].first.isLocked()) {
                         try {
@@ -655,11 +656,12 @@ class ResourceManagerImpl(
                       }
                       continue
                     }
-                  }
-                  count--
-                  if (count <= 0) {
-                    chunk++
-                    continue
+                  } else {
+                    count--
+                    if (count < 0) {
+                      chunk++
+                      continue
+                    }
                   }
                   return fileStream!!.read()
                 } while (true)
