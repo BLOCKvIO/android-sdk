@@ -14,7 +14,6 @@ package io.blockv.core.client.manager
 import android.graphics.Bitmap
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.model.AssetProvider
-import io.blockv.common.model.Resource
 import io.reactivex.Single
 import java.io.File
 import java.io.InputStream

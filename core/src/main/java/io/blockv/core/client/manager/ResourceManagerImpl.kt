@@ -13,14 +13,17 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.AssetProvider
 import io.blockv.common.util.Optional
 import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.File
@@ -34,6 +37,7 @@ import java.net.URL
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
+import java.util.concurrent.Semaphore
 import kotlin.collections.HashMap
 
 class ResourceManagerImpl(
@@ -74,8 +78,8 @@ class ResourceManagerImpl(
   }
   val imageSoftCache = HashMap<String, SoftReference<Bitmap>>()
 
-  val maxDownloads = Lock(10)
-  val maxImageProcess = Lock(10)
+  val maxDownloads = PermitLock(10)
+  val maxImageProcess = PermitLock(10)
 
   init {
     disk.mkdirs()
@@ -83,11 +87,16 @@ class ResourceManagerImpl(
       if (!it.name.endsWith(".download")) //don't add files that are not complete
       {
         diskCache.put(it.name, it)
+      } else {
+        it.delete()
       }
     }
   }
 
+
+  private val downloadMap = HashMap<String, Download>()
   private val fileMap = HashMap<String, Observable<File>>()
+
   private val imageMap = HashMap<String, Observable<Bitmap>>()
 
   @Synchronized
@@ -119,64 +128,17 @@ class ResourceManagerImpl(
             getFileFromDisk(url)
           }
             .subscribeOn(Schedulers.io())
-            .map {
+            .flatMap {
               if (it.isEmpty()) {
-                var connection: HttpURLConnection? = null
-                var input: InputStream? = null
-                var output: OutputStream? = null
-                try {
-                  maxDownloads.acquire(url)
-                  val encoded = encoder.encodeUrl(url)
-                  connection = Request(encoded, 10000, 10000).connect()
-                  val responseCode: Int = connection.responseCode
-                  if (responseCode == 200) {
-                    input = DataInputStream(connection.inputStream)
-                    val file = File(disk, hash(url) + ".download")
-                    file.createNewFile()
-                    output = FileOutputStream(file)
-                    var read: Int
-                    val buffer = ByteArray(16 * 1024)
-                    do {
-                      read = input.read(buffer, 0, buffer.size)
-                      if (read != -1) {
-                        output.write(buffer, 0, read)
-                      }
-                    } while (read != -1)
-                    output.flush()
-
-                    val outFile = File(disk, hash(url))
-                    file.renameTo(outFile)
-                    outFile
-                  } else {
-                    input = DataInputStream(connection.errorStream)
-                    output = ByteArrayOutputStream()
-                    var read: Int
-                    val buffer = ByteArray(16 * 1024)
-                    do {
-                      read = input.read(buffer, 0, buffer.size)
-                      if (read != -1) {
-                        output.write(buffer, 0, read)
-                      }
-                    } while (read != -1)
-
-                    output.flush()
-                    throw Exception(String(output.toByteArray()))
+                synchronized(downloadMap)
+                {
+                  if (downloadMap[url] == null) {
+                    downloadMap[url] = Download(url, hash(url))
                   }
-
-                } finally {
-                  maxDownloads.release()
-                  connection?.disconnect()
-                  try {
-                    output?.close()
-                  } catch (e: Exception) {
-                  }
-                  try {
-                    input?.close()
-                  } catch (e: Exception) {
-                  }
+                  downloadMap[url]!!.file
                 }
               } else {
-                it.value!!
+                Observable.just(it.value!!)
               }
             }
             .subscribeOn(Schedulers.io())
@@ -208,12 +170,22 @@ class ResourceManagerImpl(
   }
 
   override fun getInputStream(url: String): Single<InputStream> {
-
-    return getFile(url)
-      .map<InputStream> { file ->
-        FileInputStream(file)
+    return Single.fromCallable {
+      synchronized(this)
+      {
+        val file = getFileFromDisk(url)
+        if (file.isEmpty()) {
+          synchronized(downloadMap)
+          {
+            if (downloadMap[url] == null) {
+              downloadMap[url] = Download(url, hash(url))
+            }
+            downloadMap[url]!!.inputStream
+          }
+        } else
+          FileInputStream(file.value!!)
       }
-      .subscribeOn(Schedulers.io())
+    }
   }
 
   override fun getBitmap(url: String): Single<Bitmap> {
@@ -387,7 +359,7 @@ class ResourceManagerImpl(
     }
   }
 
-  class Lock(val permits: Int) {
+  class PermitLock(val permits: Int) {
     private val locks = ArrayList<Permit>()
     private var state: Int = permits
 
@@ -465,4 +437,257 @@ class ResourceManagerImpl(
       }
     }
   }
+
+  class Lock {
+
+    private val innerLock = Semaphore(1)
+
+    fun lock() {
+      innerLock.acquire()
+    }
+
+    fun unlock() {
+      innerLock.drainPermits()
+      innerLock.release()
+    }
+
+    fun isLocked(): Boolean {
+      return innerLock.availablePermits() <= 0
+    }
+
+    fun tryLock(): Boolean {
+      return innerLock.tryAcquire()
+    }
+  }
+
+  inner class Download(
+    val url: String,
+    val cacheKey: String
+  ) {
+    private val bufferSize = 16 * 1024
+    private val chunkSize = bufferSize * 64
+    var chunkIndex = 0
+    var isComplete = false
+    val chunks = ArrayList<Pair<Lock, Int>>()
+    val setupLock = Lock()
+    var masterFile: File? = null
+
+    init {
+      setupLock.tryLock()
+    }
+
+    val downloader: Observable<Unit> =
+      Observable.fromCallable<Unit> {
+        setupLock.tryLock()
+        isComplete = false
+        val cached = getFileFromDisk(url)
+        if (cached.isEmpty()) {
+          var input: InputStream? = null
+          var output: OutputStream? = null
+          var connection: HttpURLConnection? = null
+          var lock: Lock? = null
+          chunkIndex = 0
+          chunks.clear()
+          try {
+            //
+            maxDownloads.acquire(url)
+            connection = Request(encodeUrl(url), 10000, 10000).connect()
+            val responseCode: Int = connection.responseCode
+            if (responseCode == 200) {
+              val masterFile = File(disk, "$cacheKey.download")
+              masterFile.delete()
+              masterFile.createNewFile()
+              this.masterFile = masterFile
+              output = FileOutputStream(masterFile)
+              input = DataInputStream(connection.inputStream)
+              var read: Int
+              val buffer = ByteArray(bufferSize)
+              var size = 0
+              var start = true
+              do {
+                if (size >= chunkSize || start) {
+                  try {
+                    output.flush()
+                  } catch (e: Exception) {
+                  }
+                  val chunkLock = Lock()
+                  chunkLock.lock()
+                  if (chunks.size > 0) {
+                    chunks[chunks.size - 1] = Pair(lock!!, size)
+                  }
+                  chunks.add(Pair(chunkLock, 0))
+                  lock?.unlock()
+                  lock = chunkLock
+                  size = 0
+                  chunkIndex++
+                  if (start) {
+                    setupLock.unlock()
+                    start = false
+                  }
+                }
+                read = input.read(buffer, 0, buffer.size)
+                if (read != -1) {
+                  size += read
+                  output.write(buffer, 0, read)
+                } else {
+                  if (chunks.size > 0) {
+                    chunks[chunks.size - 1] = Pair(lock!!, size)
+                  }
+                  lock?.unlock()
+                }
+              } while (read != -1)
+              output.flush()
+              isComplete = true
+            } else {
+              // error on connection open, load error message and throw exception
+              input = DataInputStream(connection.errorStream)
+              output = ByteArrayOutputStream()
+              var read: Int
+              val buffer = ByteArray(16 * 1024)
+              do {
+                read = input.read(buffer, 0, buffer.size)
+                if (read != -1) {
+                  output.write(buffer, 0, read)
+                }
+              } while (read != -1)
+
+              output.flush()
+              throw Exception(String(output.toByteArray()))
+            }
+          } finally {
+            maxDownloads.release()
+            connection?.disconnect()
+            try {
+              input?.close()
+            } catch (e: Exception) {
+            }
+            try {
+              output?.close()
+            } catch (e: Exception) {
+            }
+            lock?.unlock()
+          }
+        } else {
+          masterFile = cached.value
+          isComplete = true
+          setupLock.unlock()
+        }
+      }.subscribeOn(Schedulers.io())
+        .doFinally {
+          if (isComplete) {
+            val temp = masterFile
+            if (temp != null) {
+              val outFile = File(disk, cacheKey)
+              temp.renameTo(outFile)
+              diskCache.put(outFile.name, outFile)
+              fileEmitter?.onNext(outFile)
+              fileEmitter?.onComplete()
+              downloadMap.remove(url)
+            } else
+              fileEmitter?.onError(Exception("file is null"))
+          }
+        }
+        .share()
+
+    var fileEmitter: ObservableEmitter<File>? = null
+
+    @get:Synchronized
+    val file: Observable<File> = Observable.create<File> { emitter ->
+      fileEmitter = emitter
+      emitter.setDisposable(downloader.subscribe({
+      }, {
+        emitter.onError(it)
+        emitter.onComplete()
+      }))
+    }
+      .share()
+
+    val inputStream: InputStream
+      @Synchronized get() {
+        val cached = getFileFromDisk(url)
+        if (!cached.isEmpty()) {
+          return FileInputStream(cached.value!!)
+        } else {
+          return object : InputStream() {
+            var error: Throwable? = null
+            val download = downloader
+              .subscribe({}, {
+                this.error = it
+              })
+            var chunk = 0
+            var fileStream: InputStream? = null
+            val lock = Object()
+            var count = -1
+            @Synchronized
+            override fun read(): Int {
+              try {
+                if (error != null) throw error!!
+
+                if (fileStream == null) {
+                  if (setupLock.isLocked()) {
+                    try {
+                      setupLock.lock()
+                    } finally {
+                      setupLock.unlock()
+                    }
+                    fileStream = BufferedInputStream(FileInputStream(masterFile!!))
+                  }
+                }
+                do {
+                  if (count < 0) {
+                    if (chunks.size > chunk) {
+                      if (chunks[chunk].first.isLocked()) {
+                        try {
+                          chunks[chunk].first.lock()
+                        } finally {
+                          chunks[chunk].first.unlock()
+                        }
+                      }
+                      count = chunks[chunk].second
+                    } else if (isComplete) {
+                      return -1
+                    } else {
+                      synchronized(lock)
+                      {
+                        try {
+                          lock.wait(200)
+                        } catch (e: InterruptedException) {
+                        }
+                      }
+                      continue
+                    }
+                  } else {
+                    count--
+                    if (count < 0) {
+                      chunk++
+                      continue
+                    }
+                  }
+                  return fileStream!!.read()
+                } while (true)
+              } catch (e: Exception) {
+                e.printStackTrace()
+                try {
+                  fileStream?.close()
+                  fileStream = null
+                } catch (e: Exception) {
+                }
+                throw e
+              }
+            }
+
+            override fun close() {
+              super.close()
+              try {
+                fileStream?.close()
+                fileStream = null
+              } catch (e: Exception) {
+              }
+              download.dispose()
+            }
+          }
+        }
+      }
+  }
 }
+
