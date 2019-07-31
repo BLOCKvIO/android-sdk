@@ -240,7 +240,7 @@ class Blockv {
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
-    val database = DatabaseImpl(context, "blockv-datapool.db",2)
+    val database = DatabaseImpl(context, "blockv-datapool.db", 2)
     database.addMapper(ActionMapper())
     database.addMapper(FaceMapper())
     database.addMapper(VatomMapper())
