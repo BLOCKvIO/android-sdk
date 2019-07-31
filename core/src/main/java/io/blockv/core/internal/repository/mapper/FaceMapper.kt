@@ -6,15 +6,13 @@ import org.json.JSONObject
 
 class FaceMapper : Mapper<JSONObject> {
   override fun model(data: Map<String, Any>): JSONObject {
-    return JSONObject(String(android.util.Base64.decode((data["data"] as String).toByteArray(), android.util.Base64.DEFAULT)))
+    return JSONObject((data["data"] as String))
   }
 
   override fun db(data: JSONObject): Table.Row {
     return Table.Row.Builder(data.getString("id"))
       .addValue("templateId", data.getString("template"))
-      .addValue(
-        "data", String(android.util.Base64.encode(data.toString().toByteArray(), android.util.Base64.DEFAULT))
-      )
+      .addValue("data", data.toString().replace("'", "''"))
       .build()
   }
 

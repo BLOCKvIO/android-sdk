@@ -6,7 +6,7 @@ import org.json.JSONObject
 
 class ActionMapper : Mapper<JSONObject> {
   override fun model(data: Map<String, Any>): JSONObject {
-    return JSONObject(String(android.util.Base64.decode(data["data"] as String, android.util.Base64.DEFAULT)))
+    return JSONObject(data["data"] as String)
   }
 
   override fun db(data: JSONObject): Table.Row {
@@ -14,7 +14,7 @@ class ActionMapper : Mapper<JSONObject> {
     return Table.Row.Builder(data.getString("name"))
       .addValue("template", parts[0])
       .addValue("action", parts[1])
-      .addValue("data", String(android.util.Base64.encode(data.toString().toByteArray(), android.util.Base64.DEFAULT)))
+      .addValue("data", data.toString().replace("'", "''"))
       .build()
   }
 
