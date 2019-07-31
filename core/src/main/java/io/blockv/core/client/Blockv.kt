@@ -209,7 +209,7 @@ class Blockv {
       jsonModule
     )
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
-    val database = DatabaseImpl(context, "blockv-datapool.db")
+    val database = DatabaseImpl(context, "blockv-datapool.db", 2)
     database.addMapper(ActionMapper())
     database.addMapper(FaceMapper())
     database.addMapper(VatomMapper())
@@ -236,11 +236,11 @@ class Blockv {
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(cacheDir,fileDir, ResourceEncoderImpl(preferences), preferences)
+    this.resourceManager = ResourceManagerImpl(cacheDir, fileDir, ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
-    val database = DatabaseImpl(context, "blockv-datapool.db")
+    val database = DatabaseImpl(context, "blockv-datapool.db", 2)
     database.addMapper(ActionMapper())
     database.addMapper(FaceMapper())
     database.addMapper(VatomMapper())
