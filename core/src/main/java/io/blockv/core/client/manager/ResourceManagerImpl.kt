@@ -28,6 +28,7 @@ import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.ref.SoftReference
@@ -129,17 +130,20 @@ class ResourceManagerImpl(
       }
     } else {
       val cacheFile = File(cache, key)
-      if (cacheFile.exists() && cacheFile.length() < diskCache.maxSize() / 20) {
-        val diskFile = File(disk, cacheFile.name)
-        if (cacheFile.renameTo(diskFile)) {
-          diskCache.put(diskFile.name, diskFile)
-          return Optional(diskFile)
+      if (cacheFile.exists()) {
+        return if (cacheFile.length() < diskCache.maxSize() / 20) {
+          val diskFile = File(disk, cacheFile.name)
+          if (cacheFile.renameTo(diskFile)) {
+            diskCache.put(diskFile.name, diskFile)
+            Optional(diskFile)
+          } else {
+            Optional(cacheFile)
+          }
+        } else {
+          Optional(cacheFile)
         }
-      } else {
-        return Optional(cacheFile)
       }
     }
-
     return Optional(null)
   }
 
@@ -578,7 +582,7 @@ class ResourceManagerImpl(
               } while (read != -1)
 
               output.flush()
-              throw Exception(String(output.toByteArray()))
+              throw IOException(String(output.toByteArray()))
             }
           } finally {
             maxDownloads.release()
@@ -612,6 +616,7 @@ class ResourceManagerImpl(
                 diskCache.put(outFile.name, outFile)
               } else {
                 outFile = File(cache, cacheKey)
+                temp.renameTo(outFile)
               }
               fileEmitter?.onNext(outFile)
               fileEmitter?.onComplete()
