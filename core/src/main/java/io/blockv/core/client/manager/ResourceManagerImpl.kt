@@ -13,7 +13,6 @@ package io.blockv.core.client.manager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.util.LruCache
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.repository.Preferences
@@ -29,6 +28,7 @@ import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.ref.SoftReference
@@ -41,6 +41,7 @@ import java.util.concurrent.Semaphore
 import kotlin.collections.HashMap
 
 class ResourceManagerImpl(
+  fileDir: File,
   cacheDir: File,
   private val encoder: ResourceEncoder,
   private val preferences: Preferences
@@ -55,8 +56,22 @@ class ResourceManagerImpl(
     return encoder.encodeUrl(url)
   }
 
-  val disk = File(cacheDir, "blockv_resources")
-  val diskCache = object : LruCache<String, File>(200 * 1024 * 1024) {
+  val disk = File(fileDir, "blockv_resources")
+  val cache = File(cacheDir, "blockv_resources")
+  val diskCache = object : LruCache<String, File>(100 * 1024 * 1024) {
+
+    override fun entryRemoved(evicted: Boolean, key: String?, oldValue: File?, newValue: File?) {
+      super.entryRemoved(evicted, key, oldValue, newValue)
+      if (evicted && key != null && oldValue != null) {
+        synchronized(this)
+        {
+          if (oldValue.exists()) {
+            oldValue.renameTo(File(cache, oldValue.name))
+          }
+        }
+      }
+    }
+
     override fun sizeOf(key: String, value: File): Int {
       return value.length().toInt()
     }
@@ -83,6 +98,7 @@ class ResourceManagerImpl(
 
   init {
     disk.mkdirs()
+    cache.mkdir()
     disk.listFiles().forEach {
       if (!it.name.endsWith(".download")) //don't add files that are not complete
       {
@@ -112,8 +128,22 @@ class ResourceManagerImpl(
       } else {
         diskCache.remove(key)
       }
+    } else {
+      val cacheFile = File(cache, key)
+      if (cacheFile.exists()) {
+        return if (cacheFile.length() < diskCache.maxSize() / 20) {
+          val diskFile = File(disk, cacheFile.name)
+          if (cacheFile.renameTo(diskFile)) {
+            diskCache.put(diskFile.name, diskFile)
+            Optional(diskFile)
+          } else {
+            Optional(cacheFile)
+          }
+        } else {
+          Optional(cacheFile)
+        }
+      }
     }
-
     return Optional(null)
   }
 
@@ -552,7 +582,7 @@ class ResourceManagerImpl(
               } while (read != -1)
 
               output.flush()
-              throw Exception(String(output.toByteArray()))
+              throw IOException(String(output.toByteArray()))
             }
           } finally {
             maxDownloads.release()
@@ -577,9 +607,17 @@ class ResourceManagerImpl(
           if (isComplete) {
             val temp = masterFile
             if (temp != null) {
-              val outFile = File(disk, cacheKey)
-              temp.renameTo(outFile)
-              diskCache.put(outFile.name, outFile)
+
+              val outFile: File
+              if (temp.length() < diskCache.maxSize() / 20) {
+                //only add files smaller then a 20th of cache size (5mb)
+                outFile = File(disk, cacheKey)
+                temp.renameTo(outFile)
+                diskCache.put(outFile.name, outFile)
+              } else {
+                outFile = File(cache, cacheKey)
+                temp.renameTo(outFile)
+              }
               fileEmitter?.onNext(outFile)
               fileEmitter?.onComplete()
               downloadMap.remove(url)

@@ -85,6 +85,7 @@ class Blockv {
   }
 
   private val cacheDir: File
+  private val fileDir: File
 
   @Volatile
   private var internalFaceManager: FaceManager? = null
@@ -190,6 +191,7 @@ class Blockv {
 
   constructor(context: Context, appId: String, redirectUri: String) {
     this.cacheDir = context.cacheDir
+    this.fileDir = context.filesDir
     this.jsonModule = JsonModule()
     this.appId = appId
     this.preferences = Preferences(context, jsonModule)
@@ -199,7 +201,7 @@ class Blockv {
       appId,
       redirectUri
     )
-    this.resourceManager = ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences)
+    this.resourceManager = ResourceManagerImpl(cacheDir, fileDir, ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(
       auth,
@@ -229,11 +231,12 @@ class Blockv {
 
   constructor(context: Context, environment: Environment) {
     this.cacheDir = context.cacheDir
+    this.fileDir = context.filesDir
     this.jsonModule = JsonModule()
     this.appId = environment.appId
     this.preferences = Preferences(context, jsonModule)
     this.preferences.environment = environment
-    this.resourceManager = ResourceManagerImpl(cacheDir, ResourceEncoderImpl(preferences), preferences)
+    this.resourceManager = ResourceManagerImpl(cacheDir,fileDir, ResourceEncoderImpl(preferences), preferences)
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
@@ -272,6 +275,7 @@ class Blockv {
     appManager: AppManager
   ) {
     this.cacheDir = context.cacheDir
+    this.fileDir = context.filesDir
     this.appId = appId
     this.preferences = preferences
     this.preferences.environment = Environment(
