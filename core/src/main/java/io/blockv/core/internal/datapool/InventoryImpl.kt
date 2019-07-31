@@ -49,8 +49,19 @@ class InventoryImpl(
       val disposable = CompositeDisposable()
       val messages = ArrayList<WebSocketEvent<JSONObject>>()
       emitter.setDisposable(disposable)
+      var clearCache = false
       val processMessage: (message: WebSocketEvent<JSONObject>) -> Unit =
         { message ->
+          synchronized(vatoms)
+          {
+            if(clearCache) {
+              vatoms.clear()
+              database.deleteAll("vatom").blockingGet()
+              database.deleteAll("face").blockingGet()
+              database.deleteAll("action").blockingGet()
+              clearCache = false
+            }
+          }
           if (message.type == WebSocketEvent.MessageType.INVENTORY) {
             val event = jsonModule.deserialize<InventoryEvent>(message.payload!!)
             val dbVatoms = database.get<VatomIndex>("vatom", listOf(event.vatomId))
@@ -137,13 +148,7 @@ class InventoryImpl(
         val timer = Flowable.timer(300, TimeUnit.MILLISECONDS)
           .observeOn(Schedulers.computation())
           .doFinally {
-            synchronized(vatoms)
-            {
-              vatoms.clear()
-              database.deleteAll("vatom").blockingGet()
-              database.deleteAll("face").blockingGet()
-              database.deleteAll("action").blockingGet()
-            }
+            clearCache = true
             emitter.onNext(Message(emptyList(), Message.Type.ADDED, state))
             disposable.add(
               fetchInventory()
