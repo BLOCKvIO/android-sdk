@@ -41,6 +41,8 @@ class GenericSerializer : Serializer<Any> {
       for (prop in type.memberProperties) {
         val annotation = prop.annotations.find {
           it is Serializer.Serialize
+        } ?: constructor.parameters.find { it.name == prop.name }?.annotations?.find {
+          it is Serializer.Serialize
         }
         if (annotation != null) {
           annotation as Serializer.Serialize

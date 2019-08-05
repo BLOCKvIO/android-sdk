@@ -12,45 +12,24 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class ActivityEvent : Model {
-
+class ActivityEvent @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "msg_id")
-  val eventId: Long
+  val eventId: Long,
   @Serializer.Serialize(name = "user_id")
-  val targetUserId: String
+  val targetUserId: String,
   @Serializer.Serialize(name = "triggered_by")
-  val triggerUserId: String
+  val triggerUserId: String,
   @Serializer.Serialize(name = "vatoms")
-  val vatomIds: List<String>
+  val vatomIds: List<String>,
   @Serializer.Serialize(name = "generic")
-  val resources: List<Resource>
+  val resources: List<Resource>,
   @Serializer.Serialize(name = "msg")
-  val message: String
+  val message: String,
   @Serializer.Serialize(name = "action_name")
-  val actionName: String
+  val actionName: String,
   @Serializer.Serialize(name = "when_created")
   val whenCreated: String
-
-  @Serializer.Serializable
-  constructor(
-    eventId: Long,
-    targetUserId: String,
-    triggerUserId: String,
-    vatomIds: List<String>,
-    resources: List<Resource>,
-    message: String,
-    actionName: String,
-    whenCreated: String
-  ) {
-    this.eventId = eventId
-    this.targetUserId = targetUserId
-    this.triggerUserId = triggerUserId
-    this.vatomIds = vatomIds
-    this.resources = resources
-    this.message = message
-    this.actionName = actionName
-    this.whenCreated = whenCreated
-  }
+) : Model {
 
 
   override fun toString(): String {

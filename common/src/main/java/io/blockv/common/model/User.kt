@@ -12,66 +12,34 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class User : Model {
-
+class User @Serializer.Serializable constructor(
   @Serializer.Serialize
-  val id: String
+  val id: String,
   @Serializer.Serialize(name = "when_created", path = "meta")
-  val whenCreated: String
+  val whenCreated: String,
   @Serializer.Serialize(name = "when_modified", path = "meta")
-  val whenModified: String
+  val whenModified: String,
   @Serializer.Serialize(name = "first_name", path = "properties")
-  val firstName: String
+  val firstName: String,
   @Serializer.Serialize(name = "last_name", path = "properties")
-  val lastName: String
+  val lastName: String,
   @Serializer.Serialize(name = "avatar_uri", path = "properties")
-  val avatarUri: String
+  val avatarUri: String,
   @Serializer.Serialize(name = "birthday", path = "properties")
-  val birthday: String
+  val birthday: String,
   @Serializer.Serialize(path = "properties")
-  val language: String
+  val language: String,
   @Serializer.Serialize(name = "name_public", path = "properties")
-  val isNamePublic: Boolean
+  val isNamePublic: Boolean,
   @Serializer.Serialize(name = "avatar_public", path = "properties")
-  val isAvatarPublic: Boolean
+  val isAvatarPublic: Boolean,
   @Serializer.Serialize(name = "is_password_set", path = "properties")
-  val isPasswordSet: Boolean
+  val isPasswordSet: Boolean,
   @Serializer.Serialize(name = "nonpush_notification", path = "properties")
-  val nonPushNotifications: Boolean
+  val nonPushNotifications: Boolean,
   @Serializer.Serialize(name = "guest_id", path = "properties")
   val guestId: String
-
-  @Serializer.Serializable
-  constructor(
-    id: String,
-    whenCreated: String,
-    whenModified: String,
-    firstName: String,
-    lastName: String,
-    avatarUri: String,
-    birthday: String,
-    language: String,
-    isNamePublic: Boolean,
-    isAvatarPublic: Boolean,
-    isPasswordSet: Boolean,
-    nonPushNotifications: Boolean,
-    guestId: String
-  ) {
-
-    this.id = id
-    this.whenCreated = whenCreated
-    this.whenModified = whenModified
-    this.firstName = firstName
-    this.lastName = lastName
-    this.avatarUri = avatarUri
-    this.birthday = birthday
-    this.language = language
-    this.isNamePublic = isNamePublic
-    this.isAvatarPublic = isAvatarPublic
-    this.isPasswordSet = isPasswordSet
-    this.nonPushNotifications = nonPushNotifications
-    this.guestId = guestId
-  }
+) : Model {
 
   val name: String
     get() = (this.firstName + " " + this.lastName).trim()
