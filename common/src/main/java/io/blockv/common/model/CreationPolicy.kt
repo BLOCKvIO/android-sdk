@@ -12,41 +12,22 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class CreationPolicy : Model {
-
+class CreationPolicy @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "auto_create")
-  var autoCreate: String
+  var autoCreate: String,
   @Serializer.Serialize(name = "auto_create_count")
-  var autoCreateCount: Int
+  var autoCreateCount: Int,
   @Serializer.Serialize(name = "auto_create_count_random")
-  var isAutoCreateCountRandom: Boolean
+  var isAutoCreateCountRandom: Boolean,
   @Serializer.Serialize(name = "enforce_policy_count_max")
-  var isEnforcePolicyCountMax: Boolean
+  var isEnforcePolicyCountMax: Boolean,
   @Serializer.Serialize(name = "enforce_policy_count_min")
-  var isEnforcePolicyCountMin: Boolean
+  var isEnforcePolicyCountMin: Boolean,
   @Serializer.Serialize(name = "policy_count_max")
-  var policyCountMax: Int
+  var policyCountMax: Int,
   @Serializer.Serialize(name = "policy_count_min")
   var policyCountMin: Int
-
-  @Serializer.Serializable
-  constructor(
-    autoCreate: String,
-    autoCreateCount: Int,
-    isAutoCreateCountRandom: Boolean,
-    isEnforcePolicyCountMax: Boolean,
-    isEnforcePolicyCountMin: Boolean,
-    policyCountMax: Int,
-    policyCountMin: Int
-  ) {
-    this.autoCreate = autoCreate
-    this.autoCreateCount = autoCreateCount
-    this.isAutoCreateCountRandom = isAutoCreateCountRandom
-    this.isEnforcePolicyCountMax = isEnforcePolicyCountMax
-    this.isEnforcePolicyCountMin = isEnforcePolicyCountMin
-    this.policyCountMax = policyCountMax
-    this.policyCountMin = policyCountMin
-  }
+) : Model {
 
   constructor(policy: CreationPolicy) : this(
     policy.autoCreate,

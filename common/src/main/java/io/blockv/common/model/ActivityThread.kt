@@ -12,42 +12,23 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class ActivityThread : Model {
+class ActivityThread @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "name")
-  val id: String
+  val id: String,
   @Serializer.Serialize(name = "when_modified")
-  val whenModified: Long
+  val whenModified: Long,
   @Serializer.Serialize(name = "last_message")
-  val lastMessage: ActivityMessage
+  val lastMessage: ActivityMessage,
   @Serializer.Serialize(name = "last_message_user_info")
   val lastMessageUser: UserInfo
+) : Model {
 
-  @Serializer.Serializable
-  constructor(
-    id: String,
-    whenModified: Long,
-    lastMessage: ActivityMessage,
-    lastMessageUser: UserInfo
-  ) {
-    this.id = id
-    this.whenModified = whenModified
-    this.lastMessage = lastMessage
-    this.lastMessageUser = lastMessageUser
-  }
-
-
-  class UserInfo {
-
+  class UserInfo @Serializer.Serializable constructor(
     @Serializer.Serialize
-    val name: String
+    val name: String,
     @Serializer.Serialize(name = "avatar_uri")
     val avatarUri: String
-
-    @Serializer.Serializable
-    constructor(name: String, avatarUri: String) {
-      this.name = name
-      this.avatarUri = avatarUri
-    }
+  ) {
 
     override fun toString(): String {
       return "UserInfo{" +

@@ -12,24 +12,14 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class Resource : Model {
+class Resource @Serializer.Serializable constructor(
   @Serializer.Serialize
-  var name: String
+  var name: String,
   @Serializer.Serialize(name = "resourceType")
-  var type: String
+  var type: String,
   @Serializer.Serialize(name = "value", path = "value")
   var url: String
-
-  @Serializer.Serializable
-  constructor(
-    name: String,
-    type: String,
-    url: String
-  ) {
-    this.name = name
-    this.type = type
-    this.url = url
-  }
+) : Model {
 
   override fun toString(): String {
     return "Resource{" +

@@ -12,25 +12,14 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class ChildPolicy : Model {
+class ChildPolicy @Serializer.Serializable constructor(
   @Serializer.Serialize
-  var count: Int?
+  var count: Int?,
   @Serializer.Serialize(name = "template_variation")
-  var templateVariation: String?
+  var templateVariation: String?,
   @Serializer.Serialize(name = "creation_policy")
   var creationPolicy: CreationPolicy?
-
-  @Serializer.Serializable
-  constructor(
-    count: Int?,
-    templateVariation: String?,
-    creationPolicy: CreationPolicy?
-  ) {
-    this.count = count
-    this.templateVariation = templateVariation
-    this.creationPolicy = creationPolicy
-  }
-
+) : Model {
 
   constructor(policy: ChildPolicy) : this(
     policy.count,

@@ -12,17 +12,12 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class ActivityThreadList : Model {
+class ActivityThreadList @Serializer.Serializable constructor(
   @Serializer.Serialize
-  val cursor: String
+  val cursor: String,
   @Serializer.Serialize
   val threads: List<ActivityThread>
-
-  @Serializer.Serializable
-  constructor(cursor: String, threads: List<ActivityThread>) {
-    this.cursor = cursor
-    this.threads = threads
-  }
+) : Model {
 
   override fun toString(): String {
     return "ActivityThreadList{" +

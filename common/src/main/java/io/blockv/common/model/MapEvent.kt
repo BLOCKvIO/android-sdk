@@ -12,37 +12,20 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class MapEvent : Model {
+class MapEvent @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "event_id")
-  val eventId: String
+  val eventId: String,
   @Serializer.Serialize(name = "op")
-  val operation: String
+  val operation: String,
   @Serializer.Serialize(name = "vatom_id")
-  val vatomId: String
+  val vatomId: String,
   @Serializer.Serialize(name = "action_name")
-  val actionName: String
+  val actionName: String,
   @Serializer.Serialize(name = "lat")
-  val lat: Double
+  val lat: Double,
   @Serializer.Serialize(name = "lon")
   val lon: Double
-
-  @Serializer.Serializable
-  constructor(
-    eventId: String,
-    operation: String,
-    vatomId: String,
-    actionName: String,
-    lat: Double,
-    lon: Double
-  ) {
-    this.eventId = eventId
-    this.operation = operation
-    this.vatomId = vatomId
-    this.actionName = actionName
-    this.lat = lat
-    this.lon = lon
-  }
-
+) : Model {
 
   override fun toString(): String {
     return "StateUpdateEvent{" +

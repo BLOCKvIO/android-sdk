@@ -13,33 +13,18 @@ package io.blockv.common.model
 import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
-class StateUpdateEvent : Model {
+class StateUpdateEvent @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "event_id")
-  val eventId: String
+  val eventId: String,
   @Serializer.Serialize(name = "op")
-  val operation: String
+  val operation: String,
   @Serializer.Serialize(name = "id")
-  val vatomId: String
+  val vatomId: String,
   @Serializer.Serialize(name = "new_object")
-  val vatomProperties: JSONObject
+  val vatomProperties: JSONObject,
   @Serializer.Serialize(name = "action_name")
   val actionName: String
-
-  @Serializer.Serializable
-  constructor(
-    eventId: String,
-    operation: String,
-    vatomId: String,
-    vatomProperties: JSONObject,
-    actionName: String
-  ) {
-    this.eventId = eventId
-    this.operation = operation
-    this.vatomId = vatomId
-    this.vatomProperties = vatomProperties
-    this.actionName = actionName
-  }
-
+) : Model {
 
   override fun toString(): String {
     return "StateUpdateEvent{" +
