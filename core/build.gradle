@@ -4,15 +4,15 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'maven-publish'
 
 android {
-  compileSdkVersion 27
+  compileSdkVersion 28
 
   defaultConfig {
     minSdkVersion 19
-    targetSdkVersion 27
+    targetSdkVersion 28
     versionCode 1
     versionName "1.0"
 
-    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
   }
   buildTypes {
@@ -28,7 +28,7 @@ dependencies {
   implementation 'com.neovisionaries:nv-websocket-client:2.5'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
   implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
-  implementation 'com.android.support:appcompat-v7:27.1.1'
+  implementation 'androidx.appcompat:appcompat:1.0.0'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   implementation("io.blockv.faces-alpha:image-face:4.0.0-alpha.3")
@@ -41,7 +41,7 @@ dependencies {
   implementation project(':face')
   implementation project(':faceview')
 
-  androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+  androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
     exclude group: 'com.android.support', module: 'support-annotations'
   })
   testImplementation 'junit:junit:4.12'
