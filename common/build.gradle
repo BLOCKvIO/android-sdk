@@ -33,6 +33,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   implementation 'androidx.appcompat:appcompat:1.0.0'
+  implementation 'androidx.room:room-rxjava2:2.1.0'
 
   testImplementation 'junit:junit:4.12'
   testImplementation 'com.github.cbismuth:junit-repeat-rule:1.1.2'
@@ -87,6 +88,10 @@ publishing {
         rxandroid.appendNode('groupId', 'io.reactivex.rxjava2')
         rxandroid.appendNode('artifactId', 'rxandroid')
         rxandroid.appendNode('version', '[2.1.0,3.0.0)')
+        def room = dependenciesNode.appendNode('dependency')
+        room.appendNode('groupId', 'androidx.room')
+        room.appendNode('artifactId', 'room-rxjava2')
+        room.appendNode('version', '[2.1.0,3.0.0)')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')
