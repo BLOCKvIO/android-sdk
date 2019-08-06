@@ -12,21 +12,12 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class Jwt : Model {
-
+class Jwt @Serializer.Serializable constructor(
   @Serializer.Serialize
-  val token: String
+  val token: String,
   @Serializer.Serialize(name = "token_type")
   val type: String
-
-  @Serializer.Serializable
-  constructor(
-    token: String,
-    type: String
-  ) {
-    this.token = token
-    this.type = type
-  }
+) : Model {
 
   override fun toString(): String {
     return "Jwt{" +

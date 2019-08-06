@@ -12,7 +12,7 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-open class PublicUser : Model {
+open class PublicUser() : Model {
 
   @Serializer.Serialize
   var id: String? = null
@@ -26,15 +26,12 @@ open class PublicUser : Model {
   val name: String
     get() = ((this.firstName ?: "") + " " + (this.lastName ?: "")).trim()
 
-  constructor()
-
-  constructor(id: String?, firstName: String?, lastName: String?, avatarUri: String?) {
+  constructor(id: String?, firstName: String?, lastName: String?, avatarUri: String?) : this() {
     this.id = id
     this.firstName = firstName
     this.lastName = lastName
     this.avatarUri = avatarUri
   }
-
 
   override fun toString(): String {
     return "User{" +

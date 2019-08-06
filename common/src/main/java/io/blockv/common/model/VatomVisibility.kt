@@ -12,21 +12,12 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class VatomVisibility: Model {
-
+class VatomVisibility @Serializer.Serializable constructor(
   @Serializer.Serialize
-  var type: String
+  var type: String,
   @Serializer.Serialize
   var value: String
-
-  @Serializer.Serializable
-  constructor(
-    type: String,
-    value: String
-  ) {
-    this.type = type
-    this.value = value
-  }
+) : Model {
 
   constructor(visibility: VatomVisibility) : this(visibility.type, visibility.value)
 

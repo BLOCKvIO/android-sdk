@@ -12,23 +12,16 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-open class Environment : Model {
+open class Environment @Serializer.Serializable constructor(
   @Serializer.Serialize
-  val rest: String
+  val rest: String,
   @Serializer.Serialize
-  val wss: String
+  val wss: String,
   @Serializer.Serialize(name = "app_id")
-  val appId: String
+  val appId: String,
   @Serializer.Serialize(name = "redirect_uri")
   val redirectUri: String
-
-  @Serializer.Serializable
-  constructor(rest: String, wss: String, appId: String, redirectUri: String) {
-    this.rest = rest
-    this.wss = wss
-    this.appId = appId
-    this.redirectUri = redirectUri
-  }
+) : Model {
 
   companion object {
     val DEFAULT_SERVER = "https://api.blockv.io/"

@@ -181,6 +181,7 @@ object MockData {
     "                \"avatar_uri\": \"https://cdn.blockv.io/vatomic/avatars/f33161d2-5525-xxxxxx\",\n" +
     "                \"avatar_public\": true,\n" +
     "                \"birthday\": \"\",\n" +
+    "                \"guest_id\": \"\",\n" +
     "                \"nonpush_notification\": false,\n" +
     "                \"language\": \"en\"\n" +
     "            }\n" +

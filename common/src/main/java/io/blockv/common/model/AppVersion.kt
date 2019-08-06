@@ -12,21 +12,12 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class AppVersion : Model {
-
+class AppVersion @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "supported_version")
-  val supportedVersion: String
+  val supportedVersion: String,
   @Serializer.Serialize(name = "update_url")
   val updateUrl: String
-
-  @Serializer.Serializable
-  constructor(
-    supportedVersion: String,
-    updateUrl: String
-  ) {
-    this.supportedVersion = supportedVersion
-    this.updateUrl = updateUrl
-  }
+) : Model {
 
   override fun toString(): String {
     return "AppVersion{" +

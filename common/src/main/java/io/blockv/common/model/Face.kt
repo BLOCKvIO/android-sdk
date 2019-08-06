@@ -12,36 +12,20 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class Face : Model {
+class Face @Serializer.Serializable constructor(
   @Serializer.Serialize
-  var id: String
+  var id: String,
   @Serializer.Serialize(name = "template")
-  var templateId: String
+  var templateId: String,
   @Serializer.Serialize(name = "created_by", path = "meta")
-  var createdBy: String?
+  var createdBy: String?,
   @Serializer.Serialize(name = "when_created", path = "meta")
-  var whenCreated: String?
+  var whenCreated: String?,
   @Serializer.Serialize(name = "when_modified", path = "meta")
-  var whenModified: String?
+  var whenModified: String?,
   @Serializer.Serialize(name = "properties")
   var property: FaceProperty
-
-  @Serializer.Serializable
-  constructor(
-    id: String,
-    templateId: String,
-    createdBy: String?,
-    whenCreated: String?,
-    whenModified: String?,
-    property: FaceProperty
-  ) {
-    this.id = id
-    this.templateId = templateId
-    this.createdBy = createdBy
-    this.whenCreated = whenCreated
-    this.whenModified = whenModified
-    this.property = property
-  }
+) : Model {
 
   private var native: Boolean? = null
   private var web: Boolean? = null

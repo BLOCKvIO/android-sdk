@@ -13,25 +13,11 @@ package io.blockv.common.model
 import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
-class GenericSocketEvent : WebSocketEvent<JSONObject>, Model {
-
+class GenericSocketEvent @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "msg_type")
-  override val messageType: String
+  override val messageType: String,
   @Serializer.Serialize(name = "user_id")
-  override val userId: String
+  override val userId: String,
   @Serializer.Serialize(name = "payload")
   override val payload: JSONObject
-
-  @Serializer.Serializable
-  constructor(
-    messageType: String,
-    userId: String,
-    payload: JSONObject
-  ) : super(messageType, userId, payload) {
-
-    this.messageType = messageType
-    this.userId = userId
-    this.payload = payload
-  }
-
-}
+) : WebSocketEvent<JSONObject>(messageType, userId, payload), Model

@@ -12,15 +12,10 @@ package io.blockv.common.model
 
 import io.blockv.common.internal.json.serializer.Serializer
 
-class Commerce : Model {
-
+class Commerce @Serializer.Serializable constructor(
   @Serializer.Serialize
   var pricing: Pricing?
-
-  @Serializer.Serializable
-  constructor(pricing: Pricing?) {
-    this.pricing = pricing
-  }
+) : Model {
 
   constructor(commerce: Commerce) : this(if (commerce.pricing != null) Pricing(commerce.pricing!!) else null)
 
