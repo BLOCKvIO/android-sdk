@@ -10,9 +10,13 @@
  */
 package io.blockv.common.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import io.blockv.common.internal.json.serializer.Serializer
 
+@Entity
 class Face @Serializer.Serializable constructor(
+  @PrimaryKey
   @Serializer.Serialize
   var id: String,
   @Serializer.Serialize(name = "template")

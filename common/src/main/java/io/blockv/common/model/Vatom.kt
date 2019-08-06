@@ -10,10 +10,14 @@
  */
 package io.blockv.common.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
+@Entity
 open class Vatom @Serializer.Serializable constructor(
+  @PrimaryKey
   @Serializer.Serialize
   val id: String,
   @Serializer.Serialize(name = "when_created")
