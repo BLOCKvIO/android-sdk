@@ -16,6 +16,7 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import io.blockv.common.model.OauthData
 import io.blockv.common.model.User
 import io.blockv.core.R
 import io.reactivex.Completable
@@ -186,7 +187,7 @@ class OauthActivity : AppCompatActivity() {
   }
 
   interface Handler {
-    fun onSuccess(code: String): Single<User>
+    fun onSuccess(code: String): Single<OauthData>
 
     fun onError(exception: BlockvOauthException)
   }

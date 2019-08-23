@@ -35,6 +35,7 @@ import io.blockv.common.model.Registration
 import io.blockv.common.model.Token
 import io.blockv.common.model.User
 import io.blockv.common.model.UserUpdate
+import io.blockv.common.model.OauthData
 import io.blockv.common.util.Optional
 import io.blockv.core.internal.datapool.Inventory
 import io.blockv.core.internal.oauth.BlockvOauthException
@@ -157,21 +158,35 @@ class UserManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun loginOauth(context: Context, scope: String): Single<User> {
-    return Single.create<User> { emitter ->
+  override fun loginOauth(context: Context, scope: String): Single<OauthData> {
+    return Single.create<OauthData> { emitter ->
       val environment = preferences.environment!!
       val disposable = CompositeDisposable()
       emitter.setDisposable(disposable)
       OauthActivity.start(context, environment.appId, environment.redirectUri, scope, object : OauthActivity.Handler {
-        override fun onSuccess(code: String): Single<User> {
+        override fun onSuccess(code: String): Single<OauthData> {
           return Single.fromCallable {
             api.getAccessTokens(TokenRequest(environment.appId, code, environment.redirectUri))
           }.subscribeOn(Schedulers.io())
             .map {
+              var flow = OauthData.Flow.LOGIN.value
+              environment.redirectUri.split("?")[1].split("&")
+                .forEach { param ->
+                  if (param.startsWith("flow")) {
+                    flow = param.split("=")[1]
+                  }
+                }
               preferences.refreshToken = Jwt(it.getString("refresh_token"), "bearer")
               authenticator.setToken(Jwt(it.getString("access_token"), "bearer"))
               api.refreshAssetProviders()
-              api.getCurrentUser().payload
+              Pair(api.getCurrentUser().payload, flow)
+            }
+            .map {
+              if (it.second == OauthData.Flow.LOGIN.value) {
+                OauthData(it.first, OauthData.Flow.LOGIN)
+              } else {
+                OauthData(it.first, OauthData.Flow.REGISTER)
+              }
             }
             .doOnSuccess {
               emitter.onSuccess(it)
