@@ -12,9 +12,14 @@ package io.blockv.core.client.manager
 
 import android.content.Context
 import android.graphics.Bitmap
-import io.blockv.common.model.*
+import io.blockv.common.model.Jwt
+import io.blockv.common.model.PublicUser
+import io.blockv.common.model.Registration
+import io.blockv.common.model.Token
+import io.blockv.common.model.User
+import io.blockv.common.model.UserUpdate
+import io.blockv.common.model.OauthData
 import io.blockv.common.util.Optional
-import io.reactivex.Completable
 import io.reactivex.Single
 import org.json.JSONObject
 
