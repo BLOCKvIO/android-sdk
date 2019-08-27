@@ -164,18 +164,11 @@ class UserManagerImpl(
       val disposable = CompositeDisposable()
       emitter.setDisposable(disposable)
       OauthActivity.start(context, environment.appId, environment.redirectUri, scope, object : OauthActivity.Handler {
-        override fun onSuccess(code: String): Single<OauthData> {
+        override fun onSuccess(code: String, flow: String): Single<OauthData> {
           return Single.fromCallable {
             api.getAccessTokens(TokenRequest(environment.appId, code, environment.redirectUri))
           }.subscribeOn(Schedulers.io())
             .map {
-              var flow = OauthData.Flow.LOGIN.value
-              environment.redirectUri.split("?")[1].split("&")
-                .forEach { param ->
-                  if (param.startsWith("flow")) {
-                    flow = param.split("=")[1]
-                  }
-                }
               preferences.refreshToken = Jwt(it.getString("refresh_token"), "bearer")
               authenticator.setToken(Jwt(it.getString("access_token"), "bearer"))
               api.refreshAssetProviders()
