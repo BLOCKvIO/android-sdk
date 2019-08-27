@@ -172,13 +172,13 @@ class UserManagerImpl(
               preferences.refreshToken = Jwt(it.getString("refresh_token"), "bearer")
               authenticator.setToken(Jwt(it.getString("access_token"), "bearer"))
               api.refreshAssetProviders()
-              Pair(api.getCurrentUser().payload, flow)
+              api.getCurrentUser().payload
             }
             .map {
-              if (it.second == OauthData.Flow.LOGIN.value) {
-                OauthData(it.first, OauthData.Flow.LOGIN)
+              if (flow == OauthData.Flow.LOGIN.value) {
+                OauthData(it, OauthData.Flow.LOGIN)
               } else {
-                OauthData(it.first, OauthData.Flow.REGISTER)
+                OauthData(it, OauthData.Flow.REGISTER)
               }
             }
             .doOnSuccess {
