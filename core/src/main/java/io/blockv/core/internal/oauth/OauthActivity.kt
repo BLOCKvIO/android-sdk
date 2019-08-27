@@ -102,8 +102,13 @@ class OauthActivity : AppCompatActivity() {
               }
               complete()
             } else
-              if (data.getQueryParameter("code") != null && data.getQueryParameter("flow") != null) {
-                handler.onSuccess(data.getQueryParameter("code"), data.getQueryParameter("flow"))
+              if (data.getQueryParameter("code") != null) {
+                val flow = if (data.getQueryParameter("flow") != null) {
+                  data.getQueryParameter("flow")
+                } else {
+                  "other"
+                }
+                handler.onSuccess(data.getQueryParameter("code"), flow)
                   .observeOn(AndroidSchedulers.mainThread())
                   .doOnSubscribe {
                     webView.visibility = View.GONE

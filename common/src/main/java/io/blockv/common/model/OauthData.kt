@@ -12,9 +12,20 @@ class OauthData(
       "}"
   }
 
-  enum class Flow(val value: String)
-  {
+  enum class Flow(val value: String) {
+
     LOGIN("login"),
-    REGISTER("register")
+    REGISTER("register"),
+    OTHER("other");
+
+    companion object {
+      fun from(flow: String): Flow {
+        return when (flow) {
+          "login" -> LOGIN
+          "register" -> REGISTER
+          else -> OTHER
+        }
+      }
+    }
   }
 }
