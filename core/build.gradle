@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'maven-publish'
+apply plugin: 'kotlin-kapt'
 
 android {
   compileSdkVersion 28
@@ -36,6 +37,11 @@ dependencies {
   implementation("io.blockv.faces-alpha:image-policy-face:4.0.0-alpha.5")
   implementation("io.blockv.faces-alpha:image-layered-face:4.0.0-alpha.4")
   implementation("io.blockv.faces-alpha:web-face:4.0.0-alpha.7")
+  implementation "androidx.room:room-runtime:2.1.0"
+  kapt "androidx.room:room-compiler:2.1.0"
+  implementation 'androidx.room:room-rxjava2:2.1.0'
+  implementation 'androidx.paging:paging-runtime:2.1.0'
+  implementation 'androidx.paging:paging-rxjava2:2.1.0'
 
   implementation project(':common')
   implementation project(':face')
