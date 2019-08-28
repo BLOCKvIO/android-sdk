@@ -20,7 +20,7 @@ class OauthData(
 
     companion object {
       fun from(flow: String): Flow {
-        return when (flow) {
+        return when (flow.toLowerCase()) {
           "login" -> LOGIN
           "register" -> REGISTER
           else -> OTHER
