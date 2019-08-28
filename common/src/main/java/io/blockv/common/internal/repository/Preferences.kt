@@ -30,7 +30,8 @@ class Preferences(
   enum class Key {
     ENVIRONMENT,
     REFRESH_TOKEN,
-    ASSET_PROVIDER
+    ASSET_PROVIDER,
+    INVENTORY_HASH
   }
 
   private val preferences: SharedPreferences =
@@ -97,6 +98,14 @@ class Preferences(
         array.put(jsonModule.serialize(provider))
       }
       set(Key.ASSET_PROVIDER, array.toString())
+    }
+
+  var inventoryHash: String?
+    get() {
+      return getString(Key.INVENTORY_HASH, null)
+    }
+    set(value) {
+      set(Key.INVENTORY_HASH, value ?: "")
     }
 
   fun getInt(key: Key): Int {

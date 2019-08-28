@@ -15,6 +15,7 @@ import io.blockv.common.internal.net.rest.Client
 import io.blockv.common.internal.net.rest.request.GeoGroupRequest
 import io.blockv.common.internal.net.rest.request.GeoRequest
 import io.blockv.common.internal.net.rest.request.InventoryRequest
+import io.blockv.common.internal.net.rest.request.InventorySyncRequest
 import io.blockv.common.internal.net.rest.request.PerformActionRequest
 import io.blockv.common.internal.net.rest.request.TrashVatomRequest
 import io.blockv.common.internal.net.rest.request.VatomRequest
@@ -23,6 +24,7 @@ import io.blockv.common.model.Action
 import io.blockv.common.model.DiscoverPack
 import io.blockv.common.model.Face
 import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.InventorySync
 import io.blockv.common.model.Pack
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.VatomUpdate
@@ -185,6 +187,26 @@ class VatomApiImpl(
     )
   }
 
+  override fun getInventoryHash(): BaseResponse<String> {
+    val response: JSONObject = client.get("/v1/user/vatom/inventory/hash")
+    val payload: JSONObject = response.getJSONObject("payload") ?: JSONObject()
+    return BaseResponse(
+      response.getString("request_id"),
+      payload.optString("hash", "")
+    )
+  }
+
+  override fun getInventorySync(request: InventorySyncRequest): BaseResponse<InventorySync> {
+    val response: JSONObject =
+      client.get("/v1/user/vatom/inventory/index?limit=${request.limit}&next_token=${request.token}")
+    val payload: JSONObject = response.getJSONObject("payload") ?: JSONObject()
+    val sync = jsonModule.deserialize<InventorySync>(payload)
+    return BaseResponse(
+      response.getString("request_id"),
+      sync
+    )
+  }
+
   private fun combineVatomProperties(vatoms: List<Vatom>, faces: List<Face>, actions: List<Action>): List<Vatom> {
 
     val faceMap: HashMap<String, ArrayList<Face>> = HashMap()
@@ -211,4 +233,5 @@ class VatomApiImpl(
 
     return vatoms
   }
+
 }

@@ -10,9 +10,12 @@
  */
 package io.blockv.face.client.manager
 
+import androidx.paging.PagedList
 import io.blockv.common.model.Message
 import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomGroup
 import io.blockv.common.model.VatomUpdate
+import io.blockv.common.util.Optional
 import io.reactivex.Flowable
 import io.reactivex.Single
 import org.json.JSONObject
@@ -35,7 +38,7 @@ interface VatomManager {
    * @return new Flowable<Message<Vatom>> instance.
    * @see Vatom
    */
-  fun getVatom(id: String): Flowable<Message<Vatom>>
+  fun getVatom(id: String): Flowable<Optional<Vatom>>
 
   /**
    * Fetches the current user's inventory of Vatoms.
@@ -59,7 +62,7 @@ interface VatomManager {
    * @return new Flowable<Message<Vatom>> instance.
    * @see Vatom
    */
-  fun getInventory(id: String): Flowable<Message<Vatom>>
+  fun getInventory(id: String): Flowable<PagedList<VatomGroup>>
 
   /**
    * Performs an action on the BLOCKv Platform.

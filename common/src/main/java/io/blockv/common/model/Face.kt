@@ -10,7 +10,9 @@
  */
 package io.blockv.common.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import io.blockv.common.internal.json.serializer.Serializer
 
@@ -27,11 +29,14 @@ class Face @Serializer.Serializable constructor(
   var whenCreated: String?,
   @Serializer.Serialize(name = "when_modified", path = "meta")
   var whenModified: String?,
+  @Embedded
   @Serializer.Serialize(name = "properties")
   var property: FaceProperty
 ) : Model {
 
+  @Ignore
   private var native: Boolean? = null
+  @Ignore
   private var web: Boolean? = null
 
   @Synchronized
