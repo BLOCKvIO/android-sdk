@@ -18,8 +18,8 @@ import io.blockv.common.model.Registration
 import io.blockv.common.model.Token
 import io.blockv.common.model.User
 import io.blockv.common.model.UserUpdate
+import io.blockv.common.model.OauthData
 import io.blockv.common.util.Optional
-import io.reactivex.Completable
 import io.reactivex.Single
 import org.json.JSONObject
 
@@ -62,9 +62,9 @@ interface UserManager {
    *
    * @param context
    * @param scope is the platform permissions to request, current only `all` is supported
-   * @return new Completable instance.
+   * @return new Single<OauthData> instance.
    */
-  fun loginOauth(context: Context, scope: String): Single<User>
+  fun loginOauth(context: Context, scope: String): Single<OauthData>
 
   /**
    * Logs a user into the BLOCKv platform. Accepts a guest id.
