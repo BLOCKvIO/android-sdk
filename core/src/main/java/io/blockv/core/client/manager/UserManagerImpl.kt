@@ -37,7 +37,7 @@ import io.blockv.common.model.User
 import io.blockv.common.model.UserUpdate
 import io.blockv.common.model.OauthData
 import io.blockv.common.util.Optional
-import io.blockv.core.internal.datapool.Inventory
+import io.blockv.core.internal.datapool.Datapool
 import io.blockv.core.internal.oauth.BlockvOauthException
 import io.blockv.core.internal.oauth.OauthActivity
 import io.reactivex.Single
@@ -53,7 +53,7 @@ class UserManagerImpl(
   val authenticator: Authenticator,
   val preferences: Preferences,
   val jwtDecoder: JwtDecoder,
-  val inventory: Inventory
+  val datapool: Datapool
 ) : UserManager {
 
   override var onLogoutListener: UserManager.LogoutListener? = null
@@ -254,7 +254,8 @@ class UserManagerImpl(
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun logout(): Single<JSONObject> =
-    inventory.reset()
+    datapool.inventory
+      .clear()
       .observeOn(AndroidSchedulers.mainThread())
       .map {
         preferences.refreshToken = null

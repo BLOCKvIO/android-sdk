@@ -12,6 +12,7 @@ package io.blockv.core.client
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.paging.PagedList
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.NetModule
 import io.blockv.common.internal.net.rest.auth.Authenticator
@@ -20,19 +21,19 @@ import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
 import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
-import io.blockv.common.internal.repository.DatabaseImpl
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.Environment
 import io.blockv.common.model.InventoryEvent
-import io.blockv.common.model.Message
 import io.blockv.common.model.Model
 import io.blockv.common.model.PublicUser
 import io.blockv.common.model.Resource
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.User
 import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomGroup
 import io.blockv.common.model.VatomUpdate
 import io.blockv.common.model.WebSocketEvent
+import io.blockv.common.util.Optional
 import io.blockv.core.client.manager.ActivityManager
 import io.blockv.core.client.manager.ActivityManagerImpl
 import io.blockv.core.client.manager.AppManager
@@ -45,11 +46,7 @@ import io.blockv.core.client.manager.UserManager
 import io.blockv.core.client.manager.UserManagerImpl
 import io.blockv.core.client.manager.VatomManager
 import io.blockv.core.client.manager.VatomManagerImpl
-import io.blockv.core.internal.datapool.GeoMapImpl
-import io.blockv.core.internal.datapool.InventoryImpl
-import io.blockv.core.internal.repository.mapper.ActionMapper
-import io.blockv.core.internal.repository.mapper.FaceMapper
-import io.blockv.core.internal.repository.mapper.VatomMapper
+import io.blockv.core.internal.datapool.Datapool
 import io.blockv.face.client.FaceManager
 import io.blockv.face.client.FaceManagerImpl
 import io.blockv.faces.ImageFace
@@ -132,11 +129,11 @@ class Blockv {
                 return vatomManager.setParentId(vatomId, parentId)
               }
 
-              override fun getVatom(id: String): Flowable<Message<Vatom>> {
-                return vatomManager.getVatom(id)
+              override fun getVatom(id: String): Flowable<Optional<Vatom>> {
+                return vatomManager.getVatom(id).map { Optional(it.second) }
               }
 
-              override fun getInventory(id: String): Flowable<Message<Vatom>> {
+              override fun getInventory(id: String): Flowable<PagedList<VatomGroup>> {
                 return vatomManager.getInventory(id)
               }
 
@@ -209,21 +206,17 @@ class Blockv {
       jsonModule
     )
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
-    val database = DatabaseImpl(context, "blockv-datapool.db", 2)
-    database.addMapper(ActionMapper())
-    database.addMapper(FaceMapper())
-    database.addMapper(VatomMapper())
-    val inventory = InventoryImpl(netModule.vatomApi, websocket, jsonModule, database)
+    val datapool = Datapool(context.applicationContext, netModule.vatomApi, websocket, jsonModule,preferences)
 
     this.userManager = UserManagerImpl(
       netModule.userApi,
       auth,
       preferences,
       JwtDecoderImpl(),
-      inventory
+      datapool
     )
     this.vatomManager =
-      VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket, jsonModule))
+      VatomManagerImpl(netModule.vatomApi, datapool)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
     this.appManager = AppManagerImpl(netModule.appApi)
@@ -240,20 +233,16 @@ class Blockv {
     this.auth = AuthenticatorImpl(this.preferences, jsonModule)
     this.netModule = NetModule(auth, preferences, jsonModule)
     val websocket = WebsocketImpl(preferences, jsonModule, auth)
-    val database = DatabaseImpl(context, "blockv-datapool.db", 2)
-    database.addMapper(ActionMapper())
-    database.addMapper(FaceMapper())
-    database.addMapper(VatomMapper())
-    val inventory = InventoryImpl(netModule.vatomApi, websocket, jsonModule, database)
+    val datapool = Datapool(context.applicationContext, netModule.vatomApi, websocket, jsonModule,preferences)
     this.userManager = UserManagerImpl(
       netModule.userApi,
       auth,
       preferences,
       JwtDecoderImpl(),
-      inventory
+      datapool
     )
     this.vatomManager =
-      VatomManagerImpl(netModule.vatomApi, inventory, GeoMapImpl(netModule.vatomApi, websocket, jsonModule))
+      VatomManagerImpl(netModule.vatomApi, datapool)
     this.activityManager = ActivityManagerImpl(netModule.activityApi)
     this.eventManager = EventManagerImpl(websocket, jsonModule)
     this.appManager = AppManagerImpl(netModule.appApi)

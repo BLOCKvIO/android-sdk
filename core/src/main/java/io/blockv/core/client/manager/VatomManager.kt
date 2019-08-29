@@ -10,11 +10,13 @@
  */
 package io.blockv.core.client.manager
 
+import androidx.paging.PagedList
 import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.model.GeoGroup
 import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomGroup
 import io.blockv.common.model.VatomUpdate
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -42,7 +44,7 @@ interface VatomManager {
    * @return new Flowable<Message<Vatom>> instance.
    * @see Vatom
    */
-  fun getVatom(id: String): Flowable<Message<Vatom>>
+  fun getVatom(id: String): Flowable<Pair<CacheState, Vatom?>>
 
   /**
    * Fetches the current user's inventory of Vatoms.
@@ -68,7 +70,43 @@ interface VatomManager {
    * @return new Flowable<Message<Vatom>> instance.
    * @see Vatom
    */
-  fun getInventory(id: String, invalidate: Boolean = false): Flowable<Message<Vatom>>
+  fun getInventory(
+    id: String,
+    orderBy: SortOrder = SortOrder.NEWEST,
+    category: String = "",
+    filter: String = "",
+    limit: Int = -1,
+    group: Boolean = false,
+    invalidate: Boolean = false,
+    initialIndex: Int = 0
+  ): Flowable<PagedList<VatomGroup>>
+
+  fun getVatoms(
+    ids: List<String>,
+    orderBy: SortOrder = SortOrder.NEWEST,
+    filter: String = "",
+    limit: Int = -1,
+    group: Boolean = false,
+    invalidate: Boolean = false,
+    initialIndex: Int = 0
+  ): Flowable<PagedList<VatomGroup>>
+
+  enum class SortOrder {
+    NEWEST,
+    OLDEST,
+    A_TO_Z,
+    Z_TO_A
+  }
+
+  fun getCacheState(): Flowable<CacheState>
+
+  enum class CacheState {
+    UNSTABLE,
+    STABLE,
+    DISPOSED
+  }
+
+  fun getCategories(): Single<List<String>>
 
   /**
    * Performs a geo-search for Vatoms on the BLOCKv platform (i.e. Vatoms that have been

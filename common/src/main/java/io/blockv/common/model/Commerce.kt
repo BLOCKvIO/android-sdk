@@ -10,9 +10,11 @@
  */
 package io.blockv.common.model
 
+import androidx.room.Embedded
 import io.blockv.common.internal.json.serializer.Serializer
 
 class Commerce @Serializer.Serializable constructor(
+  @Embedded
   @Serializer.Serialize
   var pricing: Pricing?
 ) : Model {

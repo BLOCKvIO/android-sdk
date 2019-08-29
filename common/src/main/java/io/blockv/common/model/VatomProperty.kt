@@ -10,10 +10,13 @@
  */
 package io.blockv.common.model
 
+import androidx.room.Embedded
+import androidx.room.Ignore
 import io.blockv.common.internal.json.serializer.Serializer
 
 class VatomProperty() : Model {
 
+  @Embedded
   @Serializer.Serialize
   var commerce: Commerce? = null
 
@@ -38,6 +41,7 @@ class VatomProperty() : Model {
   @Serializer.Serialize(name = "dropped")
   var isDropped: Boolean = false
 
+  @Embedded(prefix = "geo")
   @Serializer.Serialize(name = "geo_pos")
   var geoPos: GeoPosition? = null
 
@@ -94,11 +98,13 @@ class VatomProperty() : Model {
       field.forEach { _resources.put(it.name, it) }
     }
 
+  @Ignore
   private val _resources: HashMap<String, Resource> = HashMap<String, Resource>()
 
   @Serializer.Serialize(name = "child_policy", default = false)
   var childPolicy: List<ChildPolicy>? = null
 
+  @Embedded(prefix = "visibility")
   @Serializer.Serialize
   var visibility: VatomVisibility? = null
 

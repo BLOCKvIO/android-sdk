@@ -13,6 +13,7 @@ package io.blockv.common.internal.net.rest.api
 import io.blockv.common.internal.net.rest.request.GeoGroupRequest
 import io.blockv.common.internal.net.rest.request.GeoRequest
 import io.blockv.common.internal.net.rest.request.InventoryRequest
+import io.blockv.common.internal.net.rest.request.InventorySyncRequest
 import io.blockv.common.internal.net.rest.request.PerformActionRequest
 import io.blockv.common.internal.net.rest.request.TrashVatomRequest
 import io.blockv.common.internal.net.rest.request.VatomRequest
@@ -20,6 +21,7 @@ import io.blockv.common.internal.net.rest.response.BaseResponse
 import io.blockv.common.model.Action
 import io.blockv.common.model.DiscoverPack
 import io.blockv.common.model.GeoGroup
+import io.blockv.common.model.InventorySync
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.VatomUpdate
 import org.json.JSONObject
@@ -51,5 +53,9 @@ interface VatomApi {
   fun updateVatom(request: JSONObject): BaseResponse<VatomUpdate>
 
   fun trashVatom(request: TrashVatomRequest): BaseResponse<JSONObject>
+
+  fun getInventoryHash(): BaseResponse<String>
+
+  fun getInventorySync(request: InventorySyncRequest): BaseResponse<InventorySync>
 }
 

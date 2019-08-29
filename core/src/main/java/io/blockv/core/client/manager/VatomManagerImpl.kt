@@ -10,6 +10,7 @@
  */
 package io.blockv.core.client.manager
 
+import androidx.paging.PagedList
 import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.GeoGroupRequest
@@ -22,12 +23,12 @@ import io.blockv.common.model.GeoGroup
 import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
+import io.blockv.common.model.VatomGroup
 import io.blockv.common.model.VatomProperty
 import io.blockv.common.model.VatomUpdate
 import io.blockv.common.model.VatomVisibility
 import io.blockv.common.util.JsonUtil
-import io.blockv.core.internal.datapool.GeoMap
-import io.blockv.core.internal.datapool.Inventory
+import io.blockv.core.internal.datapool.Datapool
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -37,8 +38,7 @@ import org.json.JSONObject
 
 class VatomManagerImpl(
   val api: VatomApi,
-  val inventory: Inventory,
-  val map: GeoMap
+  val datapool: Datapool
 ) : VatomManager {
 
   override fun geoDiscover(
@@ -67,7 +67,7 @@ class VatomManagerImpl(
     topRightLat: Double,
     topRightLon: Double
   ): Flowable<Message<Vatom>> {
-    return map.getRegion(bottomLeftLat, bottomLeftLon, topRightLat, topRightLon)
+    return datapool.map.getRegion(bottomLeftLat, bottomLeftLon, topRightLat, topRightLon)
   }
 
   override fun geoDiscoverGroups(
@@ -94,7 +94,7 @@ class VatomManagerImpl(
 
   override fun setParentId(vatomId: String, parentId: String): Single<VatomUpdate> {
     var oldParentId = ""
-    return inventory.setParentId(vatomId, parentId)
+    return datapool.inventory.setParentId(vatomId, parentId)
       .map {
         oldParentId = it
         api.updateVatom(
@@ -106,7 +106,7 @@ class VatomManagerImpl(
       }
       .onErrorResumeNext { throwable ->
         if (oldParentId.isNotEmpty()) {
-          inventory.setParentId(vatomId, oldParentId)
+          datapool.inventory.setParentId(vatomId, oldParentId)
             .map { throw throwable }
         } else
           throw  throwable
@@ -122,8 +122,9 @@ class VatomManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getVatom(id: String): Flowable<Message<Vatom>> {
-    return inventory.getVatom(id)
+  override fun getVatom(id: String): Flowable<Pair<VatomManager.CacheState, Vatom?>> {
+    return datapool.inventory
+      .getVatom(id)
       .observeOn(AndroidSchedulers.mainThread())
   }
 
@@ -139,19 +140,78 @@ class VatomManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
-  override fun getInventory(id: String, invalidate: Boolean): Flowable<Message<Vatom>> {
+  override fun getInventory(
+    id: String,
+    orderBy: VatomManager.SortOrder,
+    category: String,
+    filter: String,
+    limit: Int,
+    group: Boolean,
+    invalidate: Boolean,
+    initialIndex: Int
+  ): Flowable<PagedList<VatomGroup>> {
 
     return Single.fromCallable {
       if (invalidate) {
-        inventory.invalidate()
+        datapool.inventory.invalidate()
       }
     }
       .toFlowable()
       .flatMap {
-        inventory.getRegion(id)
+        datapool.inventory.getRegion(
+          id,
+          orderBy,
+          category,
+          filter,
+          limit,
+          group,
+          initialIndex
+        )
       }
       .observeOn(AndroidSchedulers.mainThread())
   }
+
+  override fun getVatoms(
+    ids: List<String>,
+    orderBy: VatomManager.SortOrder,
+    filter: String,
+    limit: Int,
+    group: Boolean,
+    invalidate: Boolean,
+    initialIndex: Int
+  ): Flowable<PagedList<VatomGroup>> {
+
+    return Single.fromCallable {
+      if (invalidate) {
+        datapool.inventory.invalidate()
+      }
+    }
+      .toFlowable()
+      .flatMap {
+        datapool.inventory.getVatoms(
+          ids,
+          orderBy,
+          filter,
+          limit,
+          group,
+          initialIndex
+        )
+      }
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
+  override fun getCategories(): Single<List<String>> {
+    return datapool
+      .inventory
+      .getCategories()
+      .map { list ->
+        list
+          .filter { it.isNotBlank() }
+          .map { it.capitalize() }
+      }
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
 
   override fun getVatomActions(templateId: String): Single<List<io.blockv.common.model.Action>> = Single.fromCallable {
     api.getVatomActions(templateId).payload
@@ -167,7 +227,10 @@ class VatomManagerImpl(
   }
     .subscribeOn(Schedulers.io())
     .flatMap { data ->
-      inventory.performAction(action, payload)
+      datapool.inventory
+        .performAction(action, payload)
+        .firstElement()
+        .toSingle(Unit)
         .map {
           data
         }
@@ -238,7 +301,9 @@ class VatomManagerImpl(
     api.trashVatom(TrashVatomRequest(id)).payload
   }
     .flatMap { data ->
-      inventory.performAction("trash", JSONObject().put("this.id", id))
+      datapool.inventory.performAction("trash", JSONObject().put("this.id", id))
+        .firstElement()
+        .toSingle(Unit)
         .map {
           data
         }
@@ -349,12 +414,19 @@ class VatomManagerImpl(
         modified,
         props,
         privateProp,
+        vatom.sync,
         vatom.faces,
         vatom.actions
       )
 
       newVatom
     }
+      .subscribeOn(Schedulers.computation())
+      .observeOn(AndroidSchedulers.mainThread())
+  }
+
+  override fun getCacheState(): Flowable<VatomManager.CacheState> {
+    return datapool.inventory.getState()
       .subscribeOn(Schedulers.computation())
       .observeOn(AndroidSchedulers.mainThread())
   }

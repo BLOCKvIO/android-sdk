@@ -10,32 +10,53 @@
  */
 package io.blockv.common.model
 
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import io.blockv.common.internal.json.serializer.Serializer
 import org.json.JSONObject
 
+@Entity
 open class Vatom @Serializer.Serializable constructor(
+  @PrimaryKey
   @Serializer.Serialize
   val id: String,
   @Serializer.Serialize(name = "when_created")
   val whenCreated: String,
   @Serializer.Serialize(name = "when_modified")
   val whenModified: String,
+  @Embedded
   @Serializer.Serialize(name = "vAtom::vAtomType")
   val property: VatomProperty,
   @Serializer.Serialize
   val private: JSONObject?,
   @Serializer.Serialize
+  val sync: Int,
+  @Ignore
+  @Serializer.Serialize
   var faces: List<Face>,
+  @Ignore
   @Serializer.Serialize
   var actions: List<Action>
 ) : Model {
 
+  constructor(
+    id: String,
+    whenCreated: String,
+    whenModified: String,
+    property: VatomProperty,
+    private: JSONObject?,
+    sync: Int
+  ) : this(id, whenCreated, whenModified, property, private,sync, emptyList(), emptyList())
+
+  @Ignore
   val rootType: Type
 
   val isContainer: Boolean
-    get() {
-      return rootType != Type.STANDARD || rootType != Type.UNKNOWN
-    }
+  get() {
+    return rootType != Type.STANDARD || rootType != Type.UNKNOWN
+  }
 
   init {
     this.rootType = Type.from(property.rootType ?: "")

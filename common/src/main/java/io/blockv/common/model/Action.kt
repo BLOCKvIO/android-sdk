@@ -10,6 +10,9 @@
  */
 package io.blockv.common.model
 
+import androidx.room.Entity
+
+@Entity(primaryKeys = ["templateId", "name"])
 class Action(
   val templateId: String,
   val name: String
