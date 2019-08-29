@@ -41,7 +41,7 @@ dependencies {
 
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'faceview'
-def libraryVersion = '4.0.0-alpha.23'
+def libraryVersion = '4.0.0-alpha.24'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -61,7 +61,7 @@ publishing {
         def dependencyNode = dependenciesNode.appendNode('dependency')
         dependencyNode.appendNode('groupId', 'io.blockv.sdk-alpha')
         dependencyNode.appendNode('artifactId', 'common')
-        dependencyNode.appendNode('version', '3.0.0-alpha.18')
+        dependencyNode.appendNode('version', '3.0.0-alpha.19')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')
