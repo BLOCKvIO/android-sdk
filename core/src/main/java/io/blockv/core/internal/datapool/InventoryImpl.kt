@@ -1,6 +1,7 @@
 package io.blockv.core.internal.datapool
 
 import android.database.DatabaseUtils
+import android.util.Log
 import androidx.paging.PagedList
 import androidx.paging.RxPagedListBuilder
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -71,7 +72,7 @@ class InventoryImpl(
             if (message.type == WebSocketEvent.MessageType.INVENTORY) {
               val event = jsonModule.deserialize<InventoryEvent>(message.payload!!)
               val dbVatoms = database.vatomDao().getVatoms(listOf(event.vatomId)).blockingFirst()
-              if (dbVatoms.isEmpty()) {
+              if (dbVatoms.isEmpty() || dbVatoms.first().vatom == null) {
                 vatomApi.getUserVatom(VatomRequest(listOf(event.vatomId))).payload
                   .forEach { vatom ->
                     database.vatomDao().addOrUpdateFaces(vatom.faces).blockingGet()
@@ -249,6 +250,7 @@ class InventoryImpl(
         .observeOn(Schedulers.io())
         .subscribe({ message ->
           synchronized(this) {
+            Log.e("datapool", message.toString())
             if (state == VatomManager.CacheState.UNSTABLE) {
               messages.add(message)
             } else {
