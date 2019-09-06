@@ -41,7 +41,7 @@ dependencies {
 
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'faceview'
-def libraryVersion = '4.0.0-alpha.24'
+def libraryVersion = '4.0.0-alpha.25'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -61,7 +61,15 @@ publishing {
         def dependencyNode = dependenciesNode.appendNode('dependency')
         dependencyNode.appendNode('groupId', 'io.blockv.sdk-alpha')
         dependencyNode.appendNode('artifactId', 'common')
-        dependencyNode.appendNode('version', '3.0.0-alpha.19')
+        dependencyNode.appendNode('version', '3.0.0-alpha.20')
+        def paging = dependenciesNode.appendNode('dependency')
+        paging.appendNode('groupId', 'androidx.paging')
+        paging.appendNode('artifactId', 'paging-runtime')
+        paging.appendNode('version', '[2.1.0,2.9.999)')
+        def pagingRx = dependenciesNode.appendNode('dependency')
+        pagingRx.appendNode('groupId', 'androidx.paging')
+        pagingRx.appendNode('artifactId', 'paging-rxjava2')
+        pagingRx.appendNode('version', '[2.1.0,2.9.999)')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')

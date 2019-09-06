@@ -25,6 +25,7 @@ object MockData {
 
   val vatom = "{\n" +
     "                \"id\": \"0b1df9f8-784d-4dcf-8eae-xxxxx\",\n" +
+    "                \"sync\": 0,\n" +
     "                \"when_created\": \"2018-10-30T15:55:10Z\",\n" +
     "                \"when_modified\": \"2018-10-30T15:55:37Z\",\n" +
     "                \"vAtom::vAtomType\": {\n" +

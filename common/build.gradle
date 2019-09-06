@@ -50,7 +50,7 @@ repositories {
 }
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'common'
-def libraryVersion = '3.0.0-alpha.19'
+def libraryVersion = '3.0.0-alpha.20'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -88,10 +88,6 @@ publishing {
         rxandroid.appendNode('groupId', 'io.reactivex.rxjava2')
         rxandroid.appendNode('artifactId', 'rxandroid')
         rxandroid.appendNode('version', '[2.1.0,3.0.0)')
-        def room = dependenciesNode.appendNode('dependency')
-        room.appendNode('groupId', 'androidx.room')
-        room.appendNode('artifactId', 'room-rxjava2')
-        room.appendNode('version', '[2.1.0,3.0.0)')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')
