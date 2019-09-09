@@ -1,7 +1,6 @@
 package io.blockv.core.internal.datapool
 
 import android.database.DatabaseUtils
-import android.util.Log
 import androidx.paging.PagedList
 import androidx.paging.RxPagedListBuilder
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -66,46 +65,52 @@ class InventoryImpl(
       val disposable = CompositeDisposable()
       emitter.setDisposable(disposable)
       val messages = ArrayList<WebSocketEvent<JSONObject>>()
+      val lock = Object()
       val processMessage: (message: WebSocketEvent<JSONObject>) -> Unit =
         { message ->
-          try {
-            if (message.type == WebSocketEvent.MessageType.INVENTORY) {
-              val event = jsonModule.deserialize<InventoryEvent>(message.payload!!)
-              val dbVatoms = database.vatomDao().getVatoms(listOf(event.vatomId)).blockingFirst()
-              if (dbVatoms.isEmpty() || dbVatoms.first().vatom == null) {
-                vatomApi.getUserVatom(VatomRequest(listOf(event.vatomId))).payload
-                  .forEach { vatom ->
-                    database.vatomDao().addOrUpdateFaces(vatom.faces).blockingGet()
-                    database.vatomDao().addOrUpdateActions(vatom.actions).blockingGet()
-                    database.vatomDao().addOrUpdateVatoms(listOf(vatom)).blockingGet()
-                  }
+          synchronized(lock) {
+            try {
+              if (message.type == WebSocketEvent.MessageType.INVENTORY) {
+                val event = jsonModule.deserialize<InventoryEvent>(message.payload!!)
+                val dbVatoms = database.vatomDao().getVatoms(listOf(event.vatomId)).blockingFirst()
+                if (dbVatoms.isEmpty() || dbVatoms.first().vatom == null) {
+                  vatomApi.getUserVatom(VatomRequest(listOf(event.vatomId))).payload
+                    .forEach { vatom ->
+                      database.vatomDao().addOrUpdateFaces(vatom.faces).blockingGet()
+                      database.vatomDao().addOrUpdateActions(vatom.actions).blockingGet()
+                      database.vatomDao().addOrUpdateVatoms(listOf(vatom)).blockingGet()
+                    }
 
+                } else
+                  if (dbVatoms.first().vatom?.property?.owner != event.newOwnerId) {
+                    database.vatomDao().removeVatom(listOf(dbVatoms.first().vatom).filterNotNull()).blockingGet()
+                  }
               } else
-                if (dbVatoms.first().vatom?.property?.owner != event.newOwnerId) {
-                  database.vatomDao().removeVatom(listOf(dbVatoms.first().vatom).filterNotNull()).blockingGet()
-                }
-            } else
-              if (message.type == WebSocketEvent.MessageType.STATE_UPDATE) {
-                val event = jsonModule.deserialize<StateUpdateEvent>(message.payload!!)
-                if (event.operation.toLowerCase() == "update") {
-                  val dbVatoms = database.vatomDao().getVatoms(listOf(event.vatomId)).blockingFirst()
-                  if (dbVatoms.isNotEmpty()
-                    && event.vatomProperties
-                      .optJSONObject("vAtom::vAtomType")
-                      ?.optString("owner") == dbVatoms.first().vatom?.property?.owner
-                  ) {
-                    val json = jsonModule.serialize(dbVatoms.first().vatom!!)!!
-                    JsonUtil.merge(json, event.vatomProperties)
-                    val vatom = jsonModule.deserialize<Vatom>(json)
-                    database.vatomDao().addOrUpdateVatoms(listOf(vatom)).blockingGet()
+                if (message.type == WebSocketEvent.MessageType.STATE_UPDATE) {
+                  val event = jsonModule.deserialize<StateUpdateEvent>(message.payload!!)
+                  if (event.operation.toLowerCase() == "update") {
+                    val dbVatoms = database.vatomDao().getVatoms(listOf(event.vatomId)).blockingFirst()
+                    if (dbVatoms.isNotEmpty() && dbVatoms.first().vatom != null
+                      && (
+                        event.vatomProperties
+                          .optJSONObject("vAtom::vAtomType")
+                          ?.optString("owner", null) == null
+                          || event.vatomProperties
+                          .optJSONObject("vAtom::vAtomType")
+                          ?.optString("owner") == dbVatoms.first().vatom?.property?.owner)
+                    ) {
+                      val json = jsonModule.serialize(dbVatoms.first().vatom!!)!!
+                      JsonUtil.merge(json, event.vatomProperties)
+                      val vatom = jsonModule.deserialize<Vatom>(json)
+                      database.vatomDao().addOrUpdateVatoms(listOf(vatom)).blockingGet()
+                    }
                   }
                 }
-              }
-          } catch (e: Exception) {
-            e.printStackTrace()
+            } catch (e: Exception) {
+              e.printStackTrace()
+            }
           }
         }
-
       state = VatomManager.CacheState.UNSTABLE
 
       val timer = Flowable.timer(300, TimeUnit.MILLISECONDS)
@@ -250,7 +255,6 @@ class InventoryImpl(
         .observeOn(Schedulers.io())
         .subscribe({ message ->
           synchronized(this) {
-            Log.e("datapool", message.toString())
             if (state == VatomManager.CacheState.UNSTABLE) {
               messages.add(message)
             } else {
