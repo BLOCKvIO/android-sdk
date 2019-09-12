@@ -37,8 +37,8 @@ class GeoMapImpl(
   var topRightLon: Double = 0.0
   val vatoms = HashMap<String, Vatom>()
   val brains = HashMap<String, Brain>()
-  var emitter: FlowableEmitter<Message<Vatom>>? = null
-  var flowable: Flowable<Message<Vatom>>? = null
+  var emitter: FlowableEmitter<List<Vatom>>? = null
+  var flowable: Flowable<List<Vatom>>? = null
   val disposable = CompositeDisposable()
   var brainDisposable: Disposable? = null
   val brainUpdater = Observable.interval(1000 / 15, TimeUnit.MILLISECONDS)
@@ -77,7 +77,7 @@ class GeoMapImpl(
 
           }
           if (emitter?.isCancelled == false && updates.isNotEmpty()) {
-            emitter?.onNext(Message(updates, Message.Type.UPDATED, Message.State.STABLE))
+            emitter?.onNext(vatoms.values.toList())
           }
           if (updates.isEmpty()) {
             brainDisposable?.dispose()
@@ -94,8 +94,8 @@ class GeoMapImpl(
     bottomLeftLon: Double,
     topRightLat: Double,
     topRightLon: Double
-  ): Flowable<Message<Vatom>> {
-    return Flowable.create<Message<Vatom>>({ emitter ->
+  ): Flowable<List<Vatom>> {
+    return Flowable.create<List<Vatom>>({ emitter ->
       synchronized(vatoms) {
         if (this.bottomLeftLat != bottomLeftLat
           || this.bottomLeftLon != bottomLeftLon
@@ -108,7 +108,7 @@ class GeoMapImpl(
           flowable = null
         }
         if (flowable == null) {
-          flowable = Flowable.create<Message<Vatom>>({ emitter ->
+          flowable = Flowable.create<List<Vatom>>({ emitter ->
             this.emitter = emitter
             val disposable = CompositeDisposable()
             emitter.setDisposable(disposable)
@@ -124,7 +124,7 @@ class GeoMapImpl(
                 vatoms.remove(it.id)
               }
             }
-            emitter.onNext(Message(vatoms.values.toList(), Message.Type.INITIAL, Message.State.UNSTABLE))
+            emitter.onNext(vatoms.values.toList())
 
             disposable.add(
               Single.fromCallable {
@@ -150,7 +150,7 @@ class GeoMapImpl(
                       }
                       vatoms[it.id] = it
                     }
-                    emitter.onNext(Message(vatoms.values.toList(), Message.Type.INITIAL, Message.State.STABLE))
+                    emitter.onNext(vatoms.values.toList())
                   }
                 }, { emitter.onError(it) })
             )
@@ -172,7 +172,7 @@ class GeoMapImpl(
             .subscribeOn(Schedulers.io())
             .share()
         }
-        emitter.onNext(Message(vatoms.values.toList(), Message.Type.INITIAL, Message.State.STABLE))
+        emitter.onNext(vatoms.values.toList())
         emitter.setDisposable(flowable!!.subscribe({
           emitter.onNext(it)
         }, {
@@ -190,7 +190,7 @@ class GeoMapImpl(
     bottomLeftLon: Double,
     topRightLat: Double,
     topRightLon: Double
-  ): Flowable<Message<Vatom>> {
+  ): Flowable<List<Vatom>> {
 
     return webSocket
       .connectAndMessage(
@@ -234,7 +234,7 @@ class GeoMapImpl(
                   {
                     val vatom = vatoms.remove(it.vatomId)
                     if (vatom != null) {
-                      Flowable.just(Optional(Message(vatom, Message.Type.REMOVED, Message.State.STABLE)))
+                      Flowable.just(Optional(vatoms.values.toList()))
                     } else
                       Flowable.just(Optional(null))
                   }
@@ -249,7 +249,7 @@ class GeoMapImpl(
                       synchronized(vatoms)
                       {
                         vatoms[it.vatomId] = list[0]
-                        Optional(Message(list[0], Message.Type.ADDED, Message.State.STABLE))
+                        Optional(vatoms.values.toList())
                       }
                     } else
                       Optional(null)
@@ -306,7 +306,7 @@ class GeoMapImpl(
                       synchronized(vatoms)
                       {
                         vatoms[event.vatomId] = list[0]
-                        Optional(Message(list[0], Message.Type.ADDED, Message.State.STABLE))
+                        Optional(vatoms.values.toList())
                       }
                     } else
                       Optional(null)
@@ -321,7 +321,7 @@ class GeoMapImpl(
                     {
                       val vatom = vatoms.remove(event.vatomId)
                       if (vatom != null) {
-                        Optional(Message(vatom, Message.Type.REMOVED, Message.State.STABLE))
+                        Optional(vatoms.values.toList())
                       } else
                         Optional(null)
                     }

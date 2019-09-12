@@ -137,7 +137,7 @@ interface VatomManager {
     bottomLeftLon: Double,
     topRightLat: Double,
     topRightLon: Double
-  ): Flowable<Message<Vatom>>
+  ): Flowable<List<Vatom>>
 
   /**
    * Fetches the count of Vatoms dropped in the specified area.

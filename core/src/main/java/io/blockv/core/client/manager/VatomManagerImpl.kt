@@ -66,7 +66,7 @@ class VatomManagerImpl(
     bottomLeftLon: Double,
     topRightLat: Double,
     topRightLon: Double
-  ): Flowable<Message<Vatom>> {
+  ): Flowable<List<Vatom>> {
     return datapool.map.getRegion(bottomLeftLat, bottomLeftLon, topRightLat, topRightLon)
   }
 

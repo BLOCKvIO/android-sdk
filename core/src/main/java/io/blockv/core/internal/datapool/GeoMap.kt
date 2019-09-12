@@ -1,6 +1,5 @@
 package io.blockv.core.internal.datapool
 
-import io.blockv.common.model.Message
 import io.blockv.common.model.Vatom
 import io.reactivex.Flowable
 
@@ -11,5 +10,5 @@ interface GeoMap {
     bottomLeftLon: Double,
     topRightLat: Double,
     topRightLon: Double
-  ): Flowable<Message<Vatom>>
+  ): Flowable<List<Vatom>>
 }
