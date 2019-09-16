@@ -159,7 +159,7 @@ open class DiscoverQueryBuilder {
       json.put(
         "return",
         JSONObject()
-          .put("type", ResultType.PAYLOAD)
+          .put("type", ResultType.PAYLOAD.result)
           .put("fields", JSONArray())
       )
     }
