@@ -576,7 +576,10 @@ class InventoryImpl(
     return Single.fromCallable {
       dispose()
     }
-      .flatMap { database.vatomDao().removeAll() }
+      .flatMap {
+        preferences.inventoryHash = null
+        database.vatomDao().removeAll()
+      }
       .subscribeOn(Schedulers.io())
       .map {}
   }
