@@ -41,7 +41,7 @@ class GeoMapImpl(
   var flowable: Flowable<List<Vatom>>? = null
   val disposable = CompositeDisposable()
   var brainDisposable: Disposable? = null
-  val dateFormatter = SimpleDateFormat("yyyy-MM-ddThh:mm:ssZ")
+  val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ")
   val brainUpdater = Observable.interval(1000 / 15, TimeUnit.MILLISECONDS)
     .observeOn(Schedulers.computation())
     .map {
