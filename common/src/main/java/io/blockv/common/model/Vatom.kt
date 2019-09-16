@@ -25,7 +25,7 @@ open class Vatom @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "when_created")
   val whenCreated: String,
   @Serializer.Serialize(name = "when_modified")
-  val whenModified: String,
+  var whenModified: String,
   @Embedded
   @Serializer.Serialize(name = "vAtom::vAtomType")
   val property: VatomProperty,

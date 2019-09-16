@@ -8,7 +8,6 @@ import io.blockv.common.internal.net.websocket.Websocket
 import io.blockv.common.internal.net.websocket.request.BaseRequest
 import io.blockv.common.internal.net.websocket.request.MonitorRequest
 import io.blockv.common.model.MapEvent
-import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.WebSocketEvent
@@ -22,6 +21,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -41,6 +41,7 @@ class GeoMapImpl(
   var flowable: Flowable<List<Vatom>>? = null
   val disposable = CompositeDisposable()
   var brainDisposable: Disposable? = null
+  val dateFormatter = SimpleDateFormat("yyyy-MM-ddThh:mm:ssZ")
   val brainUpdater = Observable.interval(1000 / 15, TimeUnit.MILLISECONDS)
     .observeOn(Schedulers.computation())
     .map {
@@ -71,6 +72,8 @@ class GeoMapImpl(
                 startPos[1] += lon
 
                 vatom.property.geoPos?.coordinates = startPos
+                val time = dateFormatter.format(Date(System.currentTimeMillis()))
+                vatom.whenModified = time
                 updates.add(vatom)
               }
             }
