@@ -1,6 +1,5 @@
 package io.blockv.core.internal.datapool
 
-import android.util.Log
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.GeoRequest
