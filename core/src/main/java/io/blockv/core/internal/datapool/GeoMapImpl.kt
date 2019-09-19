@@ -31,6 +31,7 @@ class GeoMapImpl(
   val webSocket: Websocket,
   val jsonModule: JsonModule
 ) : GeoMap {
+  var isUpdated = false
   var bottomLeftLat: Double = 0.0
   var bottomLeftLon: Double = 0.0
   var topRightLat: Double = 0.0
@@ -41,7 +42,7 @@ class GeoMapImpl(
   var flowable: Flowable<List<Vatom>>? = null
   val disposable = CompositeDisposable()
   var brainDisposable: Disposable? = null
-  val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ")
+  val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
   val brainUpdater = Observable.interval(1000 / 15, TimeUnit.MILLISECONDS)
     .observeOn(Schedulers.computation())
     .map {
@@ -49,7 +50,6 @@ class GeoMapImpl(
       {
         synchronized(brains)
         {
-          val updates = ArrayList<Vatom>()
           brains.keys.forEach {
             val vatom = vatoms[it]
             val brain = brains[it]
@@ -58,6 +58,7 @@ class GeoMapImpl(
               val current = Date().time
               val startPos = ArrayList(vatom.property.geoPos!!.coordinates)
               if (brain.path.isNotEmpty()) {
+                isUpdated = true
                 val endPos = brain.path[0]
                 val remainingTime = endPos.time - current
 
@@ -73,16 +74,24 @@ class GeoMapImpl(
 
                 vatom.property.geoPos?.coordinates = startPos
                 val time = dateFormatter.format(Date(System.currentTimeMillis()))
-                vatom.whenModified = time
-                updates.add(vatom)
+                val newVatom = Vatom(
+                  vatom.id,
+                  vatom.whenCreated,
+                  time,
+                  vatom.property,
+                  vatom.private,
+                  vatom.sync
+                )
+                vatoms[vatom.id] = newVatom
               }
             }
 
           }
-          if (emitter?.isCancelled == false && updates.isNotEmpty()) {
+          if (emitter?.isCancelled == false && isUpdated) {
             emitter?.onNext(vatoms.values.toList())
+            isUpdated = false
           }
-          if (updates.isEmpty()) {
+          if (isUpdated) {
             brainDisposable?.dispose()
             brainDisposable = null
           }
