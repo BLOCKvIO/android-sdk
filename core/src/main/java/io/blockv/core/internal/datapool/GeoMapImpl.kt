@@ -83,6 +83,8 @@ class GeoMapImpl(
                   vatom.private,
                   vatom.sync
                 )
+                newVatom.faces = vatom.faces
+                newVatom.actions = vatom.actions
                 vatoms[vatom.id] = newVatom
               }
             }
