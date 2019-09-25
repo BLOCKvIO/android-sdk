@@ -11,6 +11,7 @@ import io.blockv.common.model.MapEvent
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.WebSocketEvent
+import io.blockv.common.util.JsonUtil
 import io.blockv.common.util.Optional
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -82,6 +83,8 @@ class GeoMapImpl(
                   vatom.private,
                   vatom.sync
                 )
+                newVatom.faces = vatom.faces
+                newVatom.actions = vatom.actions
                 vatoms[vatom.id] = newVatom
               }
             }
@@ -295,7 +298,20 @@ class GeoMapImpl(
                   }
                   Flowable.just(Optional(null))
                 }
-                else -> Flowable.just(Optional(null))
+                else -> Flowable.fromCallable {
+                  synchronized(vatoms)
+                  {
+                    val vatom = vatoms[it.vatomId]
+                    if (vatom != null) {
+                      val json = jsonModule.serialize(vatom)!!
+                      JsonUtil.merge(json, it.vatomProperties)
+                      vatoms[it.vatomId] = jsonModule.deserialize(json)
+                      Optional(vatoms.values.toList())
+                    } else
+                      Optional(null)
+                  }
+                }.subscribeOn(Schedulers.computation())
+                  .onErrorReturn { Optional(null) }
               }
             }
         } else {
