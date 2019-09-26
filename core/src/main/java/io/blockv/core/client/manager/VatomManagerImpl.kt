@@ -286,12 +286,6 @@ class VatomManagerImpl(
   }
 
   override fun discover(query: JSONObject): Single<List<Vatom>> = Single.fromCallable {
-    query.put(
-      "return",
-      JSONObject()
-        .put("type", DiscoverQueryBuilder.ResultType.PAYLOAD)
-        .put("fields", JSONArray())
-    )
     api.discover(query).payload.vatoms
   }
     .subscribeOn(Schedulers.io())
