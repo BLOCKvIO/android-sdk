@@ -33,7 +33,7 @@ class FaceProperty @Serializer.Serializable constructor(
       "displayUrl='" + displayUrl + '\'' +
       ", viewMode='" + viewMode + '\'' +
       ", platform='" + platform + '\'' +
-      ", platform='" + quality + '\'' +
+      ", quality='" + quality + '\'' +
       ", config='" + config + '\'' +
       ", resources='" + resources + '\'' +
       "}"
