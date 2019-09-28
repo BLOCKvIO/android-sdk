@@ -15,7 +15,10 @@ import android.view.View
 import android.view.ViewGroup
 import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
-import io.blockv.face.client.FaceManager.EmbeddedProcedure.*
+import io.blockv.face.client.FaceManager.EmbeddedProcedure.CARD
+import io.blockv.face.client.FaceManager.EmbeddedProcedure.ENGAGED
+import io.blockv.face.client.FaceManager.EmbeddedProcedure.FULLSCREEN
+import io.blockv.face.client.FaceManager.EmbeddedProcedure.ICON
 import io.blockv.face.client.manager.MessageManager
 import io.blockv.face.client.manager.ResourceManager
 import io.reactivex.Single
@@ -56,9 +59,9 @@ interface FaceManager {
           ): Face? {
             var context: EmbeddedProcedure? = procedure
             do {
-              val face = defaultRoutine(vatom.faces, displayUrls, context!!.viewMode)
-              if (face != null)
-                return face
+              val faces = defaultRoutine(vatom.faces, displayUrls, context!!.viewMode)
+              if (faces.isNotEmpty())
+                return faces.first()
               context = context.fallback
             } while (context != null)
             return null
@@ -67,9 +70,9 @@ interface FaceManager {
       }
 
     companion object {
-      val defaultRoutine: (faces: List<Face>, faceRegistry: Set<String>, viewMode: String) -> Face? =
+      val defaultRoutine: (faces: List<Face>, faceRegistry: Set<String>, viewMode: String) -> List<Face> =
         { faces, faceRegistry, viewMode ->
-          var selectedFace: Face? = null
+          var selectedFaces = ArrayList<Face>()
           var rating = 0
           for (face in faces) {
 
@@ -105,10 +108,14 @@ interface FaceManager {
 
             if (rate > rating) {
               rating = rate
-              selectedFace = face
-            }
+              selectedFaces.clear()
+              selectedFaces.add(face)
+            } else
+              if (rate == rating) {
+                selectedFaces.add(face)
+              }
           }
-          selectedFace
+          selectedFaces
         }
     }
   }
