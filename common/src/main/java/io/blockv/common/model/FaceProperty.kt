@@ -20,6 +20,8 @@ class FaceProperty @Serializer.Serializable constructor(
   val viewMode: String,
   @Serializer.Serialize(path = "constraints")
   val platform: String,
+  @Serializer.Serialize(path = "constraints")
+  val quality: String,
   @Serializer.Serialize
   val config: JSONObject,
   @Serializer.Serialize
@@ -31,6 +33,7 @@ class FaceProperty @Serializer.Serializable constructor(
       "displayUrl='" + displayUrl + '\'' +
       ", viewMode='" + viewMode + '\'' +
       ", platform='" + platform + '\'' +
+      ", platform='" + quality + '\'' +
       ", config='" + config + '\'' +
       ", resources='" + resources + '\'' +
       "}"
