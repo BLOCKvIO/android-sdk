@@ -18,8 +18,11 @@ class Datapool(
 
   val db = Room.databaseBuilder(
     context,
-    Database::class.java, "datapool-db"
-  ).build()
+    Database::class.java,
+    "datapool-db"
+  )
+    .fallbackToDestructiveMigration()
+    .build()
 
   val map: GeoMap = GeoMapImpl(vatomApi, websocket, jsonModule)
   val inventory: Inventory = InventoryImpl(vatomApi, websocket, jsonModule, db, preferences)
