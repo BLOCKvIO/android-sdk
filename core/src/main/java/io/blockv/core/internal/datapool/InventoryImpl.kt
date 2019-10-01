@@ -321,7 +321,7 @@ class InventoryImpl(
           if (ids?.isNotEmpty() != true) {
             "WHERE parentId = '$parentId' "
           } else {
-            "WHERE id IN (${ids.joinToString(",")}) "
+            "WHERE id IN (${ids.map { "\'$it\'" }.joinToString(",")}) "
           } +
           "AND isDropped = 0 " +
           "AND templateId NOT LIKE '%::vAtom::Avatar' " +
@@ -344,7 +344,7 @@ class InventoryImpl(
           if (ids?.isNotEmpty() != true) {
             "WHERE parentId = '$parentId' "
           } else {
-            "WHERE id IN (${ids.joinToString(",", "\'", "\'")}) "
+            "WHERE id IN (${ids.map { "\'$it\'" }.joinToString(",")}) "
           } +
           "AND isDropped = 0 " +
           "AND templateId NOT LIKE '%::vAtom::Avatar' " +
