@@ -650,7 +650,7 @@ class ResourceManagerImpl(
             var error: Throwable? = null
             val download = downloader
               .subscribe({}, {
-                this.error = it
+                this.error = IOException(it)
               })
             var chunk = 0
             var fileStream: InputStream? = null
@@ -710,7 +710,7 @@ class ResourceManagerImpl(
                   fileStream = null
                 } catch (e: Exception) {
                 }
-                throw e
+                throw IOException(e)
               }
             }
 
