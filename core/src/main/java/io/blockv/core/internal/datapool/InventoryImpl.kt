@@ -1,7 +1,6 @@
 package io.blockv.core.internal.datapool
 
 import android.database.DatabaseUtils
-import android.util.Log
 import androidx.paging.PagedList
 import androidx.paging.RxPagedListBuilder
 import androidx.sqlite.db.SimpleSQLiteQuery
