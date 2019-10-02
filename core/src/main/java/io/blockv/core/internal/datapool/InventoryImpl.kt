@@ -515,17 +515,17 @@ class InventoryImpl(
       }
       .filter { it.isNotEmpty() && it.first().vatom != null }
       .map { it.first().vatom!! }
-      .flatMapSingle<Unit> {
+      .flatMapSingle<Unit> { vatom ->
         when (action.toLowerCase()) {
           "transfer", "redeem", "trash" -> {
             database.vatomDao()
-              .removeVatom(listOf(it))
+              .removeVatom(listOf(vatom))
               .map { Unit }
           }
           "drop" -> {
-            it.property.isDropped = true
+            vatom.property.isDropped = true
             database.vatomDao()
-              .addOrUpdateVatoms(listOf(it))
+              .addOrUpdateVatoms(listOf(vatom))
               .map { Unit }
           }
           else -> Single.just(Unit)
@@ -534,21 +534,24 @@ class InventoryImpl(
       .subscribeOn(Schedulers.io())
   }
 
-  override fun setParentId(vatomId: String, parentId: String): Single<String> {
+  override fun setParentId(ids: Map<String, String>): Single<Map<String, String>> {
     return database.vatomDao()
-      .getVatoms(listOf(vatomId))
+      .getVatoms(ids.keys.toList())
       .firstElement()
-      .filter { it.isNotEmpty() && it.first().vatom != null }
+      .filter { it.isNotEmpty() }
+      .map { it.map { it.vatom }.filterNotNull() }
       .flatMap { vatoms ->
-        val vatom = vatoms.first().vatom!!
-        val oldId = vatom.id
-        vatom.property.parentId = parentId
+        val oldId = HashMap<String, String>()
+        vatoms.forEach {
+          oldId[it.id] = it.property.parentId ?: "."
+          it.property.parentId = ids[it.id] ?: "."
+        }
         database.vatomDao()
-          .addOrUpdateVatoms(listOf(vatom))
+          .addOrUpdateVatoms(vatoms)
           .toMaybe()
-          .map { oldId }
+          .map { oldId.toMap() }
       }
-      .toSingle("")
+      .toSingle(HashMap())
       .subscribeOn(Schedulers.io())
   }
 
