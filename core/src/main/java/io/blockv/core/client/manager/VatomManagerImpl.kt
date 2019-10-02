@@ -11,7 +11,6 @@
 package io.blockv.core.client.manager
 
 import androidx.paging.PagedList
-import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.internal.net.rest.api.VatomApi
 import io.blockv.common.internal.net.rest.request.GeoGroupRequest
 import io.blockv.common.internal.net.rest.request.GeoRequest
@@ -20,7 +19,6 @@ import io.blockv.common.internal.net.rest.request.PerformActionRequest
 import io.blockv.common.internal.net.rest.request.TrashVatomRequest
 import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.model.GeoGroup
-import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.VatomGroup
@@ -93,10 +91,10 @@ class VatomManagerImpl(
     .observeOn(AndroidSchedulers.mainThread())
 
   override fun setParentId(vatomId: String, parentId: String): Single<VatomUpdate> {
-    var oldParentId = ""
-    return datapool.inventory.setParentId(vatomId, parentId)
+    var oldParentIds: Map<String, String>? = null
+    return datapool.inventory.setParentId(mapOf(Pair(vatomId, parentId)))
       .map {
-        oldParentId = it
+        oldParentIds = it
         api.updateVatom(
           JSONObject()
             .put("parent_id", parentId)
@@ -105,8 +103,8 @@ class VatomManagerImpl(
           .payload
       }
       .onErrorResumeNext { throwable ->
-        if (oldParentId.isNotEmpty()) {
-          datapool.inventory.setParentId(vatomId, oldParentId)
+        if (oldParentIds != null && oldParentIds!!.isNotEmpty()) {
+          datapool.inventory.setParentId(oldParentIds!!)
             .map { throw throwable }
         } else
           throw  throwable
@@ -222,20 +220,63 @@ class VatomManagerImpl(
   override fun performAction(
     action: String,
     payload: JSONObject
-  ): Single<JSONObject> = Single.fromCallable {
-    api.preformAction(PerformActionRequest(action, payload)).payload
-  }
-    .subscribeOn(Schedulers.io())
-    .flatMap { data ->
-      datapool.inventory
-        .performAction(action, payload)
-        .firstElement()
-        .toSingle(Unit)
-        .map {
-          data
-        }
+  ): Single<JSONObject> =
+    when (action) {
+      "Combine" -> {
+        datapool.inventory
+          .setParentId(
+            mapOf(
+              Pair(
+                payload.optString("child.id", ""),
+                payload.optString("this.id", "")
+              )
+            )
+          )
+      }
+      "Split" -> {
+        datapool.inventory
+          .getVatom(payload.optString("this.id", ""))
+          .firstOrError()
+          .flatMap { vatom ->
+            val ids = payload.optJSONArray("vatom.ids")
+            val data = HashMap<String, String>()
+            (0 until ids.length()).forEach {
+              data[ids.getString(it)] = vatom.second!!.property.parentId ?: "."
+            }
+            datapool.inventory
+              .setParentId(
+                data
+              )
+          }
+          .onErrorReturn { emptyMap() }
+      }
+      else -> {
+        Single.just(emptyMap())
+      }
     }
-    .observeOn(AndroidSchedulers.mainThread())
+      .subscribeOn(Schedulers.io())
+      .flatMap { oldParentIds ->
+        Single.fromCallable {
+          api.preformAction(PerformActionRequest(action, payload)).payload
+        }.subscribeOn(Schedulers.io())
+          .onErrorResumeNext { throwable ->
+            if (oldParentIds.isNotEmpty()) {
+              datapool.inventory.setParentId(oldParentIds)
+                .map { throw throwable }
+            } else
+              throw  throwable
+          }
+      }
+      .flatMap { data ->
+        datapool.inventory
+          .performAction(action, payload)
+          .firstElement()
+          .toSingle(Unit)
+          .map {
+            data
+          }
+      }
+      .observeOn(AndroidSchedulers.mainThread())
 
   override fun performAction(
     action: VatomManager.Action,

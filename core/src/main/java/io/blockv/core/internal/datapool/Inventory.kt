@@ -40,7 +40,7 @@ interface Inventory {
 
   fun performAction(action: String, payload: JSONObject): Observable<Unit>
 
-  fun setParentId(vatomId: String, parentId: String): Single<String>
+  fun setParentId(ids: Map<String, String>): Single<Map<String, String>>
 
   fun getCategories(): Single<List<String>>
 
