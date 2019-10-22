@@ -17,7 +17,8 @@ object MockData {
     "                    \"config\": {},\n" +
     "                    \"constraints\": {\n" +
     "                        \"view_mode\": \"fullscreen\",\n" +
-    "                        \"platform\": \"android\"\n" +
+    "                        \"platform\": \"android\",\n" +
+    "                        \"quality\": \"low\"\n" +
     "                    },\n" +
     "                    \"resources\": []\n" +
     "                }\n" +
