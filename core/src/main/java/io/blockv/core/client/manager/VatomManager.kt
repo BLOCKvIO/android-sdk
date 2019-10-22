@@ -13,7 +13,6 @@ package io.blockv.core.client.manager
 import androidx.paging.PagedList
 import io.blockv.common.builder.DiscoverQueryBuilder
 import io.blockv.common.model.GeoGroup
-import io.blockv.common.model.Message
 import io.blockv.common.model.StateUpdateEvent
 import io.blockv.common.model.Vatom
 import io.blockv.common.model.VatomGroup
@@ -290,6 +289,14 @@ interface VatomManager {
    */
   fun updateVatom(vatom: Vatom, update: StateUpdateEvent): Single<Vatom>
 
+  /**
+   * Performs a redemption request on the specified vatom id. This will trigger an
+   * RPC socket event to the client informing it of the redemption request.
+   *
+   * @param vatomId is vatom identifier for redemption.
+   * @return new Single<JSONObject>.
+   */
+  fun requestRedeem(vatomId: String): Single<JSONObject>
 
   enum class TokenType {
     EMAIL,

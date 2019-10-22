@@ -17,6 +17,7 @@ import io.blockv.common.internal.net.rest.request.GeoRequest
 import io.blockv.common.internal.net.rest.request.InventoryRequest
 import io.blockv.common.internal.net.rest.request.InventorySyncRequest
 import io.blockv.common.internal.net.rest.request.PerformActionRequest
+import io.blockv.common.internal.net.rest.request.RedeemRequest
 import io.blockv.common.internal.net.rest.request.TrashVatomRequest
 import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
@@ -204,6 +205,14 @@ class VatomApiImpl(
     return BaseResponse(
       response.getString("request_id"),
       sync
+    )
+  }
+
+  override fun requestRedeem(request: RedeemRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("/v1/user/vatom/request/redemption", request.toJson())
+    return BaseResponse(
+      response.getString("request_id"),
+      response
     )
   }
 

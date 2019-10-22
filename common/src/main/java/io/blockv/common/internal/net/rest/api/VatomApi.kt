@@ -15,6 +15,7 @@ import io.blockv.common.internal.net.rest.request.GeoRequest
 import io.blockv.common.internal.net.rest.request.InventoryRequest
 import io.blockv.common.internal.net.rest.request.InventorySyncRequest
 import io.blockv.common.internal.net.rest.request.PerformActionRequest
+import io.blockv.common.internal.net.rest.request.RedeemRequest
 import io.blockv.common.internal.net.rest.request.TrashVatomRequest
 import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
@@ -57,5 +58,7 @@ interface VatomApi {
   fun getInventoryHash(): BaseResponse<String>
 
   fun getInventorySync(request: InventorySyncRequest): BaseResponse<InventorySync>
+
+  fun requestRedeem(request: RedeemRequest): BaseResponse<JSONObject>
 }
 

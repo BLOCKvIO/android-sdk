@@ -16,6 +16,7 @@ import io.blockv.common.internal.net.rest.request.GeoGroupRequest
 import io.blockv.common.internal.net.rest.request.GeoRequest
 import io.blockv.common.internal.net.rest.request.InventoryRequest
 import io.blockv.common.internal.net.rest.request.PerformActionRequest
+import io.blockv.common.internal.net.rest.request.RedeemRequest
 import io.blockv.common.internal.net.rest.request.TrashVatomRequest
 import io.blockv.common.internal.net.rest.request.VatomRequest
 import io.blockv.common.model.GeoGroup
@@ -466,4 +467,11 @@ class VatomManagerImpl(
       .observeOn(AndroidSchedulers.mainThread())
   }
 
+  override fun requestRedeem(vatomId: String): Single<JSONObject> {
+    return Single.fromCallable {
+      api.requestRedeem(RedeemRequest(vatomId)).payload
+    }
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+  }
 }
