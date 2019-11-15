@@ -409,9 +409,9 @@ class VatomManagerImpl(
             val coord = geoPos.getJSONArray("coordinates")
             if (props.geoPos != null) {
 
-              val list = ArrayList<Float>()
+              val list = ArrayList<Double>()
               (0 until coord.length()).forEach {
-                list.add(coord.getDouble(it).toFloat())
+                list.add(coord.getDouble(it))
               }
 
               props.geoPos?.coordinates = list

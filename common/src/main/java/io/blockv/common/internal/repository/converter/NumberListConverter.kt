@@ -14,7 +14,25 @@ object NumberListConverter {
 
   @TypeConverter
   @JvmStatic
-  fun toString(data: List<Float>?): String {
+  fun toDoubleList(data: String?): List<Double> {
+    return data?.split(";")?.toList()?.map {
+      it.toDoubleOrNull()
+    }?.filterNotNull() ?: emptyList()
+  }
+
+  @TypeConverter
+  @JvmStatic
+  fun floatToString(data: List<Float>?): String {
+    var outData = ""
+    data?.forEach {
+      outData += "$it;"
+    }
+    return outData
+  }
+
+  @TypeConverter
+  @JvmStatic
+  fun doubleToString(data: List<Double>?): String {
     var outData = ""
     data?.forEach {
       outData += "$it;"

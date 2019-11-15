@@ -17,13 +17,13 @@ class GeoPosition @Serializer.Serializable constructor(
   var type: String?,
   @Serializer.Serialize(name = "\$reql_type\$")
   var reqType: String?,
-  @Serializer.Serialize var coordinates: List<Float>?
+  @Serializer.Serialize var coordinates: List<Double>?
 ) : Model {
 
   constructor(geoPosition: GeoPosition) : this(
     geoPosition.type,
     geoPosition.reqType,
-    ArrayList(geoPosition.coordinates)
+    ArrayList(geoPosition.coordinates ?: emptyList())
   )
 
   override fun toString(): String {

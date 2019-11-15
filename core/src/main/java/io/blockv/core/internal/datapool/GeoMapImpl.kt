@@ -30,7 +30,8 @@ import kotlin.collections.ArrayList
 class GeoMapImpl(
   val vatomApi: VatomApi,
   val webSocket: Websocket,
-  val jsonModule: JsonModule
+  val jsonModule: JsonModule,
+  fps: Int = 30
 ) : GeoMap {
   var isUpdated = false
   var bottomLeftLat: Double = 0.0
@@ -44,7 +45,7 @@ class GeoMapImpl(
   val disposable = CompositeDisposable()
   var brainDisposable: Disposable? = null
   val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-  val brainUpdater = Observable.interval(1000 / 15, TimeUnit.MILLISECONDS)
+  val brainUpdater = Observable.interval(1000 / fps.toLong(), TimeUnit.MILLISECONDS)
     .observeOn(Schedulers.computation())
     .map {
       synchronized(vatoms)
@@ -57,35 +58,43 @@ class GeoMapImpl(
             if (vatom != null && brain != null) {
               brain.path = brain.filter(brain.path)
               val current = Date().time
-              val startPos = ArrayList(vatom.property.geoPos!!.coordinates)
               if (brain.path.isNotEmpty()) {
                 isUpdated = true
+
                 val endPos = brain.path[0]
+                if (endPos != brain.endPos) {
+                  brain.endPos = endPos
+                  brain.startPos = Position(
+                    current,
+                    vatom.property.geoPos!!.coordinates!![0],
+                    vatom.property.geoPos!!.coordinates!![1]
+                  )
+                }
+                val startPos = brain.startPos!!
+
                 val remainingTime = endPos.time - current
 
-                var interval = (remainingTime * 15f / 1000)
+                if (remainingTime >= 0) {
 
-                if (interval < 1) {
-                  interval = 1f
+                  val t = 1f - (remainingTime / (endPos.time - startPos.time).toFloat())
+
+                  val lon = (endPos.lon - startPos.lon) * t
+                  val lat = (endPos.lat - startPos.lat) * t
+
+                  vatom.property.geoPos?.coordinates = listOf(startPos.lat + lat, startPos.lon + lon)
+                  val time = dateFormatter.format(Date(System.currentTimeMillis()))
+                  val newVatom = Vatom(
+                    vatom.id,
+                    vatom.whenCreated,
+                    time,
+                    vatom.property,
+                    vatom.private,
+                    vatom.sync
+                  )
+                  newVatom.faces = vatom.faces
+                  newVatom.actions = vatom.actions
+                  vatoms[vatom.id] = newVatom
                 }
-                val lon = (endPos.lon - startPos[1]) / interval
-                val lat = (endPos.lat - startPos[0]) / interval
-                startPos[0] += lat
-                startPos[1] += lon
-
-                vatom.property.geoPos?.coordinates = startPos
-                val time = dateFormatter.format(Date(System.currentTimeMillis()))
-                val newVatom = Vatom(
-                  vatom.id,
-                  vatom.whenCreated,
-                  time,
-                  vatom.property,
-                  vatom.private,
-                  vatom.sync
-                )
-                newVatom.faces = vatom.faces
-                newVatom.actions = vatom.actions
-                vatoms[vatom.id] = newVatom
               }
             }
 
@@ -281,7 +290,7 @@ class GeoMapImpl(
                       val pos = positions.getJSONObject(it)
                       val time = pos.getLong("time")
                       val geoPos = pos.getJSONArray("geo_pos")
-                      Position(time, geoPos.getDouble(0).toFloat(), geoPos.getDouble(1).toFloat())
+                      Position(time, geoPos.getDouble(0), geoPos.getDouble(1))
                     }
                     if (brains.containsKey(it.vatomId)) {
                       brains[it.vatomId]!!.updatePath(path)
@@ -302,7 +311,11 @@ class GeoMapImpl(
                   synchronized(vatoms)
                   {
                     val vatom = vatoms[it.vatomId]
-                    if (vatom != null) {
+                    if (vatom != null &&
+                      (brains[it.vatomId] == null || it.vatomProperties
+                        .optJSONObject("vAtom::vAtomType")
+                        ?.optJSONObject("geo_pos") == null)
+                    ) {
                       val json = jsonModule.serialize(vatom)!!
                       JsonUtil.merge(json, it.vatomProperties)
                       vatoms[it.vatomId] = jsonModule.deserialize(json)
@@ -371,7 +384,9 @@ class GeoMapImpl(
 
   inner class Brain(
     var vatomId: String,
-    var path: MutableList<Position>
+    var path: MutableList<Position>,
+    var startPos: Position? = null,
+    var endPos: Position? = null
   ) {
 
     @Synchronized
@@ -383,10 +398,10 @@ class GeoMapImpl(
         val positionFirst = this.path[0]
         var index = 0
         for (position in sorted) {
+          index++
           if (position.time > positionFirst.time) {
             break
           }
-          index++
         }
         if (index < sorted.size) {
           val out = sorted.subList(index, sorted.size)
@@ -407,5 +422,5 @@ class GeoMapImpl(
     }
   }
 
-  class Position(val time: Long, val lat: Float, val lon: Float)
+  class Position(val time: Long, val lat: Double, val lon: Double)
 }
