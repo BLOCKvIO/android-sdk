@@ -419,25 +419,53 @@ class InventoryImpl(
   }
 
   override fun getVatom(id: String): Flowable<Pair<VatomManager.CacheState, Vatom?>> {
-    return Flowable.combineLatest<VatomManager.CacheState, Optional<Vatom>, Pair<VatomManager.CacheState, Vatom?>>(
-      getState(),
-      database
-        .vatomDao()
-        .getVatoms(listOf(id))
-        .map {
-          Optional(
-            if (it.isNotEmpty()) {
-              val pack = it.first()
-              pack.vatom?.actions = pack.actions ?: emptyList()
-              pack.vatom?.faces = pack.faces ?: emptyList()
-              pack.vatom
-            } else null
-          )
-        },
-      BiFunction
-      { state, vatom ->
-        Pair(state, vatom.value)
-      })
+
+    return Flowable.create<Pair<VatomManager.CacheState, Vatom?>>({ emitter ->
+      val disposable = CompositeDisposable()
+      emitter.setDisposable(disposable)
+      var internalVatom: Vatom? = null
+      var internalState: VatomManager.CacheState? = null
+      disposable.add(
+        Flowable.combineLatest<VatomManager.CacheState, Optional<Vatom>, Pair<VatomManager.CacheState, Vatom?>>(
+          getState(),
+          database
+            .vatomDao()
+            .getVatoms(listOf(id))
+            .map {
+              Optional(
+                if (it.isNotEmpty()) {
+                  val pack = it.first()
+                  pack.vatom?.actions = pack.actions ?: emptyList()
+                  pack.vatom?.faces = pack.faces ?: emptyList()
+                  pack.vatom
+                } else null
+              )
+            },
+          BiFunction
+          { state, vatom ->
+            Pair(state, vatom.value)
+          })
+          .subscribeOn(Schedulers.io())
+          .subscribe({
+            if (!emitter.isCancelled) {
+              if (
+                internalState != it.first
+                || it.second == null
+                || internalVatom == null
+                || it.second?.whenModified != internalVatom?.whenModified
+              ) {
+                internalState = it.first
+                internalVatom = it.second
+                emitter.onNext(it)
+              }
+            }
+          }, {
+            if (!emitter.isCancelled) {
+              emitter.onError(it)
+            }
+          })
+      )
+    }, BackpressureStrategy.BUFFER)
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
   }
