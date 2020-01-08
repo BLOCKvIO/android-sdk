@@ -43,7 +43,7 @@ repositories {
 }
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'face'
-def libraryVersion = '4.0.0-alpha.62'
+def libraryVersion = '4.0.0-alpha.63'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -91,7 +91,7 @@ publishing {
         def webFaceDependency = dependenciesNode.appendNode('dependency')
         webFaceDependency.appendNode('groupId', 'io.blockv.faces-alpha')
         webFaceDependency.appendNode('artifactId', 'web-face')
-        webFaceDependency.appendNode('version', '4.0.0-alpha.8')
+        webFaceDependency.appendNode('version', '4.0.0-alpha.9')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')
