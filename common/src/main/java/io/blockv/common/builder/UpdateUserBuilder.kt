@@ -21,6 +21,7 @@ class UpdateUserBuilder {
   private var avatar: String? = null
   private var password: String? = null
   private var language: String? = null
+  private var userConsent: Int? = null
 
   fun setFirstName(firstName: String): UpdateUserBuilder {
     this.firstName = firstName
@@ -52,6 +53,11 @@ class UpdateUserBuilder {
     return this
   }
 
+  fun setUserConsent(userConsent: Int): UpdateUserBuilder {
+    this.userConsent = userConsent
+    return this
+  }
+
   fun build(): UserUpdate {
     return UserUpdate(
       firstName,
@@ -59,7 +65,8 @@ class UpdateUserBuilder {
       birthday,
       avatar,
       password,
-      language
+      language,
+      userConsent
     )
   }
 

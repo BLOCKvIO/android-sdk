@@ -18,17 +18,19 @@ class UpdateUserRequest(
   var birthday: String?,
   var avatarUri: String?,
   var language: String?,
-  var password: String?
+  var password: String?,
+  var userConsent: Int?
 ) {
 
   fun toJson(): JSONObject {
-    val json: JSONObject = JSONObject()
+    val json = JSONObject()
     if (firstName != null) json.put("first_name", firstName)
     if (lastName != null) json.put("last_name", lastName)
     if (birthday != null) json.put("birthday", birthday)
     if (avatarUri != null) json.put("avatar_uri", avatarUri)
     if (password != null) json.put("password", password)
     if (language != null) json.put("language", language)
+    if (userConsent != null) json.put("user_consent", userConsent!!)
 
     return json
   }
