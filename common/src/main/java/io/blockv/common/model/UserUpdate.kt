@@ -16,5 +16,6 @@ class UserUpdate(
   var birthday: String?,
   var avatarUri: String?,
   var password: String?,
-  var language: String?
+  var language: String?,
+  var userConsent: Int?
 )

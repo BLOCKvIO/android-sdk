@@ -240,7 +240,8 @@ class UserManagerImpl(
         update.birthday,
         update.avatarUri,
         update.language,
-        update.password
+        update.password,
+        update.userConsent
       )
     ).payload
   }
