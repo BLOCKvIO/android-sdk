@@ -185,7 +185,8 @@ object MockData {
     "                \"birthday\": \"\",\n" +
     "                \"guest_id\": \"\",\n" +
     "                \"nonpush_notification\": false,\n" +
-    "                \"language\": \"en\"\n" +
+    "                \"language\": \"en\",\n" +
+    "                \"user_consents\": []\n" +
     "            }\n" +
     "        }"
 
