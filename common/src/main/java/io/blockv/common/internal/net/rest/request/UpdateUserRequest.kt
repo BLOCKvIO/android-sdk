@@ -19,7 +19,8 @@ class UpdateUserRequest(
   var avatarUri: String?,
   var language: String?,
   var password: String?,
-  var userConsent: Int?
+  var userConsent: Int?,
+  var nonPushNotification: Boolean?
 ) {
 
   fun toJson(): JSONObject {
@@ -31,6 +32,7 @@ class UpdateUserRequest(
     if (password != null) json.put("password", password)
     if (language != null) json.put("language", language)
     if (userConsent != null) json.put("user_consent", userConsent!!)
+    if (nonPushNotification != null) json.put("nonpush_notification", nonPushNotification)
 
     return json
   }

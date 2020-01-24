@@ -22,6 +22,7 @@ class UpdateUserBuilder {
   private var password: String? = null
   private var language: String? = null
   private var userConsent: Int? = null
+  private var nonPushNotification: Boolean? = null
 
   fun setFirstName(firstName: String): UpdateUserBuilder {
     this.firstName = firstName
@@ -58,6 +59,11 @@ class UpdateUserBuilder {
     return this
   }
 
+  fun setNonPushNotification(nonPushNotification: Boolean): UpdateUserBuilder {
+    this.nonPushNotification = nonPushNotification
+    return this
+  }
+
   fun build(): UserUpdate {
     return UserUpdate(
       firstName,
@@ -66,9 +72,9 @@ class UpdateUserBuilder {
       avatar,
       password,
       language,
-      userConsent
+      userConsent,
+      nonPushNotification
     )
   }
-
 
 }

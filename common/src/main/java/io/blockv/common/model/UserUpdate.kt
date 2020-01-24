@@ -17,5 +17,6 @@ class UserUpdate(
   var avatarUri: String?,
   var password: String?,
   var language: String?,
-  var userConsent: Int?
+  var userConsent: Int?,
+  var nonPushNotification: Boolean?
 )

@@ -241,7 +241,8 @@ class UserManagerImpl(
         update.avatarUri,
         update.language,
         update.password,
-        update.userConsent
+        update.userConsent,
+        update.nonPushNotification
       )
     ).payload
   }
