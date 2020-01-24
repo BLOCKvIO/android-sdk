@@ -32,7 +32,7 @@ class UpdateUserRequest(
     if (password != null) json.put("password", password)
     if (language != null) json.put("language", language)
     if (userConsent != null) json.put("user_consent", userConsent!!)
-    if (nonPushNotification != null) json.put("nonpush_notification", nonPushNotification)
+    if (nonPushNotification != null) json.put("nonpush_notification", nonPushNotification!!)
 
     return json
   }
