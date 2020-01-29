@@ -12,18 +12,9 @@ package io.blockv.common.internal.net.rest.api
 
 import io.blockv.common.internal.json.JsonModule
 import io.blockv.common.internal.net.rest.Client
-import io.blockv.common.internal.net.rest.request.CreateOauthTokenRequest
-import io.blockv.common.internal.net.rest.request.CreateTokenRequest
-import io.blockv.common.internal.net.rest.request.CreateUserRequest
-import io.blockv.common.internal.net.rest.request.GuestLoginRequest
-import io.blockv.common.internal.net.rest.request.LoginRequest
-import io.blockv.common.internal.net.rest.request.OauthLoginRequest
-import io.blockv.common.internal.net.rest.request.ResetTokenRequest
-import io.blockv.common.internal.net.rest.request.TokenRequest
-import io.blockv.common.internal.net.rest.request.UpdateUserRequest
-import io.blockv.common.internal.net.rest.request.UploadAvatarRequest
-import io.blockv.common.internal.net.rest.request.VerifyTokenRequest
+import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.net.rest.response.BaseResponse
+import io.blockv.common.model.Account
 import io.blockv.common.model.PublicUser
 import io.blockv.common.model.Token
 import io.blockv.common.model.User
@@ -144,6 +135,25 @@ class UserApiImpl(
     return BaseResponse(
       response.getString("request_id"),
       jsonModule.deserialize(payload)
+    )
+  }
+
+  override fun getCurrentUserAccounts(): BaseResponse<List<Account>> {
+    val response: JSONObject = client.get("v1/user/accounts")
+    val payload: JSONArray = response.getJSONArray("payload")
+    val list: ArrayList<Account> = ArrayList()
+    var count = 0
+    while (count < payload.length()) {
+      val account: Account? = jsonModule.deserialize(payload.getJSONObject(count))
+      if (account != null) {
+        list.add(account)
+      }
+      count++
+    }
+
+    return BaseResponse(
+      response.getString("request_id"),
+      list
     )
   }
 
