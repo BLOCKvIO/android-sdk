@@ -22,6 +22,7 @@ import io.blockv.common.internal.net.rest.request.UpdateUserRequest
 import io.blockv.common.internal.net.rest.request.UploadAvatarRequest
 import io.blockv.common.internal.net.rest.request.VerifyTokenRequest
 import io.blockv.common.internal.net.rest.response.BaseResponse
+import io.blockv.common.model.Account
 import io.blockv.common.model.PublicUser
 import io.blockv.common.model.Token
 import io.blockv.common.model.User
@@ -38,6 +39,8 @@ interface UserApi {
   fun oauthLogin(request: OauthLoginRequest): BaseResponse<User>
 
   fun getCurrentUser(): BaseResponse<User>
+
+  fun getCurrentUserAccounts(): BaseResponse<List<Account>>
 
   fun updateCurrentUser(request: UpdateUserRequest): BaseResponse<User>
 

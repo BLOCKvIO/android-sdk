@@ -29,13 +29,7 @@ import io.blockv.common.internal.net.rest.request.UpdateUserRequest
 import io.blockv.common.internal.net.rest.request.UploadAvatarRequest
 import io.blockv.common.internal.net.rest.request.VerifyTokenRequest
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.Jwt
-import io.blockv.common.model.PublicUser
-import io.blockv.common.model.Registration
-import io.blockv.common.model.Token
-import io.blockv.common.model.User
-import io.blockv.common.model.UserUpdate
-import io.blockv.common.model.OauthData
+import io.blockv.common.model.*
 import io.blockv.common.util.Optional
 import io.blockv.core.internal.datapool.Datapool
 import io.blockv.core.internal.oauth.BlockvOauthException
@@ -228,6 +222,12 @@ class UserManagerImpl(
 
   override fun getCurrentUser(): Single<User> = Single.fromCallable {
     api.getCurrentUser().payload
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun getCurrentUserAccounts(): Single<List<Account>> = Single.fromCallable {
+    api.getCurrentUserAccounts().payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
