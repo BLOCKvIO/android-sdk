@@ -12,13 +12,7 @@ package io.blockv.core.client.manager
 
 import android.content.Context
 import android.graphics.Bitmap
-import io.blockv.common.model.Jwt
-import io.blockv.common.model.PublicUser
-import io.blockv.common.model.Registration
-import io.blockv.common.model.Token
-import io.blockv.common.model.User
-import io.blockv.common.model.UserUpdate
-import io.blockv.common.model.OauthData
+import io.blockv.common.model.*
 import io.blockv.common.util.Optional
 import io.reactivex.Single
 import org.json.JSONObject
@@ -112,6 +106,13 @@ interface UserManager {
    * @return new Single<User> instance.
    */
   fun getCurrentUser(): Single<User>
+
+  /**
+   * Fetches the current user's accounts from the BLOCKv platform.
+   *
+   * @return new Single<List<Account>> instance.
+   */
+  fun getCurrentUserAccounts(): Single<List<Account>>
 
   /**
    * Updates the current user's profile on the BLOCKv platform.
