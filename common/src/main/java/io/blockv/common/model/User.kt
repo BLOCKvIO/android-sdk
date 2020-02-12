@@ -40,7 +40,9 @@ class User @Serializer.Serializable constructor(
   @Serializer.Serialize(name = "guest_id", path = "properties")
   val guestId: String,
   @Serializer.Serialize(name = "user_consents", path = "properties")
-  val userConsent: List<UserConsent>
+  val userConsent: List<UserConsent>,
+  @Serializer.Serialize(name = "is_admin", path = "system_properties")
+  val isAdmin: Boolean
 ) : Model {
 
   val name: String
@@ -62,6 +64,7 @@ class User @Serializer.Serializable constructor(
       ", nonPushNotifications='" + nonPushNotifications + '\'' +
       ", guestId='" + guestId + '\'' +
       ", userConsent='" + userConsent + '\'' +
+      ", isAdmin='" + isAdmin + '\'' +
       '}'
   }
 

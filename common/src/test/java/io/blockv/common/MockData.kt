@@ -187,6 +187,9 @@ object MockData {
     "                \"nonpush_notification\": false,\n" +
     "                \"language\": \"en\",\n" +
     "                \"user_consents\": []\n" +
+    "            },\n" +
+    "            \"system_properties\": {\n" +
+    "                \"is_admin\": true\n" +
     "            }\n" +
     "        }"
 
