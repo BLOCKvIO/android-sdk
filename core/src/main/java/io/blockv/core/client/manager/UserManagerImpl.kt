@@ -17,17 +17,7 @@ import io.blockv.common.internal.net.rest.api.UserApi
 import io.blockv.common.internal.net.rest.auth.Authenticator
 import io.blockv.common.internal.net.rest.auth.JwtDecoder
 import io.blockv.common.internal.net.rest.auth.JwtDecoderImpl
-import io.blockv.common.internal.net.rest.request.CreateOauthTokenRequest
-import io.blockv.common.internal.net.rest.request.CreateTokenRequest
-import io.blockv.common.internal.net.rest.request.CreateUserRequest
-import io.blockv.common.internal.net.rest.request.GuestLoginRequest
-import io.blockv.common.internal.net.rest.request.LoginRequest
-import io.blockv.common.internal.net.rest.request.OauthLoginRequest
-import io.blockv.common.internal.net.rest.request.ResetTokenRequest
-import io.blockv.common.internal.net.rest.request.TokenRequest
-import io.blockv.common.internal.net.rest.request.UpdateUserRequest
-import io.blockv.common.internal.net.rest.request.UploadAvatarRequest
-import io.blockv.common.internal.net.rest.request.VerifyTokenRequest
+import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.repository.Preferences
 import io.blockv.common.model.*
 import io.blockv.common.util.Optional
@@ -41,6 +31,7 @@ import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 class UserManagerImpl(
   val api: UserApi,
@@ -293,6 +284,16 @@ class UserManagerImpl(
 
   override fun getAccessToken(): Single<Optional<Jwt>> = Single.fromCallable {
     Optional(authenticator.refreshToken())
+  }
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+
+  override fun mergeAccounts(
+    token: String,
+    tokenType: UserManager.TokenType,
+    password: String
+  ): Single<JSONObject> = Single.fromCallable {
+    api.mergeAccounts(MergeRequest(token, tokenType.name.toLowerCase(Locale.US), password)).payload
   }
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())

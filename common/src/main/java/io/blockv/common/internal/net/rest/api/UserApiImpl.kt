@@ -224,4 +224,13 @@ class UserApiImpl(
     return response
   }
 
+  override fun mergeAccounts(request: MergeRequest): BaseResponse<JSONObject> {
+    val response: JSONObject = client.post("v1/user/merge_accounts", request.toJson())
+    val payload: JSONObject = response.getJSONObject("payload")
+    return BaseResponse(
+      response.getString("request_id"),
+      payload
+    )
+  }
+
 }
