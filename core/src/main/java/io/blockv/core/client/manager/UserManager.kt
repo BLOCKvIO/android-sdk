@@ -222,6 +222,13 @@ interface UserManager {
    */
   fun getAccessToken(): Single<Optional<Jwt>>
 
+  /**
+   * Merges an account with the currently logged in users account.
+   *
+   * @return new Single<JSONObject> instance.
+   */
+  fun mergeAccounts(token: String, tokenType: TokenType, password: String): Single<JSONObject>
+
   enum class TokenType {
     EMAIL,
     PHONE_NUMBER

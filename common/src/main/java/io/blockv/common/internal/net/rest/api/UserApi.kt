@@ -10,17 +10,7 @@
  */
 package io.blockv.common.internal.net.rest.api
 
-import io.blockv.common.internal.net.rest.request.CreateOauthTokenRequest
-import io.blockv.common.internal.net.rest.request.CreateTokenRequest
-import io.blockv.common.internal.net.rest.request.CreateUserRequest
-import io.blockv.common.internal.net.rest.request.GuestLoginRequest
-import io.blockv.common.internal.net.rest.request.LoginRequest
-import io.blockv.common.internal.net.rest.request.OauthLoginRequest
-import io.blockv.common.internal.net.rest.request.ResetTokenRequest
-import io.blockv.common.internal.net.rest.request.TokenRequest
-import io.blockv.common.internal.net.rest.request.UpdateUserRequest
-import io.blockv.common.internal.net.rest.request.UploadAvatarRequest
-import io.blockv.common.internal.net.rest.request.VerifyTokenRequest
+import io.blockv.common.internal.net.rest.request.*
 import io.blockv.common.internal.net.rest.response.BaseResponse
 import io.blockv.common.model.Account
 import io.blockv.common.model.PublicUser
@@ -69,4 +59,6 @@ interface UserApi {
   fun getAccessTokens(request: TokenRequest): JSONObject
 
   fun refreshAssetProviders(): BaseResponse<JSONObject>
+
+  fun mergeAccounts(request: MergeRequest): BaseResponse<JSONObject>
 }
