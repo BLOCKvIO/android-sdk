@@ -29,6 +29,7 @@ object MockData {
     "                \"sync\": 0,\n" +
     "                \"when_created\": \"2018-10-30T15:55:10Z\",\n" +
     "                \"when_modified\": \"2018-10-30T15:55:37Z\",\n" +
+    "                \"when_added\": \"2019-02-27T10:23:51Z\",\n" +
     "                \"vAtom::vAtomType\": {\n" +
     "                    \"parent_id\": \".\",\n" +
     "                    \"publisher_fqdn\": \"vatomic.prototyping\",\n" +
