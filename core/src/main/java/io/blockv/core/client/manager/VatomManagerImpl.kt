@@ -355,6 +355,7 @@ class VatomManagerImpl(
         throw Exception("vAtom id does not match state event's vAtom id")
 
       val modified = update.vatomProperties.optString("when_modified", vatom.whenModified)
+      val added = update.vatomProperties.optString("when_added", vatom.whenAdded)
 
       val privateProp = JSONObject((vatom.private ?: JSONObject()).toString())
 
@@ -448,6 +449,7 @@ class VatomManagerImpl(
         vatom.id,
         vatom.whenCreated,
         modified,
+        added,
         props,
         privateProp,
         vatom.sync,

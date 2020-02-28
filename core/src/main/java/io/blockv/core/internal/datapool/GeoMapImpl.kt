@@ -87,6 +87,7 @@ class GeoMapImpl(
                     vatom.id,
                     vatom.whenCreated,
                     time,
+                    vatom.whenAdded,
                     vatom.property,
                     vatom.private,
                     vatom.sync

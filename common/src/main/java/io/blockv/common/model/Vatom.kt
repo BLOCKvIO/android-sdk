@@ -26,6 +26,8 @@ open class Vatom @Serializer.Serializable constructor(
   val whenCreated: String,
   @Serializer.Serialize(name = "when_modified")
   var whenModified: String,
+  @Serializer.Serialize(name = "when_added")
+  var whenAdded: String,
   @Embedded
   @Serializer.Serialize(name = "vAtom::vAtomType")
   val property: VatomProperty,
@@ -45,10 +47,11 @@ open class Vatom @Serializer.Serializable constructor(
     id: String,
     whenCreated: String,
     whenModified: String,
+    whenAdded: String,
     property: VatomProperty,
     private: JSONObject?,
     sync: Int
-  ) : this(id, whenCreated, whenModified, property, private,sync, emptyList(), emptyList())
+  ) : this(id, whenCreated, whenModified, whenAdded, property, private,sync, emptyList(), emptyList())
 
   @Ignore
   val rootType: Type
@@ -67,6 +70,7 @@ open class Vatom @Serializer.Serializable constructor(
       "id='" + id + '\'' +
       ",whenCreated='" + whenCreated + '\'' +
       ", whenModified='" + whenModified + '\'' +
+      ", whenAdded='" + whenAdded + '\'' +
       "," + property + '\'' +
       ", private='" + private + '\'' +
       "}"
