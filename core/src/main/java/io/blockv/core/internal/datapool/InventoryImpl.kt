@@ -331,6 +331,7 @@ class InventoryImpl(
           "ORDER BY whenModified ASC ) " +
           "GROUP BY templateVariationId " +
           "ORDER BY ${when (orderBy) {
+            VatomManager.SortOrder.ADDED -> "whenAdded DESC"
             VatomManager.SortOrder.NEWEST -> "whenModified DESC"
             VatomManager.SortOrder.OLDEST -> "whenModified ASC"
             VatomManager.SortOrder.A_TO_Z -> "title COLLATE NOCASE ASC"
@@ -352,6 +353,7 @@ class InventoryImpl(
           (if (category.isNotEmpty()) "AND category = ${DatabaseUtils.sqlEscapeString(category)} COLLATE NOCASE " else "") +
           (if (search.isNotEmpty()) "AND title LIKE '%${escapeSql(search)}%' ESCAPE '\\' COLLATE NOCASE " else "") +
           "ORDER BY ${when (orderBy) {
+            VatomManager.SortOrder.ADDED -> "whenAdded DESC"
             VatomManager.SortOrder.NEWEST -> "whenModified DESC"
             VatomManager.SortOrder.OLDEST -> "whenModified ASC"
             VatomManager.SortOrder.A_TO_Z -> "title COLLATE NOCASE ASC"

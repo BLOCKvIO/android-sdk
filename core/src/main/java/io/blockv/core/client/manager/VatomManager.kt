@@ -71,7 +71,7 @@ interface VatomManager {
    */
   fun getInventory(
     id: String,
-    orderBy: SortOrder = SortOrder.NEWEST,
+    orderBy: SortOrder = SortOrder.ADDED,
     category: String = "",
     filter: String = "",
     limit: Int = -1,
@@ -82,7 +82,7 @@ interface VatomManager {
 
   fun getVatoms(
     ids: List<String>,
-    orderBy: SortOrder = SortOrder.NEWEST,
+    orderBy: SortOrder = SortOrder.ADDED,
     filter: String = "",
     limit: Int = -1,
     group: Boolean = false,
@@ -91,6 +91,7 @@ interface VatomManager {
   ): Flowable<PagedList<VatomGroup>>
 
   enum class SortOrder {
+    ADDED,
     NEWEST,
     OLDEST,
     A_TO_Z,
