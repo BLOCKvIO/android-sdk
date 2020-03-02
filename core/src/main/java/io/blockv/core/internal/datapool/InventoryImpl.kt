@@ -331,11 +331,12 @@ class InventoryImpl(
           "ORDER BY whenModified ASC ) " +
           "GROUP BY templateVariationId " +
           "ORDER BY ${when (orderBy) {
-            VatomManager.SortOrder.ADDED -> "whenAdded DESC"
-            VatomManager.SortOrder.NEWEST -> "whenModified DESC"
-            VatomManager.SortOrder.OLDEST -> "whenModified ASC"
-            VatomManager.SortOrder.A_TO_Z -> "title COLLATE NOCASE ASC"
-            VatomManager.SortOrder.Z_TO_A -> "title COLLATE NOCASE DESC"
+            VatomManager.SortOrder.ADDED_DESC -> "whenAdded DESC"
+            VatomManager.SortOrder.ADDED_ASC -> "whenAdded ASC"
+            VatomManager.SortOrder.UPDATED_DESC -> "whenModified DESC"
+            VatomManager.SortOrder.UPDATED_ASC -> "whenModified ASC"
+            VatomManager.SortOrder.TITLE_ASC -> "title COLLATE NOCASE ASC"
+            VatomManager.SortOrder.TITLE_DESC -> "title COLLATE NOCASE DESC"
           }} " +
           if (count > 0) "LIMIT $count" else ""
       )
@@ -353,11 +354,12 @@ class InventoryImpl(
           (if (category.isNotEmpty()) "AND category = ${DatabaseUtils.sqlEscapeString(category)} COLLATE NOCASE " else "") +
           (if (search.isNotEmpty()) "AND title LIKE '%${escapeSql(search)}%' ESCAPE '\\' COLLATE NOCASE " else "") +
           "ORDER BY ${when (orderBy) {
-            VatomManager.SortOrder.ADDED -> "whenAdded DESC"
-            VatomManager.SortOrder.NEWEST -> "whenModified DESC"
-            VatomManager.SortOrder.OLDEST -> "whenModified ASC"
-            VatomManager.SortOrder.A_TO_Z -> "title COLLATE NOCASE ASC"
-            VatomManager.SortOrder.Z_TO_A -> "title COLLATE NOCASE DESC"
+            VatomManager.SortOrder.ADDED_DESC -> "whenAdded DESC"
+            VatomManager.SortOrder.ADDED_ASC -> "whenAdded ASC"
+            VatomManager.SortOrder.UPDATED_DESC -> "whenModified DESC"
+            VatomManager.SortOrder.UPDATED_ASC -> "whenModified ASC"
+            VatomManager.SortOrder.TITLE_ASC -> "title COLLATE NOCASE ASC"
+            VatomManager.SortOrder.TITLE_DESC -> "title COLLATE NOCASE DESC"
           }} " +
           if (count > 0) "LIMIT $count" else ""
       )
