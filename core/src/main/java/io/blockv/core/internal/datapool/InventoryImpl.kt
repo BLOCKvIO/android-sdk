@@ -331,12 +331,12 @@ class InventoryImpl(
           "ORDER BY whenModified ASC ) " +
           "GROUP BY templateVariationId " +
           "ORDER BY ${when (orderBy) {
-            VatomManager.SortOrder.ADDED_DESC -> "whenAdded DESC"
-            VatomManager.SortOrder.ADDED_ASC -> "whenAdded ASC"
-            VatomManager.SortOrder.UPDATED_DESC -> "whenModified DESC"
-            VatomManager.SortOrder.UPDATED_ASC -> "whenModified ASC"
-            VatomManager.SortOrder.TITLE_ASC -> "title COLLATE NOCASE ASC"
-            VatomManager.SortOrder.TITLE_DESC -> "title COLLATE NOCASE DESC"
+            VatomManager.SortOrder.ADDED_DESC -> "whenAdded DESC, id DESC"
+            VatomManager.SortOrder.ADDED_ASC -> "whenAdded ASC, id ASC"
+            VatomManager.SortOrder.UPDATED_DESC -> "whenModified DESC, id DESC"
+            VatomManager.SortOrder.UPDATED_ASC -> "whenModified ASC, id ASC"
+            VatomManager.SortOrder.TITLE_ASC -> "title COLLATE NOCASE ASC, id ASC"
+            VatomManager.SortOrder.TITLE_DESC -> "title COLLATE NOCASE DESC, id DESC"
           }} " +
           if (count > 0) "LIMIT $count" else ""
       )
@@ -354,12 +354,12 @@ class InventoryImpl(
           (if (category.isNotEmpty()) "AND category = ${DatabaseUtils.sqlEscapeString(category)} COLLATE NOCASE " else "") +
           (if (search.isNotEmpty()) "AND title LIKE '%${escapeSql(search)}%' ESCAPE '\\' COLLATE NOCASE " else "") +
           "ORDER BY ${when (orderBy) {
-            VatomManager.SortOrder.ADDED_DESC -> "whenAdded DESC"
-            VatomManager.SortOrder.ADDED_ASC -> "whenAdded ASC"
-            VatomManager.SortOrder.UPDATED_DESC -> "whenModified DESC"
-            VatomManager.SortOrder.UPDATED_ASC -> "whenModified ASC"
-            VatomManager.SortOrder.TITLE_ASC -> "title COLLATE NOCASE ASC"
-            VatomManager.SortOrder.TITLE_DESC -> "title COLLATE NOCASE DESC"
+            VatomManager.SortOrder.ADDED_DESC -> "whenAdded DESC, id DESC"
+            VatomManager.SortOrder.ADDED_ASC -> "whenAdded ASC, id ASC"
+            VatomManager.SortOrder.UPDATED_DESC -> "whenModified DESC, id DESC"
+            VatomManager.SortOrder.UPDATED_ASC -> "whenModified ASC, id ASC"
+            VatomManager.SortOrder.TITLE_ASC -> "title COLLATE NOCASE ASC, id ASC"
+            VatomManager.SortOrder.TITLE_DESC -> "title COLLATE NOCASE DESC, id DESC"
           }} " +
           if (count > 0) "LIMIT $count" else ""
       )
