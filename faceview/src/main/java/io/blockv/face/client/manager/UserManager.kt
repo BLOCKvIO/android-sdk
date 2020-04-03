@@ -11,6 +11,7 @@
 package io.blockv.face.client.manager
 
 import io.blockv.common.model.PublicUser
+import io.blockv.common.model.Token
 import io.blockv.common.model.User
 import io.reactivex.Single
 
@@ -34,5 +35,13 @@ interface UserManager {
    * @return new Single<User> instance.
    */
   fun getCurrentUser(): Single<User>
+
+  /**
+   * Fetches a list of the current user's tokens.
+   *
+   * @return new Single<List<Token>> instance.
+   * @see Token
+   */
+  fun getCurrentUserTokens(): Single<List<Token>>
 
 }
