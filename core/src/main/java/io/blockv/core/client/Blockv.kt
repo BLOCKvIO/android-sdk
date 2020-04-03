@@ -22,17 +22,7 @@ import io.blockv.common.internal.net.rest.auth.ResourceEncoder
 import io.blockv.common.internal.net.rest.auth.ResourceEncoderImpl
 import io.blockv.common.internal.net.websocket.WebsocketImpl
 import io.blockv.common.internal.repository.Preferences
-import io.blockv.common.model.Environment
-import io.blockv.common.model.InventoryEvent
-import io.blockv.common.model.Model
-import io.blockv.common.model.PublicUser
-import io.blockv.common.model.Resource
-import io.blockv.common.model.StateUpdateEvent
-import io.blockv.common.model.User
-import io.blockv.common.model.Vatom
-import io.blockv.common.model.VatomGroup
-import io.blockv.common.model.VatomUpdate
-import io.blockv.common.model.WebSocketEvent
+import io.blockv.common.model.*
 import io.blockv.common.util.Optional
 import io.blockv.core.client.manager.ActivityManager
 import io.blockv.core.client.manager.ActivityManagerImpl
@@ -120,6 +110,10 @@ class Blockv {
 
               override fun getPublicUser(userId: String): Single<PublicUser> {
                 return userManager.getPublicUser(userId)
+              }
+
+              override fun getCurrentUserTokens(): Single<List<Token>> {
+                return userManager.getCurrentUserTokens()
               }
 
             },
