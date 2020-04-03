@@ -41,7 +41,7 @@ dependencies {
 
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'faceview'
-def libraryVersion = '4.0.0-alpha.35'
+def libraryVersion = '4.0.0-alpha.36'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
