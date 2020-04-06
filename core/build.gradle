@@ -36,7 +36,7 @@ dependencies {
   implementation 'io.blockv.faces-alpha:image-progress-face:4.0.0-alpha.4'
   implementation 'io.blockv.faces-alpha:image-policy-face:4.0.0-alpha.9'
   implementation 'io.blockv.faces-alpha:image-layered-face:4.0.0-alpha.5'
-  implementation 'io.blockv.faces-alpha:web-face:4.0.0-alpha.9'
+  implementation 'io.blockv.faces-alpha:web-face:4.0.0-alpha.10'
   implementation 'androidx.room:room-runtime:2.1.0'
   kapt 'androidx.room:room-compiler:2.1.0'
   implementation 'androidx.room:room-rxjava2:2.1.0'
@@ -58,7 +58,7 @@ repositories {
 
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'core'
-def libraryVersion = '4.0.0-alpha.67'
+def libraryVersion = '4.0.0-alpha.68'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
