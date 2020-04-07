@@ -25,7 +25,7 @@ class FaceProperty @Serializer.Serializable constructor(
   @Serializer.Serialize
   val config: JSONObject,
   @Serializer.Serialize
-  val resources: List<String>
+  val resources: List<String>?
 ) : Model {
 
   override fun toString(): String {
