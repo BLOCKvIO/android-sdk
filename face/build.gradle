@@ -43,7 +43,7 @@ repositories {
 }
 def libraryGroupId = 'io.blockv.sdk-alpha'
 def libraryArtifactId = 'face'
-def libraryVersion = '4.0.0-alpha.77'
+def libraryVersion = '4.0.0-alpha.79'
 
 task sourceJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
@@ -63,35 +63,35 @@ publishing {
         def commonDependency = dependenciesNode.appendNode('dependency')
         commonDependency.appendNode('groupId', 'io.blockv.sdk-alpha')
         commonDependency.appendNode('artifactId', 'common')
-        commonDependency.appendNode('version', '3.0.0-alpha.30')
+        commonDependency.appendNode('version', '3.0.0-alpha.31')
         def coreDependency = dependenciesNode.appendNode('dependency')
         coreDependency.appendNode('groupId', 'io.blockv.sdk-alpha')
         coreDependency.appendNode('artifactId', 'core')
-        coreDependency.appendNode('version', '4.0.0-alpha.68')
+        coreDependency.appendNode('version', '4.0.0-alpha.70')
         def faceviewDependency = dependenciesNode.appendNode('dependency')
         faceviewDependency.appendNode('groupId', 'io.blockv.sdk-alpha')
         faceviewDependency.appendNode('artifactId', 'faceview')
-        faceviewDependency.appendNode('version', '4.0.0-alpha.36')
+        faceviewDependency.appendNode('version', '4.0.0-alpha.37')
         def imageFaceDependency = dependenciesNode.appendNode('dependency')
         imageFaceDependency.appendNode('groupId', 'io.blockv.faces-alpha')
         imageFaceDependency.appendNode('artifactId', 'image-face')
-        imageFaceDependency.appendNode('version', '4.0.0-alpha.4')
+        imageFaceDependency.appendNode('version', '4.0.0-alpha.5')
         def progressFaceDependency = dependenciesNode.appendNode('dependency')
         progressFaceDependency.appendNode('groupId', 'io.blockv.faces-alpha')
         progressFaceDependency.appendNode('artifactId', 'image-progress-face')
-        progressFaceDependency.appendNode('version', '4.0.0-alpha.4')
+        progressFaceDependency.appendNode('version', '4.0.0-alpha.5')
         def policyFaceDependency = dependenciesNode.appendNode('dependency')
         policyFaceDependency.appendNode('groupId', 'io.blockv.faces-alpha')
         policyFaceDependency.appendNode('artifactId', 'image-policy-face')
-        policyFaceDependency.appendNode('version', '4.0.0-alpha.9')
+        policyFaceDependency.appendNode('version', '4.0.0-alpha.10')
         def layerFaceDependency = dependenciesNode.appendNode('dependency')
         layerFaceDependency.appendNode('groupId', 'io.blockv.faces-alpha')
         layerFaceDependency.appendNode('artifactId', 'image-layered-face')
-        layerFaceDependency.appendNode('version', '4.0.0-alpha.5')
+        layerFaceDependency.appendNode('version', '4.0.0-alpha.6')
         def webFaceDependency = dependenciesNode.appendNode('dependency')
         webFaceDependency.appendNode('groupId', 'io.blockv.faces-alpha')
         webFaceDependency.appendNode('artifactId', 'web-face')
-        webFaceDependency.appendNode('version', '4.0.0-alpha.10')
+        webFaceDependency.appendNode('version', '4.0.0-alpha.11')
         def versionPlugin = asNode()
           .appendNode('build')
           .appendNode('plugins')
