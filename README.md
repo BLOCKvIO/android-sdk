@@ -1,6 +1,8 @@
 BLOCKv SDK for Android
 ======================
 
+[![Release](https://jitpack.io/v/VatomInc/android-sdk.svg)](https://jitpack.io/#VatomInc/android-sdk)
+
 This is the official BLOCKv SDK. It allows you to easily integrate your own apps into the BLOCKv Platform. It handles a number of operations on your behalf, including:
 
 - Wrapping API endpoints,
@@ -19,39 +21,24 @@ The BLOCKv SDK is dependant on Kotlin, if your version of Android Studio < 3.0 y
 
 ### Install and configure the SDK
 
-Add the BLOCKv maven repository and Kotlin plugin to the root-level `build.gradle` file:
+Add Jitpack support to the root-level `build.gradle` file:
 
 ```gradle
-buildscript {
-  ext.kotlin_version = '1.2.61'
-  //...
-  dependencies {
-    //...
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-  }
-}
 allprojects {
-  //...
+  ...
   repositories {
-    //...
-    maven {
-      url "https://maven.blockv.io/artifactory/BLOCKv"
-    }
+    ...
+    maven { url "https://jitpack.io" }
   }
 }
 ```
 
-Next, add the Kotlin plugin and following dependencies to your module Gradle file (usually the `app/build.gradle`):
+Next, add the dependency to your module Gradle file (usually the `app/build.gradle`):
 
 ```gradle
-apply plugin: 'kotlin-android' //This should be at the top of the file.
-// ...
-//
 dependencies {
-  // ...
-  implementation 'io.blockv.sdk:face:3.0.1'
-  // Make sure android Studio version is > 3.0 or include the Kotlin Plugin
-  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version'
+  ...
+  implementation 'com.github.VatomInc.android-sdk:face:+'
 }
 ```
 

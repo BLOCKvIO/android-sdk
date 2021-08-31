@@ -1,1 +1,1 @@
-include ':app', ':core', ':face', ':common', ':faceview'
+include ':app', ':core', ':face', ':common', ':faceview', ':image-face', ':image-layered-face', ':image-policy-face', ':image-progress-face', ':web-face'

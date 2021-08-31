@@ -35,7 +35,7 @@ class ActionSerializer : Serializer<Action> {
       val parts: List<String> = name.split("::Action::")
       return Action(parts[0], parts[1])
     } catch (e: Exception) {
-      android.util.Log.w("ActionSerializer", e.message)
+      android.util.Log.w("ActionSerializer", e.message ?: "(null)")
     }
     return null
   }

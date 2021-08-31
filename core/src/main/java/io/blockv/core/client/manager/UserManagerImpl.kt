@@ -276,7 +276,7 @@ class UserManagerImpl(
         Log.i("UserManager", "token has expired $expired")
         return !expired
       } catch (exception: JwtDecoderImpl.InvalidTokenException) {
-        Log.i("UserManager", exception.message)
+        Log.i("UserManager", exception.message ?: "(null)")
       }
     }
     return false

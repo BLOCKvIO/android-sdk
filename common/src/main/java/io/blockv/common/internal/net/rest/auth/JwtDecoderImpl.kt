@@ -26,7 +26,7 @@ class JwtDecoderImpl : JwtDecoder {
         return DecodedJwt(jwt, data.getString("user_id"), Date(data.getLong("exp") * 1000))
       }
     } catch (exception: Exception) {
-      Log.e("JwtDecoder", exception.message)
+      Log.e("JwtDecoder", exception.message ?: "(null)")
     }
     throw InvalidTokenException()
   }

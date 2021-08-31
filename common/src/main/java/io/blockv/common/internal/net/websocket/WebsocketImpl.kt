@@ -51,7 +51,7 @@ class WebsocketImpl(
               val event: GenericSocketEvent = jsonModule.deserialize(JSONObject(message))
               emitter.onNext(event)
             } catch (exception: Exception) {
-              Log.i("WebSocket", exception.message)
+              Log.i("WebSocket", exception.message ?: "(null")
             }
           }
         }

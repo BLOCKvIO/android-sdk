@@ -32,12 +32,12 @@ import java.util.concurrent.TimeUnit
  *
  * @see FaceManager
  */
-class VatomView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
+class VatomView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
   FrameLayout(context, attrs, defStyleAttr), View.OnAttachStateChangeListener {
 
-  constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, -1)
+  constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, -1)
 
-  constructor(context: Context?) : this(context, null)
+  constructor(context: Context) : this(context, null)
 
 
   init {

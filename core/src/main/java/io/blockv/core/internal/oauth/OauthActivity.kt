@@ -78,7 +78,7 @@ class OauthActivity : AppCompatActivity() {
     loader = findViewById(R.id.loader)
     handler = getHandler(intent.getLongExtra("handlerId", -1))!!
     val appId = intent.getStringExtra("appId")
-    val redirectUri = intent.getStringExtra("redirectUri")
+    val redirectUri = intent.getStringExtra("redirectUri") ?: ""
     val scope = intent.getStringExtra("scope")
     val state = Uri.encode(UUID.randomUUID().toString())
     handlerId = intent.getLongExtra("handlerId", -1)
@@ -98,7 +98,7 @@ class OauthActivity : AppCompatActivity() {
                 handler.onError(BlockvOauthException.Error.ACCESS_DENIED.exception())
               } else {
                 handler.onError(BlockvOauthException.Error.UNKNOWN.exception())
-                Log.e("oauth", error)
+                Log.e("oauth", error ?: "(null)")
               }
               complete()
             } else
@@ -108,7 +108,7 @@ class OauthActivity : AppCompatActivity() {
                 } else {
                   "other"
                 }
-                handler.onSuccess(data.getQueryParameter("code"), flow)
+                handler.onSuccess(data.getQueryParameter("code") ?: "", flow ?: "")
                   .observeOn(AndroidSchedulers.mainThread())
                   .doOnSubscribe {
                     webView.visibility = View.GONE
