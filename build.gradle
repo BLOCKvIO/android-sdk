@@ -78,16 +78,20 @@ subprojects {
 }
 
 // Maven output library details for all sub-projects
-// This adds support for exporting artifacts that Jitpack can use
+// This adds support for exporting sub-projects as artifacts that Jitpack can use
 subprojects {
-    if (project.plugins.hasPlugin('com.android.library')) afterEvaluate {
-        publishing {
-            publications {
-                release(MavenPublication) {
-                    from components.release
-                    groupId = 'com.github.VatomInc.android-sdk'
-                    artifactId = project.name
-                    version = sdkVersion
+    afterEvaluate {
+        if (project.plugins.hasPlugin('com.android.library')) {
+            publishing {
+                publications {
+                    release(MavenPublication) {
+                        afterEvaluate {
+                            from components.release
+                            groupId = 'com.github.VatomInc.android-sdk'
+                            artifactId = project.name
+                            version = sdkVersion
+                        }
+                    }
                 }
             }
         }
