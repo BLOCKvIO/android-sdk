@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
 android {
   compileSdkVersion 28
@@ -48,7 +48,7 @@ dependencies {
 repositories {
   mavenCentral()
 }
-def libraryGroupId = 'io.blockv.sdk-alpha'
+def libraryGroupId = 'com.github.VatomInc.android-sdk'
 def libraryArtifactId = 'common'
 def libraryVersion = '3.0.0-alpha.31'
 
@@ -101,13 +101,13 @@ publishing {
 
     }
   }
-  repositories {
-    maven {
-      url "https://maven.blockv.io/artifactory/Blockv-Debug/"
-      credentials {
-        username = "${blockv_artifactory_username}"
-        password = "${blockv_artifactory_password}"
-      }
-    }
-  }
+  // repositories {
+  //   maven {
+  //     url "https://maven.blockv.io/artifactory/Blockv-Debug/"
+  //     credentials {
+  //       username = "${blockv_artifactory_username}"
+  //       password = "${blockv_artifactory_password}"
+  //     }
+  //   }
+  // }
 }

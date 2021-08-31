@@ -56,7 +56,7 @@ repositories {
   mavenCentral()
 }
 
-def libraryGroupId = 'io.blockv.sdk-alpha'
+def libraryGroupId = 'com.github.VatomInc.android-sdk'
 def libraryArtifactId = 'core'
 def libraryVersion = '4.0.0-alpha.70'
 
@@ -102,14 +102,14 @@ publishing {
 
     }
   }
-  repositories {
-    maven {
-      url "https://maven.blockv.io/artifactory/Blockv-Debug/"
-      credentials {
-        username = "${blockv_artifactory_username}"
-        password = "${blockv_artifactory_password}"
-      }
-    }
-  }
+  // repositories {
+  //   maven {
+  //     url "https://maven.blockv.io/artifactory/Blockv-Debug/"
+  //     credentials {
+  //       username = "${blockv_artifactory_username}"
+  //       password = "${blockv_artifactory_password}"
+  //     }
+  //   }
+  // }
 }
 
