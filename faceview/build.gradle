@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
 android {
   compileSdkVersion 28
@@ -37,58 +37,4 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'androidx.test:runner:1.1.0'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-}
-
-def libraryGroupId = 'com.github.VatomInc.android-sdk'
-def libraryArtifactId = 'faceview'
-def libraryVersion = '4.0.0-alpha.37'
-
-task sourceJar(type: Jar) {
-  from android.sourceSets.main.java.srcDirs
-  classifier "sources"
-}
-
-publishing {
-  publications {
-    faceview(MavenPublication) {
-      groupId libraryGroupId
-      artifactId libraryArtifactId
-      version libraryVersion
-      artifact(sourceJar)
-      artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
-      pom.withXml {
-        def dependenciesNode = asNode().appendNode('dependencies')
-        def dependencyNode = dependenciesNode.appendNode('dependency')
-        dependencyNode.appendNode('groupId', 'io.blockv.sdk-alpha')
-        dependencyNode.appendNode('artifactId', 'common')
-        dependencyNode.appendNode('version', '3.0.0-alpha.31')
-        def paging = dependenciesNode.appendNode('dependency')
-        paging.appendNode('groupId', 'androidx.paging')
-        paging.appendNode('artifactId', 'paging-runtime')
-        paging.appendNode('version', '[2.1.0,2.9.999)')
-        def pagingRx = dependenciesNode.appendNode('dependency')
-        pagingRx.appendNode('groupId', 'androidx.paging')
-        pagingRx.appendNode('artifactId', 'paging-rxjava2')
-        pagingRx.appendNode('version', '[2.1.0,2.9.999)')
-        def versionPlugin = asNode()
-          .appendNode('build')
-          .appendNode('plugins')
-          .appendNode('plugin')
-        versionPlugin.appendNode('groupId', 'org.codehaus.mojo')
-        versionPlugin.appendNode('artifactId', 'versions-maven-plugin')
-        versionPlugin.appendNode('version', '2.1')
-        def configuration = versionPlugin.appendNode('configuration')
-        configuration.appendNode('rulesUri', 'https://raw.githubusercontent.com/BLOCKvIO/android-sdk/master/maven-rules.xml')
-      }
-    }
-  }
-  // repositories {
-  //   maven {
-  //     url "https://maven.blockv.io/artifactory/Blockv-Debug/"
-  //     credentials {
-  //       username = "${blockv_artifactory_username}"
-  //       password = "${blockv_artifactory_password}"
-  //     }
-  //   }
-  // }
 }

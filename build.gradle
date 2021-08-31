@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-  ext.kotlin_version = '1.3.31'
+  ext.kotlin_version = '1.3.72'
   repositories {
     jcenter()
     maven { url 'https://maven.google.com' }
@@ -17,28 +17,15 @@ buildscript {
 }
 
 allprojects {
+
+  // SDK version
+  version = "4.0.1"
+
   repositories {
     jcenter()
-    maven {
-      url "https://maven.google.com"
-    }
-    // maven {
-    //   url "https://maven.blockv.io/artifactory/BLOCKv"
-    // }
-    // maven {
-    //   url "https://maven.blockv.io/artifactory/Blockv-Debug/"
-    //   credentials {
-    //     username = "${blockv_artifactory_username}"
-    //     password = "${blockv_artifactory_password}"
-    //   }
-    //   authentication {
-    //     basic(BasicAuthentication)
-    //   }
-    // }
+    mavenCentral()
+    maven { url "https://maven.google.com" }
     google()
   }
-}
 
-task clean(type: Delete) {
-  delete rootProject.buildDir
 }
