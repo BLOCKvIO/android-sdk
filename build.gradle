@@ -1,76 +1,99 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+// SDK details
+var sdkVersion = "4.0.1"
+
 buildscript {
-  ext.kotlin_version = '1.5.20'
-  repositories {
-    jcenter()
-    maven { url 'https://maven.google.com' }
-    google()
-  }
-  dependencies {
-    classpath 'com.android.tools.build:gradle:7.0.1'
-    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.1.1"
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    // NOTE: Do not place your application dependencies here; they belong
-    // in the individual module build.gradle files
-  }
+    ext.kotlin_version = '1.5.30'
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url 'https://maven.google.com' }
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.1'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.1.1"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
 }
 
 allprojects {
-
-  // SDK version, this gets applied to all sub-projects as well
-  version = "4.0.1"
-
-  // Repos
-  repositories {
-    mavenCentral()
-    maven { url "https://maven.google.com" }
-    google()
-  }
-
+    repositories {
+        mavenCentral()
+        maven { url "https://maven.google.com" }
+        google()
+    }
 }
 
 // Dependencies that all sub-projects use
 subprojects {
-  afterEvaluate {
-    dependencies {
+    afterEvaluate {
+        dependencies {
 
-      // Kotlin
-      implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-      implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+            // Kotlin
+            implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+            implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-      // AndroidX
-      implementation 'androidx.core:core-ktx:1.6.0'
-      implementation 'androidx.appcompat:appcompat:1.3.1'
+            // AndroidX
+            implementation 'androidx.core:core-ktx:1.6.0'
+            implementation 'androidx.appcompat:appcompat:1.3.1'
 
-      // RxAndroid
-      implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-      implementation 'io.reactivex.rxjava2:rxjava:2.2.14'
+            // RxAndroid
+            implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+            implementation 'io.reactivex.rxjava2:rxjava:2.2.14'
 
+        }
     }
-  }
 }
 
-// Android library details for all sub-projects
+// Generate Android version code
+var androidVersionComponents = sdkVersion.split("\\.")
+if (androidVersionComponents.length != 3) throw new Error("Version string must have 3 components.")
+var autoAndroidVersionCode =
+        (androidVersionComponents[0] as int) * 1_000_0000
+      + (androidVersionComponents[1] as int) * 1_0000
+      + (androidVersionComponents[2] as int)
+
+// Android build details for all sub-projects
 subprojects {
-  afterEvaluate {
-    android {
-      compileSdkVersion 30
-      compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-      }
-      defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-      }
+    afterEvaluate {
+        android {
+            compileSdkVersion 30
+            compileOptions {
+                sourceCompatibility 1.8
+                targetCompatibility 1.8
+            }
+            defaultConfig {
+                minSdkVersion 19
+                targetSdkVersion 30
+                versionCode autoAndroidVersionCode
+                versionName sdkVersion
+                testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+            }
+        }
     }
-  }
+}
+
+// Maven output library details for all sub-projects
+// This adds support for exporting artifacts that Jitpack can use
+subprojects {
+    if (project.plugins.hasPlugin('com.android.library')) afterEvaluate {
+        publishing {
+            publications {
+                release(MavenPublication) {
+                    from components.release
+                    groupId = 'com.github.VatomInc.android-sdk'
+                    artifactId = project.name
+                    version = sdkVersion
+                }
+            }
+        }
+    }
 }
 
 task clean(type: Delete) {
-  delete rootProject.buildDir
+    delete rootProject.buildDir
 }
