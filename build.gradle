@@ -45,6 +45,13 @@ subprojects {
             implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
             implementation 'io.reactivex.rxjava2:rxjava:2.2.14'
 
+            // AndroidX Room
+            def room_version = "2.3.0"
+            implementation "androidx.room:room-runtime:$room_version"
+            annotationProcessor "androidx.room:room-compiler:$room_version"
+            implementation "androidx.room:room-rxjava2:$room_version"
+            testImplementation "androidx.room:room-testing:$room_version"
+
         }
     }
 }
