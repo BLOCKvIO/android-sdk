@@ -183,6 +183,23 @@ class UserManagerImpl(
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
+
+  override fun loginWithRefreshToken(refreshToken: String): Single<User> = Single.fromCallable {
+
+    // Store refresh token
+    preferences.refreshToken = Jwt(refreshToken, "bearer")
+
+    // Empty out current access token, if any
+    authenticator.setToken(null)
+
+    // Refresh asset providers
+    api.refreshAssetProviders()
+
+    // Fetch user info
+    api.getCurrentUser().payload
+
+  }.subscribeOn(Schedulers.io())
+
   override fun verifyUserToken(
     token: String,
     tokenType: UserManager.TokenType,

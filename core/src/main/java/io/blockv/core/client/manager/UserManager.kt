@@ -69,6 +69,14 @@ interface UserManager {
   fun loginGuest(guestId: String): Single<User>
 
   /**
+   * Logs a user into the BLOCKv platform. Accepts a refresh token from a previous login.
+   *
+   * @param refreshToken the user's latest refresh token.
+   * @return new Single<User> instance.
+   */
+  fun loginWithRefreshToken(refreshToken: String): Single<User>
+
+  /**
    * Verifies ownership of a token by submitting the verification code to the BLOCKv platform.
    *
    * @param token the user's phone(E.164) or email.

@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 // SDK details
-var sdkVersion = "4.0.1"
+var sdkVersion = "4.0.2"
 
 buildscript {
     ext.kotlin_version = '1.5.30'
@@ -12,7 +12,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.1'
+        classpath 'com.android.tools.build:gradle:7.0.2'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.1.1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
@@ -61,14 +61,17 @@ var autoAndroidVersionCode =
 subprojects {
     afterEvaluate {
         android {
-            compileSdkVersion 30
+            buildFeatures {
+                viewBinding true
+            }
+            compileSdkVersion 31
             compileOptions {
                 sourceCompatibility 1.8
                 targetCompatibility 1.8
             }
             defaultConfig {
                 minSdkVersion 19
-                targetSdkVersion 30
+                targetSdkVersion 31
                 versionCode autoAndroidVersionCode
                 versionName sdkVersion
                 testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
