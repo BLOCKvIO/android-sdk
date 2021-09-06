@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 // SDK details
-var sdkVersion = "4.0.2"
+def sdkVersion = "4.0.2"
 
 buildscript {
     ext.kotlin_version = '1.5.30'
@@ -30,6 +30,7 @@ allprojects {
 
 // Dependencies that all sub-projects use
 subprojects {
+    apply plugin: 'kotlin-kapt'
     afterEvaluate {
         dependencies {
 
@@ -44,6 +45,14 @@ subprojects {
             // RxAndroid
             implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
             implementation 'io.reactivex.rxjava2:rxjava:2.2.14'
+
+            // Room
+            def room_version = "2.3.0"//"2.2.4" // <-- NOTE: Can't build later versions on M1 Mac : https://stackoverflow.com/a/67072556/1008736
+            implementation "androidx.room:room-runtime:$room_version"
+            implementation "androidx.room:room-ktx:$room_version"
+            implementation "androidx.room:room-rxjava2:$room_version"
+//            annotationProcessor "androidx.room:room-compiler:$room_version"
+            kapt "androidx.room:room-compiler:$room_version"
 
         }
     }
