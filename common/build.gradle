@@ -4,4 +4,5 @@ apply plugin: 'maven-publish'
 
 dependencies {
   implementation 'com.neovisionaries:nv-websocket-client:2.8'
+  implementation 'androidx.room:room-rxjava2:2.3.0'
 }

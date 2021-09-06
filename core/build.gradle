@@ -4,9 +4,14 @@ apply plugin: 'maven-publish'
 
 dependencies {
   implementation 'com.neovisionaries:nv-websocket-client:2.8'
-  implementation "androidx.room:room-paging:2.4.0-alpha04"
   implementation 'androidx.paging:paging-runtime-ktx:3.0.1'
   implementation 'androidx.paging:paging-rxjava2-ktx:3.0.1'
+
+  // Room
+  def room_version = "2.3.0"
+  implementation "androidx.room:room-runtime:$room_version"
+  annotationProcessor "androidx.room:room-compiler:$room_version"
+  implementation "androidx.room:room-rxjava2:$room_version"
 
   implementation project(':common')
   implementation project(':face')
