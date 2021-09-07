@@ -29,6 +29,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLConnection
 import java.util.*
+import java.util.logging.Logger
 import kotlin.collections.HashMap
 
 class HttpClient(
@@ -87,8 +88,8 @@ class HttpClient(
     headers["Content-Type"] = "application/json"
     request.headers = headers
     request.payload = payload
-
     val requestResponse = request.execute()
+    Logger.getLogger("BLOCKv").info("API Call: ${request.endpoint!!} returned ${requestResponse.first}")
     if (requestResponse.first == 200) {
       val response: JSONObject = requestResponse.second
       try {
