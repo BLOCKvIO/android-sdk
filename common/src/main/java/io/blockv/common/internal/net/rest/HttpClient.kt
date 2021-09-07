@@ -89,7 +89,6 @@ class HttpClient(
     request.headers = headers
     request.payload = payload
     val requestResponse = request.execute()
-    Logger.getLogger("BLOCKv").info("API Call: ${request.endpoint!!} returned ${requestResponse.first}")
     if (requestResponse.first == 200) {
       val response: JSONObject = requestResponse.second
       try {
