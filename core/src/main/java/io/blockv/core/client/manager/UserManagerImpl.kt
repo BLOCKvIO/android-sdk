@@ -192,6 +192,9 @@ class UserManagerImpl(
     // Empty out current access token, if any
     authenticator.setToken(null)
 
+    // Fetch a new access token from the refresh token
+    authenticator.refreshToken()
+
     // Refresh asset providers
     api.refreshAssetProviders()
 
