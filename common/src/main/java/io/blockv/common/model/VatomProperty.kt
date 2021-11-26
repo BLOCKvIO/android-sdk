@@ -20,6 +20,9 @@ class VatomProperty() : Model {
   @Serializer.Serialize
   var commerce: Commerce? = null
 
+  @Serializer.Serialize(name = "activate_action")
+  var activateAction: String? = null
+
   @Serializer.Serialize(name = "acquirable")
   var isAcquireable: Boolean = false
 

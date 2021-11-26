@@ -26,6 +26,11 @@ allprojects {
         maven { url "https://maven.google.com" }
         google()
     }
+    configurations.all {
+        resolutionStrategy {
+            force 'org.xerial:sqlite-jdbc:3.34.0'
+        }
+    }
 }
 
 // Dependencies that all sub-projects use
