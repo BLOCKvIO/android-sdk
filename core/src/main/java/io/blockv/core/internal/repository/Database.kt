@@ -13,7 +13,7 @@ import io.blockv.common.model.Face
 import io.blockv.common.model.Vatom
 import io.blockv.core.internal.repository.dao.VatomDao
 
-@Database(entities = [Vatom::class, Face::class, Action::class], version = 5)
+@Database(entities = [Vatom::class, Face::class, Action::class], version = 6)
 @TypeConverters(
   JsonConverter::class,
   StringListConverter::class,
